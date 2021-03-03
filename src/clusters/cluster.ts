@@ -16,6 +16,7 @@ interface PlaceClusterDetails {
     run_count?: PlaceClusterRunCounts;
 }
 interface PlaceClusterComplete extends PlaceCluster {
+    core_id?: string;
     status: HashMap;
     load: {
         local: PlaceClusterDetails;
@@ -63,7 +64,7 @@ export class PlaceCluster {
     public readonly run_counts: PlaceClusterRunCounts;
 
     constructor(raw_data: Partial<PlaceClusterComplete> = {}) {
-        this.id = raw_data.id || '';
+        this.id = raw_data.id || raw_data.core_id || '';
         this.compiled_drivers = raw_data.compiled_drivers || [];
         this.available_repositories =
             raw_data.available_repositories || raw_data.status?.available_repositories || [];
