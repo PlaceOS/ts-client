@@ -5,7 +5,7 @@ interface PlaceClusterRunCounts {
     modules: number;
     drivers: number;
 }
-interface PlaceClusterDetails {
+export interface PlaceClusterNode {
     hostname: string;
     cpu_count: number;
     core_cpu: number;
@@ -15,12 +15,13 @@ interface PlaceClusterDetails {
     core_memory: number;
     run_count?: PlaceClusterRunCounts;
 }
+
 interface PlaceClusterComplete extends PlaceCluster {
     core_id?: string;
     status: HashMap;
     load: {
-        local: PlaceClusterDetails;
-        edge: HashMap<PlaceClusterDetails>;
+        local: PlaceClusterNode;
+        edge: HashMap<PlaceClusterNode>;
     };
 }
 export class PlaceCluster {
@@ -59,7 +60,7 @@ export class PlaceCluster {
     /** Display string for the memory total */
     public readonly total_memory: string;
     /** List of edge nodes within the cluster */
-    public readonly edge_nodes: PlaceClusterDetails[];
+    public readonly edge_nodes: PlaceClusterNode[];
 
     public readonly run_counts: PlaceClusterRunCounts;
 
