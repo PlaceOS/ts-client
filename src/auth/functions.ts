@@ -109,7 +109,7 @@ export function token(return_expired: boolean = true): string {
     }
     const expires_at = `${_storage.getItem(`${_client_id}_expires_at`)}`;
     const access_token = _access_token.getValue();
-    if (isBefore(new Date(+expires_at), new Date())) {
+    if (isBefore(+expires_at, new Date())) {
         log('Auth', 'Token expired. Requesting new token...');
         invalidateToken();
         authorise();
