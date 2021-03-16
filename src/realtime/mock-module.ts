@@ -10,6 +10,7 @@ export class MockPlaceWebsocketModule {
         protected _system: MockPlaceWebsocketSystem,
         properties: HashMap
     ) {
+        const proto_fn = Object.getOwnPropertyNames(Object.getPrototypeOf(properties || {})).filter(_ => _.startsWith('$'));
         for (const key in properties) {
             /* istanbul ignore else */
             if (
@@ -21,6 +22,11 @@ export class MockPlaceWebsocketModule {
                 } else {
                     this.addProperty(key, properties[key]);
                 }
+            }
+        }
+        for(const fn of proto_fn) {
+            if (properties[fn] instanceof Function) {
+                this.addMethod(fn, properties[fn]);
             }
         }
     }
