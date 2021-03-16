@@ -1,7 +1,15 @@
 import { MockPlaceWebsocketModule } from '../../src/realtime/mock-module';
 
+class TestModule {
+    public value = 0;
+    $testFn() {
+        this.value++;
+    }
+}
+
 describe('MockPlaceWebsocketModule', () => {
     let module: MockPlaceWebsocketModule;
+    let test: MockPlaceWebsocketModule;
     const system = {
         Bookings: [
             {
@@ -16,6 +24,7 @@ describe('MockPlaceWebsocketModule', () => {
                 },
             },
         ],
+        Test: [new TestModule()],
         Other: [
             {
                 test: 20,
@@ -28,10 +37,15 @@ describe('MockPlaceWebsocketModule', () => {
             system as any,
             system.Bookings[0]
         );
+        test = new MockPlaceWebsocketModule(
+            system as any,
+            system.Test[0]
+        );
     });
 
     it('should create an instance', () => {
         expect(module).toBeTruthy();
+        expect(test).toBeTruthy();
     });
 
     it('should allow getting binding values', () => {
