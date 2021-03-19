@@ -18,6 +18,8 @@ export class PlaceMetadata {
     public readonly details: HashMap | any[];
     /** List user groups allowed to edit the metadata */
     public readonly editors: readonly string [];
+    /** JSON schema associated with the metadata details */
+    public readonly schema: string;
 
     constructor(data: PlaceMetadataComplete = {}) {
         this.id = data.id || data.parent_id || '';
@@ -25,5 +27,6 @@ export class PlaceMetadata {
         this.description = data.description || '';
         this.details = data.details || {};
         this.editors = data.editors || [];
+        this.schema = data.schema || '';
     }
 }
