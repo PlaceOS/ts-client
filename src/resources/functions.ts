@@ -82,7 +82,7 @@ export function query<T>(q: QueryParameters<T>): QueryResponse<T> {
         map((resp: HashMap) => {
             const details = handleHeaders(url, query_str, path);
             return {
-                total: details.total || resp?.total,
+                total: details.total || resp?.total || 0,
                 next: details.next
                     ? () => query({ query_params: details.next as HashMap, fn, path })
                     : null,
