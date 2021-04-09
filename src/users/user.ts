@@ -36,6 +36,8 @@ export class PlaceUser extends PlaceResource {
     public readonly sys_admin: boolean;
     /** Name of the active theme on the displayed UI */
     public readonly ui_theme: string;
+    /** Card Number associated with the user */
+    public readonly card_number: string;
     /** Password */
     protected password = '';
     /** Password */
@@ -58,7 +60,7 @@ export class PlaceUser extends PlaceResource {
         this.support = !!raw_data.support;
         this.sys_admin = !!raw_data.sys_admin;
         this.ui_theme = raw_data.ui_theme || '';
+        this.card_number = raw_data.card_number || '';
         this.groups = raw_data.groups || [];
-
     }
 }
