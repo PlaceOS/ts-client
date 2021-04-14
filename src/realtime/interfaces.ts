@@ -107,6 +107,7 @@ export enum PlaceLogLevel {
     Warning = 'warn',
     Error = 'error',
     Fatal = 'fatal',
+    Trace = 'trace',
 }
 
 /** Metadata associated with Place Debug events */
