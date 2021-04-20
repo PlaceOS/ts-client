@@ -6,8 +6,17 @@ import { fromFetch } from 'rxjs/fetch';
 import { map } from 'rxjs/operators';
 import { Md5 } from 'ts-md5/dist/md5';
 import { toQueryString } from '../utilities/api';
-import { clearAsyncTimeout, destroyWaitingAsync, timeout } from '../utilities/async';
-import { generateNonce, getFragments, log, removeFragment } from '../utilities/general';
+import {
+    clearAsyncTimeout,
+    destroyWaitingAsync,
+    timeout,
+} from '../utilities/async';
+import {
+    generateNonce,
+    getFragments,
+    log,
+    removeFragment,
+} from '../utilities/general';
 import { HashMap } from '../utilities/types';
 import {
     AuthorizeDetails,
@@ -75,7 +84,9 @@ const _online_observer = _online.asObservable();
 /** API Endpoint for the retrieved version of PlaceOS */
 export function apiEndpoint(): string {
     const secure = _options.secure || location.protocol.indexOf('https') >= 0;
-    const api_host = `${secure ? 'https:' : 'http:'}//${_options.host || location.host}`;
+    const api_host = `${secure ? 'https:' : 'http:'}//${
+        _options.host || location.host
+    }`;
     return `${api_host}${httpRoute()}`;
 }
 
@@ -122,7 +133,11 @@ export function token(return_expired: boolean = true): string {
 
 /** Refresh token for renewing the access token */
 export function refreshToken(): string {
-    return _refresh_token.getValue() || _storage.getItem(`${_client_id}_refresh_token`) || '';
+    return (
+        _refresh_token.getValue() ||
+        _storage.getItem(`${_client_id}_refresh_token`) ||
+        ''
+    );
 }
 
 /** Host domain of the PlaceOS server */
@@ -282,12 +297,17 @@ export function authorise(
                         },
                     ];
                     if (_options && _options.auth_type === 'password') {
-                        generateTokenWithCredentials(_options).then(...token_handlers);
+                        generateTokenWithCredentials(_options).then(
+                            ...token_handlers
+                        );
                     } else if (_code || refreshToken()) {
                         generateToken().then(...token_handlers);
                     } else {
                         if (api_authority!.session) {
-                            log('Auth', 'Users has session. Authorising application...');
+                            log(
+                                'Auth',
+                                'Users has session. Authorising application...'
+                            );
                             sendToAuthorize(state).then(...token_handlers);
                         } else {
                             log('Auth', 'No user session');
@@ -342,22 +362,32 @@ export function loadAuthority(tries: number = 0): Promise<void> {
             }
             log('Auth', `Fixed: ${isFixedDevice()} | Trusted: ${isTrusted()}`);
             log('Auth', `Loading authority...`);
-            const secure = _options.secure || location.protocol.indexOf('https') >= 0;
+            const secure =
+                _options.secure || location.protocol.indexOf('https') >= 0;
             const on_error = (err: any) => {
                 log('Auth', `Failed to load authority(${err})`);
                 _online.next(false);
                 // Retry if authority fails to load
-                timeout('load_authority', () => {
-                    delete _promises.load_authority;
-                    loadAuthority(tries).then((_) => resolve());
-                }, 300 * Math.min(20, ++tries));
+                timeout(
+                    'load_authority',
+                    () => {
+                        delete _promises.load_authority;
+                        loadAuthority(tries).then((_) => resolve());
+                    },
+                    300 * Math.min(20, ++tries)
+                );
             };
-            fromFetch(`${secure ? 'https:' : 'http:'}//${host()}/auth/authority`, {
-                credentials: 'same-origin',
-            }).subscribe(async (resp) => {
+            fromFetch(
+                `${secure ? 'https:' : 'http:'}//${host()}/auth/authority`,
+                {
+                    credentials: 'same-origin',
+                }
+            ).subscribe(async (resp) => {
                 if (!resp.ok) return on_error(await resp.json());
                 _authority = (await resp.json()) as PlaceAuthority;
-                _route = !/[2-9]\.[0-9]+\.[0-9]+/g.test(_authority.version || '')
+                _route = !/[2-9]\.[0-9]+\.[0-9]+/g.test(
+                    _authority.version || ''
+                )
                     ? `/control/api`
                     : `/api/engine/v2`;
 
@@ -406,7 +436,10 @@ export function authorizeWithIFrame(url: string): Promise<void> {
             iframe.id = 'place-authorize';
             iframe.src = `${url}`;
             const callback = (event: MessageEvent) => {
-                if (event.origin === location.origin && event.data.type === 'place-os') {
+                if (
+                    event.origin === location.origin &&
+                    event.data.type === 'place-os'
+                ) {
                     const data: AuthorizeDetails = event.data;
                     log('Auth', 'Received credentials from iFrame...');
                     document.body.removeChild(iframe);
@@ -415,7 +448,10 @@ export function authorizeWithIFrame(url: string): Promise<void> {
                     delete _promises.iframe_auth;
                     if (data.token) {
                         resolve();
-                        return _storeTokenDetails({ access_token: data.token, ...data } as any);
+                        return _storeTokenDetails({
+                            access_token: data.token,
+                            ...data,
+                        } as any);
                     }
                     _code = data.code || '';
                     generateToken().then(
@@ -424,10 +460,14 @@ export function authorizeWithIFrame(url: string): Promise<void> {
                     );
                 }
             };
-            timeout('iframe_auth', () => {
-                log('Auth', 'Unable to resolve iFrame after 15 seconds...');
-                reject();
-            }, 15 * 1000);
+            timeout(
+                'iframe_auth',
+                () => {
+                    log('Auth', 'Unable to resolve iFrame after 15 seconds...');
+                    reject();
+                },
+                15 * 1000
+            );
             window.addEventListener('message', callback);
             iframe.onerror = (_) => {
                 log('Auth', 'iFrame error.', _);
@@ -449,7 +489,10 @@ export function sendToLogin(api_authority: PlaceAuthority): void {
     if (_options.handle_login !== false) {
         log('Auth', 'Redirecting to login page...');
         // Redirect to login form
-        const url = api_authority!.login_url?.replace('{{url}}', encodeURIComponent(location.href));
+        const url = api_authority!.login_url?.replace(
+            '{{url}}',
+            encodeURIComponent(location.href)
+        );
         setTimeout(() => window.location.assign(url), 300);
     } else {
         log('Auth', 'Login being handled locally.');
@@ -489,12 +532,19 @@ export function checkForAuthParameters(): Promise<boolean> {
         _promises.check_params = new Promise((resolve) => {
             log('Auth', 'Checking for auth parameters...');
             let fragments = getFragments();
-            if ((!fragments || Object.keys(fragments).length <= 0) && sessionStorage) {
-                fragments = JSON.parse(sessionStorage.getItem('ENGINE.auth.params') || '{}');
+            if (
+                (!fragments || Object.keys(fragments).length <= 0) &&
+                sessionStorage
+            ) {
+                fragments = JSON.parse(
+                    sessionStorage.getItem('ENGINE.auth.params') || '{}'
+                );
             }
             if (
                 fragments &&
-                (fragments.code || fragments.access_token || fragments.refresh_token)
+                (fragments.code ||
+                    fragments.access_token ||
+                    fragments.refresh_token)
             ) {
                 // Store authorisation code
                 if (fragments.code) {
@@ -503,10 +553,14 @@ export function checkForAuthParameters(): Promise<boolean> {
                 }
                 // Store refresh token
                 if (fragments.refresh_token) {
-                    _storage.setItem(`${_client_id}_refresh_token`, fragments.refresh_token);
+                    _storage.setItem(
+                        `${_client_id}_refresh_token`,
+                        fragments.refresh_token
+                    );
                     removeFragment('refresh_token');
                 }
-                const saved_nonce = _storage.getItem(`${_client_id}_nonce`) || '';
+                const saved_nonce =
+                    _storage.getItem(`${_client_id}_nonce`) || '';
                 const state_parts = (fragments.state || '').split(';');
                 removeFragment('state');
                 removeFragment('token_type');
@@ -521,7 +575,11 @@ export function checkForAuthParameters(): Promise<boolean> {
             } else {
                 resolve(false);
             }
-            timeout('check_params_promise', () => delete _promises.check_params, 50);
+            timeout(
+                'check_params_promise',
+                () => delete _promises.check_params,
+                50
+            );
         });
     }
     return _promises.check_params as Promise<boolean>;
@@ -535,9 +593,13 @@ export function checkForAuthParameters(): Promise<boolean> {
 export function createLoginURL(state?: string): string {
     const nonce = createAndSaveNonce();
     state = state ? `${nonce};${state}` : nonce;
-    const has_query = _options ? (_options.auth_uri || '').indexOf('?') >= 0 : false;
-    const login_url = (_options ? _options.auth_uri : null) || '/auth/oauth/authorize';
-    const response_type = isTrusted() || _options.auth_type === 'auth_code' ? 'code' : 'token';
+    const has_query = _options
+        ? (_options.auth_uri || '').indexOf('?') >= 0
+        : false;
+    const login_url =
+        (_options ? _options.auth_uri : null) || '/auth/oauth/authorize';
+    const response_type =
+        isTrusted() || _options.auth_type === 'auth_code' ? 'code' : 'token';
     let url =
         `${login_url}${has_query ? '&' : '?'}` +
         `response_type=${encodeURIComponent(response_type)}` +
@@ -557,7 +619,9 @@ export function createLoginURL(state?: string): string {
 /**
  * @private
  */
-const AVAILABLE_CHARS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('');
+const AVAILABLE_CHARS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split(
+    ''
+);
 /**
  * @private
  * @param length Length of the challenge string
@@ -565,7 +629,12 @@ const AVAILABLE_CHARS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ012
 export function generateChallenge(length: number = 43) {
     const challenge = new Array(length)
         .fill(0)
-        .map(() => AVAILABLE_CHARS[Math.floor(Math.random() * AVAILABLE_CHARS.length)])
+        .map(
+            () =>
+                AVAILABLE_CHARS[
+                    Math.floor(Math.random() * AVAILABLE_CHARS.length)
+                ]
+        )
         .join('');
     const uint8array = base64.base64ToBytes(base64.base64encode(challenge));
     const verify = base64
@@ -635,19 +704,18 @@ export function revokeToken(): Promise<void> {
                 reject(err);
                 delete _promises.revoke_token;
             };
-            fromFetch(`${token_uri}?token=${token()}`, { method: 'POST' }).subscribe(
-                (r: Response) => {
-                    if (!r.ok) return on_error(r);
-                    log('Auth', 'Successfully revoked token.');
-                    _access_token.next('');
-                    _refresh_token.next('');
-                    _storage.removeItem(`${_client_id}_access_token`);
-                    _storage.removeItem(`${_client_id}_refresh_token`);
-                    resolve();
-                    delete _promises.revoke_token;
-                },
-                on_error
-            );
+            fromFetch(`${token_uri}?token=${token()}`, {
+                method: 'POST',
+            }).subscribe((r: Response) => {
+                if (!r.ok) return on_error(r);
+                log('Auth', 'Successfully revoked token.');
+                _access_token.next('');
+                _refresh_token.next('');
+                _storage.removeItem(`${_client_id}_access_token`);
+                _storage.removeItem(`${_client_id}_refresh_token`);
+                resolve();
+                delete _promises.revoke_token;
+            }, on_error);
         });
     }
     return _promises.revoke_token;
@@ -685,13 +753,16 @@ export function generateTokenWithUrl(url: string): Promise<void> {
                 reject();
                 delete _promises.generate_tokens;
             };
-            fromFetch(url, { method: 'POST' }).subscribe(async (r: Response) => {
-                if (!r.ok) return on_error(r);
-                const tokens = await r.json();
-                _storeTokenDetails(tokens);
-                resolve();
-                delete _promises.generate_tokens;
-            }, on_error);
+            fromFetch(url, { method: 'POST' }).subscribe(
+                async (r: Response) => {
+                    if (!r.ok) return on_error(r);
+                    const tokens = await r.json();
+                    _storeTokenDetails(tokens);
+                    resolve();
+                    delete _promises.generate_tokens;
+                },
+                on_error
+            );
         });
     }
     return _promises.generate_tokens as Promise<void>;
@@ -703,17 +774,26 @@ export function generateTokenWithUrl(url: string): Promise<void> {
  * @param details
  */
 export function _storeTokenDetails(details: PlaceTokenResponse) {
-    const expires_at = addSeconds(new Date(), Math.max(60, parseInt(details.expires_in, 10) - 300));
+    const expires_at = addSeconds(
+        new Date(),
+        Math.max(60, parseInt(details.expires_in, 10) - 300)
+    );
     log('Auth', 'Tokens generated storing...');
     if (isTrusted()) {
         // Store access token
         if (details.access_token) {
-            _storage.setItem(`${_client_id}_access_token`, details.access_token);
+            _storage.setItem(
+                `${_client_id}_access_token`,
+                details.access_token
+            );
             removeFragment('access_token');
         }
         // Store refresh token
         if (details.refresh_token) {
-            _storage.setItem(`${_client_id}_refresh_token`, details.refresh_token);
+            _storage.setItem(
+                `${_client_id}_refresh_token`,
+                details.refresh_token
+            );
             removeFragment('refresh_token');
         }
     }
