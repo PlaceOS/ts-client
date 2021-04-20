@@ -167,7 +167,10 @@ export function onlineState(): Observable<boolean> {
 
 /** Whether this application is trusted */
 export function isTrusted(): boolean {
-    return checkStoreForAuthParam('trust') === 'true';
+    return (
+        checkStoreForAuthParam('trust') === 'true' ||
+        checkStoreForAuthParam('trusted') === 'true'
+    );
 }
 
 /** Whether this application is on a fixed location device */
