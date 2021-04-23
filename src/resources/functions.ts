@@ -84,7 +84,12 @@ export function query<T>(q: QueryParameters<T>): QueryResponse<T> {
             return {
                 total: details.total || resp?.total || 0,
                 next: details.next
-                    ? () => query({ query_params: details.next as HashMap, fn, path })
+                    ? () =>
+                          query({
+                              query_params: details.next as HashMap,
+                              fn,
+                              path,
+                          })
                     : null,
                 data:
                     resp && resp instanceof Array
@@ -106,7 +111,9 @@ export function query<T>(q: QueryParameters<T>): QueryResponse<T> {
 export function show<T>(details: ShowParameters<T>): Observable<T> {
     const { query_params, id, path, fn } = details;
     const query_str = toQueryString(query_params);
-    const url = `${apiEndpoint()}/${path || 'resource'}/${id}${query_str ? '?' + query_str : ''}`;
+    const url = `${apiEndpoint()}/${path || 'resource'}/${id}${
+        query_str ? '?' + query_str : ''
+    }`;
     return get(url).pipe(map((resp: any) => fn(resp)));
 }
 
@@ -119,7 +126,9 @@ export function show<T>(details: ShowParameters<T>): Observable<T> {
 export function create<T>(details: CreateParameters<T>): Observable<T> {
     const { query_params, form_data, path, fn } = details;
     const query_str = toQueryString(query_params);
-    const url = `${apiEndpoint()}/${path || 'resource'}${query_str ? '?' + query_str : ''}`;
+    const url = `${apiEndpoint()}/${path || 'resource'}${
+        query_str ? '?' + query_str : ''
+    }`;
     const observable = post(url, form_data).pipe(map((resp: any) => fn(resp)));
     return observable;
 }
@@ -139,10 +148,15 @@ export function task<T = any>(details: TaskParameters<T>): Observable<T> {
     const request =
         method === 'post' || method === 'put' || !method
             ? (method === 'put' ? put : post)(url, form_data)
-            : (method === 'del' ? del : get)(`${url}${query_str ? '?' + query_str : ''}`, {
-                  response_type: 'json',
-              });
-    return request.pipe(map((resp: HashMap) => (callback || ((_: any) => _))(resp)));
+            : (method === 'del' ? del : get)(
+                  `${url}${query_str ? '?' + query_str : ''}`,
+                  {
+                      response_type: 'json',
+                  }
+              );
+    return request.pipe(
+        map((resp: HashMap) => (callback || ((_: any) => _))(resp))
+    );
 }
 
 /**
@@ -154,9 +168,16 @@ export function task<T = any>(details: TaskParameters<T>): Observable<T> {
  */
 export function update<T>(details: UpdateParameters<T>): Observable<T> {
     const { id, query_params, form_data, method, path, fn } = details;
-    const query_str = toQueryString({ ...query_params, version: form_data.version || 0 });
-    const url = `${apiEndpoint()}/${path || 'resource'}/${id}${query_str ? '?' + query_str : ''}`;
-    return (method === 'put' ? put : patch)(url, form_data).pipe(map((resp: any) => fn(resp)));
+    const query_str = toQueryString({
+        ...query_params,
+        version: form_data.version || 0,
+    });
+    const url = `${apiEndpoint()}/${path || 'resource'}/${id}${
+        query_str ? '?' + query_str : ''
+    }`;
+    return (method === 'put' ? put : patch)(url, form_data).pipe(
+        map((resp: any) => fn(resp))
+    );
 }
 
 /**
@@ -167,7 +188,9 @@ export function update<T>(details: UpdateParameters<T>): Observable<T> {
 export function remove(details: RemoveParameters): Observable<HashMap> {
     const { id, query_params, path } = details;
     const query_str = toQueryString(query_params);
-    const url = `${apiEndpoint()}/${path || 'resource'}/${id}${query_str ? '?' + query_str : ''}`;
+    const url = `${apiEndpoint()}/${path || 'resource'}/${id}${
+        query_str ? '?' + query_str : ''
+    }`;
     return del(url);
 }
 
@@ -179,17 +202,23 @@ export function remove(details: RemoveParameters): Observable<HashMap> {
  */
 export function handleHeaders(url: string, query_str: string, name: string) {
     const headers = responseHeaders(url);
-    const details: { total: number; next: HashMap<string> | null } = { total: 0, next: null };
+    const details: { total: number; next: HashMap<string> | null } = {
+        total: 0,
+        next: null,
+    };
     if (headers && headers['x-total-count']) {
         const total_value = +(headers['x-total-count'] || 0);
-        if (query_str.length < 2 || (query_str.length < 12 && query_str.indexOf('offset=') >= 0)) {
+        if (
+            query_str.length < 2 ||
+            (query_str.length < 12 && query_str.indexOf('offset=') >= 0)
+        ) {
             _total[name] = total_value;
         }
         _last_total[name] = total_value;
         details.total = total_value;
     }
-    if (headers && headers.Link) {
-        const link_map = parseLinkHeader(headers.Link || '');
+    if (headers && headers.link) {
+        const link_map = parseLinkHeader(headers.link || '');
         _next = link_map.next;
         details.next = convertPairStringToMap(_next.split('?')[1]);
     }

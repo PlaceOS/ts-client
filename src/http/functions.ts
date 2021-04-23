@@ -47,12 +47,19 @@ export function responseHeaders(
  * @param url URL of the GET endpoint
  * @param options Options to add to the request
  */
-export function get(url: string, options?: HttpJsonOptions): Observable<HashMap>;
+export function get(
+    url: string,
+    options?: HttpJsonOptions
+): Observable<HashMap>;
 export function get(url: string, options?: HttpTextOptions): Observable<string>;
 export function get(
     url: string,
     options?: HttpOptions,
-    handler: (m: HttpVerb, url: string, opts: HttpOptions) => Observable<HttpResponse> = request
+    handler: (
+        m: HttpVerb,
+        url: string,
+        opts: HttpOptions
+    ) => Observable<HttpResponse> = request
 ): Observable<HttpResponse> {
     /* istanbul ignore else */
     if (!options) {
@@ -67,13 +74,25 @@ export function get(
  * @param body Body contents of the request
  * @param options Options to add to the request
  */
-export function post(url: string, body: any, options?: HttpJsonOptions): Observable<HashMap>;
-export function post(url: string, body: any, options?: HttpTextOptions): Observable<string>;
+export function post(
+    url: string,
+    body: any,
+    options?: HttpJsonOptions
+): Observable<HashMap>;
+export function post(
+    url: string,
+    body: any,
+    options?: HttpTextOptions
+): Observable<string>;
 export function post(
     url: string,
     body: any,
     options?: HttpOptions,
-    handler: (m: HttpVerb, url: string, opts: HttpOptions) => Observable<HttpResponse> = request
+    handler: (
+        m: HttpVerb,
+        url: string,
+        opts: HttpOptions
+    ) => Observable<HttpResponse> = request
 ): Observable<HttpResponse> {
     /* istanbul ignore else */
     if (!options) {
@@ -88,13 +107,25 @@ export function post(
  * @param body Body contents of the request
  * @param options Options to add to the request
  */
-export function put(url: string, body: any, options?: HttpJsonOptions): Observable<HashMap>;
-export function put(url: string, body: any, options?: HttpTextOptions): Observable<string>;
+export function put(
+    url: string,
+    body: any,
+    options?: HttpJsonOptions
+): Observable<HashMap>;
+export function put(
+    url: string,
+    body: any,
+    options?: HttpTextOptions
+): Observable<string>;
 export function put(
     url: string,
     body: any,
     options?: HttpOptions,
-    handler: (m: HttpVerb, url: string, opts: HttpOptions) => Observable<HttpResponse> = request
+    handler: (
+        m: HttpVerb,
+        url: string,
+        opts: HttpOptions
+    ) => Observable<HttpResponse> = request
 ): Observable<HttpResponse> {
     /* istanbul ignore else */
     if (!options) {
@@ -109,13 +140,25 @@ export function put(
  * @param body Body contents of the request
  * @param options Options to add to the request
  */
-export function patch(url: string, body: any, options?: HttpJsonOptions): Observable<HashMap>;
-export function patch(url: string, body: any, options?: HttpTextOptions): Observable<string>;
+export function patch(
+    url: string,
+    body: any,
+    options?: HttpJsonOptions
+): Observable<HashMap>;
+export function patch(
+    url: string,
+    body: any,
+    options?: HttpTextOptions
+): Observable<string>;
 export function patch(
     url: string,
     body: any,
     options?: HttpOptions,
-    handler: (m: HttpVerb, url: string, opts: HttpOptions) => Observable<HttpResponse> = request
+    handler: (
+        m: HttpVerb,
+        url: string,
+        opts: HttpOptions
+    ) => Observable<HttpResponse> = request
 ): Observable<HttpResponse> {
     /* istanbul ignore else */
     if (!options) {
@@ -129,13 +172,20 @@ export function patch(
  * @param url URL of the DELETE endpoint
  * @param options Options to add to the request
  */
-export function del(url: string, options?: HttpJsonOptions): Observable<HashMap>;
+export function del(
+    url: string,
+    options?: HttpJsonOptions
+): Observable<HashMap>;
 export function del(url: string, options?: HttpTextOptions): Observable<string>;
 export function del(url: string, options?: HttpVoidOptions): Observable<void>;
 export function del(
     url: string,
     options?: HttpOptions,
-    handler: (m: HttpVerb, url: string, opts: HttpOptions) => Observable<HttpResponse> = request
+    handler: (
+        m: HttpVerb,
+        url: string,
+        opts: HttpOptions
+    ) => Observable<HttpResponse> = request
 ): Observable<HttpResponse> {
     /* istanbul ignore else */
     if (!options) {
@@ -161,7 +211,9 @@ export async function transform(
         if (resp.headers.forEach) {
             resp.headers.forEach((v, k) => (map[k.toLowerCase()] = v));
         } else {
-            Object.keys(resp.headers).forEach((k) => (map[k] = (resp as any).headers[k]));
+            Object.keys(resp.headers).forEach(
+                (k) => (map[k.toLowerCase()] = (resp as any).headers[k])
+            );
         }
         headers[resp.url || ''] = map;
     }
@@ -196,8 +248,14 @@ export function request(
     url: string,
     options: HttpOptions,
     is_mock: () => boolean = isMock,
-    mock_handler: (m: HttpVerb, url: string) => Observable<HttpResponse> | null = mockRequest,
-    success: (e: Response, t: HttpResponseType) => Promise<HttpResponse> = transform
+    mock_handler: (
+        m: HttpVerb,
+        url: string
+    ) => Observable<HttpResponse> | null = mockRequest,
+    success: (
+        e: Response,
+        t: HttpResponseType
+    ) => Promise<HttpResponse> = transform
 ): Observable<HttpResponse> {
     if (is_mock()) {
         const request_obs = mock_handler(method, url);
