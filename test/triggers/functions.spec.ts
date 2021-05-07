@@ -42,10 +42,10 @@ describe('Triggers API', () => {
         expect(item).toBeFalsy();
     });
 
-    it('should allow listing trigger\'s systems', async () => {
+    it("should allow listing trigger's instances", async () => {
         const spy = jest.spyOn(Resources, 'task');
         spy.mockImplementation((_: any) => of(_.callback([{}]) as any));
-        const item = await SERVICE.listTriggerSystems('1').toPromise();
-        expect(item[0]).toBeInstanceOf(PlaceSystem);
+        const item = await SERVICE.listTriggerInstances('1').toPromise();
+        expect(item[0]).toBeInstanceOf(PlaceTrigger);
     });
 });
