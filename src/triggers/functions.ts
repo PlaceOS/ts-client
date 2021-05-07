@@ -1,5 +1,12 @@
 import { Observable } from 'rxjs';
-import { create, query, remove, show, task, update } from '../resources/functions';
+import {
+    create,
+    query,
+    remove,
+    show,
+    task,
+    update,
+} from '../resources/functions';
 import { PlaceResourceQueryOptions } from '../resources/interface';
 import { PlaceSystem } from '../systems/system';
 import { HashMap } from '../utilities/types';
@@ -28,7 +35,10 @@ export function queryTriggers(query_params: PlaceResourceQueryOptions = {}) {
  * @param id ID of the trigger to retrieve
  * @param query_params Query parameters to add the to request URL
  */
-export function showTrigger(id: string, query_params: PlaceResourceQueryOptions = {}) {
+export function showTrigger(
+    id: string,
+    query_params: PlaceResourceQueryOptions = {}
+) {
     return show({ id, query_params, fn: process, path: PATH });
 }
 
@@ -44,7 +54,14 @@ export function updateTrigger(
     form_data: Partial<PlaceTrigger>,
     method: 'put' | 'patch' = 'patch'
 ) {
-    return update({ id, form_data, query_params: {}, method, fn: process, path: PATH });
+    return update({
+        id,
+        form_data,
+        query_params: {},
+        method,
+        fn: process,
+        path: PATH,
+    });
 }
 
 /**
@@ -69,13 +86,14 @@ export function removeTrigger(id: string, query_params: HashMap = {}) {
  * List systems that contain instances of a trigger
  * @param id ID of the trigger to grab system instances for
  */
-export function listTriggerSystems(id: string): Observable<PlaceSystem[]> {
+export function listTriggerInstances(id: string): Observable<PlaceTrigger[]> {
     return task({
         id,
         task_name: `instances`,
         form_data: {},
         method: 'get',
-        callback: (data: Partial<PlaceSystem>[]) => data.map((sys) => new PlaceSystem(sys)),
+        callback: (data: Partial<PlaceTrigger>[]) =>
+            data.map((i) => new PlaceTrigger(i)),
         path: PATH,
     });
 }

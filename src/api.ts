@@ -220,7 +220,7 @@ export {
     addTrigger,
     updateTrigger,
     removeTrigger,
-    listTriggerSystems,
+    listTriggerInstances,
 } from './triggers/functions';
 export { PlaceTrigger } from './triggers/trigger';
 export {
