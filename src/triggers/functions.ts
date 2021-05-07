@@ -8,7 +8,6 @@ import {
     update,
 } from '../resources/functions';
 import { PlaceResourceQueryOptions } from '../resources/interface';
-import { PlaceSystem } from '../systems/system';
 import { HashMap } from '../utilities/types';
 import { PlaceTrigger } from './trigger';
 

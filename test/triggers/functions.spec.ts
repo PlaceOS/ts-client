@@ -1,8 +1,9 @@
 import { of } from 'rxjs';
-import * as Resources from '../../src/resources/functions';
-import { PlaceSystem } from '../../src/systems/system';
-import * as SERVICE from '../../src/triggers/functions';
+
 import { PlaceTrigger } from '../../src/triggers/trigger';
+
+import * as Resources from '../../src/resources/functions';
+import * as SERVICE from '../../src/triggers/functions';
 
 describe('Triggers API', () => {
     it('should allow querying triggers', async () => {
