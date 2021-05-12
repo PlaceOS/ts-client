@@ -27,11 +27,19 @@ describe('Resource API', () => {
         jest.runOnlyPendingTimers();
         expect(value.data ? value.data : value).toEqual(item || []);
         // Test request with parameters
-        await fn({ fn: (_: any) => _, path: 'resource', ...test2[0] }).toPromise();
+        await fn({
+            fn: (_: any) => _,
+            path: 'resource',
+            ...test2[0],
+        }).toPromise();
         jest.runOnlyPendingTimers();
         // Test error handling
         try {
-            await fn({ fn: (_: any) => _, path: 'resource', ...test1[0] }).toPromise();
+            await fn({
+                fn: (_: any) => _,
+                path: 'resource',
+                ...test1[0],
+            }).toPromise();
             throw new Error('Failed to error');
         } catch (e) {
             expect(e).toBe('An Error Value');
@@ -60,6 +68,11 @@ describe('Resource API', () => {
         }
     });
 
+    it('should return 0 from total requests by default', () => {
+        expect(Resource.requestTotal('any')).toBe(0);
+        expect(Resource.lastRequestTotal('any')).toBe(0);
+    });
+
     it('should allow querying the index endpoint', async () => {
         expect.assertions(8);
         const item = { id: 'test', name: 'Test' };
@@ -84,8 +97,12 @@ describe('Resource API', () => {
             [{}],
             [{ query_params: { test: true } }]
         );
-        expect(Http.get).toBeCalledWith('http://localhost/api/engine/v2/resource');
-        expect(Http.get).toBeCalledWith('http://localhost/api/engine/v2/resource?test=true');
+        expect(Http.get).toBeCalledWith(
+            'http://localhost/api/engine/v2/resource'
+        );
+        expect(Http.get).toBeCalledWith(
+            'http://localhost/api/engine/v2/resource?test=true'
+        );
     });
 
     it('should save index request totals', async () => {
@@ -123,8 +140,12 @@ describe('Resource API', () => {
             [{ id: 'test' }],
             [{ id: 'test', query_params: { test: true } }]
         );
-        expect(Http.get).toBeCalledWith('http://localhost/api/engine/v2/resource/test');
-        expect(Http.get).toBeCalledWith('http://localhost/api/engine/v2/resource/test?test=true');
+        expect(Http.get).toBeCalledWith(
+            'http://localhost/api/engine/v2/resource/test'
+        );
+        expect(Http.get).toBeCalledWith(
+            'http://localhost/api/engine/v2/resource/test?test=true'
+        );
     });
 
     it('should allow adding new items', async () => {
@@ -137,7 +158,10 @@ describe('Resource API', () => {
             [{ form_data: item }],
             [{ form_data: item }]
         );
-        expect(Http.post).toBeCalledWith('http://localhost/api/engine/v2/resource', item);
+        expect(Http.post).toBeCalledWith(
+            'http://localhost/api/engine/v2/resource',
+            item
+        );
     });
 
     it('should allow running POST tasks on items', async () => {
@@ -153,9 +177,12 @@ describe('Resource API', () => {
             'http://localhost/api/engine/v2/resource/test/a_task',
             undefined
         );
-        expect(Http.post).toBeCalledWith('http://localhost/api/engine/v2/resource/test/a_task', {
-            test: true,
-        });
+        expect(Http.post).toBeCalledWith(
+            'http://localhost/api/engine/v2/resource/test/a_task',
+            {
+                test: true,
+            }
+        );
     });
 
     it('should allow updating items', async () => {
@@ -188,8 +215,12 @@ describe('Resource API', () => {
             [{ id: 'test' }],
             [{ id: 'test', query_params: { test: true } }]
         );
-        expect(Http.del).toBeCalledWith('http://localhost/api/engine/v2/resource/test');
-        expect(Http.del).toBeCalledWith('http://localhost/api/engine/v2/resource/test?test=true');
+        expect(Http.del).toBeCalledWith(
+            'http://localhost/api/engine/v2/resource/test'
+        );
+        expect(Http.del).toBeCalledWith(
+            'http://localhost/api/engine/v2/resource/test?test=true'
+        );
     });
 
     it('should allow running GET tasks on items', async () => {
@@ -199,16 +230,27 @@ describe('Resource API', () => {
             Resource.task,
             'success',
             [{ id: 'test', task_name: 'a_task', method: 'get' }],
-            [{ id: 'test', task_name: 'a_task', form_data: { test: true }, method: 'get' }]
+            [
+                {
+                    id: 'test',
+                    task_name: 'a_task',
+                    form_data: { test: true },
+                    method: 'get',
+                },
+            ]
         );
-        expect(Http.get).toBeCalledWith('http://localhost/api/engine/v2/resource/test/a_task', {
-            response_type: 'json',
-        });
-        expect(
-            Http.get
-        ).toBeCalledWith('http://localhost/api/engine/v2/resource/test/a_task?test=true', {
-            response_type: 'json',
-        });
+        expect(Http.get).toBeCalledWith(
+            'http://localhost/api/engine/v2/resource/test/a_task',
+            {
+                response_type: 'json',
+            }
+        );
+        expect(Http.get).toBeCalledWith(
+            'http://localhost/api/engine/v2/resource/test/a_task?test=true',
+            {
+                response_type: 'json',
+            }
+        );
     });
 
     it('should allow getting the next page', () => {

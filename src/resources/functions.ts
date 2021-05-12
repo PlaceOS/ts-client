@@ -82,7 +82,7 @@ export function query<T>(q: QueryParameters<T>): QueryResponse<T> {
         map((resp: HashMap) => {
             const details = handleHeaders(url, query_str, path);
             return {
-                total: details.total || resp?.total || 0,
+                total: details.total || 0,
                 next: details.next
                     ? () =>
                           query({
@@ -111,7 +111,7 @@ export function query<T>(q: QueryParameters<T>): QueryResponse<T> {
 export function show<T>(details: ShowParameters<T>): Observable<T> {
     const { query_params, id, path, fn } = details;
     const query_str = toQueryString(query_params);
-    const url = `${apiEndpoint()}/${path || 'resource'}/${id}${
+    const url = `${apiEndpoint()}/${path}/${id}${
         query_str ? '?' + query_str : ''
     }`;
     return get(url).pipe(map((resp: any) => fn(resp)));
@@ -126,9 +126,7 @@ export function show<T>(details: ShowParameters<T>): Observable<T> {
 export function create<T>(details: CreateParameters<T>): Observable<T> {
     const { query_params, form_data, path, fn } = details;
     const query_str = toQueryString(query_params);
-    const url = `${apiEndpoint()}/${path || 'resource'}${
-        query_str ? '?' + query_str : ''
-    }`;
+    const url = `${apiEndpoint()}/${path}${query_str ? '?' + query_str : ''}`;
     const observable = post(url, form_data).pipe(map((resp: any) => fn(resp)));
     return observable;
 }
@@ -144,7 +142,7 @@ export function create<T>(details: CreateParameters<T>): Observable<T> {
 export function task<T = any>(details: TaskParameters<T>): Observable<T> {
     const { id, task_name, form_data, method, path, callback } = details;
     const query_str = toQueryString(form_data);
-    const url = `${apiEndpoint()}/${path || 'resource'}/${id}/${task_name}`;
+    const url = `${apiEndpoint()}/${path}/${id}/${task_name}`;
     const request =
         method === 'post' || method === 'put' || !method
             ? (method === 'put' ? put : post)(url, form_data)
@@ -172,7 +170,7 @@ export function update<T>(details: UpdateParameters<T>): Observable<T> {
         ...query_params,
         version: form_data.version || 0,
     });
-    const url = `${apiEndpoint()}/${path || 'resource'}/${id}${
+    const url = `${apiEndpoint()}/${path}/${id}${
         query_str ? '?' + query_str : ''
     }`;
     return (method === 'put' ? put : patch)(url, form_data).pipe(
@@ -188,7 +186,7 @@ export function update<T>(details: UpdateParameters<T>): Observable<T> {
 export function remove(details: RemoveParameters): Observable<HashMap> {
     const { id, query_params, path } = details;
     const query_str = toQueryString(query_params);
-    const url = `${apiEndpoint()}/${path || 'resource'}/${id}${
+    const url = `${apiEndpoint()}/${path}/${id}${
         query_str ? '?' + query_str : ''
     }`;
     return del(url);

@@ -1,5 +1,5 @@
 import { HashMap } from '../utilities/types';
-
+/* istanbul ignore file */
 /** HTTP request verb. Can be one of either `GET`, `POST`, `PUT`, `PATCH`, or `DELETE` */
 export type HttpVerb = `GET` | `POST` | `PUT` | `PATCH` | `DELETE`;
 
@@ -81,4 +81,3 @@ export interface MockHttpRequest {
     /** Request body */
     body: any;
 }
-

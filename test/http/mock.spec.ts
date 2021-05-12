@@ -8,14 +8,14 @@ describe('MockHttp', () => {
             path: 'test/path',
             method: 'GET',
             metadata: {},
-            callback: () => 'test'
+            callback: () => 'test',
         },
         {
             path: '/test/path2',
             method: 'GET',
             metadata: {},
-            callback: () => 'test'
-        }
+            callback: () => 'test',
+        },
     ];
 
     beforeEach(() => {
@@ -44,52 +44,76 @@ describe('MockHttp', () => {
     it('should register new handlers', () => {
         MockHttp.registerMockEndpoint({
             path: 'please/delete/me',
-            method: 'DELETE'
+            method: 'DELETE',
         });
         let handler = MockHttp.findRequestHandler('DELETE', 'please/delete/me');
         expect(handler).toBeTruthy();
         // Check registration of handlers with route parameters
         MockHttp.registerMockEndpoint({
             path: 'please/:get/me',
-            method: 'GET'
+            method: 'GET',
         });
         handler = MockHttp.findRequestHandler('GET', 'please/join/me');
         expect(handler).toBeTruthy();
     });
 
-    it('should handle route parameters', done => {
+    it('should handle route parameters', (done) => {
         expect.assertions(3);
         MockHttp.registerMockEndpoint({
             path: 'please/:get/me',
-            method: 'GET'
+            method: 'GET',
         });
         const handler = MockHttp.findRequestHandler('GET', 'please/join/me');
         expect(handler).toBeTruthy();
-        expect((handler || ({} as any)).path_structure).toEqual(['', 'get', '']);
+        expect((handler || ({} as any)).path_structure).toEqual([
+            '',
+            'get',
+            '',
+        ]);
         MockHttp.registerMockEndpoint({
             path: 'please/:get/me',
             metadata: null,
             method: 'GET',
-            callback: request => {
+            callback: (request) => {
                 expect(request.route_params).toEqual({ get: 'help' });
                 done();
-            }
+            },
         });
-        MockHttp.mockRequest('GET', 'please/help/me?query=true')!.subscribe(_ => null);
+        MockHttp.mockRequest('GET', 'please/help/me?query=true')!.subscribe(
+            (_) => null
+        );
         jest.runOnlyPendingTimers();
     });
 
-    it('should handle query parameters', done => {
+    it('should handle query parameters', (done) => {
         expect.assertions(1);
         MockHttp.registerMockEndpoint({
             path: 'please/:get/me',
             method: 'GET',
-            callback: request => {
+            callback: (request) => {
                 expect(request.query_params).toEqual({ query: 'true' });
                 done();
-            }
+            },
         });
-        MockHttp.mockRequest('GET', 'please/help/me?query=true')!.subscribe(_ => null);
+        MockHttp.mockRequest('GET', 'please/help/me?query=true')!.subscribe(
+            (_) => null
+        );
+        jest.runOnlyPendingTimers();
+    });
+
+    it('should handle request body', (done) => {
+        expect.assertions(1);
+        MockHttp.registerMockEndpoint({
+            path: 'please/:get/me',
+            method: 'POST',
+            callback: (request) => {
+                expect(request.body).toEqual({ help: false });
+                done();
+            },
+        });
+        MockHttp.mockRequest('POST', 'please/help/me?query=true', {
+            help: false,
+        })!.subscribe((_) => null);
         jest.runOnlyPendingTimers();
     });
 });
