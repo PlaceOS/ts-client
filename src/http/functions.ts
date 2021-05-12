@@ -250,7 +250,8 @@ export function request(
     is_mock: () => boolean = isMock,
     mock_handler: (
         m: HttpVerb,
-        url: string
+        url: string,
+        body?: any
     ) => Observable<HttpResponse> | null = mockRequest,
     success: (
         e: Response,
@@ -258,7 +259,7 @@ export function request(
     ) => Promise<HttpResponse> = transform
 ): Observable<HttpResponse> {
     if (is_mock()) {
-        const request_obs = mock_handler(method, url);
+        const request_obs = mock_handler(method, url, options?.body);
         if (request_obs) {
             return request_obs;
         }

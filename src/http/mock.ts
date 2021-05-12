@@ -36,7 +36,9 @@ export function registerMockEndpoint<T>(
     const handler: MockHttpRequestHandler<T> = {
         ...handler_ops,
         path_parts,
-        path_structure: path_parts.map((i: string) => (i[0] === ':' ? i.replace(':', '') : '')),
+        path_structure: path_parts.map((i: string) =>
+            i[0] === ':' ? i.replace(':', '') : ''
+        ),
     };
     handler_map[key] = handler;
     log('HTTP(M)', `+ ${handler_ops.method} ${handler_ops.path}`);
@@ -65,7 +67,9 @@ export function deregisterMockEndpoint(
  * Remove mapping of handlers for Mock Http requests
  * @param handler_map Handler map to clear. Defaults to the global handler map
  */
-export function clearMockEndpoints(handler_map: HashMap<MockHttpRequestHandler> = _handlers) {
+export function clearMockEndpoints(
+    handler_map: HashMap<MockHttpRequestHandler> = _handlers
+) {
     for (const key in handler_map) {
         if (handler_map[key]) {
             delete handler_map[key];
@@ -85,11 +89,12 @@ export function clearMockEndpoints(handler_map: HashMap<MockHttpRequestHandler> 
 export function mockRequest<T>(
     method: HttpVerb,
     url: string,
+    body?: any,
     handler_map: HashMap<MockHttpRequestHandler> = _handlers
 ): Observable<T> | null {
     const handler = findRequestHandler(method, url, handler_map);
     if (handler) {
-        const request = processRequest(url, handler);
+        const request = processRequest(url, handler, body);
         return onMockRequest(handler, request);
     }
     return null;
@@ -112,9 +117,9 @@ export function findRequestHandler(
         .replace(/^\//, '')
         .split('?')[0];
     const route_parts = path.split('/');
-    const method_handlers: MockHttpRequestHandler[] = Object.keys(handler_map).reduce<
-        MockHttpRequestHandler[]
-    >((l, i) => {
+    const method_handlers: MockHttpRequestHandler[] = Object.keys(
+        handler_map
+    ).reduce<MockHttpRequestHandler[]>((l, i) => {
         if (i.indexOf(`${method}|`) === 0) {
             l.push(handler_map[i]);
         }
@@ -125,7 +130,10 @@ export function findRequestHandler(
             // Path lengths match
             let match = true;
             for (let i = 0; i < handler.path_structure.length; i++) {
-                if (!handler.path_structure[i] && handler.path_parts[i] !== route_parts[i]) {
+                if (
+                    !handler.path_structure[i] &&
+                    handler.path_parts[i] !== route_parts[i]
+                ) {
                     // Static path fragments don't match
                     match = false;
                     break;
@@ -150,7 +158,9 @@ export function processRequest<T = any>(
     handler: MockHttpRequestHandler<T>,
     body?: any
 ): MockHttpRequest {
-    const parts = url.replace(/(http|https):\/\/[a-zA-Z0-9.]*:?([0-9]*)?/g, '').split('?');
+    const parts = url
+        .replace(/(http|https):\/\/[a-zA-Z0-9.]*:?([0-9]*)?/g, '')
+        .split('?');
     const path = parts[0].replace(/^\//g, '');
     const query = parts[1] || '';
     const query_params = convertPairStringToMap(query);
@@ -159,7 +169,8 @@ export function processRequest<T = any>(
     const route_params: HashMap = {};
     for (const part of handler.path_structure) {
         if (part) {
-            route_params[part] = route_parts[handler.path_structure.indexOf(part)];
+            route_params[part] =
+                route_parts[handler.path_structure.indexOf(part)];
         }
     }
     const request = {
@@ -181,11 +192,17 @@ export function processRequest<T = any>(
  * @param handler Request handler
  * @param request Request contents
  */
-export function onMockRequest(handler: MockHttpRequestHandler, request: MockHttpRequest) {
-    const result = handler.callback ? handler.callback(request) : handler.metadata;
+export function onMockRequest(
+    handler: MockHttpRequestHandler,
+    request: MockHttpRequest
+) {
+    const result = handler.callback
+        ? handler.callback(request)
+        : handler.metadata;
     const variance = handler.delay_variance || 100;
     const delay_value = handler.delay || 300;
-    const delay_time = Math.floor(Math.random() * variance - variance / 2) + delay_value;
+    const delay_time =
+        Math.floor(Math.random() * variance - variance / 2) + delay_value;
     log('HTTP(M)', `RESP ${request.method}:`, [request.url, result]);
     return from([result]).pipe(delay(Math.max(200, delay_time)));
 }
