@@ -1,9 +1,9 @@
 /** Type of repository */
 export enum PlaceRepositoryType {
     /** Repository is a collection of Driver logic */
-    Driver = 'Driver',
+    Driver = 'driver',
     /** Repository is a collection of interfaces */
-    Interface = 'Interface',
+    Interface = 'interface',
 }
 
 export interface PlaceRepositoryCommitQuery {
