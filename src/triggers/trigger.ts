@@ -36,8 +36,6 @@ export class PlaceTrigger extends PlaceResource {
     public readonly control_system_id: string;
     /** ID of the zone associated with the trigger */
     public readonly zone_id: string;
-    /** Timezone to associate with condtion times */
-    public readonly timezone: string;
 
     /** ID of the system associated with the trigger */
     public get system_id(): string {
@@ -99,6 +97,5 @@ export class PlaceTrigger extends PlaceResource {
         this.supported_methods = raw_data.supported_methods || ['POST'];
         this.activated_count =
             raw_data.activated_count || raw_data.trigger_count || 0;
-        this.timezone = raw_data.timezone || '';
     }
 }

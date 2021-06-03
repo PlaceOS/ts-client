@@ -85,6 +85,8 @@ export interface TriggerCronTimeCondition {
     type: TriggerTimeConditionType.CRON;
     /** CRON tab string */
     cron: string;
+    /** Timezone associated with the schedule */
+    timezone: string;
 }
 
 export enum TriggerTimeConditionType {
