@@ -1,4 +1,3 @@
-
 import { PlaceSystem } from '../systems/system';
 import { HttpVerb } from '../http/interfaces';
 import { PlaceResource } from '../resources/resource';
@@ -37,6 +36,8 @@ export class PlaceTrigger extends PlaceResource {
     public readonly control_system_id: string;
     /** ID of the zone associated with the trigger */
     public readonly zone_id: string;
+    /** Timezone to associate with condtion times */
+    public readonly timezone: string;
 
     /** ID of the system associated with the trigger */
     public get system_id(): string {
@@ -46,11 +47,11 @@ export class PlaceTrigger extends PlaceResource {
     /** Actions to perform when the trigger is activated */
     public get actions(): TriggerActions {
         const actions = this._actions;
-        const fn_list = (actions.functions || []).map(i => ({
+        const fn_list = (actions.functions || []).map((i) => ({
             ...i,
             args: { ...i.args },
         }));
-        const mail_list = (actions.mailers || []).map(i => ({
+        const mail_list = (actions.mailers || []).map((i) => ({
             ...i,
             emails: [...i.emails],
         }));
@@ -59,12 +60,12 @@ export class PlaceTrigger extends PlaceResource {
     /** Conditions for activating the trigger */
     public get conditions(): TriggerConditions {
         const conditions = this._conditions;
-        const cmp_list = (conditions.comparisons || []).map(i => ({
+        const cmp_list = (conditions.comparisons || []).map((i) => ({
             ...i,
             left: typeof i.left === 'object' ? { ...i.left } : i.left,
             right: typeof i.right === 'object' ? { ...i.right } : i.right,
         }));
-        const time_list = (conditions.time_dependents || []).map(i => ({
+        const time_list = (conditions.time_dependents || []).map((i) => ({
             ...i,
         }));
         return { comparisons: cmp_list, time_dependents: time_list };
@@ -98,5 +99,6 @@ export class PlaceTrigger extends PlaceResource {
         this.supported_methods = raw_data.supported_methods || ['POST'];
         this.activated_count =
             raw_data.activated_count || raw_data.trigger_count || 0;
+        this.timezone = raw_data.timezone || '';
     }
 }
