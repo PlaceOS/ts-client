@@ -158,7 +158,7 @@ showZone(zone_id).then(zone => {
 
 You can find more details about endpoint action on the API docs
 
-https://app.swaggerhub.com/apis/ACAprojects/PlaceOS/3.5.0#/
+https://placeos.docs.apiary.io/
 
 ## Writing mocks
 
