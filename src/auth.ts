@@ -22,6 +22,11 @@ export {
     invalidateToken,
     authorise,
     logout,
-    listenForToken
+    listenForToken,
+    setToken,
 } from './auth/functions';
-export { PlaceAuthority, PlaceAuthOptions, PlaceTokenResponse } from './auth/interfaces';
+export {
+    PlaceAuthority,
+    PlaceAuthOptions,
+    PlaceTokenResponse,
+} from './auth/interfaces';

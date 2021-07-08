@@ -1,5 +1,5 @@
 import * as base64 from 'byte-base64';
-import { addSeconds, isBefore } from 'date-fns';
+import { addHours, addSeconds, isBefore } from 'date-fns';
 import * as sha256 from 'fast-sha256';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { fromFetch } from 'rxjs/fetch';
@@ -111,6 +111,15 @@ export function clientId(): string {
 /** Redirect URI for the OAuth flow */
 export function redirectUri(): string {
     return _options.redirect_uri;
+}
+
+/** Manually set an access token */
+export function setToken(
+    token: string,
+    expires_at: number = addHours(new Date(), 2).valueOf()
+) {
+    _storage.setItem(`${_client_id}_expires_at`, `${expires_at}`);
+    _storage.setItem(`${_client_id}_access_token`, token);
 }
 
 /** Bearer token for authenticating requests to PlaceOS */
@@ -619,9 +628,8 @@ export function createLoginURL(state?: string): string {
 /**
  * @private
  */
-const AVAILABLE_CHARS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split(
-    ''
-);
+const AVAILABLE_CHARS =
+    'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('');
 /**
  * @private
  * @param length Length of the challenge string
