@@ -10,7 +10,9 @@ export class MockPlaceWebsocketModule {
         protected _system: MockPlaceWebsocketSystem,
         properties: HashMap
     ) {
-        const proto_fn = Object.getOwnPropertyNames(Object.getPrototypeOf(properties)).filter(_ => _.startsWith('$'));
+        const proto_fn = Object.getOwnPropertyNames(
+            Object.getPrototypeOf(properties)
+        ).filter((_) => _.startsWith('$'));
         for (const key in properties) {
             /* istanbul ignore else */
             if (
@@ -24,7 +26,7 @@ export class MockPlaceWebsocketModule {
                 }
             }
         }
-        for(const fn of proto_fn) {
+        for (const fn of proto_fn) {
             if (properties[fn] instanceof Function) {
                 this.addMethod(fn, properties[fn]);
             }
@@ -85,7 +87,7 @@ export class MockPlaceWebsocketModule {
         this[`_${prop_name}_obs`] = this[`_${prop_name}`].asObservable();
         Object.defineProperty(this, prop_name, {
             get: () => this[`_${prop_name}`].getValue(),
-            set: v => this[`_${prop_name}`].next(v),
+            set: (v) => this[`_${prop_name}`].next(v),
         });
     }
 }

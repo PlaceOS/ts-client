@@ -1,15 +1,22 @@
 import { Observable } from 'rxjs';
-import { PlaceResourceQueryOptions } from '../resources/interface';
-import { PlaceDriverDetails } from '../drivers/interfaces';
-import { create, query, remove, show, task, update } from '../resources/functions';
-import { HashMap } from '../utilities/types';
 import {
     GitCommitDetails,
     PlaceRepositoryCommitQuery,
     PlaceRepositoryDetailsQuery,
-    PlaceRepositoryPullQuery
+    PlaceRepositoryPullQuery,
 } from './interfaces';
 import { PlaceRepository } from './repository';
+import { PlaceDriverDetails } from '../drivers/interfaces';
+import {
+    create,
+    query,
+    remove,
+    show,
+    task,
+    update,
+} from '../resources/functions';
+import { PlaceResourceQueryOptions } from '../resources/interface';
+import { HashMap } from '../utilities/types';
 
 /**
  * @private
@@ -25,7 +32,9 @@ function process(item: Partial<PlaceRepository>) {
  * Query the available repositories
  * @param query_params Query parameters to add the to request URL
  */
-export function queryRepositories(query_params: PlaceResourceQueryOptions = {}) {
+export function queryRepositories(
+    query_params: PlaceResourceQueryOptions = {}
+) {
     return query({ query_params, fn: process, path: PATH });
 }
 
@@ -50,7 +59,14 @@ export function updateRepository(
     form_data: Partial<PlaceRepository>,
     method: 'put' | 'patch' = 'patch'
 ) {
-    return update({ id, form_data, query_params: {}, method, fn: process, path: PATH });
+    return update({
+        id,
+        form_data,
+        query_params: {},
+        method,
+        fn: process,
+        path: PATH,
+    });
 }
 
 /**
@@ -75,8 +91,15 @@ export function removeRepository(id: string, query_params: HashMap = {}) {
  * Get a list of all the interfaces
  * @param query_params Addition query parameters to pass to the request
  */
-export function listInterfaceRepositories(query_params: HashMap = {}): Observable<string[]> {
-    return show({ id: 'interfaces', query_params, fn: (_) => _ as string[], path: PATH });
+export function listInterfaceRepositories(
+    query_params: HashMap = {}
+): Observable<string[]> {
+    return show({
+        id: 'interfaces',
+        query_params,
+        fn: (_) => _ as string[],
+        path: PATH,
+    });
 }
 
 /**
@@ -84,7 +107,10 @@ export function listInterfaceRepositories(query_params: HashMap = {}): Observabl
  * @param id ID of the repository
  * @param query Addition query parameters to pass to the request
  */
-export function listRepositoryDrivers(id: string, query_params?: HashMap): Observable<string[]> {
+export function listRepositoryDrivers(
+    id: string,
+    query_params?: HashMap
+): Observable<string[]> {
     return task({
         id,
         task_name: 'drivers',

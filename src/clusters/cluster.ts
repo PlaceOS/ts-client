@@ -1,5 +1,5 @@
-import { HashMap } from '../utilities/types';
 import { humanReadableByteCount } from '../utilities/general';
+import { HashMap } from '../utilities/types';
 
 interface PlaceClusterRunCounts {
     modules: number;
