@@ -1,4 +1,6 @@
 /* istanbul ignore file */
 export class AbortControllerStub {
-    public abort() {}
+    public abort() {
+        console.log('Aborted');
+    }
 }

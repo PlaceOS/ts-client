@@ -117,11 +117,11 @@ export function redirectUri(): string {
 
 /** Manually set an access token */
 export function setToken(
-    token: string,
+    new_token: string,
     expires_at: number = addHours(new Date(), 2).valueOf()
 ) {
     _storage.setItem(`${_client_id}_expires_at`, `${expires_at}`);
-    _storage.setItem(`${_client_id}_access_token`, token);
+    _storage.setItem(`${_client_id}_access_token`, new_token);
 }
 
 /** Bearer token for authenticating requests to PlaceOS */
@@ -129,7 +129,8 @@ export function token(return_expired: boolean = true): string {
     if (_options.mock) {
         return 'mock-token';
     }
-    const expires_at = `${_storage.getItem(`${_client_id}_expires_at`)}`;
+    if (!_storage) return '';
+    const expires_at = _storage.getItem(`${_client_id}_expires_at`) || '';
     const access_token = _access_token.getValue();
     if (isBefore(+expires_at, new Date())) {
         log('Auth', 'Token expired. Requesting new token...');
@@ -229,7 +230,7 @@ export function setup(options: PlaceAuthOptions): Promise<void> {
     }
     // Intialise storage
     _storage = _options.storage === 'session' ? sessionStorage : localStorage;
-    _client_id = Md5.hashStr(_options.redirect_uri, false) as string;
+    _client_id = Md5.hashStr(_options.redirect_uri, false);
     return loadAuthority();
 }
 
@@ -248,7 +249,7 @@ export function cleanupAuth() {
     // Clear local subscriptions
     for (const key in _promises) {
         /* istanbul ignore else */
-        if (_promises.hasOwnProperty(key)) {
+        if (key in _promises) {
             delete _promises[key];
         }
     }
@@ -280,7 +281,6 @@ export function invalidateToken(): void {
  * required for the user to authenticate
  * @param state Additional state information for auth requests
  */
-export function authorise(state?: string): Promise<string>;
 export function authorise(
     state?: string,
     api_authority: PlaceAuthority = _authority as PlaceAuthority
@@ -307,7 +307,7 @@ export function authorise(
                         },
                         () => {
                             log('Auth', 'Failed to generate token.');
-                            reject();
+                            reject('Failed to generate token');
                             delete _promises.authorise;
                         },
                     ];
@@ -334,7 +334,7 @@ export function authorise(
                         } else {
                             log('Auth', 'No user session');
                             sendToLogin(api_authority);
-                            reject();
+                            reject('No user session');
                             delete _promises.authorise;
                         }
                     }

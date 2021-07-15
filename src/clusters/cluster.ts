@@ -68,23 +68,40 @@ export class PlaceCluster {
         this.id = raw_data.id || raw_data.core_id || '';
         this.compiled_drivers = raw_data.compiled_drivers || [];
         this.available_repositories =
-            raw_data.available_repositories || raw_data.status?.available_repositories || [];
-        this.running_drivers = raw_data.running_drivers || raw_data.status?.running_drivers || 0;
-        this.module_instances = raw_data.module_instances || raw_data.status?.module_instances || 0;
+            raw_data.available_repositories ||
+            raw_data.status?.available_repositories ||
+            [];
+        this.running_drivers =
+            raw_data.running_drivers || raw_data.status?.running_drivers || 0;
+        this.module_instances =
+            raw_data.module_instances || raw_data.status?.module_instances || 0;
         this.unavailable_repositories =
-            raw_data.unavailable_repositories || raw_data.status?.unavailable_repositories || [];
+            raw_data.unavailable_repositories ||
+            raw_data.status?.unavailable_repositories ||
+            [];
         this.unavailable_drivers =
-            raw_data.unavailable_drivers || raw_data.status?.unavailable_drivers || [];
-        this.hostname = raw_data.hostname || raw_data.load?.local.hostname || '';
-        this.cpu_count = raw_data.cpu_count || raw_data.load?.local.cpu_count || 0;
+            raw_data.unavailable_drivers ||
+            raw_data.status?.unavailable_drivers ||
+            [];
+        this.hostname =
+            raw_data.hostname || raw_data.load?.local.hostname || '';
+        this.cpu_count =
+            raw_data.cpu_count || raw_data.load?.local.cpu_count || 0;
         this.core_cpu = raw_data.core_cpu || raw_data.load?.local.core_cpu || 0;
-        this.total_cpu = raw_data.total_cpu || raw_data.load?.local.total_cpu || 0;
-        this.memory_total = raw_data.memory_total || raw_data.load?.local.memory_total || 0;
-        this.memory_usage = raw_data.memory_usage || raw_data.load?.local.memory_usage || 0;
-        this.core_memory = raw_data.core_memory || raw_data.load?.local.core_memory || 0;
+        this.total_cpu =
+            raw_data.total_cpu || raw_data.load?.local.total_cpu || 0;
+        this.memory_total =
+            raw_data.memory_total || raw_data.load?.local.memory_total || 0;
+        this.memory_usage =
+            raw_data.memory_usage || raw_data.load?.local.memory_usage || 0;
+        this.core_memory =
+            raw_data.core_memory || raw_data.load?.local.core_memory || 0;
         this.run_counts = raw_data.run_counts ||
             raw_data.status?.run_counts?.local || { modules: 0, drivers: 0 };
-        this.memory_percentage = +((this.memory_usage / this.memory_total) * 100).toFixed(4);
+        this.memory_percentage = +(
+            (this.memory_usage / this.memory_total) *
+            100
+        ).toFixed(4);
         this.used_memory = humanReadableByteCount(this.memory_usage * 1024);
         this.total_memory = humanReadableByteCount(this.memory_total * 1024);
         const edges = raw_data.load?.edge || {};

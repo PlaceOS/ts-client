@@ -177,7 +177,7 @@ export function humanReadableByteCount(bytes: number, si: boolean = false) {
  */
 export function parseLinkHeader(header: string): HashMap<string> {
     if (header.length === 0) {
-        throw new Error('input must not be of zero length');
+        throw new Error('Input must not be of zero length');
     }
 
     // Split parts by comma
@@ -187,7 +187,7 @@ export function parseLinkHeader(header: string): HashMap<string> {
     for (const part of parts) {
         const section = part.split(';');
         if (section.length !== 2) {
-            throw new Error("section could not be split on ';'");
+            throw new Error("Section could not be split on ';'");
         }
         const url = section[0].replace(/<(.*)>/, '$1').trim();
         const name = section[1].replace(/rel="(.*)"/, '$1').trim();

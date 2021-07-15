@@ -80,7 +80,7 @@ export class PlaceVariableBinding<T = any> {
      * Rebind to the status variable
      */
     private async rebind() {
-        await bind(this.binding())
+        await bind(this.binding());
         this._binding_count = this._stale_bindings;
         this._stale_bindings = 0;
     }
