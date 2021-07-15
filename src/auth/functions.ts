@@ -5,6 +5,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { fromFetch } from 'rxjs/fetch';
 import { map } from 'rxjs/operators';
 import { Md5 } from 'ts-md5/dist/md5';
+import { AbortControllerStub } from '../utilities/abort-controller';
 import { toQueryString } from '../utilities/api';
 import {
     clearAsyncTimeout,
@@ -34,7 +35,7 @@ let _options: PlaceAuthOptions = {} as any;
  * @private
  * Browser key store to use for authentication credentials. Defaults to `localStorage`
  */
-let _storage: Storage = localStorage;
+let _storage: Storage;
 /**
  * @private
  * Authentication authority of for the current domain
@@ -133,7 +134,7 @@ export function token(return_expired: boolean = true): string {
     if (isBefore(+expires_at, new Date())) {
         log('Auth', 'Token expired. Requesting new token...');
         invalidateToken();
-        authorise();
+        setTimeout(() => authorise(), 50);
         if (!return_expired) {
             return '';
         }
@@ -223,6 +224,9 @@ export function checkStoreForAuthParam(name: string): string {
 /** Initialise authentication for the http and realtime APIs */
 export function setup(options: PlaceAuthOptions): Promise<void> {
     _options = options || _options;
+    if (!window.AbortController) {
+        (window as any).AbortController = AbortControllerStub;
+    }
     // Intialise storage
     _storage = _options.storage === 'session' ? sessionStorage : localStorage;
     _client_id = Md5.hashStr(_options.redirect_uri, false) as string;
@@ -267,7 +271,7 @@ export function invalidateToken(): void {
     log('Auth', 'Invalidating tokens.');
     _storage.removeItem(`${_client_id}_access_token`);
     _storage.removeItem(`${_client_id}_expires_at`);
-    _access_token.next('');
+    if (_access_token.getValue()) _access_token.next('');
 }
 
 /* istanbul ignore else */
@@ -281,7 +285,6 @@ export function authorise(
     state?: string,
     api_authority: PlaceAuthority = _authority as PlaceAuthority
 ): Promise<string> {
-    console.log('Promises:', _promises);
     /* istanbul ignore else */
     if (!_promises.authorise) {
         _promises.authorise = new Promise<string>((resolve, reject) => {
@@ -300,17 +303,26 @@ export function authorise(
                         () => {
                             log('Auth', 'Successfully generated token.');
                             resolve(token());
+                            delete _promises.authorise;
                         },
                         () => {
                             log('Auth', 'Failed to generate token.');
                             reject();
+                            delete _promises.authorise;
                         },
                     ];
                     if (_options && _options.auth_type === 'password') {
+                        log('Auth', 'Logging in with credentials.');
                         generateTokenWithCredentials(_options).then(
                             ...token_handlers
                         );
                     } else if (_code || refreshToken()) {
+                        log(
+                            'Auth',
+                            `Generating token with ${
+                                _code ? 'code' : 'refresh token'
+                            }`
+                        );
                         generateToken().then(...token_handlers);
                     } else {
                         if (api_authority!.session) {
@@ -323,9 +335,9 @@ export function authorise(
                             log('Auth', 'No user session');
                             sendToLogin(api_authority);
                             reject();
+                            delete _promises.authorise;
                         }
                     }
-                    delete _promises.authorise;
                 }
             };
             checkToken().then(after_check, after_check);

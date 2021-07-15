@@ -513,7 +513,7 @@ export function createWebsocket() {
         log('WS', `Cookies:`, [document.cookie, cookie]);
     } else {
         log('WS', `Authenticating through URL query parameter...`);
-        url += `${url.indexOf('?') >= 0 ? '&' : '?'}bearer_token=${token()}`;
+        url += `${url.indexOf('?') >= 0 ? '&'  :'?'}bearer_token=${token()}`;
     }
     log('WS', `Creating websocket connection to ws${secure ? 's' : ''}://${host()}${websocketRoute()}`);
     /* istanbul ignore next */

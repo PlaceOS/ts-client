@@ -272,3 +272,32 @@ If you wish to handle login within your application you can set `handle_login` t
 If you wish to prevent redirecting the application to handle application authentication you can set `use_iframe` to `true` to have that handled in the background.
 
 ![Authentication Flowchart](https://aca.im/cdn/images/auth-flowchart.png)
+
+## Usage with Node JS
+
+It is possible to use `ts-client` with Node JS.
+It requires an addition setup step before the library can be used loading the library.
+
+### Javascript:
+```javascript
+const ts_client = require('@placeos/ts-client');
+
+async function setupPlaceOS() {
+    await ts_client.preSetupNode();
+    await ts_client.setup({
+        ...
+    })
+}
+```
+
+### Typescript:
+```typescript
+import { preSetupNode, setup } from '@placeos/ts-client';
+
+async function setupPlaceOS() {
+    await preSetupNode();
+    await setup({
+        ...
+    })
+}
+```
