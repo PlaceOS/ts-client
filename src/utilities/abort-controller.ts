@@ -1,8 +1,10 @@
 /* istanbul ignore file */
 export class AbortControllerStub {
-    public abort() { }
+    public abort() {}
 }
 
-if (!window.AbortController) {
-    (window as any).AbortController = AbortControllerStub;
+const global_space = window || global;
+
+if (!global_space.AbortController) {
+    (global_space as any).AbortController = AbortControllerStub;
 }
