@@ -6,7 +6,11 @@
     "module": "dist/esm/index.js",
     "main": "dist/cjs/index.js",
     "typings": "dist/esm/index.d.ts",
-    "keywords": ["placeos", "browser", "api"],
+    "keywords": [
+        "placeos",
+        "browser",
+        "api"
+    ],
     "files": [
         "dist",
         "src"
@@ -56,10 +60,10 @@
         ],
         "coverageThreshold": {
             "global": {
-                "branches": 90,
-                "functions": 95,
-                "lines": 95,
-                "statements": 95
+                "branches": 85,
+                "functions": 90,
+                "lines": 90,
+                "statements": 90
             }
         },
         "collectCoverageFrom": [
