@@ -63,8 +63,12 @@ export function consoleHasColours() {
  * Get URL paramters from hash or query string
  */
 export function getFragments(): HashMap<string> {
-    const hash = location.hash ? location.hash.slice(1) : location.href.split('#')[1] || '';
-    let query = location.search ? location.search.slice(1) : location.href.split('?')[1] || '';
+    const hash = window.location?.hash
+        ? window.location?.hash.slice(1)
+        : window.location?.href.split('#')[1] || '';
+    let query = window.location?.search
+        ? window.location?.search.slice(1)
+        : window.location?.href.split('?')[1] || '';
     let hash_fragments = {};
     if (hash) {
         // Hash can also contain the query so we need to check for it
@@ -108,7 +112,8 @@ export function convertPairStringToMap(str: string): HashMap<string> {
 /**
  * @hidden
  */
-const NONCE_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+const NONCE_CHARS =
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
 /**
  * @private
@@ -182,7 +187,7 @@ export function parseLinkHeader(header: string): HashMap<string> {
     for (const part of parts) {
         const section = part.split(';');
         if (section.length !== 2) {
-            throw new Error('section could not be split on \';\'');
+            throw new Error("section could not be split on ';'");
         }
         const url = section[0].replace(/<(.*)>/, '$1').trim();
         const name = section[1].replace(/rel="(.*)"/, '$1').trim();
@@ -210,15 +215,16 @@ export function cleanObject(object: HashMap, delete_values: any[]) {
 }
 
 export function is_iOS() {
-    return [
-      'iPad Simulator',
-      'iPhone Simulator',
-      'iPod Simulator',
-      'iPad',
-      'iPhone',
-      'iPod'
-    ].includes(navigator.platform)
-    // iPad on iOS 13 detection
-    || (navigator.userAgent.includes("Mac") && "ontouchend" in document)
+    return (
+        [
+            'iPad Simulator',
+            'iPhone Simulator',
+            'iPod Simulator',
+            'iPad',
+            'iPhone',
+            'iPod',
+        ].includes(navigator.platform) ||
+        // iPad on iOS 13 detection
+        (navigator.userAgent.includes('Mac') && 'ontouchend' in document)
+    );
 }
-
