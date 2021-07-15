@@ -3,6 +3,6 @@ export class AbortControllerStub {
     public abort() {}
 }
 
-if (!globalThis.AbortController) {
-    (globalThis as any).AbortController = AbortControllerStub;
+if (!window.AbortController) {
+    (window as any).AbortController = AbortControllerStub;
 }
