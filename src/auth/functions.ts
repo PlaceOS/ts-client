@@ -83,9 +83,10 @@ const _online_observer = _online.asObservable();
 
 /** API Endpoint for the retrieved version of PlaceOS */
 export function apiEndpoint(): string {
-    const secure = _options.secure || location.protocol.indexOf('https') >= 0;
+    const secure =
+        _options.secure || globalThis.location?.protocol.indexOf('https') >= 0;
     const api_host = `${secure ? 'https:' : 'http:'}//${
-        _options.host || location.host
+        _options.host || globalThis.location?.host
     }`;
     return `${api_host}${httpRoute()}`;
 }
@@ -151,7 +152,7 @@ export function refreshToken(): string {
 
 /** Host domain of the PlaceOS server */
 export function host(): string {
-    return _options.host || location.host;
+    return _options.host || globalThis.location?.host;
 }
 
 /** Whether the application has an authentication token */
@@ -347,7 +348,7 @@ export function logout(): void {
         }
         // Redirect user to logout URL
         const url = _authority ? _authority.logout_url : '/logout';
-        setTimeout(() => window.location.assign(url), 300);
+        setTimeout(() => globalThis.location?.assign(url), 300);
         _online.next(false);
     };
     revokeToken().then(done, done);
@@ -372,7 +373,8 @@ export function loadAuthority(tries: number = 0): Promise<void> {
             log('Auth', `Fixed: ${isFixedDevice()} | Trusted: ${isTrusted()}`);
             log('Auth', `Loading authority...`);
             const secure =
-                _options.secure || location.protocol.indexOf('https') >= 0;
+                _options.secure ||
+                globalThis.location?.protocol.indexOf('https') >= 0;
             const on_error = (err: any) => {
                 log('Auth', `Failed to load authority(${err})`);
                 _online.next(false);
@@ -423,7 +425,7 @@ export async function sendToAuthorize(state?: string): Promise<void> {
     if (_options.use_iframe) {
         return authorizeWithIFrame(auth_url);
     }
-    location.assign(auth_url);
+    globalThis.location?.assign(auth_url);
 }
 
 /* istanbul ignore next */
@@ -433,7 +435,7 @@ export async function sendToAuthorize(state?: string): Promise<void> {
  */
 export function authorizeWithIFrame(url: string): Promise<void> {
     if (!_promises.iframe_auth) {
-        _promises.iframe_auth = new Promise((resolve, reject) => {
+        _promises.iframe_auth = new Promise<void>((resolve, reject) => {
             log('Auth', 'Authorizing in an iFrame...');
             const iframe = document.createElement('iframe');
             iframe.style.position = 'absolute';
@@ -446,7 +448,7 @@ export function authorizeWithIFrame(url: string): Promise<void> {
             iframe.src = `${url}`;
             const callback = (event: MessageEvent) => {
                 if (
-                    event.origin === location.origin &&
+                    event.origin === globalThis.location?.origin &&
                     event.data.type === 'place-os'
                 ) {
                     const data: AuthorizeDetails = event.data;
@@ -500,9 +502,9 @@ export function sendToLogin(api_authority: PlaceAuthority): void {
         // Redirect to login form
         const url = api_authority!.login_url?.replace(
             '{{url}}',
-            encodeURIComponent(location.href)
+            encodeURIComponent(globalThis.location?.href)
         );
-        setTimeout(() => window.location.assign(url), 300);
+        setTimeout(() => globalThis.location?.assign(url), 300);
     } else {
         log('Auth', 'Login being handled locally.');
     }
