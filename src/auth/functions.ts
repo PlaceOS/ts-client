@@ -1,5 +1,5 @@
 import * as base64 from 'byte-base64';
-import { addHours, addSeconds, isBefore } from 'date-fns';
+import { addHours, addSeconds, addYears, isBefore } from 'date-fns';
 import * as sha256 from 'fast-sha256';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { fromFetch } from 'rxjs/fetch';
@@ -113,6 +113,18 @@ export function clientId(): string {
 /** Redirect URI for the OAuth flow */
 export function redirectUri(): string {
     return _options.redirect_uri;
+}
+
+/** Manually set an X API key */
+export function setAPI_Key(api_key: string) {
+    _storage.setItem('x-api-key', `${api_key}`);
+    _storage.setItem('trusted', `true`);
+    setToken('x-api-key', addYears(new Date(), 5).valueOf());
+}
+
+/** Get X API Key for application */
+export function apiKey() {
+    return _storage.getItem('x-api-key') || '';
 }
 
 /** Manually set an access token */

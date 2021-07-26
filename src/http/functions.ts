@@ -3,6 +3,7 @@ import { fromFetch } from 'rxjs/fetch';
 import { filter, mergeMap, retryWhen, switchMap, take } from 'rxjs/operators';
 
 import {
+    apiKey,
     invalidateToken,
     isMock,
     listenForToken,
@@ -270,7 +271,11 @@ export function request(
         filter((_) => _),
         take(1),
         switchMap((_) => {
-            options.headers!.Authorization = `Bearer ${token()}`;
+            if (token() === 'x-api-key') {
+                options.headers!['X-API-Key'] = apiKey();
+            } else {
+                options.headers!.Authorization = `Bearer ${token()}`;
+            }
             return fromFetch(url, {
                 ...options,
                 body: JSON.stringify(options.body),
