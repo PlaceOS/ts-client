@@ -148,7 +148,7 @@ export function token(return_expired: boolean = true): string {
         log('Auth', 'Token expired. Requesting new token...');
         invalidateToken();
         if (!_promises.load_authority) {
-            setTimeout(() => authorise(), 50);
+            setTimeout(() => authorise(), 200);
         }
         if (!return_expired) {
             return '';
@@ -322,7 +322,7 @@ export function authorise(
                         () => {
                             log('Auth', 'Failed to generate token.');
                             reject('Failed to generate token');
-                            delete _promises.authorise;
+                            setTimeout(() => delete _promises.authorise, 200);
                         },
                     ];
                     if (_options && _options.auth_type === 'password') {
@@ -349,7 +349,7 @@ export function authorise(
                             log('Auth', 'No user session');
                             sendToLogin(api_authority);
                             reject('No user session');
-                            delete _promises.authorise;
+                            setTimeout(() => delete _promises.authorise, 200);
                         }
                     }
                 }
