@@ -147,7 +147,9 @@ export function token(return_expired: boolean = true): string {
     if (isBefore(+expires_at, new Date())) {
         log('Auth', 'Token expired. Requesting new token...');
         invalidateToken();
-        setTimeout(() => authorise(), 50);
+        if (!_promises.load_authority) {
+            setTimeout(() => authorise(), 50);
+        }
         if (!return_expired) {
             return '';
         }
