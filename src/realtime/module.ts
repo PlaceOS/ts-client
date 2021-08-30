@@ -36,9 +36,9 @@ export class PlaceModuleBinding {
      * Get binding with the given name
      * @param name Name of the binding
      */
-    public binding(name: string) {
+    public binding<T = any>(name: string) {
         if (!this._bindings[name]) {
-            this._bindings[name] = new PlaceVariableBinding(this, name);
+            this._bindings[name] = new PlaceVariableBinding<T>(this, name);
         }
         return this._bindings[name];
     }
