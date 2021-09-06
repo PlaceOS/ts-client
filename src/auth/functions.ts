@@ -518,13 +518,15 @@ export function authorizeWithIFrame(url: string): Promise<void> {
     return _promises.iframe_auth;
 }
 
+let _redirecting = false;
+
 /**
  * @private
  * @param api_authority
  */
 export function sendToLogin(api_authority: PlaceAuthority): void {
     /* istanbul ignore else */
-    if (_options.handle_login !== false) {
+    if (_options.handle_login !== false && !_redirecting) {
         log('Auth', 'Redirecting to login page...');
         // Redirect to login form
         const url = api_authority!.login_url?.replace(
@@ -532,7 +534,7 @@ export function sendToLogin(api_authority: PlaceAuthority): void {
             encodeURIComponent(window.location?.href)
         );
         setTimeout(() => window.location?.assign(url), 300);
-        _options.handle_login = true;
+        _redirecting = true;
     } else {
         log('Auth', 'Login being handled locally.');
     }
