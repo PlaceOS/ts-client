@@ -532,6 +532,7 @@ export function sendToLogin(api_authority: PlaceAuthority): void {
             encodeURIComponent(window.location?.href)
         );
         setTimeout(() => window.location?.assign(url), 300);
+        _options.handle_login = true;
     } else {
         log('Auth', 'Login being handled locally.');
     }

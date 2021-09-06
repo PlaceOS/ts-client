@@ -40,7 +40,7 @@ export class PlaceModuleBinding {
         if (!this._bindings[name]) {
             this._bindings[name] = new PlaceVariableBinding<T>(this, name);
         }
-        return this._bindings[name];
+        return this._bindings[name] as PlaceVariableBinding<T>;
     }
 
     /**
