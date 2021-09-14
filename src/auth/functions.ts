@@ -124,7 +124,7 @@ export function setAPI_Key(api_key: string) {
 
 /** Get X API Key for application */
 export function apiKey() {
-    return _storage.getItem('x-api-key') || '';
+    return checkStoreForAuthParam('x-api-key') || '';
 }
 
 /** Manually set an access token */
@@ -535,6 +535,7 @@ export function sendToLogin(api_authority: PlaceAuthority): void {
         );
         setTimeout(() => window.location?.assign(url), 300);
         _redirecting = true;
+        throw new Error('Redirecting to login page...');
     } else {
         log('Auth', 'Login being handled locally.');
     }
