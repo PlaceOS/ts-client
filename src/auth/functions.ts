@@ -308,10 +308,10 @@ export function authorise(
             }
             log('Auth', 'Authorising user...');
             const after_check = () => {
-                if (token(false)) {
+                if (token(false) || apiKey()) {
                     log('Auth', 'Valid token found.');
                     delete _promises.authorise;
-                    resolve(token());
+                    resolve(apiKey() || token());
                 } else {
                     const token_handlers = [
                         () => {
