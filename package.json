@@ -38,11 +38,6 @@
         "rxjs": "^6.6.2",
         "ts-md5": "^1.2.7"
     },
-    "husky": {
-        "hooks": {
-            "pre-commit": "npm run lint"
-        }
-    },
     "jest": {
         "transform": {
             ".(ts|tsx)": "ts-jest"
@@ -73,7 +68,6 @@
     "devDependencies": {
         "@types/jest": "^26.0.9",
         "date-fns": "^2.15.0",
-        "husky": "^4.2.5",
         "jest": "^26.2.2",
         "jest-config": "^26.2.2",
         "rxjs": "^6.6.2",
