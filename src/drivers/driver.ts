@@ -36,7 +36,7 @@ export class PlaceDriver extends PlaceResource {
         super(raw_data);
         this.description = raw_data.description || '';
         this.module_name = raw_data.module_name || '';
-        this.role = raw_data.role || PlaceDriverRole.Logic;
+        this.role = raw_data.role ?? PlaceDriverRole.Logic;
         this.default_uri = raw_data.default_uri || '';
         this.default_port = raw_data.default_port || 1;
         this.ignore_connected = raw_data.ignore_connected || false;
