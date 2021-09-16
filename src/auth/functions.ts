@@ -308,7 +308,7 @@ export function authorise(
             }
             log('Auth', 'Authorising user...');
             const after_check = () => {
-                if (token(false) || apiKey()) {
+                if (apiKey() || token(false)) {
                     log('Auth', 'Valid token found.');
                     delete _promises.authorise;
                     resolve(apiKey() || token());
@@ -550,9 +550,9 @@ export function checkToken(): Promise<boolean> {
     /* istanbul ignore else */
     if (!_promises.check_token) {
         _promises.check_token = new Promise(async (resolve, reject) => {
-            if (token()) {
+            if (apiKey() || token()) {
                 log('Auth', 'Valid token found.');
-                resolve(token());
+                resolve(apiKey() || token());
             } else {
                 log('Auth', 'No token. Checking URL for auth credentials...');
                 const success = await checkForAuthParameters();
