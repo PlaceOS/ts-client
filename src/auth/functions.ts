@@ -138,10 +138,9 @@ export function setToken(
 
 /** Bearer token for authenticating requests to PlaceOS */
 export function token(return_expired: boolean = true): string {
-    if (_options.mock) {
-        return 'mock-token';
-    }
+    if (_options.mock) return 'mock-token';
     if (!_storage) return '';
+    if (apiKey()) return 'x-api-key';
     const expires_at = _storage.getItem(`${_client_id}_expires_at`) || '';
     const access_token = _access_token.getValue();
     if (isBefore(+expires_at, new Date())) {
@@ -308,10 +307,10 @@ export function authorise(
             }
             log('Auth', 'Authorising user...');
             const after_check = () => {
-                if (apiKey() || token(false)) {
+                if (token(false)) {
                     log('Auth', 'Valid token found.');
                     delete _promises.authorise;
-                    resolve(apiKey() || token());
+                    resolve(token());
                 } else {
                     const token_handlers = [
                         () => {
@@ -550,9 +549,9 @@ export function checkToken(): Promise<boolean> {
     /* istanbul ignore else */
     if (!_promises.check_token) {
         _promises.check_token = new Promise(async (resolve, reject) => {
-            if (apiKey() || token()) {
+            if (token()) {
                 log('Auth', 'Valid token found.');
-                resolve(apiKey() || token());
+                resolve(token());
             } else {
                 log('Auth', 'No token. Checking URL for auth credentials...');
                 const success = await checkForAuthParameters();
