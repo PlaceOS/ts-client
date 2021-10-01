@@ -1,4 +1,4 @@
-import { Observable, timer } from 'rxjs';
+import { Observable } from 'rxjs';
 import { clearAsyncTimeout, timeout } from 'src/utilities/async';
 import { log } from '../utilities/general';
 
