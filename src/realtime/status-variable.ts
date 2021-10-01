@@ -1,4 +1,5 @@
-import { Observable } from 'rxjs';
+import { Observable, timer } from 'rxjs';
+import { clearAsyncTimeout, timeout } from 'src/utilities/async';
 import { log } from '../utilities/general';
 
 import { bind, listen, status, unbind, value } from './functions';
@@ -21,6 +22,7 @@ export class PlaceVariableBinding<T = any> {
                 log('VAR', 'Re-binding to status variable', this.binding());
                 this.rebind();
             } else if (!connected) {
+                clearAsyncTimeout(`rebind:${JSON.stringify(this.binding)}`);
                 log('VAR', 'Setting binding as stale', this.binding());
                 this._stale_bindings =
                     this._binding_count || this._stale_bindings;
@@ -80,9 +82,12 @@ export class PlaceVariableBinding<T = any> {
      * Rebind to the status variable
      */
     private async rebind() {
-        await bind(this.binding());
-        this._binding_count = this._stale_bindings;
-        this._stale_bindings = 0;
+        if (!this._stale_bindings) return;
+        timeout(`rebind:${JSON.stringify(this.binding)}`, async () => {
+            await bind(this.binding());
+            this._binding_count = this._stale_bindings;
+            this._stale_bindings = 0;
+        }, 100)
     }
 
     /**
