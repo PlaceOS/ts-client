@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { clearAsyncTimeout, timeout } from 'src/utilities/async';
+import { clearAsyncTimeout, timeout } from '../utilities/async';
 import { log } from '../utilities/general';
 
 import { bind, listen, status, unbind, value } from './functions';
