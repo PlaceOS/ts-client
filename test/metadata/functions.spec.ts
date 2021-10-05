@@ -8,16 +8,14 @@ describe('Applications API', () => {
     it('should allow listing metadata', async () => {
         const spy = jest.spyOn(Resources, 'show');
         spy.mockImplementation((_) => of(_.fn([{}]) as any));
-        const item = await SERVICE.showMetadata('1').toPromise();
+        const item = await SERVICE.listMetadata('1').toPromise();
         expect(item[0]).toBeInstanceOf(PlaceMetadata);
     });
 
     it('should allow getting metadata', async () => {
         const spy = jest.spyOn(Resources, 'show');
         spy.mockImplementation((_) => of(_.fn({}) as any));
-        const item = await SERVICE.showMetadata('1', {
-            name: 'test',
-        }).toPromise();
+        const item = await SERVICE.showMetadata('1', 'test').toPromise();
         expect(item).toBeInstanceOf(PlaceMetadata);
     });
 

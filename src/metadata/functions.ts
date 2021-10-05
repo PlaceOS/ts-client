@@ -16,23 +16,38 @@ function process(item: Partial<PlaceMetadata>) {
 }
 
 /**
- * Get the metadata for a database item
+ * List the metadata for a database item
  * @param id ID of the item to retrieve metadata
  * @param query_params Query parameters to add the to request URL.
- *  Use key `name` to retrieve specific metadata
  */
-export function showMetadata(id: string): Observable<PlaceMetadata[]>;
-export function showMetadata(id: string, query_params: { name: string }): Observable<PlaceMetadata>;
-export function showMetadata(
+export function listMetadata(
     id: string,
     query_params: HashMap = {}
-): Observable<PlaceMetadata[]> | Observable<PlaceMetadata> {
+): Observable<PlaceMetadata[]> {
     return show({
         id,
         query_params,
-        fn: query_params.name
-            ? (data: HashMap) => process(data[query_params.name])
-            : (list: HashMap) => Object.keys(list).map((key: string) => process(list[key])) as any,
+        fn: (list: HashMap) =>
+            Object.keys(list).map((key: string) => process(list[key])) as any,
+        path: PATH,
+    });
+}
+
+/**
+ * Get the metadata for a database item
+ * @param id ID of the item to retrieve metadata
+ * @param name Name of the metadata field to retrieve
+ * @param query_params Query parameters to add the to request URL.
+ */
+export function showMetadata(
+    id: string,
+    name: string,
+    query_params: HashMap = {}
+): Observable<PlaceMetadata> {
+    return show({
+        id,
+        query_params: { ...query_params, name },
+        fn: (data: HashMap) => process(data[query_params.name]),
         path: PATH,
     });
 }
@@ -49,7 +64,14 @@ export function updateMetadata(
     form_data: Partial<PlaceMetadata>,
     method: 'put' | 'patch' = 'patch'
 ) {
-    return update({ id, form_data, query_params: {}, method, fn: process, path: PATH });
+    return update({
+        id,
+        form_data,
+        query_params: {},
+        method,
+        fn: process,
+        path: PATH,
+    });
 }
 
 export function addMetadata(form_data: Partial<PlaceMetadata>) {
@@ -70,7 +92,10 @@ export function removeMetadata(id: string, query_params: HashMap = {}) {
  * @param id ID of the item to get associated child metadata
  * @param query_params Query parameters to add the to request URL
  */
-export function listChildMetadata(id: string, query_params: PlaceZoneMetadataOptions) {
+export function listChildMetadata(
+    id: string,
+    query_params: PlaceZoneMetadataOptions
+) {
     return task({
         id,
         task_name: 'children',
@@ -84,6 +109,6 @@ export function listChildMetadata(id: string, query_params: PlaceZoneMetadataOpt
                         keys: Object.keys(item.metadata),
                     })
             ),
-        path: PATH
+        path: PATH,
     });
 }
