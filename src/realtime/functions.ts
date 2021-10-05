@@ -325,7 +325,7 @@ export function onMessage(message: PlaceResponse | 'pong'): void {
         } else if (message.type === 'success') {
             handleSuccess(message);
         } else if (message.type === 'debug') {
-            log('WS', `[DEBUG] ${message.mod}${message.klass} →`, message.msg);
+            log('WS', `[DEBUG] ${message.mod}${message.klass || ''} →`, message.msg);
             const meta = message.meta || { mod: '', index: '' };
             debug_events.next({
                 mod_id: message.mod || '<empty>',
