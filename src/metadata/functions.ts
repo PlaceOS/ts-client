@@ -21,7 +21,7 @@ function process(item: Partial<PlaceMetadata>) {
  * @param query_params Query parameters to add the to request URL.
  *  Use key `name` to retrieve specific metadata
  */
-export function showMetadata(id: string, query_params?: {}): Observable<PlaceMetadata[]>;
+export function showMetadata(id: string): Observable<PlaceMetadata[]>;
 export function showMetadata(id: string, query_params: { name: string }): Observable<PlaceMetadata>;
 export function showMetadata(
     id: string,
