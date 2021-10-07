@@ -86,6 +86,7 @@ export {
 export { PlaceLDAPSource } from './ldap-sources/ldap-source';
 
 export {
+    listMetadata,
     showMetadata,
     updateMetadata,
     addMetadata,
