@@ -1,4 +1,5 @@
 import { Observable } from 'rxjs';
+import { distinctUntilChanged } from 'rxjs/operators';
 import { clearAsyncTimeout, timeout } from '../utilities/async';
 import { log } from '../utilities/general';
 
@@ -17,12 +18,12 @@ export class PlaceVariableBinding<T = any> {
     constructor(private _module: PlaceModuleBinding, _name: string) {
         this.name = _name;
         // Listen for state changes in the websocket connection
-        status().subscribe((connected: boolean) => {
+        status().pipe(distinctUntilChanged()).subscribe((connected: boolean) => {
             if (connected && this._stale_bindings) {
                 log('VAR', 'Re-binding to status variable', this.binding());
                 this.rebind();
             } else if (!connected) {
-                clearAsyncTimeout(`rebind:${JSON.stringify(this.binding)}`);
+                clearAsyncTimeout(`rebind:${JSON.stringify(this.binding())}`);
                 log('VAR', 'Setting binding as stale', this.binding());
                 this._stale_bindings =
                     this._binding_count || this._stale_bindings;
@@ -54,10 +55,8 @@ export class PlaceVariableBinding<T = any> {
      */
     public bind(): () => void {
         /* istanbul ignore else */
-        if (this._binding_count <= 0) {
-            bind(this.binding()).then(() => {
-                this._binding_count++;
-            });
+        if (this._binding_count <= 0 && this._stale_bindings <= 0) {
+            bind(this.binding()).then(() => this._binding_count++);
         }
         return () => this.unbind();
     }
@@ -65,11 +64,10 @@ export class PlaceVariableBinding<T = any> {
     /**
      * Unbind from status variable
      */
-    public unbind() {
+    public async unbind() {
         if (this._binding_count === 1) {
-            unbind(this.binding()).then(() => {
-                this._binding_count--;
-            });
+            await unbind(this.binding());
+            this._binding_count--;
         } else {
             this._binding_count--;
             if (this._binding_count < 0) {
@@ -83,11 +81,15 @@ export class PlaceVariableBinding<T = any> {
      */
     private async rebind() {
         if (!this._stale_bindings) return;
-        timeout(`rebind:${JSON.stringify(this.binding)}`, async () => {
-            await bind(this.binding());
-            this._binding_count = this._stale_bindings;
-            this._stale_bindings = 0;
-        }, 100)
+        timeout(
+            `rebind:${JSON.stringify(this.binding())}`,
+            async () => {
+                await bind(this.binding());
+                this._binding_count = this._stale_bindings;
+                this._stale_bindings = 0;
+            },
+            100
+        );
     }
 
     /**

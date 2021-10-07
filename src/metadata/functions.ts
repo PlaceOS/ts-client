@@ -34,7 +34,7 @@ export function listMetadata(
 }
 
 /**
- * Get the metadata for a database item
+ * Get a metadata field for a database item
  * @param id ID of the item to retrieve metadata
  * @param name Name of the metadata field to retrieve
  * @param query_params Query parameters to add the to request URL.

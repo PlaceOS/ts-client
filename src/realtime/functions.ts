@@ -556,7 +556,7 @@ export function reconnect() {
  * Send ping through the websocket
  */
 export function ping() {
-    _websocket!.next('ping');
+    _websocket?.next('ping');
 }
 
 /**
