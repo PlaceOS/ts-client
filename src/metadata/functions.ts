@@ -47,7 +47,7 @@ export function showMetadata(
     return show({
         id,
         query_params: { ...query_params, name },
-        fn: (data: HashMap) => process(data[query_params.name]),
+        fn: (data: HashMap) => process(data[name]),
         path: PATH,
     });
 }
