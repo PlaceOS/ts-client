@@ -3,6 +3,7 @@ import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
 
 import {
     apiEndpoint,
+    apiKey,
     authority,
     host,
     httpRoute,
@@ -506,9 +507,10 @@ export function createWebsocket() {
     }`;
     if (!needsTokenHeader() && !is_iOS()) {
         log('WS', `Authenticating through cookie...`);
-        const cookie = `bearer_token=${token()};max-age=120;path=${httpRoute()};${
-            secure ? 'secure;' : ''
-        }samesite=strict`;
+        const tkn = token();
+        let cookie = tkn === 'x-api-key' ? `api-key=${apiKey()}` : `bearer_token=${tkn};`
+        cookie += `max-age=120;path=${httpRoute()};`
+        cookie += `${secure ? 'secure;' : ''}samesite=strict`;
         document.cookie = cookie;
         log('WS', `Cookies:`, [document.cookie, cookie]);
     } else {
