@@ -508,7 +508,7 @@ export function createWebsocket() {
     if (!needsTokenHeader() && !is_iOS()) {
         log('WS', `Authenticating through cookie...`);
         const tkn = token();
-        let cookie = tkn === 'x-api-key' ? `api-key=${apiKey()}` : `bearer_token=${tkn};`
+        let cookie = tkn === 'x-api-key' ? `api-key=${apiKey()};` : `bearer_token=${tkn};`
         cookie += `max-age=120;path=${httpRoute()};`
         cookie += `${secure ? 'secure;' : ''}samesite=strict`;
         document.cookie = cookie;
