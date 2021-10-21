@@ -316,13 +316,7 @@ export function send<T = any>(request: PlaceCommandRequest, tries: number = 0): 
 export function onMessage(message: PlaceResponse | 'pong'): void {
     if (message !== 'pong' && message instanceof Object) {
         if (message.type === 'notify' && message.meta) {
-            let updated_value = message.value;
-            try {
-                updated_value = JSON.parse(message.value || '""');
-            } catch (e) {
-                log('WS', `[ERROR](${message.id}) Unable to parse JSON in notify value`, message);
-            }
-            handleNotify(message.meta, updated_value);
+            handleNotify(message.meta, message.value);
         } else if (message.type === 'success') {
             handleSuccess(message);
         } else if (message.type === 'debug') {
