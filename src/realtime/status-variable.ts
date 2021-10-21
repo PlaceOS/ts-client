@@ -11,6 +11,8 @@ export class PlaceVariableBinding<T = any> {
     /** Status variable name */
     public readonly name: string;
     /** Number of active bindings to this variable */
+    private _pending = false;
+    /** Number of active bindings to this variable */
     private _binding_count: number = 0;
     /** Number of bindings to restore on reconnection */
     private _stale_bindings: number = 0;
@@ -56,8 +58,11 @@ export class PlaceVariableBinding<T = any> {
     public bind(): () => void {
         /* istanbul ignore else */
         if (this._binding_count <= 0 && this._stale_bindings <= 0) {
-            this._binding_count++
-            bind(this.binding()).catch(() => this._binding_count--);
+            this._pending = true;
+            bind(this.binding()).then(() => {
+                this._binding_count++;
+                this._pending = false;
+            });
         }
         return () => this.unbind();
     }
@@ -66,7 +71,7 @@ export class PlaceVariableBinding<T = any> {
      * Unbind from status variable
      */
     public async unbind() {
-        if (this._binding_count === 1) {
+        if (this._binding_count === 1 && !this._pending) {
             await unbind(this.binding());
             this._binding_count--;
         } else {
