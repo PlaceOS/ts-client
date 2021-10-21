@@ -56,7 +56,8 @@ export class PlaceVariableBinding<T = any> {
     public bind(): () => void {
         /* istanbul ignore else */
         if (this._binding_count <= 0 && this._stale_bindings <= 0) {
-            bind(this.binding()).then(() => this._binding_count++);
+            this._binding_count++
+            bind(this.binding()).catch(() => this._binding_count--);
         }
         return () => this.unbind();
     }
