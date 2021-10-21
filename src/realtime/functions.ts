@@ -318,9 +318,9 @@ export function onMessage(message: PlaceResponse | 'pong'): void {
         if (message.type === 'notify' && message.meta) {
             let updated_value = message.value;
             try {
-                updated_value = JSON.parse(message.value);
+                updated_value = JSON.parse(message.value || '""');
             } catch (e) {
-                log('WS', '[ERROR] Unable to parse JSON in notify value');
+                log('WS', `[ERROR](${message.id}) Unable to parse JSON in notify value`, message);
             }
             handleNotify(message.meta, updated_value);
         } else if (message.type === 'success') {
