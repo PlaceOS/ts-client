@@ -689,24 +689,28 @@ export function generateChallenge(length: number = 43) {
  * @private
  * Generate token generation URL
  */
-export function createRefreshURL(): string {
+export function createRefreshURL(): [string, string] {
     const refresh_uri = _options.token_uri || '/auth/token';
     let url = refresh_uri + `?client_id=${encodeURIComponent(_client_id)}`;
+    let body = '';
     url += `&redirect_uri=${encodeURIComponent(_options.redirect_uri)}`;
     if (refreshToken()) {
         url += `&refresh_token=${encodeURIComponent(refreshToken())}`;
         url += `&grant_type=refresh_token`;
+        const parts = url.split('?');
+        url = parts[0];
+        body = parts[1];
     } else {
         url += `&code=${encodeURIComponent(_code)}`;
         url += `&grant_type=authorization_code`;
+        const challenge = sessionStorage.getItem(`${_client_id}_challenge`);
+        if (challenge) {
+            url += `&code_verifier=${challenge}`;
+            sessionStorage.removeItem(`${_client_id}_challenge`);
+        }
+        _code = '';
     }
-    const challenge = sessionStorage.getItem(`${_client_id}_challenge`);
-    if (challenge) {
-        url += `&code_verifier=${challenge}`;
-        sessionStorage.removeItem(`${_client_id}_challenge`);
-    }
-    _code = '';
-    return url;
+    return [url, body];
 }
 
 /**
@@ -766,7 +770,7 @@ export function revokeToken(): Promise<void> {
  * Generate new tokens from a auth code or refresh token
  */
 export function generateToken() {
-    return generateTokenWithUrl(createRefreshURL());
+    return generateTokenWithUrl(...createRefreshURL());
 }
 
 /**
@@ -781,7 +785,10 @@ export function generateTokenWithCredentials(options: PlaceAuthOptions) {
  * @private
  * Make a request to the tokens endpoint with the given URL
  */
-export function generateTokenWithUrl(url: string): Promise<void> {
+export function generateTokenWithUrl(
+    url: string,
+    body: string = ''
+): Promise<void> {
     /* istanbul ignore else */
     if (!_promises.generate_tokens) {
         _promises.generate_tokens = new Promise<void>((resolve, reject) => {
@@ -793,16 +800,19 @@ export function generateTokenWithUrl(url: string): Promise<void> {
                 reject();
                 delete _promises.generate_tokens;
             };
-            fromFetch(url, { method: 'POST' }).subscribe(
-                async (r: Response) => {
-                    if (!r.ok) return on_error(r);
-                    const tokens = await r.json();
-                    _storeTokenDetails(tokens);
-                    resolve();
-                    delete _promises.generate_tokens;
+            fromFetch(url, {
+                method: 'POST',
+                body,
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
                 },
-                on_error
-            );
+            }).subscribe(async (r: Response) => {
+                if (!r.ok) return on_error(r);
+                const tokens = await r.json();
+                _storeTokenDetails(tokens);
+                resolve();
+                delete _promises.generate_tokens;
+            }, on_error);
         });
     }
     return _promises.generate_tokens as Promise<void>;
