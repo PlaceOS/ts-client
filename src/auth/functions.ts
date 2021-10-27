@@ -699,13 +699,13 @@ export function createRefreshURL(): string {
     } else {
         url += `&code=${encodeURIComponent(_code)}`;
         url += `&grant_type=authorization_code`;
-        const challenge = sessionStorage.getItem(`${_client_id}_challenge`);
-        if (challenge) {
-            url += `&code_verifier=${challenge}`;
-            sessionStorage.removeItem(`${_client_id}_challenge`);
-        }
-        _code = '';
     }
+    const challenge = sessionStorage.getItem(`${_client_id}_challenge`);
+    if (challenge) {
+        url += `&code_verifier=${challenge}`;
+        sessionStorage.removeItem(`${_client_id}_challenge`);
+    }
+    _code = '';
     return url;
 }
 
