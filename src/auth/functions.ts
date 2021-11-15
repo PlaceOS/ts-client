@@ -124,7 +124,7 @@ export function setAPI_Key(api_key: string) {
 
 /** Get X API Key for application */
 export function apiKey() {
-    return checkStoreForAuthParam('x-api-key') || '';
+    return checkStoreForAuthParam('x-api-key', false) || '';
 }
 
 /** Manually set an access token */
@@ -223,14 +223,14 @@ export function isFixedDevice(): boolean {
  * Check for an auth related param in the URL or storage
  * @param name Name of the paramater to look for
  */
-export function checkStoreForAuthParam(name: string): string {
+export function checkStoreForAuthParam(name: string, store: boolean = true): string {
     const fragments = getFragments();
     let param = fragments[name];
     /* istanbul ignore else */
     if (_storage) {
         const key = `${clientId()}_${name}`;
         param = param || _storage.getItem(key) || _storage.getItem(name) || '';
-        _storage.setItem(key, `${param}`);
+        if (store) _storage.setItem(key, `${param}`);
     }
     return param;
 }
