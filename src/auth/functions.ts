@@ -17,6 +17,7 @@ import {
     getFragments,
     log,
     removeFragment,
+    is_iFrame
 } from '../utilities/general';
 import { HashMap } from '../utilities/types';
 import {
@@ -238,6 +239,7 @@ export function checkStoreForAuthParam(name: string, store: boolean = true): str
 /** Initialise authentication for the http and realtime APIs */
 export function setup(options: PlaceAuthOptions): Promise<void> {
     _options = options || _options;
+    _options.token_header = _options.token_header ?? is_iFrame();
     if (!window.AbortController) {
         (window as any).AbortController = AbortControllerStub;
     }

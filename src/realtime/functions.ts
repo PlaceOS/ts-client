@@ -499,17 +499,17 @@ export function createWebsocket() {
     let url = `ws${secure ? 's' : ''}://${host()}${websocketRoute()}${
         isFixedDevice() ? '?fixed_device=true' : ''
     }`;
+    const tkn = token();
+    let query = tkn === 'x-api-key' ? `api-key=${apiKey()}` : `bearer_token=${tkn}`
     if (!needsTokenHeader() && !is_iOS()) {
         log('WS', `Authenticating through cookie...`);
-        const tkn = token();
-        let cookie = tkn === 'x-api-key' ? `api-key=${apiKey()};` : `bearer_token=${tkn};`
-        cookie += `max-age=120;path=${httpRoute()};`
-        cookie += `${secure ? 'secure;' : ''}samesite=strict`;
-        document.cookie = cookie;
-        log('WS', `Cookies:`, [document.cookie, cookie]);
+        query += `;max-age=120;path=${httpRoute()};`
+        query += `${secure ? 'secure;' : ''}samesite=strict`;
+        document.cookie = query;
+        log('WS', `Cookies:`, [document.cookie, query]);
     } else {
         log('WS', `Authenticating through URL query parameter...`);
-        url += `${url.indexOf('?') >= 0 ? '&'  :'?'}bearer_token=${token()}`;
+        url += `${url.indexOf('?') >= 0 ? '&'  :'?'}${query}`;
     }
     log('WS', `Creating websocket connection to ws${secure ? 's' : ''}://${host()}${websocketRoute()}`);
     /* istanbul ignore next */

@@ -228,3 +228,7 @@ export function is_iOS() {
         (navigator.userAgent.includes('Mac') && 'ontouchend' in document)
     );
 }
+
+export function is_iFrame() {
+    return window.location !== window.parent.location;
+}
