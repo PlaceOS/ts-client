@@ -24,6 +24,7 @@ export {
     logout,
     listenForToken,
     setToken,
+    setAPI_Key
 } from './auth/functions';
 export {
     PlaceAuthority,
