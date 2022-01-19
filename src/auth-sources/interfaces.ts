@@ -4,4 +4,6 @@ import { PlaceResourceQueryOptions } from '../resources/interface';
 export interface PlaceAuthSourceQueryOptions extends PlaceResourceQueryOptions {
     /** ID of the authority to filter the auth sources */
     authority?: string;
+    /** ID of the authority to filter the auth sources */
+    authority_id?: string;
 }
