@@ -24,7 +24,7 @@
     },
     "scripts": {
         "build": "node ./clean.js && tsc -p tsconfig.json && tsc -p tsconfig-cjs.json",
-        "docs": "typedoc --excludePrivate --out docs --target es6 --theme minimal --mode file src",
+        "docs": "typedoc --excludePrivate --out docs src",
         "test": "jest --coverage",
         "test:watch": "jest --coverage --watch",
         "test:coverage": "jest --coverage",
