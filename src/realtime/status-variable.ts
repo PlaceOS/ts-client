@@ -7,11 +7,17 @@ import { bind, listen, status, unbind, value } from './functions';
 import { PlaceRequestOptions } from './interfaces';
 import { PlaceModuleBinding } from './module';
 
+enum PENDING {
+    NONE,
+    BIND,
+    UNBIND
+}
+
 export class PlaceVariableBinding<T = any> {
     /** Status variable name */
     public readonly name: string;
-    /** Number of active bindings to this variable */
-    private _pending = false;
+    /** Active pending state of the variable binding */
+    private _pending = PENDING.NONE;
     /** Number of active bindings to this variable */
     private _binding_count: number = 0;
     /** Number of bindings to restore on reconnection */
@@ -57,11 +63,11 @@ export class PlaceVariableBinding<T = any> {
      */
     public bind(): () => void {
         /* istanbul ignore else */
-        if (this._binding_count <= 0 && this._stale_bindings <= 0) {
-            this._pending = true;
+        if ((this._binding_count <= 0 && this._stale_bindings <= 0) || this._pending === PENDING.UNBIND) {
+            this._pending = PENDING.BIND;
             bind(this.binding()).then(() => {
                 this._binding_count++;
-                this._pending = false;
+                this._pending = PENDING.NONE;
             });
         }
         return () => this.unbind();
@@ -70,15 +76,15 @@ export class PlaceVariableBinding<T = any> {
     /**
      * Unbind from status variable
      */
-    public async unbind() {
-        if (this._binding_count === 1 && !this._pending) {
-            await unbind(this.binding());
-            this._binding_count--;
+    public unbind() {
+        if (this._binding_count === 1 && this._pending === PENDING.NONE) {
+            this._pending = PENDING.UNBIND;
+            unbind(this.binding()).then(() => {
+                if (this._pending === PENDING.UNBIND) this._pending = PENDING.NONE;
+                this._binding_count--;
+            });
         } else {
-            this._binding_count--;
-            if (this._binding_count < 0) {
-                this._binding_count = 0;
-            }
+            this._binding_count = Math.max(this._binding_count - 1, 0);
         }
     }
 
