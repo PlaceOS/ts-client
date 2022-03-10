@@ -20,6 +20,10 @@ export class PlaceMetadata {
     public readonly editors: readonly string [];
     /** JSON schema associated with the metadata details */
     public readonly schema: string;
+    /** Unix timestamp that the metadata was last modified at */
+    public readonly modified_at: number;
+    /** ID of the user that last modified the metadata */
+    public readonly modified_by: string;
 
     constructor(data: PlaceMetadataComplete = {}) {
         this.id = data.id || data.parent_id || '';
@@ -28,5 +32,7 @@ export class PlaceMetadata {
         this.details = data.details || {};
         this.editors = data.editors || [];
         this.schema = data.schema || '';
+        this.modified_at = (data.modified_at || 0) * 1000 || Date.now();
+        this.modified_by = data.modified_by || '';
     }
 }
