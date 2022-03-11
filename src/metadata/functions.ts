@@ -34,6 +34,26 @@ export function listMetadata(
 }
 
 /**
+ * List the metadata history for a database item
+ * @param id ID of the item to retrieve metadata
+ * @param form_data Data to pass to the request URL.
+ */
+export function listMetadataHistory(
+    id: string,
+    form_data: HashMap = {}
+): Observable<PlaceMetadata[]> {
+    return task({
+        id,
+        task_name: 'history',
+        form_data,
+        method: 'get',
+        callback: (list: HashMap) =>
+            Object.keys(list).map((key: string) => process(list[key])) as any,
+        path: PATH,
+    });
+}
+
+/**
  * Get a metadata field for a database item
  * @param id ID of the item to retrieve metadata
  * @param name Name of the metadata field to retrieve
