@@ -120,6 +120,25 @@ export function listRepositoryDrivers(
     });
 }
 
+
+/**
+ * Get a list of all the releases for a repository
+ * @param id ID of the repository
+ * @param query Addition query parameters to pass to the request
+ */
+ export function listRepositoryReleases(
+    id: string,
+    query_params?: HashMap
+): Observable<string[]> {
+    return task({
+        id,
+        task_name: 'releases',
+        form_data: query_params,
+        method: 'get',
+        path: PATH,
+    });
+}
+
 /**
  * Get a list of all the commits for a repository
  * @param id ID of the repository
