@@ -62,6 +62,13 @@ describe('Repositories API', () => {
         item = await SERVICE.listRepositoryDrivers('1', {}).toPromise();
     });
 
+    it('should allow listing repository releases', async () => {
+        const spy = jest.spyOn(Resources, 'task');
+        spy.mockImplementation(() => of([{}]));
+        const item = await SERVICE.listRepositoryReleases('1').toPromise();
+        expect(item).toEqual([{}]);
+    });
+
     it('should allow listing repository commits', async () => {
         const spy = jest.spyOn(Resources, 'task');
         spy.mockImplementation(() => of([{}]));
