@@ -146,11 +146,12 @@ export function removeFragment(name: string) {
         .replace(/&&/g, '&')
         .replace(/\?&/g, '#')
         .replace(/&$/g, '#');
-    window.history?.replaceState(
-        null,
-        '',
-        `${window.location?.pathname}${new_hash}${new_search}`
-    );
+    if (window.history?.replaceState)
+        window.history?.replaceState(
+            null,
+            '',
+            `${window.location?.pathname}${new_hash}${new_search}`
+        );
 }
 
 /**
