@@ -24,6 +24,8 @@ export class PlaceMetadata {
     public readonly modified_at: number;
     /** ID of the user that last modified the metadata */
     public readonly modified_by: string;
+    /** Version of the data */
+    public readonly version: number;
 
     constructor(data: PlaceMetadataComplete = {}) {
         this.id = data.id || data.parent_id || '';
@@ -34,5 +36,6 @@ export class PlaceMetadata {
         this.schema = data.schema || '';
         this.modified_at = (data.modified_at || 0) * 1000 || Date.now();
         this.modified_by = data.modified_by || '';
+        this.version = data.version || 0;
     }
 }
