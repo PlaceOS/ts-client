@@ -13,10 +13,8 @@ export class PlaceSettings extends PlaceResource {
     public readonly settings_string: string;
     /** Top level keys for the parsed settings */
     public readonly keys: string[];
-    /** Unix timestamp that the metadata was last modified at */
-    public readonly modified_at: number;
     /** ID of the user that last modified the metadata */
-    public readonly modified_by: string;
+    public readonly modified_by_id: string;
 
     /** Contents of the settings */
     public get value(): string {
@@ -32,7 +30,6 @@ export class PlaceSettings extends PlaceResource {
         this.encryption_level =
             raw_data.encryption_level || EncryptionLevel.None;
         this.keys = raw_data.keys || [];
-        this.modified_at = (raw_data.modified_at || 0) * 1000 || Date.now();
-        this.modified_by = raw_data.modified_by || '';
+        this.modified_by_id = raw_data.modified_by_id || '';
     }
 }
