@@ -82,7 +82,7 @@ export function showMetadata(
 export function updateMetadata(
     id: string,
     form_data: Partial<PlaceMetadata>,
-    method: 'put' | 'patch' = 'patch'
+    method: 'put' | 'patch' = 'put'
 ) {
     return update({
         id,
