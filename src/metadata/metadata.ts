@@ -31,7 +31,11 @@ export class PlaceMetadata {
         this.id = data.id || data.parent_id || '';
         this.name = data.name || '';
         this.description = data.description || '';
-        this.details = data.details || {};
+        try{
+            this.details = (typeof data.details === 'string' ? JSON.parse(data.details) : data.details) || {};
+        } catch {
+            this.details = data.details || {};
+        }
         this.editors = data.editors || [];
         this.schema = data.schema || '';
         this.updated_at = (data.updated_at || 0) * 1000 || Date.now();
