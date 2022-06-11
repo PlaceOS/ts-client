@@ -95,7 +95,7 @@ export function apiEndpoint(): string {
 
 /** Path of the API endpoint */
 export function httpRoute() {
-    return _route;
+    return _options.version === 'ACA Engine' ? '/control/api' : _route;
 }
 
 /**

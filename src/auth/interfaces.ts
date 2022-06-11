@@ -79,6 +79,8 @@ export interface PlaceAuthOptions {
     client_secret?: string;
     /** Whether access tokens should be injected into request headers */
     token_header?: boolean;
+    /** Version of the API endpoints to use */
+    version?: 'ACA Engine' | 'PlaceOS';
 }
 
 export interface PlaceTokenResponse {
