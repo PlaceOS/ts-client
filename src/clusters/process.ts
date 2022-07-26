@@ -6,6 +6,8 @@ import { humanReadableByteCount } from '../utilities/general';
 export interface PlaceProcessComplete extends Partial<PlaceProcess> {
     driver?: string;
     percentage_cpu?: number;
+    local?: { status: PlaceProcessComplete }
+    edge?: { status: PlaceProcessComplete }
 }
 
 export class PlaceProcess {
@@ -41,13 +43,13 @@ export class PlaceProcess {
         this.id = raw_data.id || raw_data.driver || '';
         this.modules = raw_data.modules || [];
         this.running = raw_data.running || false;
-        this.module_instances = raw_data.module_instances || 0;
-        this.last_exit_code = raw_data.last_exit_code || 0;
-        this.launch_count = raw_data.launch_count || 0;
-        this.launch_time = raw_data.launch_time || 0;
-        this.cpu_usage = raw_data.cpu_usage || raw_data.percentage_cpu || 0;
-        this.memory_total = raw_data.memory_total || 0;
-        this.memory_usage = raw_data.memory_usage || 0;
+        this.module_instances = raw_data.module_instances || raw_data.edge?.status.module_instances || raw_data.local?.status.module_instances || 0;
+        this.last_exit_code = raw_data.last_exit_code || raw_data.edge?.status.last_exit_code || raw_data.local?.status.last_exit_code  || 0;
+        this.launch_count = raw_data.launch_count || raw_data.edge?.status.launch_count || raw_data.local?.status.launch_count  || 0;
+        this.launch_time = raw_data.launch_time || raw_data.edge?.status.launch_time || raw_data.local?.status.launch_time  || 0;
+        this.cpu_usage = raw_data.cpu_usage || raw_data.percentage_cpu || raw_data.edge?.status.percentage_cpu || raw_data.local?.status.percentage_cpu  || 0;
+        this.memory_total = raw_data.memory_total || raw_data.edge?.status.memory_total || raw_data.local?.status.memory_total  || 0;
+        this.memory_usage = raw_data.memory_usage || raw_data.edge?.status.memory_usage || raw_data.local?.status.memory_usage  || 0;
         this.used_memory = humanReadableByteCount(this.memory_usage * 1024);
         this.total_memory = humanReadableByteCount(this.memory_total * 1024);
     }
