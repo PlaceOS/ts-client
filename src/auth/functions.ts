@@ -4,7 +4,7 @@ import * as sha256 from 'fast-sha256';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { fromFetch } from 'rxjs/fetch';
 import { map } from 'rxjs/operators';
-import { Md5 } from 'ts-md5/dist/md5';
+import { Md5 } from 'ts-md5';
 import { AbortControllerStub } from '../utilities/abort-controller';
 import { toQueryString } from '../utilities/api';
 import {
