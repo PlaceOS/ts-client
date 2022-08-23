@@ -84,6 +84,12 @@ const _online = new BehaviorSubject(false);
  */
 const _online_observer = _online.asObservable();
 
+/**
+ * @private
+ */
+
+let _failed_count = 0;
+
 /** API Endpoint for the retrieved version of PlaceOS */
 export function apiEndpoint(): string {
     const secure =
@@ -149,7 +155,8 @@ export function token(return_expired: boolean = true): string {
         log('Auth', 'Token expired. Requesting new token...');
         invalidateToken();
         if (!_promises.load_authority) {
-            setTimeout(() => authorise(), 200);
+            _failed_count += 1;
+            timeout('re-authorise', () => authorise(), 200 * Math.min(20, _failed_count));
         }
         if (!return_expired) {
             return '';
@@ -332,6 +339,7 @@ export function authorise(
                         generateTokenWithCredentials(_options).then(
                             ...token_handlers
                         );
+                        _failed_count = 0;
                     } else if (_code || refreshToken()) {
                         log(
                             'Auth',
@@ -340,6 +348,7 @@ export function authorise(
                             }`
                         );
                         generateToken().then(...token_handlers);
+                        _failed_count = 0;
                     } else {
                         if (api_authority!.session) {
                             log(
