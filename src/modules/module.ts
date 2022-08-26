@@ -20,7 +20,7 @@ export type EndDebugFn = () => void;
 
 export class PlaceModule extends PlaceResource {
     /** Whether the associated hardware is connected */
-    public readonly connected: boolean;
+    public readonly connected: boolean | undefined;
     /** Whether the module driver is running */
     public readonly running: boolean;
     /** Timestamp of last update in ms since UTC epoch */
@@ -82,7 +82,7 @@ export class PlaceModule extends PlaceResource {
         this.role = raw_data.role ?? PlaceDriverRole.Logic;
         this.notes = raw_data.notes || '';
         this.ignore_connected = raw_data.ignore_connected || false;
-        this.connected = raw_data.connected || false;
+        this.connected = raw_data.connected;
         this.running = raw_data.running || false;
         this.updated_at = raw_data.updated_at || 0;
         this.system = new PlaceSystem(
