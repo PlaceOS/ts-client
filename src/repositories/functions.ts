@@ -109,7 +109,7 @@ export function listRemoteRepositoryDefaultBranch(
     query_params: RepositoryDetails
 ): Observable<string> {
     return show({
-        id: 'remote_branches',
+        id: 'remote_default_branch',
         query_params,
         path: PATH,
     });
