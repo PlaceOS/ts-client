@@ -6,7 +6,7 @@ import * as Resources from '../../src/resources/functions';
 describe('Repositories API', () => {
     it('should allow querying repositories', async () => {
         const spy = jest.spyOn(Resources, 'query');
-        spy.mockImplementation((_) => of({ data: [_.fn({})] } as any));
+        spy.mockImplementation((_) => of({ data: [_.fn!({})] } as any));
         let list = await SERVICE.queryRepositories().toPromise();
         expect(list).toBeTruthy();
         expect(list.data.length).toBe(1);
@@ -16,7 +16,7 @@ describe('Repositories API', () => {
 
     it('should allow showing repository details', async () => {
         const spy = jest.spyOn(Resources, 'show');
-        spy.mockImplementation((_) => of(_.fn({}) as any));
+        spy.mockImplementation((_) => of(_.fn!({}) as any));
         let item = await SERVICE.showRepository('1').toPromise();
         expect(item).toBeInstanceOf(PlaceRepository);
         item = await SERVICE.showRepository('1', {}).toPromise();
@@ -24,7 +24,7 @@ describe('Repositories API', () => {
 
     it('should allow creating new repositories', async () => {
         const spy = jest.spyOn(Resources, 'create');
-        spy.mockImplementation((_) => of(_.fn({}) as any));
+        spy.mockImplementation((_) => of(_.fn!({}) as any));
         let item = await SERVICE.addRepository({}).toPromise();
         expect(item).toBeInstanceOf(PlaceRepository);
         item = await SERVICE.addRepository({}).toPromise();
@@ -32,7 +32,7 @@ describe('Repositories API', () => {
 
     it('should allow updating repository details', async () => {
         const spy = jest.spyOn(Resources, 'update');
-        spy.mockImplementation((_) => of(_.fn({}) as any));
+        spy.mockImplementation((_) => of(_.fn!({}) as any));
         let item = await SERVICE.updateRepository('1', {}).toPromise();
         expect(item).toBeInstanceOf(PlaceRepository);
         item = await SERVICE.updateRepository('1', {}, 'patch').toPromise();
