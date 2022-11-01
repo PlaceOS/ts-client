@@ -46,6 +46,42 @@ describe('Repositories API', () => {
         item = await SERVICE.removeRepository('1').toPromise();
     });
 
+    it('should allow listing remote repository default branch', async () => {
+        const spy = jest.spyOn(Resources, 'show');
+        spy.mockImplementation(() => of(''));
+        let item = await SERVICE.listRemoteRepositoryDefaultBranch({
+            repository_url: 'test'
+        }).toPromise();
+        expect(item).toEqual('');
+    });
+
+    it('should allow listing remote repository branches', async () => {
+        const spy = jest.spyOn(Resources, 'show');
+        spy.mockImplementation(() => of([]));
+        let item = await SERVICE.listRemoteRepositoryBranches({
+            repository_url: 'test'
+        }).toPromise();
+        expect(item).toEqual([]);
+    });
+
+    it('should allow listing remote repository commits', async () => {
+        const spy = jest.spyOn(Resources, 'show');
+        spy.mockImplementation(() => of([]));
+        let item = await SERVICE.listRemoteRepositoryCommits({
+            repository_url: 'test'
+        }).toPromise();
+        expect(item).toEqual([]);
+    });
+
+    it('should allow listing remote repository tags', async () => {
+        const spy = jest.spyOn(Resources, 'show');
+        spy.mockImplementation(() => of([]));
+        let item = await SERVICE.listRemoteRepositoryTags({
+            repository_url: 'test'
+        }).toPromise();
+        expect(item).toEqual([]);
+    });
+
     it('should allow listing interface repositories', async () => {
         const spy = jest.spyOn(Resources, 'show');
         spy.mockImplementation(() => of({}));
@@ -81,6 +117,20 @@ describe('Repositories API', () => {
         spy.mockImplementation(() => of(['master']));
         const item = await SERVICE.listRepositoryBranches('1').toPromise();
         expect(item).toEqual(['master']);
+    });
+
+    it('should allow listing repository default branch', async () => {
+        const spy = jest.spyOn(Resources, 'task');
+        spy.mockImplementation(() => of('master'));
+        const item = await SERVICE.listRepositoryDefaultBranch('1').toPromise();
+        expect(item).toEqual('master');
+    });
+
+    it('should allow listing repository tags', async () => {
+        const spy = jest.spyOn(Resources, 'task');
+        spy.mockImplementation(() => of(['v1.0.0']));
+        const item = await SERVICE.listRepositoryTags('1').toPromise();
+        expect(item).toEqual(['v1.0.0']);
     });
 
     it('should allow getting repository driver details', async () => {

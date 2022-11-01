@@ -49,6 +49,8 @@ let _last_total: HashMap<number> = {};
  */
 let _next: string = '';
 
+const pass_fn = (_: any) => _;
+
 /**
  * @private
  */
@@ -93,7 +95,7 @@ export function query<T>(q: QueryParameters<T>): QueryResponse<T> {
                     : null,
                 data:
                     resp && resp instanceof Array
-                        ? resp.map((i) => fn(i))
+                        ? resp.map((i) => (fn || pass_fn)(i))
                         : resp && !(resp instanceof Array) && resp.results
                         ? (resp.results as HashMap[]).map((i) => process(i))
                         : [],
@@ -114,7 +116,7 @@ export function show<T>(details: ShowParameters<T>): Observable<T> {
     const url = `${apiEndpoint()}/${path}/${id}${
         query_str ? '?' + query_str : ''
     }`;
-    return get(url).pipe(map((resp: any) => fn(resp)));
+    return get(url).pipe(map((resp: any) => (fn || pass_fn)(resp)));
 }
 
 /**
@@ -127,7 +129,7 @@ export function create<T>(details: CreateParameters<T>): Observable<T> {
     const { query_params, form_data, path, fn } = details;
     const query_str = toQueryString(query_params);
     const url = `${apiEndpoint()}/${path}${query_str ? '?' + query_str : ''}`;
-    const observable = post(url, form_data).pipe(map((resp: any) => fn(resp)));
+    const observable = post(url, form_data).pipe(map((resp: any) => (fn || pass_fn)(resp)));
     return observable;
 }
 
@@ -174,7 +176,7 @@ export function update<T>(details: UpdateParameters<T>): Observable<T> {
         query_str ? '?' + query_str : ''
     }`;
     return (method === 'put' ? put : patch)(url, form_data).pipe(
-        map((resp: any) => fn(resp))
+        map((resp: any) => (fn || pass_fn)(resp))
     );
 }
 

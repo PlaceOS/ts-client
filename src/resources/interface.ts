@@ -38,7 +38,7 @@ export interface PlaceDataClassEvent {
 
 export interface QueryParameters<T> {
     query_params: HashMap;
-    fn: (data: Partial<T>) => T;
+    fn?: (data: Partial<T>) => T;
     path: string;
 }
 

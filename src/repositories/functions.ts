@@ -97,7 +97,78 @@ export function listInterfaceRepositories(
     return show({
         id: 'interfaces',
         query_params,
-        fn: (_) => _ as string[],
+        path: PATH,
+    });
+}
+
+/**
+ * Get name of the default branches for a new repository
+ * @param query_params Details about the repository
+ */
+export function listRemoteRepositoryDefaultBranch(
+    query_params: RepositoryDetails
+): Observable<string> {
+    return show({
+        id: 'remote_branches',
+        query_params,
+        path: PATH,
+    });
+}
+
+export interface RepositoryDetails {
+    /** Git URL of the remote repository */
+    repository_url: string,
+    /** Username required to access the repository */
+    username?: string,
+    /** Password for the required user */
+    password?: string,
+}
+
+/**
+ * Get a list of branches for a new repository
+ * @param query_params Details about the repository
+ */
+export function listRemoteRepositoryBranches(
+    query_params: RepositoryDetails
+): Observable<string[]> {
+    return show({
+        id: 'remote_branches',
+        query_params,
+        path: PATH,
+    });
+}
+
+export interface RepositoryBranchDetails extends RepositoryDetails {
+    /** Branch to grab details for. Defaults to the default branch */
+    branch?: string;
+    /** Number of commits to retrieve from the remote. Defaults to `50` */
+    depth?: number;
+}
+
+/**
+ * Get a list of branch commits for a new repository
+ * @param query_params Details about the repository
+ */
+export function listRemoteRepositoryCommits(
+    query_params: RepositoryBranchDetails
+): Observable<GitCommitDetails[]> {
+    return show({
+        id: 'remote_commits',
+        query_params,
+        path: PATH,
+    });
+}
+
+/**
+ * Get a list of tags for a new repository
+ * @param query_params Details about the repository
+ */
+export function listRemoteRepositoryTags(
+    query_params: RepositoryDetails
+): Observable<string[]> {
+    return show({
+        id: 'remote_tags',
+        query_params,
         path: PATH,
     });
 }
@@ -169,6 +240,33 @@ export function listRepositoryBranches(id: string): Observable<string[]> {
         path: PATH,
     });
 }
+
+/**
+ * Get a list of all the branches for a repository
+ * @param id ID of the repository
+ */
+export function listRepositoryDefaultBranch(id: string): Observable<string> {
+    return task({
+        id,
+        task_name: 'default_branch',
+        method: 'get',
+        path: PATH,
+    });
+}
+
+/**
+ * Get a list of all the tags for a repository
+ * @param id ID of the repository
+ */
+export function listRepositoryTags(id: string): Observable<string[]> {
+    return task({
+        id,
+        task_name: 'tags',
+        method: 'get',
+        path: PATH,
+    });
+}
+
 
 /**
  * Get the details for a given driver
