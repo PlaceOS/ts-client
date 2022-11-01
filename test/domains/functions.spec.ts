@@ -7,7 +7,7 @@ import * as Resources from '../../src/resources/functions';
 describe('Domains API', () => {
     it('should allow querying domain', async () => {
         const spy = jest.spyOn(Resources, 'query');
-        spy.mockImplementation((_) => of({ data: [_.fn({})] } as any));
+        spy.mockImplementation((_) => of({ data: [_.fn!({})] } as any));
         let list = await SERVICE.queryDomains().toPromise();
         expect(list).toBeTruthy();
         expect(list.data.length).toBe(1);

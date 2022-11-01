@@ -8,7 +8,7 @@ import * as SERVICE from '../../src/triggers/functions';
 describe('Triggers API', () => {
     it('should allow querying triggers', async () => {
         const spy = jest.spyOn(Resources, 'query');
-        spy.mockImplementation((_) => of({ data: [_.fn({})] } as any));
+        spy.mockImplementation((_) => of({ data: [_.fn!({})] } as any));
         const list = await SERVICE.queryTriggers().toPromise();
         expect(list).toBeTruthy();
         expect(list.data.length).toBe(1);

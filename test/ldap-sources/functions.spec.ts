@@ -7,7 +7,7 @@ import * as Resources from '../../src/resources/functions';
 describe('LDAPSources API', () => {
     it('should allow querying ldapsources', async () => {
         const spy = jest.spyOn(Resources, 'query');
-        spy.mockImplementation((_) => of({ data: [_.fn({})] } as any));
+        spy.mockImplementation((_) => of({ data: [_.fn!({})] } as any));
         const list = await SERVICE.queryLDAPSources().toPromise();
         expect(list).toBeTruthy();
         expect(list.data.length).toBe(1);

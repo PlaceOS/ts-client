@@ -6,7 +6,7 @@ import * as Resources from '../../src/resources/functions';
 describe('OAuthSources API', () => {
     it('should allow querying oauth sources', async () => {
         const spy = jest.spyOn(Resources, 'query');
-        spy.mockImplementation((_) => of({ data: [_.fn({})] } as any));
+        spy.mockImplementation((_) => of({ data: [_.fn!({})] } as any));
         const list = await SERVICE.queryOAuthSources().toPromise();
         expect(list).toBeTruthy();
         expect(list.data.length).toBe(1);

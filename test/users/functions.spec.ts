@@ -6,7 +6,7 @@ import { PlaceUser } from '../../src/users/user';
 describe('Users API', () => {
     it('should allow querying users', async () => {
         const spy = jest.spyOn(Resources, 'query');
-        spy.mockImplementation((_) => of({ data: [_.fn({})] } as any));
+        spy.mockImplementation((_) => of({ data: [_.fn!({})] } as any));
         let list = await SERVICE.queryUsers().toPromise();
         expect(list).toBeTruthy();
         expect(list.data.length).toBe(1);

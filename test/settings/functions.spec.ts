@@ -6,7 +6,7 @@ import { PlaceSettings } from '../../src/settings/settings';
 describe('Settings API', () => {
     it('should allow querying settings', async () => {
         const spy = jest.spyOn(Resources, 'query');
-        spy.mockImplementation((_) => of({ data: [_.fn({})] } as any));
+        spy.mockImplementation((_) => of({ data: [_.fn!({})] } as any));
         const list = await SERVICE.querySettings().toPromise();
         expect(list).toBeTruthy();
         expect(list.data.length).toBe(1);
