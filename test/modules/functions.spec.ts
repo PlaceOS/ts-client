@@ -17,7 +17,7 @@ describe('Modules API', () => {
 
     it('should allow showing module details', async () => {
         const spy = jest.spyOn(Resources, 'show');
-        spy.mockImplementation((_) => of(_.fn({}) as any));
+        spy.mockImplementation((_) => of(_.fn!({}) as any));
         let item = await SERVICE.showModule('1').toPromise();
         expect(item).toBeInstanceOf(PlaceModule);
         item = await SERVICE.showModule('1', {}).toPromise();
@@ -25,7 +25,7 @@ describe('Modules API', () => {
 
     it('should allow creating new modules', async () => {
         const spy = jest.spyOn(Resources, 'create');
-        spy.mockImplementation((_) => of(_.fn({}) as any));
+        spy.mockImplementation((_) => of(_.fn!({}) as any));
         let item = await SERVICE.addModule({}).toPromise();
         expect(item).toBeInstanceOf(PlaceModule);
         item = await SERVICE.addModule({}).toPromise();
@@ -33,7 +33,7 @@ describe('Modules API', () => {
 
     it('should allow updating module details', async () => {
         const spy = jest.spyOn(Resources, 'update');
-        spy.mockImplementation((_) => of(_.fn({}) as any));
+        spy.mockImplementation((_) => of(_.fn!({}) as any));
         let item = await SERVICE.updateModule('1', {}).toPromise();
         expect(item).toBeInstanceOf(PlaceModule);
         item = await SERVICE.updateModule('1', {}, 'patch').toPromise();

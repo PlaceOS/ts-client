@@ -14,14 +14,14 @@ describe('Applications API', () => {
 
     it('should allow getting metadata', async () => {
         const spy = jest.spyOn(Resources, 'show');
-        spy.mockImplementation((_) => of(_.fn({}) as any));
+        spy.mockImplementation((_) => of(_.fn!({}) as any));
         const item = await SERVICE.showMetadata('1', 'test').toPromise();
         expect(item).toBeInstanceOf(PlaceMetadata);
     });
 
     it('should allow creating new metadata', async () => {
         const spy = jest.spyOn(Resources, 'create');
-        spy.mockImplementation((_) => of(_.fn({}) as any));
+        spy.mockImplementation((_) => of(_.fn!({}) as any));
         let item = await SERVICE.addMetadata({}).toPromise();
         expect(item).toBeInstanceOf(PlaceMetadata);
         item = await SERVICE.addMetadata({}).toPromise();
@@ -29,7 +29,7 @@ describe('Applications API', () => {
 
     it('should allow updating metadata details', async () => {
         const spy = jest.spyOn(Resources, 'update');
-        spy.mockImplementation((_) => of(_.fn({}) as any));
+        spy.mockImplementation((_) => of(_.fn!({}) as any));
         let item = await SERVICE.updateMetadata('1', {}).toPromise();
         expect(item).toBeInstanceOf(PlaceMetadata);
         item = await SERVICE.updateMetadata('1', {}, 'patch').toPromise();

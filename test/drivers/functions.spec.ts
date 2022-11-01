@@ -34,7 +34,7 @@ describe('Drivers API', () => {
 
     it('should allow updating driver details', async () => {
         const spy = jest.spyOn(Resources, 'update');
-        spy.mockImplementation((_) => of(_.fn({}) as any));
+        spy.mockImplementation((_) => of(_.fn!({}) as any));
         let item = await SERVICE.updateDriver('1', {}).toPromise();
         expect(item).toBeInstanceOf(PlaceDriver);
         item = await SERVICE.updateDriver('1', {}, 'put').toPromise();

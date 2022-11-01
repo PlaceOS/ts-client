@@ -16,7 +16,7 @@ describe('SAML Auth Sources API', () => {
 
     it('should allow showing SAML source details', async () => {
         const spy = jest.spyOn(Resources, 'show');
-        spy.mockImplementation((_) => of(_.fn({}) as any));
+        spy.mockImplementation((_) => of(_.fn!({}) as any));
         let item = await SERVICE.showSAMLSource('1').toPromise();
         expect(item).toBeInstanceOf(PlaceSAMLSource);
         item = await SERVICE.showSAMLSource('1', {}).toPromise();
@@ -24,7 +24,7 @@ describe('SAML Auth Sources API', () => {
 
     it('should allow creating new SAML sources', async () => {
         const spy = jest.spyOn(Resources, 'create');
-        spy.mockImplementation((_) => of(_.fn({}) as any));
+        spy.mockImplementation((_) => of(_.fn!({}) as any));
         let item = await SERVICE.addSAMLSource({}).toPromise();
         expect(item).toBeInstanceOf(PlaceSAMLSource);
         item = await SERVICE.addSAMLSource({}).toPromise();
@@ -32,7 +32,7 @@ describe('SAML Auth Sources API', () => {
 
     it('should allow updating SAML source details', async () => {
         const spy = jest.spyOn(Resources, 'update');
-        spy.mockImplementation((_) => of(_.fn({}) as any));
+        spy.mockImplementation((_) => of(_.fn!({}) as any));
         let item = await SERVICE.updateSAMLSource('1', {}).toPromise();
         expect(item).toBeInstanceOf(PlaceSAMLSource);
         item = await SERVICE.updateSAMLSource('1', {}, 'patch').toPromise();

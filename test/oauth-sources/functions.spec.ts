@@ -15,7 +15,7 @@ describe('OAuthSources API', () => {
 
     it('should allow showing oauth source details', async () => {
         const spy = jest.spyOn(Resources, 'show');
-        spy.mockImplementation((_) => of(_.fn({}) as any));
+        spy.mockImplementation((_) => of(_.fn!({}) as any));
         let item = await SERVICE.showOAuthSource('1').toPromise();
         expect(item).toBeInstanceOf(PlaceOAuthSource);
         item = await SERVICE.showOAuthSource('1', {}).toPromise();
@@ -23,7 +23,7 @@ describe('OAuthSources API', () => {
 
     it('should allow creating new oauth sources', async () => {
         const spy = jest.spyOn(Resources, 'create');
-        spy.mockImplementation((_) => of(_.fn({}) as any));
+        spy.mockImplementation((_) => of(_.fn!({}) as any));
         let item = await SERVICE.addOAuthSource({}).toPromise();
         expect(item).toBeInstanceOf(PlaceOAuthSource);
         item = await SERVICE.addOAuthSource({}).toPromise();
@@ -31,7 +31,7 @@ describe('OAuthSources API', () => {
 
     it('should allow updating oauth source details', async () => {
         const spy = jest.spyOn(Resources, 'update');
-        spy.mockImplementation((_) => of(_.fn({}) as any));
+        spy.mockImplementation((_) => of(_.fn!({}) as any));
         let item = await SERVICE.updateOAuthSource('1', {}).toPromise();
         expect(item).toBeInstanceOf(PlaceOAuthSource);
         item = await SERVICE.updateOAuthSource('1', {}, 'patch').toPromise();

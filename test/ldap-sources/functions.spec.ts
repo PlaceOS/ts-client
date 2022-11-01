@@ -16,21 +16,21 @@ describe('LDAPSources API', () => {
 
     it('should allow showing ldapsource details', async () => {
         const spy = jest.spyOn(Resources, 'show');
-        spy.mockImplementation((_) => of(_.fn({}) as any));
+        spy.mockImplementation((_) => of(_.fn!({}) as any));
         const item = await SERVICE.showLDAPSource('1').toPromise();
         expect(item).toBeInstanceOf(PlaceLDAPSource);
     });
 
     it('should allow creating new LDAP sources', async () => {
         const spy = jest.spyOn(Resources, 'create');
-        spy.mockImplementation((_) => of(_.fn({}) as any));
+        spy.mockImplementation((_) => of(_.fn!({}) as any));
         const item = await SERVICE.addLDAPSource({}).toPromise();
         expect(item).toBeInstanceOf(PlaceLDAPSource);
     });
 
     it('should allow updating LDAP source details', async () => {
         const spy = jest.spyOn(Resources, 'update');
-        spy.mockImplementation((_) => of(_.fn({}) as any));
+        spy.mockImplementation((_) => of(_.fn!({}) as any));
         const item = await SERVICE.updateLDAPSource('1', {}).toPromise();
         expect(item).toBeInstanceOf(PlaceLDAPSource);
     });

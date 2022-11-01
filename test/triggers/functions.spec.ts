@@ -17,21 +17,21 @@ describe('Triggers API', () => {
 
     it('should allow showing trigger details', async () => {
         const spy = jest.spyOn(Resources, 'show');
-        spy.mockImplementation((_) => of(_.fn({}) as any));
+        spy.mockImplementation((_) => of(_.fn!({}) as any));
         const item = await SERVICE.showTrigger('1').toPromise();
         expect(item).toBeInstanceOf(PlaceTrigger);
     });
 
     it('should allow creating new triggers', async () => {
         const spy = jest.spyOn(Resources, 'create');
-        spy.mockImplementation((_) => of(_.fn({}) as any));
+        spy.mockImplementation((_) => of(_.fn!({}) as any));
         const item = await SERVICE.addTrigger({}).toPromise();
         expect(item).toBeInstanceOf(PlaceTrigger);
     });
 
     it('should allow updating trigger details', async () => {
         const spy = jest.spyOn(Resources, 'update');
-        spy.mockImplementation((_) => of(_.fn({}) as any));
+        spy.mockImplementation((_) => of(_.fn!({}) as any));
         const item = await SERVICE.updateTrigger('1', {}).toPromise();
         expect(item).toBeInstanceOf(PlaceTrigger);
     });

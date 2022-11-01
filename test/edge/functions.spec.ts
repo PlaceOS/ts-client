@@ -16,7 +16,7 @@ describe('SAML Auth Sources API', () => {
 
     it('should allow showing Edge details', async () => {
         const spy = jest.spyOn(Resources, 'show');
-        spy.mockImplementation((_) => of(_.fn({}) as any));
+        spy.mockImplementation((_) => of(_.fn!({}) as any));
         let item = await SERVICE.showEdge('1').toPromise();
         expect(item).toBeInstanceOf(PlaceEdge);
         item = await SERVICE.showEdge('1', {}).toPromise();
@@ -24,7 +24,7 @@ describe('SAML Auth Sources API', () => {
 
     it('should allow creating new Edges', async () => {
         const spy = jest.spyOn(Resources, 'create');
-        spy.mockImplementation((_) => of(_.fn({}) as any));
+        spy.mockImplementation((_) => of(_.fn!({}) as any));
         let item = await SERVICE.addEdge({}).toPromise();
         expect(item).toBeInstanceOf(PlaceEdge);
         item = await SERVICE.addEdge({}).toPromise();
@@ -32,7 +32,7 @@ describe('SAML Auth Sources API', () => {
 
     it('should allow updating Edge details', async () => {
         const spy = jest.spyOn(Resources, 'update');
-        spy.mockImplementation((_) => of(_.fn({}) as any));
+        spy.mockImplementation((_) => of(_.fn!({}) as any));
         let item = await SERVICE.updateEdge('1', {}).toPromise();
         expect(item).toBeInstanceOf(PlaceEdge);
         item = await SERVICE.updateEdge('1', {}, 'patch').toPromise();

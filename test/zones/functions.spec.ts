@@ -17,7 +17,7 @@ describe('Zones API', () => {
 
     it('should allow showing zone details', async () => {
         const spy = jest.spyOn(Resources, 'show');
-        spy.mockImplementation((_) => of(_.fn({}) as any));
+        spy.mockImplementation((_) => of(_.fn!({}) as any));
         let item = await SERVICE.showZone('1').toPromise();
         expect(item).toBeInstanceOf(PlaceZone);
         item = await SERVICE.showZone('1', {}).toPromise();
@@ -25,7 +25,7 @@ describe('Zones API', () => {
 
     it('should allow creating new zones', async () => {
         const spy = jest.spyOn(Resources, 'create');
-        spy.mockImplementation((_) => of(_.fn({}) as any));
+        spy.mockImplementation((_) => of(_.fn!({}) as any));
         let item = await SERVICE.addZone({}).toPromise();
         expect(item).toBeInstanceOf(PlaceZone);
         item = await SERVICE.addZone({}).toPromise();
@@ -33,7 +33,7 @@ describe('Zones API', () => {
 
     it('should allow updating zone details', async () => {
         const spy = jest.spyOn(Resources, 'update');
-        spy.mockImplementation((_) => of(_.fn({}) as any));
+        spy.mockImplementation((_) => of(_.fn!({}) as any));
         let item = await SERVICE.updateZone('1', {}).toPromise();
         expect(item).toBeInstanceOf(PlaceZone);
         item = await SERVICE.updateZone('1', {}, 'patch').toPromise();

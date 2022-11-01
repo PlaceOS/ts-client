@@ -15,7 +15,7 @@ describe('Settings API', () => {
 
     it('should allow showing settings details', async () => {
         const spy = jest.spyOn(Resources, 'show');
-        spy.mockImplementation((_) => of(_.fn({}) as any));
+        spy.mockImplementation((_) => of(_.fn!({}) as any));
         let item = await SERVICE.showSettings('1').toPromise();
         expect(item).toBeInstanceOf(PlaceSettings);
         item = await SERVICE.showSettings('1', {}).toPromise();
@@ -23,7 +23,7 @@ describe('Settings API', () => {
 
     it('should allow creating new settings', async () => {
         const spy = jest.spyOn(Resources, 'create');
-        spy.mockImplementation((_) => of(_.fn({}) as any));
+        spy.mockImplementation((_) => of(_.fn!({}) as any));
         let item = await SERVICE.addSettings({}).toPromise();
         expect(item).toBeInstanceOf(PlaceSettings);
         item = await SERVICE.addSettings({}, {}).toPromise();
@@ -31,7 +31,7 @@ describe('Settings API', () => {
 
     it('should allow updating settings details', async () => {
         const spy = jest.spyOn(Resources, 'update');
-        spy.mockImplementation((_) => of(_.fn({}) as any));
+        spy.mockImplementation((_) => of(_.fn!({}) as any));
         let item = await SERVICE.updateSettings('1', {}).toPromise();
         expect(item).toBeInstanceOf(PlaceSettings);
         item = await SERVICE.updateSettings('1', {}, {}, 'patch').toPromise();

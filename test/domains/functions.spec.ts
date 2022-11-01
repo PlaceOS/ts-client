@@ -17,7 +17,7 @@ describe('Domains API', () => {
 
     it('should allow showing domain details', async () => {
         const spy = jest.spyOn(Resources, 'show');
-        spy.mockImplementation((_) => of(_.fn({}) as any));
+        spy.mockImplementation((_) => of(_.fn!({}) as any));
         let item = await SERVICE.showDomain('1').toPromise();
         expect(item).toBeInstanceOf(PlaceDomain);
         item = await SERVICE.showDomain('1', {}).toPromise();
@@ -25,7 +25,7 @@ describe('Domains API', () => {
 
     it('should allow creating new domains', async () => {
         const spy = jest.spyOn(Resources, 'create');
-        spy.mockImplementation((_) => of(_.fn({}) as any));
+        spy.mockImplementation((_) => of(_.fn!({}) as any));
         let item = await SERVICE.addDomain({}).toPromise();
         expect(item).toBeInstanceOf(PlaceDomain);
         item = await SERVICE.addDomain({}).toPromise();
@@ -33,7 +33,7 @@ describe('Domains API', () => {
 
     it('should allow updating domain details', async () => {
         const spy = jest.spyOn(Resources, 'update');
-        spy.mockImplementation((_) => of(_.fn({}) as any));
+        spy.mockImplementation((_) => of(_.fn!({}) as any));
         let item = await SERVICE.updateDomain('1', {}).toPromise();
         expect(item).toBeInstanceOf(PlaceDomain);
         item = await SERVICE.updateDomain('1', {}, 'patch').toPromise();

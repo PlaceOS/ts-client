@@ -16,7 +16,7 @@ describe('Users API', () => {
 
     it('should allow showing user details', async () => {
         const spy = jest.spyOn(Resources, 'show');
-        spy.mockImplementation((_) => of(_.fn({}) as any));
+        spy.mockImplementation((_) => of(_.fn!({}) as any));
         let item = await SERVICE.showUser('1').toPromise();
         expect(item).toBeInstanceOf(PlaceUser);
         item = await SERVICE.showUser('1', {}).toPromise();
@@ -24,7 +24,7 @@ describe('Users API', () => {
 
     it('should allow showing current user details', async () => {
         const spy = jest.spyOn(Resources, 'show');
-        spy.mockImplementation((_) => of(_.fn({}) as any));
+        spy.mockImplementation((_) => of(_.fn!({}) as any));
         let item = await SERVICE.currentUser().toPromise();
         expect(item).toBeInstanceOf(PlaceUser);
         item = await SERVICE.currentUser({}).toPromise();
@@ -32,7 +32,7 @@ describe('Users API', () => {
 
     it('should allow creating new users', async () => {
         const spy = jest.spyOn(Resources, 'create');
-        spy.mockImplementation((_) => of(_.fn({}) as any));
+        spy.mockImplementation((_) => of(_.fn!({}) as any));
         let item = await SERVICE.addUser({}).toPromise();
         expect(item).toBeInstanceOf(PlaceUser);
         item = await SERVICE.addUser({}).toPromise();
@@ -40,7 +40,7 @@ describe('Users API', () => {
 
     it('should allow updating user details', async () => {
         const spy = jest.spyOn(Resources, 'update');
-        spy.mockImplementation((_) => of(_.fn({}) as any));
+        spy.mockImplementation((_) => of(_.fn!({}) as any));
         let item = await SERVICE.updateUser('1', {}).toPromise();
         expect(item).toBeInstanceOf(PlaceUser);
         item = await SERVICE.updateUser('1', {}, 'patch').toPromise();
