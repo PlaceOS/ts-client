@@ -7,7 +7,7 @@ import * as Resources from '../../src/resources/functions';
 describe('Applications API', () => {
     it('should allow listing metadata', async () => {
         const spy = jest.spyOn(Resources, 'show');
-        spy.mockImplementation((_) => of(_.fn([{}]) as any));
+        spy.mockImplementation((_) => of(_.fn!([{}]) as any));
         const item = await SERVICE.listMetadata('1').toPromise();
         expect(item[0]).toBeInstanceOf(PlaceMetadata);
     });

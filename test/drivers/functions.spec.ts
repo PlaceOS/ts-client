@@ -16,7 +16,7 @@ describe('Drivers API', () => {
 
     it('should allow showing driver details', async () => {
         const spy = jest.spyOn(Resources, 'show');
-        spy.mockImplementation((_) => of(_.fn({})));
+        spy.mockImplementation((_) => of(_.fn!({})));
         let item = await SERVICE.showDriver('1').toPromise();
         expect(item).toBeInstanceOf(PlaceDriver);
         item = await SERVICE.showDriver('1', {}).toPromise();
@@ -25,7 +25,7 @@ describe('Drivers API', () => {
 
     it('should allow creating new drivers', async () => {
         const spy = jest.spyOn(Resources, 'create');
-        spy.mockImplementation((_) => of(_.fn({})));
+        spy.mockImplementation((_) => of(_.fn!({})));
         let item = await SERVICE.addDriver({}).toPromise();
         expect(item).toBeInstanceOf(PlaceDriver);
         item = await SERVICE.addDriver({}).toPromise();
