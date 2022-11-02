@@ -27,7 +27,7 @@ export class PlaceRepository extends PlaceResource {
         this.folder_name = raw_data.folder_name || '';
         this.description = raw_data.description || '';
         this.uri = raw_data.uri || '';
-        this.branch = raw_data.branch || 'master';
+        this.branch = raw_data.branch || '';
         this.commit_hash = raw_data.commit_hash || '';
         this.repo_type = raw_data.repo_type || PlaceRepositoryType.Driver;
         this.username = raw_data.username || '';
