@@ -7,7 +7,7 @@ export interface PlaceZoneQueryOptions extends PlaceResourceQueryOptions {
     /** ID of the system to filter the results */
     control_system_id?: string;
     /** ID of the parent zone to filter the results */
-    parent?: string;
+    parent_id?: string;
 }
 
 /** Mapping of available query parameters for the zones show endpoint */
