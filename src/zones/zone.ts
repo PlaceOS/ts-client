@@ -40,6 +40,10 @@ export class PlaceZone extends PlaceResource {
     public readonly capacity: number;
     /** ID or URL of or in a map associated with the zone */
     public readonly map_id: string;
+    /** List of image URLs */
+    public readonly images: string[];
+    /** Timezone of the associated real world location */
+    public readonly timezone: string;
     /**
      * List of modules associated with the system.
      * Only available from the show method with the `complete` query parameter
@@ -60,6 +64,8 @@ export class PlaceZone extends PlaceResource {
         this.count = raw_data.count || 0;
         this.capacity = raw_data.capacity || 0;
         this.map_id = raw_data.map_id || '';
+        this.timezone = raw_data.timezone || '';
+        this.images = raw_data.images || [];
         if (typeof this.settings !== 'object') {
             (this as any).settings = [null, null, null, null];
         }
