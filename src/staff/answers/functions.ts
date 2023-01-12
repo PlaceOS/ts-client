@@ -1,6 +1,6 @@
 import { map } from 'rxjs/operators';
-import { get, post } from 'src/api';
-import { toQueryString } from 'src/utilities/api';
+import { get, post } from '../../api';
+import { toQueryString } from '../../utilities/api';
 import { AnswerQueryOptions } from './interfaces';
 import { SurveyAnswer } from './model';
 
