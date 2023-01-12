@@ -7,7 +7,7 @@ import { SurveyQuestion } from './model';
 /**
  * @private
  */
-const PATH = '/api/staff/v1/survey/questions';
+const PATH = '/api/staff/v1/surveys/questions';
 
 /**
  * Query the available questions

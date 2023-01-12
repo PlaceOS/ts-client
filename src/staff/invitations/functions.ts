@@ -7,7 +7,7 @@ import { SurveyInvitation } from './model';
 /**
  * @private
  */
-const PATH = '/api/staff/v1/survey/invitations';
+const PATH = '/api/staff/v1/surveys/invitations';
 
 /**
  * Query the available invitations
