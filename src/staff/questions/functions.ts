@@ -26,11 +26,11 @@ export function queryQuestions(query_params: QuestionQueryOptions = {}) {
  * @param query_params Query parameters to add the to request URL
  */
 export function showQuestion(
-    token: string,
+    id: string,
     query_params: QuestionShowOptions = {}
 ) {
     const query = toQueryString(query_params);
-    return get(`${PATH}/${token}${query ? '?' + query : ''}`).pipe(
+    return get(`${PATH}/${id}${query ? '?' + query : ''}`).pipe(
         map((l: any) => new SurveyQuestion(l))
     );
 }
