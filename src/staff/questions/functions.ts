@@ -52,9 +52,9 @@ export function addQuestion(form_data: Partial<SurveyQuestion>) {
  * @param query_params Query parameters to add the to request URL
  */
 export function removeQuestion(
-    token: string,
+    id: string,
     query_params: Record<string, any> = {}
 ) {
     const query = toQueryString(query_params);
-    return del(`${PATH}/${token}${query ? '?' + query : ''}`);
+    return del(`${PATH}/${id}${query ? '?' + query : ''}`);
 }
