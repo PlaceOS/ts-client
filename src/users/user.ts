@@ -38,6 +38,8 @@ export class PlaceUser extends PlaceResource {
     public readonly ui_theme: string;
     /** Card Number associated with the user */
     public readonly card_number: string;
+    /** Organisational department the user belongs */
+    public readonly department: string;
     /** Password */
     protected password = '';
     /** Password */
@@ -62,5 +64,6 @@ export class PlaceUser extends PlaceResource {
         this.ui_theme = raw_data.ui_theme || '';
         this.card_number = raw_data.card_number || '';
         this.groups = raw_data.groups || [];
+        this.department = raw_data.department || '';
     }
 }
