@@ -56,7 +56,7 @@ export function updateSurvey(
  */
 export function addSurvey(form_data: Partial<Survey>) {
     return post(`${PATH}`, form_data).pipe(
-        map((l: any) => l.map((_: any) => new Survey(_)))
+        map((l: any) => new Survey(l))
     );
 }
 
