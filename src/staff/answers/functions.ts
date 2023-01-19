@@ -25,8 +25,8 @@ export function queryAnswers(query_params: AnswerQueryOptions = {}) {
  * @param form_data Answer data
  * @param query_params Query parameters to add the to request URL
  */
-export function addAnswer(form_data: Partial<SurveyAnswer>) {
+export function addAnswer(form_data: Partial<SurveyAnswer>[]) {
     return post(`${PATH}`, form_data).pipe(
-        map((l: any) => new SurveyAnswer(l))
+        map((l: any) => l.map((_: any) => new SurveyAnswer(_)))
     );
 }
