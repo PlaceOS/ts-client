@@ -1,4 +1,3 @@
-
 import { PlaceModule } from '../modules/module';
 import { PlaceResource } from '../resources/resource';
 import { EncryptionLevel } from '../settings/interfaces';
@@ -31,6 +30,8 @@ export class PlaceSystem extends PlaceResource {
     public readonly features: string[];
     /** Whether system is bookable by end users */
     public readonly bookable: boolean;
+    /** Whether system is public accessible */
+    public readonly public: boolean;
     /** Count of UI devices attached to the system */
     public readonly installed_ui_devices: number;
     /** Support URL for the system */
@@ -57,6 +58,7 @@ export class PlaceSystem extends PlaceResource {
         this.capacity = raw_data.capacity || 0;
         this.features = raw_data.features || [];
         this.bookable = raw_data.bookable || false;
+        this.public = raw_data.public ?? false;
         this.installed_ui_devices = raw_data.installed_ui_devices || 0;
         this.support_url = raw_data.support_url || '';
         this.map_id = raw_data.map_id || '';
@@ -77,7 +79,7 @@ export class PlaceSystem extends PlaceResource {
         }
         if (raw_data.module_data && raw_data.module_data instanceof Array) {
             this.module_list = raw_data.module_data.map(
-                mod => new PlaceModule(mod)
+                (mod) => new PlaceModule(mod)
             );
         }
     }
