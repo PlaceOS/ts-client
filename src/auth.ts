@@ -2,6 +2,7 @@
 
 export {
     apiEndpoint,
+    apiKey,
     httpRoute,
     cleanupAuth,
     clientId,
@@ -24,7 +25,7 @@ export {
     logout,
     listenForToken,
     setToken,
-    setAPI_Key
+    setAPI_Key,
 } from './auth/functions';
 export {
     PlaceAuthority,
