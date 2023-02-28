@@ -24,6 +24,8 @@ export class PlaceSystem extends PlaceResource {
     public readonly description: string;
     /** Email address associated with the system */
     public readonly email: string;
+    /** Email address associated with the system */
+    public readonly code: string;
     /** Capacity of the space associated with the system */
     public readonly capacity: number;
     /** Features associated with the system */
@@ -55,6 +57,7 @@ export class PlaceSystem extends PlaceResource {
         this.display_name = raw_data.display_name || '';
         this.description = raw_data.description || '';
         this.email = raw_data.email || '';
+        this.code = raw_data.code || '';
         this.capacity = raw_data.capacity || 0;
         this.features = raw_data.features || [];
         this.bookable = raw_data.bookable || false;
