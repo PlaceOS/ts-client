@@ -1,5 +1,5 @@
 import { map } from 'rxjs/operators';
-import { del, get, post } from '../../api';
+import { del, get, patch, post, put } from '../../api';
 import { toQueryString } from '../../utilities/api';
 import { QuestionQueryOptions, QuestionShowOptions } from './interfaces';
 import { SurveyQuestion } from './model';
@@ -42,6 +42,23 @@ export function showQuestion(
  */
 export function addQuestion(form_data: Partial<SurveyQuestion>) {
     return post(`${PATH}`, form_data).pipe(
+        map((l: any) => new SurveyQuestion(l))
+    );
+}
+
+/**
+ * Update the question in the database
+ * @param id ID of the question
+ * @param form_data New values for the question
+ * @param query_params Query parameters to add the to request URL
+ * @param method HTTP verb to use on request. Defaults to `patch`
+ */
+export function updateQuestion(
+    id: string,
+    form_data: Partial<SurveyQuestion>,
+    method: 'put' | 'patch' = 'patch'
+) {
+    return (method === 'put' ? put : patch)(`${PATH}/${id}`, form_data).pipe(
         map((l: any) => new SurveyQuestion(l))
     );
 }
