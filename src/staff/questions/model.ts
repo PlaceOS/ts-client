@@ -8,6 +8,7 @@ export class SurveyQuestion {
     max_rating: number;
     choices: Array<any>;
     tags: Array<string>;
+    deleted: boolean;
 
     constructor(_data: Partial<SurveyQuestion>) {
         this.id = _data.id || 0;
@@ -19,5 +20,6 @@ export class SurveyQuestion {
         this.max_rating = _data.max_rating || 0;
         this.choices = _data.choices || [];
         this.tags = _data.tags || [];
+        this.deleted = _data.deleted || false;
     }
 }
