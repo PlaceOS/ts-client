@@ -30,9 +30,9 @@ describe('MockEngineWebsocket', () => {
         ws.cleanupRealtime();
     });
 
-    it('should bind to mock system modules', done => {
+    it('should bind to mock system modules', (done) => {
         const binding = { sys: 'sys-A0', mod: 'Test', index: 1, name: 'test' };
-        ws.listen(binding).subscribe(value => {
+        ws.listen(binding).subscribe((value) => {
             if (value) {
                 expect(ws.value(binding)).toBe(10);
                 done();
@@ -41,12 +41,12 @@ describe('MockEngineWebsocket', () => {
         ws.bind(binding);
     });
 
-    it('post binding value updates', done => {
+    it('post binding value updates', (done) => {
         const binding = { sys: 'sys-A0', mod: 'Test', index: 1, name: 'test' };
         let count = 0;
-        ws.listen(binding).subscribe(value => {
+        ws.listen(binding).subscribe((value) => {
             if (count === 0) {
-                expect(value).toBeNull();
+                expect(value).toBeUndefined();
                 count++;
             } else {
                 expect(value).toBe(10);
@@ -56,9 +56,9 @@ describe('MockEngineWebsocket', () => {
         ws.bind(binding);
     });
 
-    it('should unbind from mock system modules', done => {
+    it('should unbind from mock system modules', (done) => {
         const binding = { sys: 'sys-A0', mod: 'Test', index: 1, name: 'test' };
-        ws.listen(binding).subscribe(value => {
+        ws.listen(binding).subscribe((value) => {
             if (value) {
                 expect(ws.value(binding)).toBe(10);
                 ws.unbind(binding).then(() => {
@@ -73,12 +73,12 @@ describe('MockEngineWebsocket', () => {
         ws.bind(binding);
     });
 
-    it('should exec mock system module methods', done => {
+    it('should exec mock system module methods', (done) => {
         const binding = { sys: 'sys-A0', mod: 'Test', index: 1, name: 'test' };
         ws.listen(binding)
-            .pipe(first(_ => _))
-            .subscribe(_ => {
-                ws.execute({ ...binding, name: 'testCall' }).then(value => {
+            .pipe(first((_) => _))
+            .subscribe((_) => {
+                ws.execute({ ...binding, name: 'testCall' }).then((value) => {
                     expect(value).toBe(10);
                     setTimeout(() => {
                         expect(ws.value(binding)).toBe(11);
@@ -89,7 +89,7 @@ describe('MockEngineWebsocket', () => {
         ws.bind(binding);
     });
 
-    it('should error if binding module not found', done => {
+    it('should error if binding module not found', (done) => {
         const binding = {
             sys: 'sys-A0',
             mod: 'Testing',
@@ -99,7 +99,7 @@ describe('MockEngineWebsocket', () => {
         ws.bind(binding).then(null, () => done());
     });
 
-    it('should error if binding system not found', done => {
+    it('should error if binding system not found', (done) => {
         const binding = { sys: 'sys-B0', mod: 'Test', index: 1, name: 'test' };
         ws.bind(binding).then(null, () => done());
     });
