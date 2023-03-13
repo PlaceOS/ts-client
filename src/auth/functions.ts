@@ -18,7 +18,7 @@ import {
     getFragments,
     log,
     removeFragment,
-    is_iFrame
+    is_iFrame,
 } from '../utilities/general';
 import { HashMap } from '../utilities/types';
 import {
@@ -140,6 +140,7 @@ export function setToken(
     new_token: string,
     expires_at: number = addHours(new Date(), 2).valueOf()
 ) {
+    if (_options.ignore_api_key && new_token === 'x-api-key') return;
     _storage.setItem(`${_client_id}_expires_at`, `${expires_at}`);
     _storage.setItem(`${_client_id}_access_token`, new_token);
 }
@@ -148,7 +149,7 @@ export function setToken(
 export function token(return_expired: boolean = true): string {
     if (_options.mock) return 'mock-token';
     if (!_storage) return '';
-    if (apiKey()) return 'x-api-key';
+    if (apiKey() && !_options.ignore_api_key) return 'x-api-key';
     const expires_at = _storage.getItem(`${_client_id}_expires_at`) || '';
     const access_token = _access_token.getValue();
     if (isBefore(+expires_at, new Date())) {
@@ -156,7 +157,11 @@ export function token(return_expired: boolean = true): string {
         invalidateToken();
         if (!_promises.load_authority) {
             _failed_count += 1;
-            timeout('re-authorise', () => authorise(), 200 * Math.min(20, _failed_count));
+            timeout(
+                're-authorise',
+                () => authorise(),
+                200 * Math.min(20, _failed_count)
+            );
         }
         if (!return_expired) {
             return '';
@@ -232,7 +237,10 @@ export function isFixedDevice(): boolean {
  * Check for an auth related param in the URL or storage
  * @param name Name of the paramater to look for
  */
-export function checkStoreForAuthParam(name: string, store: boolean = true): string {
+export function checkStoreForAuthParam(
+    name: string,
+    store: boolean = true
+): string {
     const fragments = getFragments();
     let param = fragments[name];
     /* istanbul ignore else */

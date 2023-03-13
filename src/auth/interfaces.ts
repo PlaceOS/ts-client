@@ -81,6 +81,8 @@ export interface PlaceAuthOptions {
     token_header?: boolean;
     /** Version of the API endpoints to use */
     version?: 'ACA Engine' | 'PlaceOS';
+    /** Whether X-API-KEY values should be ignored */
+    ignore_api_key?: boolean;
 }
 
 export interface PlaceTokenResponse {
