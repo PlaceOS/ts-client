@@ -301,6 +301,7 @@ export function refreshAuthority(): Promise<void> {
  */
 export function invalidateToken(): void {
     log('Auth', 'Invalidating tokens.');
+    _storage.removeItem(`x-api-key`);
     _storage.removeItem(`${_client_id}_access_token`);
     _storage.removeItem(`${_client_id}_expires_at`);
     if (_access_token.getValue()) _access_token.next('');
