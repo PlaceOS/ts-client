@@ -46,6 +46,8 @@ export class PlaceSystem extends PlaceResource {
     public readonly images: readonly string[];
     /** List of the zone IDs that the system belongs */
     public readonly zones: readonly string[];
+    /** Timezone of the associated real world space */
+    public readonly timezone: string;
     /**
      * List of modules associated with the system.
      * Only available from the show method with the `complete` query parameter
@@ -69,6 +71,7 @@ export class PlaceSystem extends PlaceResource {
         this.images = raw_data.images || [];
         this.zones = raw_data.zones || [];
         this.settings = raw_data.settings || [null, null, null, null];
+        this.timezone = raw_data.timezone || '';
         if (typeof this.settings !== 'object') {
             (this as any).settings = [null, null, null, null];
         }
