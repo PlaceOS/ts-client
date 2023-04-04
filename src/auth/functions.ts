@@ -449,7 +449,7 @@ export function loadAuthority(tries: number = 0): Promise<void> {
                     : `/api/engine/v2`;
 
                 log('Auth', `Loaded authority.`, [], 'group');
-                {
+                if (_authority) {
                     log('Auth', `Name: ${_authority.name}`);
                     log('Auth', `Version: ${_authority.version}`);
                     log('Auth', `Domain: ${_authority.domain}`);
@@ -457,7 +457,9 @@ export function loadAuthority(tries: number = 0): Promise<void> {
                     log('Auth', `Production: ${_authority.production}`);
                     log(
                         'Auth',
-                        `Config Keys: ${Object.keys(_authority.config).length}`
+                        `Config Keys: ${
+                            Object.keys(_authority.config || {}).length
+                        }`
                     );
                 }
                 log('Auth', ``, [], 'groupEnd');
