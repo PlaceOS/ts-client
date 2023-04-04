@@ -448,7 +448,20 @@ export function loadAuthority(tries: number = 0): Promise<void> {
                     ? `/control/api`
                     : `/api/engine/v2`;
 
-                log('Auth', `Loaded authority.`, _authority);
+                log('Auth', `Loaded authority.`, [], 'group');
+                {
+                    log('Auth', `Name: ${_authority.name}`);
+                    log('Auth', `Version: ${_authority.version}`);
+                    log('Auth', `Domain: ${_authority.domain}`);
+                    log('Auth', `Session: ${_authority.session}`);
+                    log('Auth', `Production: ${_authority.production}`);
+                    log(
+                        'Auth',
+                        `Config Keys: ${Object.keys(_authority.config).length}`
+                    );
+                }
+                log('Auth', ``, [], 'groupEnd');
+
                 const response = () => {
                     _online.next(true);
                     log('Auth', 'Application set online.');

@@ -8,7 +8,15 @@ declare global {
 /**
  * @hidden
  */
-export type ConsoleIOStream = 'log' | 'warn' | 'debug' | 'error' | 'info';
+export type ConsoleIOStream =
+    | 'log'
+    | 'warn'
+    | 'debug'
+    | 'error'
+    | 'info'
+    | 'group'
+    | 'groupCollapsed'
+    | 'groupEnd';
 /* istanbul ignore next */
 /**
  * Log message to the console
