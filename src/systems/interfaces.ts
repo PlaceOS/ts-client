@@ -14,6 +14,8 @@ export interface PlaceModuleFunction {
 
 /** Allowable query parameters for systems index endpoint */
 export interface PlaceSystemsQueryOptions extends PlaceResourceQueryOptions {
+    /** Comma seperated list of email addresses to filter on */
+    email?: string;
     /** Zone ID to filter the returned values on */
     zone_id?: string;
     /** Driver ID to filter the returned values on */
