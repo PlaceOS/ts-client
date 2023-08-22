@@ -38,7 +38,7 @@ export class PlaceVariableBinding<T = any> {
                     );
                     log(
                         'VAR',
-                        'Marking binding for re-bind when possible.',
+                        'Binding dropped due to disconnection. Marking binding for re-bind when possible.',
                         this.binding()
                     );
                     this._stale_bindings =
