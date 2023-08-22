@@ -10,7 +10,7 @@ import { PlaceModuleBinding } from './module';
 enum PENDING {
     NONE,
     BIND,
-    UNBIND
+    UNBIND,
 }
 
 export class PlaceVariableBinding<T = any> {
@@ -26,18 +26,26 @@ export class PlaceVariableBinding<T = any> {
     constructor(private _module: PlaceModuleBinding, _name: string) {
         this.name = _name;
         // Listen for state changes in the websocket connection
-        status().pipe(distinctUntilChanged()).subscribe((connected: boolean) => {
-            if (connected && this._stale_bindings) {
-                log('VAR', 'Re-binding to status variable', this.binding());
-                this.rebind();
-            } else if (!connected) {
-                clearAsyncTimeout(`rebind:${JSON.stringify(this.binding())}`);
-                log('VAR', 'Setting binding as stale', this.binding());
-                this._stale_bindings =
-                    this._binding_count || this._stale_bindings;
-                this._binding_count = 0;
-            }
-        });
+        status()
+            .pipe(distinctUntilChanged())
+            .subscribe((connected: boolean) => {
+                if (connected && this._stale_bindings) {
+                    log('VAR', 'Re-binding to status variable', this.binding());
+                    this.rebind();
+                } else if (!connected) {
+                    clearAsyncTimeout(
+                        `rebind:${JSON.stringify(this.binding())}`
+                    );
+                    log(
+                        'VAR',
+                        'Marking binding for re-bind when possible.',
+                        this.binding()
+                    );
+                    this._stale_bindings =
+                        this._binding_count || this._stale_bindings;
+                    this._binding_count = 0;
+                }
+            });
     }
 
     /** Number of bindings to this status variable */
@@ -63,7 +71,10 @@ export class PlaceVariableBinding<T = any> {
      */
     public bind(): () => void {
         /* istanbul ignore else */
-        if ((this._binding_count <= 0 && this._stale_bindings <= 0) || this._pending === PENDING.UNBIND) {
+        if (
+            (this._binding_count <= 0 && this._stale_bindings <= 0) ||
+            this._pending === PENDING.UNBIND
+        ) {
             this._pending = PENDING.BIND;
             bind(this.binding()).then(() => {
                 this._binding_count++;
@@ -80,7 +91,8 @@ export class PlaceVariableBinding<T = any> {
         if (this._binding_count === 1 && this._pending === PENDING.NONE) {
             this._pending = PENDING.UNBIND;
             unbind(this.binding()).then(() => {
-                if (this._pending === PENDING.UNBIND) this._pending = PENDING.NONE;
+                if (this._pending === PENDING.UNBIND)
+                    this._pending = PENDING.NONE;
                 this._binding_count--;
             });
         } else {
