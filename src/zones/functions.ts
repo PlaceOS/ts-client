@@ -1,4 +1,12 @@
-import { create, query, remove, show, update } from '../resources/functions';
+import { Observable } from 'rxjs';
+import {
+    create,
+    query,
+    remove,
+    show,
+    task,
+    update,
+} from '../resources/functions';
 import { PlaceTrigger } from '../triggers/trigger';
 import { HashMap } from '../utilities/types';
 import { PlaceZoneQueryOptions, PlaceZoneShowOptions } from './interfaces';
@@ -43,7 +51,14 @@ export function updateZone(
     form_data: Partial<PlaceZone>,
     method: 'put' | 'patch' = 'patch'
 ) {
-    return update({ id, form_data, query_params: {}, method, fn: process, path: PATH });
+    return update({
+        id,
+        form_data,
+        query_params: {},
+        method,
+        fn: process,
+        path: PATH,
+    });
 }
 
 /**
@@ -52,7 +67,7 @@ export function updateZone(
  * @param query_params Query parameters to add the to request URL
  */
 export function addZone(form_data: Partial<PlaceZone>) {
-    return create({form_data, query_params: {}, fn: process, path: PATH});
+    return create({ form_data, query_params: {}, fn: process, path: PATH });
 }
 
 /**
@@ -73,6 +88,31 @@ export function listZoneTriggers(id: string, query_params: HashMap = {}) {
     return query({
         query_params,
         fn: (i: Partial<PlaceTrigger>) => new PlaceTrigger(i),
-        path: `${PATH}/${id}/triggers`
+        path: `${PATH}/${id}/triggers`,
+    });
+}
+
+/**
+ * Execute a function of the system's module under a given zone
+ * @param id Zone ID
+ * @param method Name of the function to execute
+ * @param module Class name of the Module e.g. `Display`, `Lighting` etc.
+ * @param index Module index. Defaults to `1`
+ * @param args Array of arguments to pass to the executed method
+ */
+export function executeOnZone(
+    id: string,
+    method: string,
+    module: string,
+    index: number = 1,
+    args: any[] = []
+): Observable<HashMap> {
+    return task({
+        id,
+        task_name: `exec/${encodeURIComponent(
+            module + '_' + index
+        )}/${encodeURIComponent(method)}`,
+        form_data: args,
+        path: PATH,
     });
 }

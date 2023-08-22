@@ -262,6 +262,7 @@ export {
     updateZone,
     removeZone,
     listZoneTriggers,
+    executeOnZone,
 } from './zones/functions';
 export { PlaceZone } from './zones/zone';
 export {
