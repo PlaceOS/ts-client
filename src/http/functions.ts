@@ -222,7 +222,7 @@ export async function transform(
         case 'json':
             return await resp.json().catch(() => ({}));
         case 'text':
-            return resp.text();
+            return await resp.text();
     }
 }
 

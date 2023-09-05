@@ -92,6 +92,7 @@ export function query<T>(q: QueryParameters<T>): QueryResponse<T> {
                           query({
                               query_params: details.next as HashMap,
                               fn,
+                              endpoint,
                               path,
                           })
                     : null,
@@ -205,11 +206,14 @@ export function remove(details: RemoveParameters): Observable<HashMap> {
  * @param name
  */
 export function handleHeaders(url: string, query_str: string, name: string) {
-    const headers = responseHeaders(url);
+    const headers = responseHeaders(
+        url[0] === '/' ? `${location.origin}${url}` : url
+    );
     const details: { total: number; next: HashMap<string> | null } = {
         total: 0,
         next: null,
     };
+
     if (headers && headers['x-total-count']) {
         const total_value = +(headers['x-total-count'] || 0);
         if (
