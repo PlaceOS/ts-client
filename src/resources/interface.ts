@@ -23,11 +23,20 @@ export interface ResourceService<T = any> {
     query: (fields?: HashMap) => Promise<T[]>;
     show: (id: string, fields?: HashMap) => Promise<T>;
     add: (data: HashMap) => Promise<T>;
-    update: (id: string, data: HashMap, fields?: HashMap, type?: 'put' | 'patch') => Promise<T>;
+    update: (
+        id: string,
+        data: HashMap,
+        fields?: HashMap,
+        type?: 'put' | 'patch'
+    ) => Promise<T>;
     delete: (id: string) => Promise<void>;
 }
 
-export type PlaceDataEventType = 'value_change' | 'item_saved' | 'reset' | 'other';
+export type PlaceDataEventType =
+    | 'value_change'
+    | 'item_saved'
+    | 'reset'
+    | 'other';
 
 export interface PlaceDataClassEvent {
     /** Type of event that has occurred on the object */
@@ -40,6 +49,7 @@ export interface QueryParameters<T> {
     query_params: HashMap;
     fn?: (data: Partial<T>) => T;
     path: string;
+    endpoint?: string;
 }
 
 export interface ShowParameters<T> extends QueryParameters<T> {

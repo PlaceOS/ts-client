@@ -77,9 +77,11 @@ export type QueryResponse<T> = Observable<{
  * @param query_params Map of query paramaters to add to the request URL
  */
 export function query<T>(q: QueryParameters<T>): QueryResponse<T> {
-    const { query_params, fn, path } = q;
+    const { query_params, fn, path, endpoint } = q;
     const query_str = toQueryString(query_params);
-    const url = `${apiEndpoint()}/${path}${query_str ? '?' + query_str : ''}`;
+    const url = `${endpoint || apiEndpoint()}/${path}${
+        query_str ? '?' + query_str : ''
+    }`;
     return get(url).pipe(
         map((resp: HashMap) => {
             const details = handleHeaders(url, query_str, path);
@@ -129,7 +131,9 @@ export function create<T>(details: CreateParameters<T>): Observable<T> {
     const { query_params, form_data, path, fn } = details;
     const query_str = toQueryString(query_params);
     const url = `${apiEndpoint()}/${path}${query_str ? '?' + query_str : ''}`;
-    const observable = post(url, form_data).pipe(map((resp: any) => (fn || pass_fn)(resp)));
+    const observable = post(url, form_data).pipe(
+        map((resp: any) => (fn || pass_fn)(resp))
+    );
     return observable;
 }
 
