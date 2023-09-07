@@ -223,7 +223,7 @@ export function cleanObject(object: HashMap, delete_values: any[]) {
     return object;
 }
 
-export function is_iOS() {
+export function isMobileSafari() {
     return (
         [
             'iPad Simulator',
@@ -238,6 +238,6 @@ export function is_iOS() {
     );
 }
 
-export function is_iFrame() {
+export function isNestedFrame() {
     return window.location !== window.parent.location;
 }

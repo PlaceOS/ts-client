@@ -15,7 +15,7 @@ import {
     refreshAuthority,
     token,
 } from '../auth/functions';
-import { is_iOS, log } from '../utilities/general';
+import { isMobileSafari, log } from '../utilities/general';
 import { HashMap } from '../utilities/types';
 import {
     PlaceCommandRequest,
@@ -543,7 +543,7 @@ export function createWebsocket() {
     const tkn = token();
     let query =
         tkn === 'x-api-key' ? `api-key=${apiKey()}` : `bearer_token=${tkn}`;
-    if (!needsTokenHeader() && !is_iOS()) {
+    if (!needsTokenHeader() && !isMobileSafari()) {
         log('WS', `Authenticating through cookie...`);
         query += `;max-age=120;path=${httpRoute()};`;
         query += `${secure ? 'secure;' : ''}samesite=strict`;
