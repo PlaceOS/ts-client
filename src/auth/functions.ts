@@ -159,14 +159,13 @@ export function token(return_expired: boolean = true): string {
             _failed_count += 1;
             timeout(
                 're-authorise',
-                () =>
-                    authorise().catch((e) =>
-                        log('Auth', `Failed to re-auth (${e})`)
-                    ),
+                () => authorise(),
                 200 * Math.min(20, _failed_count)
             );
         }
-        if (!return_expired) return '';
+        if (!return_expired) {
+            return '';
+        }
     }
     return access_token || _storage.getItem(`${_client_id}_access_token`) || '';
 }
@@ -474,7 +473,7 @@ export function loadAuthority(tries: number = 0): Promise<void> {
                     resolve();
                 };
                 delete _promises.load_authority;
-                authorise('').then(response);
+                authorise('').then(response, response);
             }, on_error);
         });
     }
