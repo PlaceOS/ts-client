@@ -233,7 +233,7 @@ export function isTrusted(): boolean {
 /** Whether this application is on a fixed location device */
 export function isFixedDevice(): boolean {
     return (
-        token() === 'x-api-key' ||
+        (!!apiKey() && !_options.ignore_api_key) ||
         checkStoreForAuthParam('fixed_device') === 'true'
     );
 }
