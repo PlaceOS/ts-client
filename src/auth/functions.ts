@@ -159,7 +159,10 @@ export function token(return_expired: boolean = true): string {
             _failed_count += 1;
             timeout(
                 're-authorise',
-                () => authorise(),
+                () =>
+                    authorise().catch((e) =>
+                        log('Auth', `Failed to get token: ${e}`)
+                    ),
                 200 * Math.min(20, _failed_count)
             );
         }
