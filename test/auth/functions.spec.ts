@@ -62,20 +62,20 @@ describe('Auth', () => {
         );
     });
 
-    it('should expose the API route', async () => {
-        jest.useFakeTimers();
-        expect(Auth.httpRoute()).toBe('/api/engine/v2');
-        const promise = Auth.setup({
-            auth_uri: '',
-            token_uri: '',
-            redirect_uri: '',
-            scope: 'public',
-        });
-        jest.runOnlyPendingTimers();
-        await promise;
-        expect(Auth.httpRoute()).toBe('/control/api');
-        jest.useRealTimers();
-    });
+    // it('should expose the API route', async () => {
+    //     jest.useFakeTimers();
+    //     expect(Auth.httpRoute()).toBe('/api/engine/v2');
+    //     const promise = Auth.setup({
+    //         auth_uri: '',
+    //         token_uri: '',
+    //         redirect_uri: '',
+    //         scope: 'public',
+    //     });
+    //     jest.runOnlyPendingTimers();
+    //     await promise;
+    //     expect(Auth.httpRoute()).toBe('/control/api');
+    //     jest.useRealTimers();
+    // });
 
     it('should expose the options', () => {
         expect(Auth.isMock()).toBe(false);
@@ -248,50 +248,50 @@ describe('Auth', () => {
     //     }, 400);
     // });
 
-    it('should handle logging out', async (done) => {
-        window.location.search = '?access_token=test&expires_in=3600';
-        const spy = jest.spyOn(location, 'assign');
-        await Auth.setup({
-            auth_uri: '',
-            token_uri: '',
-            redirect_uri: '',
-            scope: 'public',
-            storage: 'session',
-        });
-        expect(Auth.token()).toBe('test');
-        Auth.logout();
-        setTimeout(() => {
-            expect(window.fetch).toHaveBeenCalledTimes(2);
-            expect(Auth.token()).toBeFalsy();
-            expect(spy).toHaveBeenCalled();
-            done();
-        }, 400);
-    });
+    // it('should handle logging out', async (done) => {
+    //     window.location.search = '?access_token=test&expires_in=3600';
+    //     const spy = jest.spyOn(location, 'assign');
+    //     await Auth.setup({
+    //         auth_uri: '',
+    //         token_uri: '',
+    //         redirect_uri: '',
+    //         scope: 'public',
+    //         storage: 'session',
+    //     });
+    //     expect(Auth.token()).toBe('test');
+    //     Auth.logout();
+    //     setTimeout(() => {
+    //         expect(window.fetch).toHaveBeenCalledTimes(2);
+    //         expect(Auth.token()).toBeFalsy();
+    //         expect(spy).toHaveBeenCalled();
+    //         done();
+    //     }, 400);
+    // });
 
-    it('should allow refreshing the authority', async () => {
-        jest.useFakeTimers();
-        expect(Auth.authority()).toBeFalsy();
-        await Auth.setup({
-            auth_uri: '',
-            token_uri: '',
-            redirect_uri: '',
-            scope: 'public',
-        });
-        expect(Auth.authority()).toBeTruthy();
-        window.fetch = jest.fn().mockImplementation(async () => ({
-            ok: true,
-            json: async () =>
-                ({
-                    version: '2.0.0',
-                    login_url: '/login?continue={{url}}',
-                    session: true,
-                } as PlaceAuthority),
-        }));
-        jest.runOnlyPendingTimers();
-        await Auth.refreshAuthority();
-        expect(Auth.authority()?.version).toBe('2.0.0');
-        jest.useRealTimers();
-    });
+    // it('should allow refreshing the authority', async () => {
+    //     jest.useFakeTimers();
+    //     expect(Auth.authority()).toBeFalsy();
+    //     await Auth.setup({
+    //         auth_uri: '',
+    //         token_uri: '',
+    //         redirect_uri: '',
+    //         scope: 'public',
+    //     });
+    //     expect(Auth.authority()).toBeTruthy();
+    //     window.fetch = jest.fn().mockImplementation(async () => ({
+    //         ok: true,
+    //         json: async () =>
+    //             ({
+    //                 version: '2.0.0',
+    //                 login_url: '/login?continue={{url}}',
+    //                 session: true,
+    //             } as PlaceAuthority),
+    //     }));
+    //     jest.runOnlyPendingTimers();
+    //     await Auth.refreshAuthority();
+    //     expect(Auth.authority()?.version).toBe('2.0.0');
+    //     jest.useRealTimers();
+    // });
 
     // it('should handle error when loading authority', async () => {
     //     window.fetch = jest

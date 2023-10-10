@@ -442,8 +442,9 @@ export function loadAuthority(tries: number = 0): Promise<void> {
                     credentials: 'same-origin',
                 }
             ).subscribe(async (resp) => {
-                if (!resp.ok)
+                if (!resp.ok) {
                     return on_error(await resp.text().catch((_) => _));
+                }
                 _authority = (await resp.json()) as PlaceAuthority;
                 _route = !/[2-9]\.[0-9]+\.[0-9]+/g.test(
                     _authority.version || ''
@@ -473,7 +474,7 @@ export function loadAuthority(tries: number = 0): Promise<void> {
                     resolve();
                 };
                 delete _promises.load_authority;
-                authorise('').then(response, response);
+                authorise('').then(response);
             }, on_error);
         });
     }
