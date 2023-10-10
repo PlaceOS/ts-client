@@ -474,7 +474,7 @@ export function loadAuthority(tries: number = 0): Promise<void> {
                     resolve();
                 };
                 delete _promises.load_authority;
-                authorise('').then(response);
+                authorise('').then(response, response);
             }, on_error);
         });
     }
