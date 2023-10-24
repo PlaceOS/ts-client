@@ -48,12 +48,15 @@ describe('PlaceSystemBinding', () => {
     it('should allow methods to be executed', () => {
         const promise = module.execute('testCall');
         expect(promise).toBeInstanceOf(Promise);
-        expect(ws.execute).toBeCalledWith({
-            sys: fake_system.id,
-            mod: module.name,
-            index: module.index,
-            name: 'testCall',
-            args: undefined,
-        });
+        expect(ws.execute).toBeCalledWith(
+            {
+                sys: fake_system.id,
+                mod: module.name,
+                index: module.index,
+                name: 'testCall',
+                args: undefined,
+            },
+            ws.REQUEST_TIMEOUT
+        );
     });
 });

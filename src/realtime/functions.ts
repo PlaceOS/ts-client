@@ -31,6 +31,11 @@ import {
 import { mockSystem } from './mock';
 import { MockPlaceWebsocketModule } from './mock-module';
 import { MockPlaceWebsocketSystem } from './mock-system';
+import {
+    timeout,
+    clearAsyncTimeout,
+    destroyWaitingAsync,
+} from '../utilities/async';
 
 /**
  * @private
@@ -93,6 +98,11 @@ let _connection_promise: Promise<void> | null = null;
  * Timer to check the initial health of the websocket connection
  */
 let _health_check: number | undefined;
+/**
+ * @private
+ * Delay in milliseconds to cancel a request
+ */
+export const REQUEST_TIMEOUT = 10 * 1000;
 
 /** Listener for debugging events */
 export const debug_events = new Subject<PlaceDebugEvent>();
@@ -101,6 +111,7 @@ _observers._place_os_debug_events = debug_events.asObservable();
 /* istanbul ignore next */
 /**
  * @private
+ * Cleanup websocket connection in tests
  */
 export function cleanupRealtime() {
     _websocket?.complete();
@@ -130,6 +141,7 @@ export function cleanupRealtime() {
     _status.next(false);
     clearInterval(_keep_alive);
     clearTimeout(_health_check);
+    destroyWaitingAsync();
 }
 
 export function websocketRoute() {
@@ -191,34 +203,42 @@ export function value<T = any>(
  * Bind to status variable on the given system module
  * @param options Binding request options
  */
-export function bind(options: PlaceRequestOptions): Promise<void>;
 export function bind(
     options: PlaceRequestOptions,
-    post: (_: PlaceCommandRequest) => Promise<void> = send
+    timeout_delay?: number
+): Promise<void>;
+export function bind(
+    options: PlaceRequestOptions,
+    timeout_delay: number = REQUEST_TIMEOUT,
+    post: (_: PlaceCommandRequest, t?: number) => Promise<void> = send
 ): Promise<void> {
     const request: PlaceCommandRequest = {
         id: ++REQUEST_COUNT,
         cmd: 'bind',
         ...options,
     };
-    return post(request);
+    return post(request, timeout_delay);
 }
 
 /**
  * Unbind from a status variable on the given system module
  * @param options Unbind request options
  */
-export function unbind(options: PlaceRequestOptions): Promise<void>;
 export function unbind(
     options: PlaceRequestOptions,
-    post: (_: PlaceCommandRequest) => Promise<void> = send
+    timeout_delay?: number
+): Promise<void>;
+export function unbind(
+    options: PlaceRequestOptions,
+    timeout_delay: number = REQUEST_TIMEOUT,
+    post: (_: PlaceCommandRequest, t?: number) => Promise<void> = send
 ): Promise<void> {
     const request: PlaceCommandRequest = {
         id: ++REQUEST_COUNT,
         cmd: 'unbind',
         ...options,
     };
-    return post(request);
+    return post(request, timeout_delay);
 }
 
 /**
@@ -227,48 +247,57 @@ export function unbind(
  */
 export function execute<T = void>(
     options: PlaceExecRequestOptions,
-    post: (_: PlaceCommandRequest) => Promise<T> = send
+    timeout_delay: number = REQUEST_TIMEOUT,
+    post: (_: PlaceCommandRequest, t?: number) => Promise<T> = send
 ): Promise<T> {
     const request: PlaceCommandRequest = {
         id: ++REQUEST_COUNT,
         cmd: 'exec',
         ...options,
     };
-    return post(request);
+    return post(request, timeout_delay);
 }
 
 /**
  * Listen to debug logging for on the given system module binding
  * @param options Debug request options
  */
-export function debug(options: PlaceRequestOptions): Promise<void>;
 export function debug(
     options: PlaceRequestOptions,
-    post: (_: PlaceCommandRequest) => Promise<void> = send
+    timeout_delay?: number
+): Promise<void>;
+export function debug(
+    options: PlaceRequestOptions,
+    timeout_delay: number = REQUEST_TIMEOUT,
+    post: (_: PlaceCommandRequest, t?: number) => Promise<void> = send
 ): Promise<void> {
     const request: PlaceCommandRequest = {
         id: ++REQUEST_COUNT,
         cmd: 'debug',
         ...options,
     };
-    return post(request);
+    return post(request, timeout_delay);
 }
 
 /**
  * Stop debug logging on the given system module binding
  * @param options Debug request options
  */
-export function ignore(options: PlaceRequestOptions): Promise<void>;
 export function ignore(
     options: PlaceRequestOptions,
-    post: (_: PlaceCommandRequest) => Promise<void> = send
+    timeout_delay?: number
+): Promise<void>;
+export function ignore(
+    options: PlaceRequestOptions,
+    timeout_delay: number = REQUEST_TIMEOUT,
+    post: (_: PlaceCommandRequest, t?: number) => Promise<void> = send
 ): Promise<void> {
     const request: PlaceCommandRequest = {
         id: ++REQUEST_COUNT,
         cmd: 'ignore',
         ...options,
     };
-    return post(request);
+    return post(request, timeout_delay);
 }
 
 /**
@@ -278,6 +307,7 @@ export function ignore(
  */
 export function send<T = any>(
     request: PlaceCommandRequest,
+    timeout_delay: number = REQUEST_TIMEOUT,
     tries: number = 0
 ): Promise<T> {
     const key = `${request.cmd}|${request.sys}|${request.mod}${request.index}|${request.name}|${request.args}`;
@@ -288,15 +318,13 @@ export function send<T = any>(
             const retry = () => {
                 delete _requests[key];
                 (_requests[key] as any) = null;
-                send(request, tries).then(
+                send(request, timeout_delay, tries).then(
                     (_) => resolve(_),
                     (_) => reject(_)
                 );
             };
             if (_websocket && isConnected()) {
-                if (isMock()) {
-                    handleMockSend(request, _websocket, _listeners);
-                }
+                if (isMock()) handleMockSend(request, _websocket, _listeners);
                 req.resolve = resolve;
                 req.reject = reject;
                 const binding = `${request.sys}, ${request.mod}_${request.index}, ${request.name}`;
@@ -306,6 +334,17 @@ export function send<T = any>(
                     request.args
                 );
                 _websocket.next(request);
+                if (timeout_delay > 0) {
+                    timeout(
+                        `${key}`,
+                        () => {
+                            reject('Request timed out.');
+                            delete _requests[key];
+                            (_requests[key] as any) = null;
+                        },
+                        timeout_delay
+                    );
+                }
             } else if (!_connection_promise) {
                 connect().then(() => retry());
             } else {
@@ -349,6 +388,7 @@ export function onMessage(message: PlaceResponse | 'pong'): void {
             // Not mock message
             log('WS', 'Invalid websocket message', message, 'error');
         }
+        clearAsyncTimeout(`${message.id}`);
     }
 }
 
@@ -410,6 +450,7 @@ export function handleError(message: PlaceResponse) {
         .find((i) => i.id === message.id);
     if (request && request.reject) {
         request.reject(message);
+        clearAsyncTimeout(`${request.key}`);
         delete _requests[request.key];
     }
 }
@@ -691,23 +732,29 @@ export function handleMockSend(
                 if (listeners[key]) {
                     listeners[key].unsubscribe();
                     delete listeners[key];
+                    clearAsyncTimeout(`${key}`);
                 }
                 break;
         }
-        setTimeout(() => {
-            const resp = {
-                id: request.id,
-                type: 'success',
-                value:
-                    request.cmd === 'exec'
-                        ? module.call(request.name, request.args)
-                        : null,
-            } as PlaceResponse;
-            websocket.next(resp);
-        }, 10);
+        timeout(
+            `${request.id}-response`,
+            () => {
+                const resp = {
+                    id: request.id,
+                    type: 'success',
+                    value:
+                        request.cmd === 'exec'
+                            ? module.call(request.name, request.args)
+                            : null,
+                } as PlaceResponse;
+                websocket.next(resp);
+            },
+            10
+        );
     } else {
         // Error determining system or module
-        setTimeout(
+        timeout(
+            `${request.id}-error`,
             () =>
                 websocket.next({
                     id: request.id,

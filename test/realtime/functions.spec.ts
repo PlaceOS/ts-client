@@ -11,6 +11,8 @@ import * as ws from '../../src/realtime/functions';
 
 jest.mock('../../src/auth/functions');
 
+const DELAY = Math.pow(2, 40);
+
 describe('Realtime API', () => {
     let fake_socket: Subject<any>;
     let another_fake_socket: Subject<any>;
@@ -28,14 +30,18 @@ describe('Realtime API', () => {
         (Auth as any).apiEndpoint = jest.fn().mockReturnValue('/api/engine/v2');
         (Auth as any).authority = jest.fn().mockReturnValue({});
         (Auth as any).isMock = jest.fn().mockReturnValue(false);
-        (Auth as any).refreshAuthority = jest.fn().mockImplementation(async () => null);
-        (Auth as any).invalidateToken = jest.fn().mockImplementation(async () => null);
+        (Auth as any).refreshAuthority = jest
+            .fn()
+            .mockImplementation(async () => null);
+        (Auth as any).invalidateToken = jest
+            .fn()
+            .mockImplementation(async () => null);
         ws_spy = jest.spyOn(rxjs, 'webSocket');
         ws_spy
             .mockImplementationOnce(() => fake_socket)
             .mockImplementationOnce(() => another_fake_socket)
             .mockImplementation(() => fake_socket);
-        ws.ignore({ sys: 'sys-A0', mod: 'mod', index: 1, name: 'power' });
+        ws.ignore({ sys: 'sys-A0', mod: 'mod', index: 1, name: 'power' }, 0);
         count++;
         conn_spy = jest.spyOn(ws, 'isConnected');
         conn_spy.mockReturnValue(true);
@@ -51,20 +57,26 @@ describe('Realtime API', () => {
         jest.useRealTimers();
     });
 
-    const test_method = (method: 'bind' | 'unbind' | 'debug' | 'ignore', done: () => void) => {
+    const test_method = (
+        method: 'bind' | 'unbind' | 'debug' | 'ignore',
+        done: () => void
+    ) => {
         const details = {
             sys: `sys-B0-${method}`,
             mod: 'mod',
             index: 1,
-            name: 'power'
+            name: 'power',
         };
         const post = jest.fn().mockImplementation(async () => null);
-        let promise = (ws[method] as any)(details, post);
-        expect(post).toHaveBeenCalledWith({
-            id: ++count,
-            cmd: method,
-            ...details
-        });
+        let promise = (ws[method] as any)(details, DELAY, post);
+        expect(post).toHaveBeenCalledWith(
+            {
+                id: ++count,
+                cmd: method,
+                ...details,
+            },
+            DELAY
+        );
         // Test success
         promise.then(() => {
             post.mockImplementation(async () => {
@@ -72,44 +84,50 @@ describe('Realtime API', () => {
                     id: 2,
                     type: 'error',
                     code: 7,
-                    msg: 'test error'
+                    msg: 'test error',
                 } as PlaceResponse;
             });
-            promise = (ws[method] as any)(details, post);
-            expect(post).toHaveBeenCalledWith({
-                id: ++count,
-                cmd: method,
-                ...details
-            });
+            promise = (ws[method] as any)(details, DELAY, post);
+            expect(post).toHaveBeenCalledWith(
+                {
+                    id: ++count,
+                    cmd: method,
+                    ...details,
+                },
+                DELAY
+            );
             // Test error
             promise.then(null, () => done());
         });
     };
 
-    it('should handle bind request', done => test_method('bind', done));
+    it('should handle bind request', (done) => test_method('bind', done));
 
-    it('should handle unbind request', done => test_method('unbind', done));
+    it('should handle unbind request', (done) => test_method('unbind', done));
 
-    it('should handle debug request', done => test_method('debug', done));
+    it('should handle debug request', (done) => test_method('debug', done));
 
-    it('should handle ignore request', done => test_method('ignore', done));
+    it('should handle ignore request', (done) => test_method('ignore', done));
 
-    it('should handle exec request', done => {
+    it('should handle exec request', (done) => {
         const details = {
             sys: 'sys-A3',
             mod: 'mod',
             index: 1,
             name: 'power',
-            args: [true]
+            args: [true],
         };
         const result = { test: 1 };
         const post = jest.fn().mockImplementation(async () => result);
-        let promise = (ws.execute as any)(details, post);
-        expect(post).toHaveBeenCalledWith({
-            id: ++count,
-            cmd: 'exec',
-            ...details
-        });
+        let promise = (ws.execute as any)(details, DELAY, post);
+        expect(post).toHaveBeenCalledWith(
+            {
+                id: ++count,
+                cmd: 'exec',
+                ...details,
+            },
+            DELAY
+        );
         expect(promise).toBeInstanceOf(Promise);
         // Test success
         promise.then((resp: HashMap) => {
@@ -119,23 +137,26 @@ describe('Realtime API', () => {
                     id: 2,
                     type: 'error',
                     code: 7,
-                    msg: 'test error'
+                    msg: 'test error',
                 } as PlaceResponse;
             });
-            promise = (ws.execute as any)(details, post);
-            expect(post).toHaveBeenCalledWith({
-                id: ++count,
-                cmd: 'exec',
-                ...details
-            });
+            promise = (ws.execute as any)(details, DELAY, post);
+            expect(post).toHaveBeenCalledWith(
+                {
+                    id: ++count,
+                    cmd: 'exec',
+                    ...details,
+                },
+                DELAY
+            );
             // Test error
             promise.then(null, () => done());
         });
     });
 
-    it('should handle notify responses', done => {
+    it('should handle notify responses', (done) => {
         const binding = { sys: 'sys-A2', mod: 'mod', index: 1, name: 'power' };
-        ws.listen(binding).subscribe(value => {
+        ws.listen(binding).subscribe((value) => {
             if (value) {
                 expect(value).toBe('Yeah');
                 done();
@@ -144,11 +165,11 @@ describe('Realtime API', () => {
         fake_socket.next({
             type: 'notify',
             value: 'Yeah',
-            meta: binding
+            meta: binding,
         } as PlaceResponse);
     });
 
-    it('should reconnect the websocket', done => {
+    it('should reconnect the websocket', (done) => {
         jest.useRealTimers();
         let actions = 0;
         ws.status().subscribe((connected: boolean) => {
@@ -158,7 +179,7 @@ describe('Realtime API', () => {
                 expect(connected).toBe(true);
                 fake_socket.error({
                     status: 401,
-                    message: 'Invalid auth token'
+                    message: 'Invalid auth token',
                 });
                 // jest.runOnlyPendingTimers();
             } else if (actions === 1) {
@@ -176,16 +197,16 @@ describe('Realtime API', () => {
         });
     });
 
-    it('should allow to grab the current value of a binding', done => {
+    it('should allow retrieving the current value of a binding', (done) => {
         const metadata = { sys: 'sys-A0', mod: 'mod', index: 1, name: 'power' };
         const post = jest.fn().mockImplementation(async () => null);
         expect(ws.value(metadata)).toBeUndefined();
-        const promise = (ws as any).bind(metadata, post);
+        const promise = (ws as any).bind(metadata, DELAY, post);
         promise.then(() => {
             fake_socket.next({
                 type: 'notify',
                 value: 'Yeah',
-                meta: metadata
+                meta: metadata,
             } as PlaceResponse);
             expect(ws.value(metadata)).toBe('Yeah');
             done();
@@ -193,69 +214,66 @@ describe('Realtime API', () => {
         fake_socket.next({ id: 1, type: 'success' } as PlaceResponse);
     });
 
-    it('should ping the websocket every X seconds', done => {
-        fake_socket.subscribe((message: any) => {
-            expect(message).toBe('ping');
-            done();
-        });
-        jest.runOnlyPendingTimers();
-    });
-
     it('should handle engine errors', () => {
         fake_socket.next({
             id: 0,
             type: 'error',
             code: 0,
-            msg: 'test error'
+            msg: 'test error',
         } as PlaceResponse);
         // fake_socket.next({ id: 1, type: 'error', code: 1, msg: 'test error' } as PlaceResponse);
         fake_socket.next({
             id: 2,
             type: 'error',
             code: 2,
-            msg: 'test error'
+            msg: 'test error',
         } as PlaceResponse);
         fake_socket.next({
             id: 3,
             type: 'error',
             code: 3,
-            msg: 'test error'
+            msg: 'test error',
         } as PlaceResponse);
         fake_socket.next({
             id: 4,
             type: 'error',
             code: 4,
-            msg: 'test error'
+            msg: 'test error',
         } as PlaceResponse);
         fake_socket.next({
             id: 5,
             type: 'error',
             code: 5,
-            msg: 'test error'
+            msg: 'test error',
         } as PlaceResponse);
         fake_socket.next({
             id: 6,
             type: 'error',
             code: 6,
-            msg: 'test error'
+            msg: 'test error',
         } as PlaceResponse);
         fake_socket.next({
             id: 7,
             type: 'error',
             code: 7,
-            msg: 'test error'
+            msg: 'test error',
         } as PlaceResponse);
-        jest.advanceTimersByTime(10000);
+        jest.advanceTimersByTime(1000);
         expect(log_spy).toBeCalledTimes(14);
     });
 
     it('should log error when engine message is invalid', () => {
         const message = {};
         fake_socket.next(message);
-        expect(log_spy).toBeCalledWith('WS', 'Invalid websocket message', message, 'error');
+        expect(log_spy).toBeCalledWith(
+            'WS',
+            'Invalid websocket message',
+            message,
+            'error'
+        );
     });
 
-    it('should delay requests while reconnecting', done => {
+    it('should delay requests while reconnecting', (done) => {
         const metadata = { sys: 'sys-A0', mod: 'mod', index: 1, name: 'power' };
         another_fake_socket.subscribe((msg_str: string) => {
             if (msg_str !== 'ping' && typeof msg_str === 'string') {
@@ -271,11 +289,19 @@ describe('Realtime API', () => {
         (Auth as any).token.mockReturnValue('test');
         (ws.isConnected as any).mockReturnValue(false);
         ws.bind(metadata);
-        jest.runOnlyPendingTimers();
+        jest.advanceTimersByTime(ws.REQUEST_TIMEOUT / 2);
         (ws.isConnected as any).mockReturnValue(true);
         another_fake_socket.next({ id: 1, type: 'success' } as PlaceResponse);
-        jest.runOnlyPendingTimers();
+        jest.advanceTimersByTime(ws.REQUEST_TIMEOUT / 2 - 1);
         done();
+    });
+
+    it('should ping the websocket every X seconds', (done) => {
+        fake_socket.subscribe((message: any) => {
+            expect(message).toBe('ping');
+            done();
+        });
+        jest.runOnlyPendingTimers();
     });
 
     it('should retry connecting if websocket fails to create', () => {
@@ -283,7 +309,7 @@ describe('Realtime API', () => {
         expect(1).toBe(1);
     });
 
-    it('should bind to mock system modules', done => {
+    it('should bind to mock system modules', (done) => {
         jest.useRealTimers();
         mock_ws.registerSystem('sys-A9', {
             Test: [
@@ -291,20 +317,19 @@ describe('Realtime API', () => {
                     test: 0,
                     $testCall() {
                         return (this as any)._system.Test[0].test++;
-                    }
-                }
-            ]
+                    },
+                },
+            ],
         });
         ws.cleanupRealtime();
         jest.spyOn(Auth, 'isMock').mockReturnValue(true);
         const binding = { sys: 'sys-A9', mod: 'Test', index: 1, name: 'test' };
         ws.bind(binding).then(() => {
-            ws.listen(binding).subscribe(value => {
-                if (value) {
-                    expect(ws.value(binding)).toBe(value);
-                    expect(ws.value(binding)).toBe(10);
-                    done();
-                }
+            ws.listen(binding).subscribe((value) => {
+                if (!value) return;
+                expect(ws.value(binding)).toBe(value);
+                expect(ws.value(binding)).toBe(10);
+                done();
             });
             mock_ws.mockSystem('sys-A9').Test[0].test = 10;
         });

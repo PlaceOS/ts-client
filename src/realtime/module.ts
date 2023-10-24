@@ -1,5 +1,5 @@
 import { HashMap } from '../utilities/types';
-import { execute } from './functions';
+import { execute, REQUEST_TIMEOUT } from './functions';
 import { PlaceVariableBinding } from './status-variable';
 import { PlaceSystemBinding } from './system';
 
@@ -48,13 +48,20 @@ export class PlaceModuleBinding {
      * @param method Name of the method
      * @param args Array of arguments to pass to the method
      */
-    public execute<T = any>(method: string, args?: any[]): Promise<T> {
-        return execute<T>({
-            sys: this._system.id,
-            mod: this.name,
-            index: this.index,
-            name: method,
-            args,
-        });
+    public execute<T = any>(
+        method: string,
+        args?: any[],
+        timeout_delay: number = REQUEST_TIMEOUT
+    ): Promise<T> {
+        return execute<T>(
+            {
+                sys: this._system.id,
+                mod: this.name,
+                index: this.index,
+                name: method,
+                args,
+            },
+            timeout_delay
+        );
     }
 }
