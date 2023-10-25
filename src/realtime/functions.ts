@@ -209,7 +209,7 @@ export function bind(
 ): Promise<void>;
 export function bind(
     options: PlaceRequestOptions,
-    timeout_delay: number = REQUEST_TIMEOUT,
+    timeout_delay: number = 0,
     post: (_: PlaceCommandRequest, t?: number) => Promise<void> = send
 ): Promise<void> {
     const request: PlaceCommandRequest = {
@@ -230,7 +230,7 @@ export function unbind(
 ): Promise<void>;
 export function unbind(
     options: PlaceRequestOptions,
-    timeout_delay: number = REQUEST_TIMEOUT,
+    timeout_delay: number = 0,
     post: (_: PlaceCommandRequest, t?: number) => Promise<void> = send
 ): Promise<void> {
     const request: PlaceCommandRequest = {
@@ -400,7 +400,7 @@ export function onMessage(message: PlaceResponse | 'pong'): void {
 export function handleSuccess(message: PlaceResponse) {
     const request = Object.keys(_requests)
         .map((i) => _requests[i])
-        .find((i) => i.id === message.id);
+        .find((item) => item?.id === message.id);
     log('WS', `[SUCCESS](${message.id})`);
     /* istanbul ignore else */
     if (request && request.resolve) {
