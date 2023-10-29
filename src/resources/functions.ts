@@ -79,7 +79,7 @@ export type QueryResponse<T> = Observable<{
 export function query<T>(q: QueryParameters<T>): QueryResponse<T> {
     const { query_params, fn, path, endpoint } = q;
     const query_str = toQueryString(query_params);
-    const url = `${endpoint || apiEndpoint()}/${path}${
+    const url = `${endpoint || apiEndpoint()}${path ? '/' + path : ''}${
         query_str ? '?' + query_str : ''
     }`;
     return get(url).pipe(
