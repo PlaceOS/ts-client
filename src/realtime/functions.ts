@@ -323,6 +323,7 @@ export function send<T = any>(
                     (_) => reject(_)
                 );
             };
+            req.retry = retry;
             if (_websocket && isConnected()) {
                 if (isMock()) handleMockSend(request, _websocket, _listeners);
                 req.resolve = resolve;
@@ -570,6 +571,14 @@ export function connect(tries: number = 0): Promise<void> {
     return _connection_promise;
 }
 
+function _retryRequests(): void {
+    for (const key in _requests) {
+        if (_requests[key] && _requests[key].retry) {
+            _requests[key].retry!();
+        }
+    }
+}
+
 /**
  * @private
  * Create websocket connection
@@ -640,7 +649,7 @@ export function reconnect() {
         )}ms...`
     );
     setTimeout(
-        () => connect(),
+        () => connect().then(() => _retryRequests()),
         Math.min(5000, _connection_attempts * 300 || 1000)
     );
 }

@@ -29,6 +29,8 @@ export interface PlaceCommandRequestMetadata extends PlaceCommandRequest {
     resolve?: (_?: any) => void;
     /** Reject function for the request promise */
     reject?: (_?: any) => void;
+    /** Function for retrying request when websocket drops before request resolves */
+    retry?: () => void;
 }
 
 /** Metadata describing the actor the request should be performed on */
