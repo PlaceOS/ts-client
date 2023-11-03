@@ -98,6 +98,8 @@ let _connection_promise: Promise<void> | null = null;
  * Timer to check the initial health of the websocket connection
  */
 let _health_check: number | undefined;
+
+let _websocket_id: number = 0;
 /**
  * @private
  * Delay in milliseconds to cancel a request
@@ -514,6 +516,7 @@ export function connect(tries: number = 0): Promise<void> {
                         _websocket = undefined;
                         _connection_promise = null;
                         clearHealthCheck();
+                        log('WS', 'Inflight Requests:', [{ ..._requests }]);
                         onWebSocketError(err);
                     },
                     () => {
@@ -586,6 +589,7 @@ function _retryRequests(): void {
 export function createWebsocket() {
     /* istanbul ignore if */
     if (!authority() || !token()) return null;
+    _websocket_id++;
     const secure = isSecure() || location.protocol.indexOf('https') >= 0;
     let url = `ws${secure ? 's' : ''}://${host()}${websocketRoute()}${
         isFixedDevice() ? '?fixed_device=true' : ''
@@ -712,7 +716,7 @@ export function handleMockSend(
     websocket: Subject<any>,
     listeners: HashMap<Subscription>
 ) {
-    const key = `${request.sys}|${request.mod}_${request.index}|${request.name}`;
+    const key = `${request.sys}|${request.mod}_${request.index}|${request.name}|${_websocket_id}`;
     const system: MockPlaceWebsocketSystem = mockSystem(request.sys);
     const module: MockPlaceWebsocketModule =
         system && system[request.mod]
