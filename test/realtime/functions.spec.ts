@@ -150,7 +150,7 @@ describe('Realtime API', () => {
                 DELAY
             );
             // Test error
-            promise.then(null, () => done());
+            promise.then(null).catch(() => done());
         });
     });
 
@@ -259,7 +259,7 @@ describe('Realtime API', () => {
             msg: 'test error',
         } as PlaceResponse);
         jest.advanceTimersByTime(1000);
-        expect(log_spy).toBeCalledTimes(15);
+        expect(log_spy).toBeCalledTimes(14);
     });
 
     it('should log error when engine message is invalid', () => {

@@ -1,5 +1,6 @@
 const store: Record<string, string> = {};
 
+/** istanbul ignore */
 export async function preSetupNode() {
     const global_space: any = global;
     global_space.debug = true;

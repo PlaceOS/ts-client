@@ -98,8 +98,6 @@ let _connection_promise: Promise<void> | null = null;
  * Timer to check the initial health of the websocket connection
  */
 let _health_check: number | undefined;
-
-let _websocket_id: number = 0;
 /**
  * @private
  * Delay in milliseconds to cancel a request
@@ -325,7 +323,6 @@ export function send<T = any>(
                     (_) => reject(_)
                 );
             };
-            req.retry = retry;
             if (_websocket && isConnected()) {
                 if (isMock()) handleMockSend(request, _websocket, _listeners);
                 req.resolve = resolve;
@@ -515,13 +512,18 @@ export function connect(tries: number = 0): Promise<void> {
                     (err: SimpleNetworkError) => {
                         _websocket = undefined;
                         _connection_promise = null;
+
                         clearHealthCheck();
-                        log('WS', 'Inflight Requests:', [{ ..._requests }]);
                         onWebSocketError(err);
                     },
                     () => {
                         _websocket = undefined;
                         _connection_promise = null;
+                        for (const key in _requests) {
+                            if (_requests[key]) {
+                                delete _requests[key];
+                            }
+                        }
                         log('WS', `Connection closed by browser.`);
                         _status.next(false);
                         // Try reconnecting after 1 second
@@ -574,14 +576,6 @@ export function connect(tries: number = 0): Promise<void> {
     return _connection_promise;
 }
 
-function _retryRequests(): void {
-    for (const key in _requests) {
-        if (_requests[key] && _requests[key].retry) {
-            _requests[key].retry!();
-        }
-    }
-}
-
 /**
  * @private
  * Create websocket connection
@@ -589,7 +583,6 @@ function _retryRequests(): void {
 export function createWebsocket() {
     /* istanbul ignore if */
     if (!authority() || !token()) return null;
-    _websocket_id++;
     const secure = isSecure() || location.protocol.indexOf('https') >= 0;
     let url = `ws${secure ? 's' : ''}://${host()}${websocketRoute()}${
         isFixedDevice() ? '?fixed_device=true' : ''
@@ -636,6 +629,7 @@ export function createWebsocket() {
  * Close old websocket connect and open a new one
  */
 export function reconnect() {
+    clearAsyncTimeout('retry-requests');
     /* istanbul ignore else */
     if (_websocket && isConnected()) {
         _websocket.complete();
@@ -652,9 +646,10 @@ export function reconnect() {
             _connection_attempts * 300 || 1000
         )}ms...`
     );
-    setTimeout(
-        () => connect().then(() => _retryRequests()),
-        Math.min(5000, _connection_attempts * 300 || 1000)
+    timeout(
+        'reconnect',
+        () => connect(),
+        Math.min(5000, (_connection_attempts + 1) * 300 || 1000)
     );
 }
 
@@ -716,7 +711,7 @@ export function handleMockSend(
     websocket: Subject<any>,
     listeners: HashMap<Subscription>
 ) {
-    const key = `${request.sys}|${request.mod}_${request.index}|${request.name}|${_websocket_id}`;
+    const key = `${request.sys}|${request.mod}_${request.index}|${request.name}`;
     const system: MockPlaceWebsocketSystem = mockSystem(request.sys);
     const module: MockPlaceWebsocketModule =
         system && system[request.mod]

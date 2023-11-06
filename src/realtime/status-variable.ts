@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { distinctUntilChanged } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { clearAsyncTimeout, timeout } from '../utilities/async';
 import { log } from '../utilities/general';
 
@@ -27,9 +27,12 @@ export class PlaceVariableBinding<T = any> {
         this.name = _name;
         // Listen for state changes in the websocket connection
         status()
-            .pipe(distinctUntilChanged())
+            .pipe(distinctUntilChanged(), debounceTime(1000))
             .subscribe((connected: boolean) => {
-                if (connected && this._stale_bindings) {
+                if (
+                    connected &&
+                    (this._stale_bindings || this._pending === PENDING.BIND)
+                ) {
                     log('VAR', 'Re-binding to status variable', this.binding());
                     this.rebind();
                 } else if (!connected) {
@@ -76,10 +79,12 @@ export class PlaceVariableBinding<T = any> {
             this._pending === PENDING.UNBIND
         ) {
             this._pending = PENDING.BIND;
-            bind(this.binding()).then(() => {
-                this._binding_count++;
-                this._pending = PENDING.NONE;
-            });
+            bind(this.binding())
+                .then(() => {
+                    this._binding_count++;
+                    this._pending = PENDING.NONE;
+                })
+                .catch(() => null);
         }
         return () => this.unbind();
     }
@@ -109,7 +114,7 @@ export class PlaceVariableBinding<T = any> {
             `rebind:${JSON.stringify(this.binding())}`,
             async () => {
                 await bind(this.binding());
-                this._binding_count = this._stale_bindings;
+                this._binding_count = this._stale_bindings || 1;
                 this._stale_bindings = 0;
             },
             100
