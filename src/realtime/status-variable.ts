@@ -27,7 +27,7 @@ export class PlaceVariableBinding<T = any> {
         this.name = _name;
         // Listen for state changes in the websocket connection
         status()
-            .pipe(distinctUntilChanged(), debounceTime(1000))
+            .pipe(distinctUntilChanged())
             .subscribe((connected: boolean) => {
                 if (
                     connected &&

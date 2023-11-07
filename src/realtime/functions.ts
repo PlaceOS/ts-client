@@ -521,6 +521,11 @@ export function connect(tries: number = 0): Promise<void> {
                         _connection_promise = null;
                         for (const key in _requests) {
                             if (_requests[key]) {
+                                _requests[key].resolve
+                                    ? _requests[key].resolve!(
+                                          'Connection closed by browser.'
+                                      )
+                                    : '';
                                 delete _requests[key];
                             }
                         }
@@ -629,7 +634,6 @@ export function createWebsocket() {
  * Close old websocket connect and open a new one
  */
 export function reconnect() {
-    clearAsyncTimeout('retry-requests');
     /* istanbul ignore else */
     if (_websocket && isConnected()) {
         _websocket.complete();
