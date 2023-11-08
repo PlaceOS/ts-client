@@ -11,7 +11,8 @@ export {
     execute,
     debug,
     ignore,
-    debug_events
+    debug_events,
+    connectionState,
 } from './realtime/functions';
 export {
     PlaceCommand,

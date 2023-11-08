@@ -52,6 +52,7 @@ let REQUEST_COUNT = 0;
  * Websocket for connecting to engine
  */
 let _websocket: WebSocketSubject<any> | Subject<any> | undefined;
+let _websocket_id = 0;
 /**
  * @private
  * Request promises
@@ -78,6 +79,13 @@ const _listeners: { [id: string]: Subscription } = {};
  */
 const _status = new BehaviorSubject<boolean>(false);
 _observers._place_os_status = _status.asObservable();
+/**
+ * @private
+ * BehaviorSubject holding the connection past websocket
+ */
+const _sync = new BehaviorSubject<[number, number]>([0, 0]);
+_observers._place_os_sync = _sync.asObservable();
+let _connect_time = Date.now();
 /**
  * @private
  * Interval ID for the server ping callback
@@ -159,6 +167,16 @@ export function isConnected(): boolean {
  * Listen to websocket status changes
  */
 export function status(): Observable<boolean> {
+    return _observers._place_os_status;
+}
+
+/**
+ * Listen to details about the connection status.
+ * First value is the number of the current websocket connection.
+ * Second value is the time the successful websocket connection was alive.
+ * @returns
+ */
+export function connectionState(): Observable<boolean> {
     return _observers._place_os_status;
 }
 
@@ -492,6 +510,7 @@ export function connect(tries: number = 0): Promise<void> {
                 return location.reload();
             }
             _connection_attempts++;
+            _connect_time = Date.now();
             _websocket = (
                 isMock() ? createMockWebSocket() : createWebsocket()
             ) as any;
@@ -512,7 +531,6 @@ export function connect(tries: number = 0): Promise<void> {
                     (err: SimpleNetworkError) => {
                         _websocket = undefined;
                         _connection_promise = null;
-
                         clearHealthCheck();
                         onWebSocketError(err);
                     },
@@ -544,6 +562,7 @@ export function connect(tries: number = 0): Promise<void> {
                     KEEP_ALIVE * 1000
                 ) as any;
                 clearHealthCheck();
+                _websocket_id += 1;
                 _health_check = setTimeout(() => {
                     log('WS', 'Unhealthy connection. Reconnecting...');
                     _status.next(false);
@@ -634,6 +653,7 @@ export function createWebsocket() {
  * Close old websocket connect and open a new one
  */
 export function reconnect() {
+    _sync.next([_websocket_id, Date.now() - _connect_time]);
     /* istanbul ignore else */
     if (_websocket && isConnected()) {
         _websocket.complete();
