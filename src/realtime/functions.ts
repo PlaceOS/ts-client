@@ -176,7 +176,7 @@ export function status(): Observable<boolean> {
  * Second value is the time the successful websocket connection was alive.
  * @returns
  */
-export function connectionState(): Observable<boolean> {
+export function connectionState(): Observable<[number, number]> {
     return _observers._place_os_status;
 }
 
