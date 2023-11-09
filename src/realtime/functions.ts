@@ -531,22 +531,14 @@ export function connect(tries: number = 0): Promise<void> {
                     (err: SimpleNetworkError) => {
                         _websocket = undefined;
                         _connection_promise = null;
+                        _clearRequests();
                         clearHealthCheck();
                         onWebSocketError(err);
                     },
                     () => {
                         _websocket = undefined;
                         _connection_promise = null;
-                        for (const key in _requests) {
-                            if (_requests[key]) {
-                                _requests[key].resolve
-                                    ? _requests[key].resolve!(
-                                          'Connection closed by browser.'
-                                      )
-                                    : '';
-                                delete _requests[key];
-                            }
-                        }
+                        _clearRequests();
                         log('WS', `Connection closed by browser.`);
                         _status.next(false);
                         // Try reconnecting after 1 second
@@ -797,5 +789,16 @@ export function handleMockSend(
                 } as PlaceResponse),
             10
         );
+    }
+}
+
+function _clearRequests() {
+    for (const key in _requests) {
+        if (_requests[key]) {
+            _requests[key].resolve
+                ? _requests[key].resolve!('Connection closed by browser.')
+                : '';
+            delete _requests[key];
+        }
     }
 }
