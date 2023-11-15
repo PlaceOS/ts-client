@@ -109,7 +109,7 @@ export class PlaceVariableBinding<T = any> {
      * Rebind to the status variable
      */
     private async rebind() {
-        if (!this._stale_bindings) return;
+        if (!this._stale_bindings && this._pending !== PENDING.BIND) return;
         timeout(
             `rebind:${JSON.stringify(this.binding())}`,
             async () => {
