@@ -241,3 +241,10 @@ export function isMobileSafari() {
 export function isNestedFrame() {
     return window.location !== window.parent.location;
 }
+
+export function simplifiedTime(
+    time: number = Date.now(),
+    interval: number = 60 * 1000
+) {
+    return Math.floor(time / interval);
+}

@@ -15,7 +15,7 @@ import {
     refreshAuthority,
     token,
 } from '../auth/functions';
-import { isMobileSafari, log } from '../utilities/general';
+import { isMobileSafari, log, simplifiedTime } from '../utilities/general';
 import { HashMap } from '../utilities/types';
 import {
     PlaceCommandRequest,
@@ -328,7 +328,9 @@ export function send<T = any>(
     timeout_delay: number = REQUEST_TIMEOUT,
     tries: number = 0
 ): Promise<T> {
-    const key = `${request.cmd}|${request.sys}|${request.mod}${request.index}|${request.name}|${request.args}`;
+    const key = `${request.cmd}|${request.sys}|${request.mod}${request.index}|${
+        request.name
+    }|${request.args}|${simplifiedTime()}`;
     /* istanbul ignore else */
     if (!_requests[key]) {
         const req: PlaceCommandRequestMetadata = { ...request, key };
@@ -370,6 +372,8 @@ export function send<T = any>(
             }
         });
         _requests[key] = req;
+    } else {
+        log('WS', `Request already in progress. Waiting...`, request);
     }
     return _requests[key].promise as Promise<any>;
 }
