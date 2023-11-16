@@ -106,6 +106,7 @@ let _connection_promise: Promise<void> | null = null;
  * Timer to check the initial health of the websocket connection
  */
 let _health_check: number | undefined;
+let _last_pong = 0;
 /**
  * @private
  * Delay in milliseconds to cancel a request
@@ -411,6 +412,8 @@ export function onMessage(message: PlaceResponse | 'pong'): void {
             log('WS', 'Invalid websocket message', message, 'error');
         }
         clearAsyncTimeout(`${message.id}`);
+    } else if (message === 'pong') {
+        _last_pong = Date.now();
     }
 }
 
@@ -549,9 +552,8 @@ export function connect(tries: number = 0): Promise<void> {
                         reconnect();
                     }
                 );
-                if (_keep_alive) {
-                    clearInterval(_keep_alive);
-                }
+                if (_keep_alive) clearInterval(_keep_alive);
+                _last_pong = Date.now();
                 ping();
                 _keep_alive = setInterval(
                     () => ping(),
@@ -678,6 +680,9 @@ export function reconnect() {
  * Send ping through the websocket
  */
 export function ping() {
+    if (Date.now() - _last_pong > 4 * KEEP_ALIVE * 1000) {
+        return reconnect();
+    }
     _websocket?.next('ping');
 }
 
