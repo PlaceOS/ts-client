@@ -798,11 +798,6 @@ export function handleMockSend(
 
 function _clearRequests() {
     for (const key in _requests) {
-        if (_requests[key]) {
-            _requests[key].resolve
-                ? _requests[key].resolve!('Connection closed by browser.')
-                : '';
-            delete _requests[key];
-        }
+        if (_requests[key]) delete _requests[key];
     }
 }
