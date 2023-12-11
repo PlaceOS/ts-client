@@ -635,13 +635,12 @@ export function createWebsocket() {
             typeof data === 'object' ? JSON.stringify(data) : data,
         deserializer: (data) => {
             let return_value = data.data;
+            if (return_value === 'pong') return return_value;
             try {
-                const obj = JSON.parse(data.data);
-                return_value = obj;
+                return JSON.parse(data.data);
             } catch (e) {
-                return_value = return_value;
+                return return_value;
             }
-            return return_value;
         },
     });
 }
