@@ -471,8 +471,9 @@ export function handleError(message: PlaceResponse) {
         'error'
     );
     const request = Object.keys(_requests)
-        .map((i) => _requests[i])
-        .find((i) => i.id === message.id);
+        .map((key) => _requests[key])
+        .filter((_) => _)
+        .find((request) => request.id === message.id);
     if (request && request.reject) {
         request.reject(message);
         clearAsyncTimeout(`${request.key}`);
