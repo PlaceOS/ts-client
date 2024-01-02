@@ -26,6 +26,12 @@ export class PlaceDriver extends PlaceResource {
     public readonly ignore_connected: boolean;
     /** Whether newer version of driver is available */
     public readonly update_available: boolean;
+    public readonly update_info?: {
+        commit: string;
+        message: string;
+        author: string;
+        date: string;
+    };
     /** Tuple of user settings of differring encryption levels for the driver */
     public readonly settings: [
         PlaceSettings | null,
@@ -47,6 +53,7 @@ export class PlaceDriver extends PlaceResource {
         this.file_name = raw_data.file_name || '';
         this.commit = raw_data.commit || '';
         this.update_available = raw_data.update_available || false;
+        this.update_info = raw_data.update_info;
         this.settings = raw_data.settings || [null, null, null, null];
         if (typeof this.settings !== 'object') {
             (this as any).settings = [null, null, null, null];
