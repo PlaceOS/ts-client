@@ -2,6 +2,7 @@
 export interface PlaceDriverQueryOptions {
     /** Filter result by type of driver. One of either `ssh`, `device`, `service` or `logic` */
     role?: 'ssh' | 'device' | 'service' | 'logic' | 'websocket';
+    update_available?: boolean;
 }
 
 /** List of details that can be assigned to a new Driver */
