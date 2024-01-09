@@ -414,6 +414,7 @@ export function onMessage(message: PlaceResponse | 'pong'): void {
         clearAsyncTimeout(`${message.id}`);
     } else if (message === 'pong') {
         _last_pong = Date.now();
+        log('WS', `Pong!`);
     }
 }
 
