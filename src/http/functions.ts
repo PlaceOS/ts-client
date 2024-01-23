@@ -4,10 +4,12 @@ import { filter, mergeMap, retryWhen, switchMap, take } from 'rxjs/operators';
 
 import {
     apiKey,
+    authority,
     invalidateToken,
     isMock,
     listenForToken,
     refreshAuthority,
+    sendToLogin,
     token,
 } from '../auth/functions';
 import { log } from '../utilities/general';
@@ -292,6 +294,10 @@ export function request(
         retryWhen((attempts: Observable<any>) =>
             attempts.pipe(
                 mergeMap((error, i) => {
+                    if (error.status === 511) {
+                        sendToLogin(authority()!);
+                        return of(error);
+                    }
                     if (i + 1 > 4 || error.status !== 401) {
                         return throwError(error || {});
                     }
