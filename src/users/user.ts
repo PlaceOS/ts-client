@@ -1,5 +1,16 @@
 import { PlaceResource } from '../resources/resource';
 
+export interface WorktimePreference {
+    /* Day of the week */
+    day: 0 | 1 | 2 | 3 | 4 | 5 | 6;
+    /* Start time of work hours. e.g. `7.5` being 7:30AM */
+    start_time: number;
+    /* End time of work hours. e.g. `18.5` being 6:30PM */
+    end_time: number;
+    /** Name of the location the work is being performed at */
+    location?: string;
+}
+
 /**
  * Representation of the user model in Place
  */
@@ -40,6 +51,8 @@ export class PlaceUser extends PlaceResource {
     public readonly card_number: string;
     /** Organisational department the user belongs */
     public readonly department: string;
+    /** Default worktime preferences for the user */
+    public readonly wfh_preferences: WorktimePreference[];
     /** Password */
     protected password = '';
     /** Password */
@@ -65,5 +78,6 @@ export class PlaceUser extends PlaceResource {
         this.card_number = raw_data.card_number || '';
         this.groups = raw_data.groups || [];
         this.department = raw_data.department || '';
+        this.wfh_preferences = raw_data.wfh_preferences || [];
     }
 }

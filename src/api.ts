@@ -252,7 +252,7 @@ export {
     removeUser,
     currentUser,
 } from './users/functions';
-export { PlaceUser } from './users/user';
+export { PlaceUser, WorktimePreference } from './users/user';
 export { PlaceUserQueryOptions } from './users/interfaces';
 
 export {
