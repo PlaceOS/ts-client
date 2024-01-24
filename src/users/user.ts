@@ -1,8 +1,8 @@
 import { PlaceResource } from '../resources/resource';
 
 export interface WorktimePreference {
-    /* Day of the week */
-    day: 0 | 1 | 2 | 3 | 4 | 5 | 6;
+    /* Index of the day of the week. `0` being Sunday */
+    day_of_week: 0 | 1 | 2 | 3 | 4 | 5 | 6;
     /* Start time of work hours. e.g. `7.5` being 7:30AM */
     start_time: number;
     /* End time of work hours. e.g. `18.5` being 6:30PM */
@@ -52,7 +52,9 @@ export class PlaceUser extends PlaceResource {
     /** Organisational department the user belongs */
     public readonly department: string;
     /** Default worktime preferences for the user */
-    public readonly wfh_preferences: WorktimePreference[];
+    public readonly work_preferences: WorktimePreference[];
+    /** Overrides of the worktime preferences for the user */
+    public readonly work_overrides: Record<string, WorktimePreference>;
     /** Password */
     protected password = '';
     /** Password */
@@ -78,6 +80,7 @@ export class PlaceUser extends PlaceResource {
         this.card_number = raw_data.card_number || '';
         this.groups = raw_data.groups || [];
         this.department = raw_data.department || '';
-        this.wfh_preferences = raw_data.wfh_preferences || [];
+        this.work_preferences = raw_data.work_preferences || [];
+        this.work_overrides = raw_data.work_overrides || ({} as any);
     }
 }
