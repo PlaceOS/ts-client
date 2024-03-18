@@ -13,6 +13,8 @@ export class PlaceApplication extends PlaceResource {
     public readonly redirect_uri: string;
     /** Skip authorization checks for the application */
     public readonly skip_authorization: boolean;
+    /** Whether Client ID should be updated on changes */
+    public readonly preserve_client_id: boolean;
 
     constructor(raw_data: Partial<PlaceApplication> = {}) {
         super(raw_data);
@@ -22,5 +24,6 @@ export class PlaceApplication extends PlaceResource {
         this.scopes = raw_data.scopes || '';
         this.redirect_uri = raw_data.redirect_uri || '';
         this.skip_authorization = raw_data.skip_authorization || false;
+        this.preserve_client_id = raw_data.preserve_client_id || false;
     }
 }
