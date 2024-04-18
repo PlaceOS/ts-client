@@ -124,9 +124,9 @@ export function redirectUri(): string {
 }
 
 /** Manually set an X API key */
-export function setAPI_Key(api_key: string) {
-    _storage.setItem('x-api-key', `${api_key}`);
-    _storage.setItem('trusted', `true`);
+export function setAPI_Key(api_key: string, trusted: boolean = true) {
+    _storage.setItem(`${_client_id}_x-api-key`, `${api_key}`);
+    _storage.setItem('trusted', `${trusted}`);
     setToken('x-api-key', addYears(new Date(), 5).valueOf());
 }
 
