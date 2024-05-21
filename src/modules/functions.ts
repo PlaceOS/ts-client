@@ -1,5 +1,12 @@
 import { Observable } from 'rxjs';
-import { create, query, remove, show, task, update } from '../resources/functions';
+import {
+    create,
+    query,
+    remove,
+    show,
+    task,
+    update,
+} from '../resources/functions';
 import { PlaceSettings } from '../settings/settings';
 import { HashMap } from '../utilities/types';
 import { PlaceModulePingOptions, PlaceModuleQueryOptions } from './interfaces';
@@ -44,7 +51,14 @@ export function updateModule(
     form_data: Partial<PlaceModule>,
     method: 'put' | 'patch' = 'patch'
 ) {
-    return update({ id, form_data, query_params: {}, method, fn: process, path: PATH });
+    return update({
+        id,
+        form_data,
+        query_params: {},
+        method,
+        fn: process,
+        path: PATH,
+    });
 }
 
 /**
@@ -103,7 +117,10 @@ export function moduleState(id: string): Observable<HashMap> {
  * @param id Module ID
  * @param key Status variable of interest. If set it will return only the state of this variable
  */
-export function lookupModuleState(id: string, key: string): Observable<HashMap> {
+export function lookupModuleState(
+    id: string,
+    key: string
+): Observable<HashMap> {
     return task({ id, task_name: `state${key}`, method: 'get', path: PATH });
 }
 
@@ -124,7 +141,21 @@ export function moduleSettings(id: string) {
         id,
         task_name: 'settings',
         method: 'get',
-        callback: (list) => list.map((item: Partial<PlaceSettings>) => new PlaceSettings(item)),
+        callback: (list) =>
+            list.map((item: Partial<PlaceSettings>) => new PlaceSettings(item)),
+        path: PATH,
+    });
+}
+
+/**
+ * Get the runtime errors of the given module
+ * @param id Module ID
+ */
+export function moduleRuntimeError(id: string) {
+    return task<string[]>({
+        id,
+        task_name: 'error',
+        method: 'get',
         path: PATH,
     });
 }

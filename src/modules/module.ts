@@ -62,6 +62,10 @@ export class PlaceModule extends PlaceResource {
         PlaceSettings | null,
         PlaceSettings | null
     ] = [null, null, null, null];
+    /** Whether the module has a runtime error */
+    public readonly has_runtime_error: boolean;
+    /** Timestamp of the last runtime error in ms since UTC epoch */
+    public readonly error_timestamp: number;
     /** ID of the system associated with the module */
     public get system_id(): string {
         return this.control_system_id;
@@ -88,6 +92,8 @@ export class PlaceModule extends PlaceResource {
         this.system = new PlaceSystem(
             raw_data.control_system || raw_data.system
         );
+        this.has_runtime_error = raw_data.has_runtime_error || false;
+        this.error_timestamp = raw_data.error_timestamp || 0;
         this.driver = new PlaceDriver(raw_data.dependency || raw_data.driver);
         this.settings = raw_data.settings || [null, null, null, null];
         if (typeof this.settings !== 'object') {
@@ -108,7 +114,10 @@ export class PlaceModule extends PlaceResource {
      */
     public toJSON(keep_system: boolean = false): HashMap {
         const obj = super.toJSON();
-        if ((obj.role !== PlaceDriverRole.Logic && !keep_system) || !obj.control_system_id) {
+        if (
+            (obj.role !== PlaceDriverRole.Logic && !keep_system) ||
+            !obj.control_system_id
+        ) {
             delete obj.control_system_id;
         }
         delete obj.driver;
