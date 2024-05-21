@@ -112,6 +112,7 @@ export {
     moduleSettings,
     lookupModuleState,
     loadModule,
+    moduleRuntimeError,
 } from './modules/functions';
 export { PlaceModule } from './modules/module';
 export {
