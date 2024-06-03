@@ -122,6 +122,8 @@ export class PlaceModule extends PlaceResource {
         }
         delete obj.driver;
         delete obj.system;
+        delete obj.error_timestamp;
+        delete obj.has_runtime_error;
         return obj;
     }
 }
