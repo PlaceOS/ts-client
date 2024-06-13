@@ -270,3 +270,20 @@ export {
     PlaceZoneQueryOptions,
     PlaceZoneShowOptions,
 } from './zones/interfaces';
+
+export {
+    showSignage,
+    showSignageMetrics,
+    querySignageMedia,
+    showSignageMedia,
+    updateSignageMedia,
+    addSignageMedia,
+    removeSignageMedia,
+    querySignagePlaylists,
+    showSignagePlaylist,
+    updateSignagePlaylist,
+    addSignagePlaylist,
+    removeSignagePlaylist,
+} from './signage/functions';
+export { SignageMedia } from './signage/media.class';
+export { SignageMediaQueryOptions, SignageMetrics } from './signage/interfaces';
