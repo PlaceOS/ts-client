@@ -616,7 +616,7 @@ export function createWebsocket() {
         tkn === 'x-api-key' ? `api-key=${apiKey()}` : `bearer_token=${tkn}`;
     if (!needsTokenHeader() && !isMobileSafari()) {
         log('WS', `Authenticating through cookie...`);
-        query += `;max-age=120;path=${httpRoute()};`;
+        query += `;max-age=120;path=${websocketRoute()};`;
         query += `${secure ? 'secure;' : ''}samesite=strict`;
         document.cookie = query;
         log('WS', `Cookies:`, [document.cookie, query]);
