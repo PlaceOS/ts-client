@@ -1,8 +1,8 @@
-import { create, query, remove, show, update } from 'src/api';
+import { create, query, remove, show, update } from '../api';
 import { SignageMedia } from './media.class';
 import { SignagePlaylist } from './playlist.class';
 import { SignageMediaQueryOptions, SignageMetrics } from './interfaces';
-import { task } from 'src/resources/functions';
+import { task } from '../resources/functions';
 
 /**
  * @private
@@ -26,10 +26,7 @@ export function showSignage(
  * @param id ID of the signage item to retrieve
  * @param query_params Query parameters to add the to request URL
  */
-export function showSignageMetrics(
-    id: string,
-    query_params: SignageMediaQueryOptions = {}
-) {
+export function showSignageMetrics(id: string) {
     return task({
         id,
         task_name: `metrics`,
