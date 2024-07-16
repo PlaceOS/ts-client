@@ -63,11 +63,3 @@ jobs:
         PUBLISH_DIR: ./docs
       with:
         emptyCommits: false
-
-    - name: Update Pipeline Chat Status
-      uses: fjogeleit/http-request-action@master
-      continue-on-error: true
-      with:
-          url: ${{ secrets.CHAT_SUCCESS }}
-          data: '{ "name": "${{ github.repository }}", "commit": "${{ github.sha }}", "pipeline_name": "ts-client", "branch": "${{ github.ref }}", "status": "${{ job.status }}", "url": "https://github.com/${{ github.repository }}/runs/${{ github.run_id }}" }'
-      if: ${{ always() }}
