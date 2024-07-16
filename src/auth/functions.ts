@@ -1,5 +1,4 @@
 import * as base64 from 'byte-base64';
-import { addHours, addSeconds, addYears, isBefore } from 'date-fns';
 import * as sha256 from 'fast-sha256';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { fromFetch } from 'rxjs/fetch';
@@ -28,6 +27,7 @@ import {
     PlaceAuthority,
     PlaceTokenResponse,
 } from './interfaces';
+import { addHours, addSeconds, addYears, isBefore } from 'date-fns';
 
 /**
  * @private

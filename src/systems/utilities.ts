@@ -1,5 +1,4 @@
-import { startOfMinute } from 'date-fns';
-import { sub } from 'date-fns';
+import { startOfMinute, sub } from 'date-fns';
 
 export function generateMockSystem(overrides: any = {}) {
     if (typeof overrides !== 'object' || !overrides) {
