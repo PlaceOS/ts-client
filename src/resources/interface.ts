@@ -9,6 +9,8 @@ export interface PlaceResourceQueryOptions {
      * https://www.elastic.co/guide/en/elasticsearch/reference/5.5/query-dsl-simple-query-string-query.html
      */
     q?: string;
+    /** Comma seperated list of fields to apply the query to */
+    fields?: string;
     /** Number of results to return. Defaults to `20`. Max `500` */
     limit?: number;
     /** Offsets of the results to return. Max `10000` */
