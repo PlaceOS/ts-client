@@ -64,26 +64,10 @@ jobs:
       with:
         emptyCommits: false
 
-    - name: G-Chat Success Notify
-      uses: Co-qn/google-chat-notification@releases/v1
+    - name: Update Pipeline Chat Status
+      uses: fjogeleit/http-request-action@master
+      continue-on-error: true
       with:
-        name: Build
-        url: ${{ secrets.CHAT_SUCCESS }}
-        status: ${{ job.status }}
-      if: success()
-
-    - name: G-Chat Failed Notify
-      uses: Co-qn/google-chat-notification@releases/v1
-      with:
-        name: Build
-        url: ${{ secrets.CHAT_ERROR }}
-        status: ${{ job.status }}
-      if: failure()
-
-    - name: G-Chat Cancelled Notify
-      uses: Co-qn/google-chat-notification@releases/v1
-      with:
-        name: Build
-        url: ${{ secrets.CHAT_ERROR }}
-        status: ${{ job.status }}
-      if: cancelled()
+          url: ${{ secrets.CHAT_SUCCESS }}
+          data: '{ "name": "${{ github.repository }}", "commit": "${{ github.sha }}", "pipeline_name": "ts-client", "branch": "${{ github.ref }}", "status": "${{ job.status }}", "url": "https://github.com/${{ github.repository }}/runs/${{ github.run_id }}" }'
+      if: ${{ always() }}
