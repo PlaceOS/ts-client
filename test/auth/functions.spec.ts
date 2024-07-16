@@ -318,20 +318,22 @@ describe('Auth', () => {
     //     expect(Auth.authority()).toBeTruthy();
     // });
 
-    it('should allow listening to changes to token', async (done) => {
-        window.location.search = '?access_token=test&expires_in=3600';
-        Auth.listenForToken().subscribe((token) => {
-            if (token) {
-                done();
-            }
-        });
-        await Auth.setup({
-            auth_uri: '',
-            token_uri: '',
-            redirect_uri: '',
-            secure: true,
-            scope: 'public',
-        });
+    it('should allow listening to changes to token', (done) => {
+        (async () => {
+            window.location.search = '?access_token=test&expires_in=3600';
+            Auth.listenForToken().subscribe((token) => {
+                if (token) {
+                    done();
+                }
+            });
+            await Auth.setup({
+                auth_uri: '',
+                token_uri: '',
+                redirect_uri: '',
+                secure: true,
+                scope: 'public',
+            });
+        })();
     });
 
     it('should allow generating challenge pairs', () => {

@@ -31,26 +31,30 @@ describe('MockEngineWebsocket', () => {
     });
 
     it('should bind to mock system modules', (done) => {
+        let checked = false;
         const binding = { sys: 'sys-A0', mod: 'Test', index: 1, name: 'test' };
         ws.listen(binding).subscribe((value) => {
-            if (value) {
+            if (value && !checked) {
                 expect(ws.value(binding)).toBe(10);
                 done();
+                checked = true;
             }
         });
         ws.bind(binding);
     });
 
     it('post binding value updates', (done) => {
+        let checked = false;
         const binding = { sys: 'sys-A0', mod: 'Test', index: 1, name: 'test' };
         let count = 0;
         ws.listen(binding).subscribe((value) => {
             if (count === 0) {
                 expect(value).toBeUndefined();
                 count++;
-            } else {
+            } else if (value && !checked) {
                 expect(value).toBe(10);
                 done();
+                checked = true;
             }
         });
         ws.bind(binding);

@@ -310,6 +310,7 @@ describe('Realtime API', () => {
     });
 
     it('should bind to mock system modules', (done) => {
+        let checked = false;
         jest.useRealTimers();
         mock_ws.registerSystem('sys-A9', {
             Test: [
@@ -326,10 +327,11 @@ describe('Realtime API', () => {
         const binding = { sys: 'sys-A9', mod: 'Test', index: 1, name: 'test' };
         ws.bind(binding).then(() => {
             ws.listen(binding).subscribe((value) => {
-                if (!value) return;
+                if (!value || checked) return;
                 expect(ws.value(binding)).toBe(value);
                 expect(ws.value(binding)).toBe(10);
                 done();
+                checked = true;
             });
             mock_ws.mockSystem('sys-A9').Test[0].test = 10;
         });
