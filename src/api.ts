@@ -284,6 +284,13 @@ export {
     updateSignagePlaylist,
     addSignagePlaylist,
     removeSignagePlaylist,
+    listSignagePlaylistMediaRevisions,
+    listSignagePlaylistMedia,
+    updateSignagePlaylistMedia,
 } from './signage/functions';
 export { SignageMedia } from './signage/media.class';
+export {
+    SignagePlaylist,
+    SignagePlaylistMedia,
+} from './signage/playlist.class';
 export { SignageMediaQueryOptions, SignageMetrics } from './signage/interfaces';

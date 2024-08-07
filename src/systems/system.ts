@@ -53,6 +53,16 @@ export class PlaceSystem extends PlaceResource {
      * Only available from the show method with the `complete` query parameter
      */
     public module_list: readonly PlaceModule[] = [];
+    /** Whether the system has signage capabilities */
+    public readonly signage: boolean;
+    /** List of playlist IDs associated with the system */
+    public readonly playlists: readonly string[];
+    /** Orientation of the signage system */
+    public readonly orientation:
+        | 'unspecified'
+        | 'portrait'
+        | 'landscape'
+        | 'square';
 
     constructor(raw_data: PlaceSystemComplete = {}) {
         super(raw_data);
@@ -72,6 +82,9 @@ export class PlaceSystem extends PlaceResource {
         this.zones = raw_data.zones || [];
         this.settings = raw_data.settings || [null, null, null, null];
         this.timezone = raw_data.timezone || '';
+        this.signage = raw_data.signage || false;
+        this.playlists = raw_data.playlists || [];
+        this.orientation = raw_data.orientation || 'unspecified';
         if (typeof this.settings !== 'object') {
             (this as any).settings = [null, null, null, null];
         }

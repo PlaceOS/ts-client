@@ -18,7 +18,11 @@ export class SignageMedia {
     public readonly play_time: number;
     public readonly animation: string;
     public readonly media_type: MediaType;
-    public readonly orientation: string;
+    public readonly orientation:
+        | 'unspecified'
+        | 'portrait'
+        | 'landscape'
+        | 'square';
     public readonly media_uri: string;
     public readonly media_id: string;
     public readonly thumbnail_id: string;

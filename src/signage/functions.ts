@@ -1,6 +1,6 @@
 import { create, query, remove, show, update } from '../api';
 import { SignageMedia } from './media.class';
-import { SignagePlaylist } from './playlist.class';
+import { SignagePlaylist, SignagePlaylistMedia } from './playlist.class';
 import { SignageMediaQueryOptions, SignageMetrics } from './interfaces';
 import { task } from '../resources/functions';
 
@@ -18,7 +18,7 @@ export function showSignage(
     id: string,
     query_params: SignageMediaQueryOptions = {}
 ) {
-    return show({ id, query_params, fn: (r) => r, path: PATH });
+    return show({ id, query_params, fn: (r) => r, path: `${PATH}` });
 }
 
 /**
@@ -198,4 +198,63 @@ export function removeSignagePlaylist(
     query_params: Record<string, any> = {}
 ) {
     return remove({ id, query_params, path: PLAYLISTS_PATH });
+}
+
+/**
+ * Get media for a playlist
+ * @param id ID of the playlist
+ * @param query_params Query parameters to add the to request URL
+ */
+export function listSignagePlaylistMedia(
+    id: string,
+    query_params: SignageMediaQueryOptions = {}
+) {
+    return task({
+        id,
+        task_name: 'media',
+        form_data: query_params,
+        method: 'get',
+        callback: (value: SignagePlaylistMedia) =>
+            new SignagePlaylistMedia(value),
+        path: PLAYLISTS_PATH,
+    });
+}
+
+/**
+ * List all versions of the media lists for a playlist
+ * @param id ID of the playlist
+ * @param query_params Query parameters to add the to request URL
+ */
+export function listSignagePlaylistMediaRevisions(
+    id: string,
+    query_params: SignageMediaQueryOptions = {}
+) {
+    return task({
+        id,
+        task_name: 'media/revisions',
+        form_data: query_params,
+        method: 'get',
+        callback: (list: SignagePlaylistMedia[]) =>
+            list.map(
+                (item: SignagePlaylistMedia) => new SignagePlaylistMedia(item)
+            ),
+        path: PLAYLISTS_PATH,
+    });
+}
+
+/**
+ * Update the media for a playlist
+ * @param id ID of the playlist
+ * @param form_data New list of media IDs for the playlist
+ */
+export function updateSignagePlaylistMedia(id: string, form_data: string[]) {
+    return task({
+        id,
+        task_name: 'media',
+        form_data,
+        method: 'post',
+        path: PLAYLISTS_PATH,
+        callback: (value: SignagePlaylistMedia) =>
+            new SignagePlaylistMedia(value),
+    });
 }

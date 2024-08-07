@@ -20,6 +20,8 @@ export interface PlaceSystemsQueryOptions extends PlaceResourceQueryOptions {
     zone_id?: string;
     /** Driver ID to filter the returned values on */
     module_id?: string;
+    /** Only return systems that have signage capabilities */
+    signage?: boolean;
 }
 
 /** Allowable query parameters for systems show endpoint */

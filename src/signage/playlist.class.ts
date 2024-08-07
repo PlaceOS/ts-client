@@ -1,3 +1,25 @@
+export class SignagePlaylistMedia {
+    public readonly id: string;
+    public readonly playlist_id: string;
+    public readonly items: string[];
+    public readonly user_id: string;
+    public readonly user_name: string;
+    public readonly user_email: string;
+    public readonly created_at: number;
+    public readonly updated_at: number;
+
+    constructor(data: Partial<SignagePlaylistMedia> = {}) {
+        this.id = data.id || '';
+        this.playlist_id = data.playlist_id || '';
+        this.items = data.items || [];
+        this.user_id = data.user_id || '';
+        this.user_name = data.user_name || '';
+        this.user_email = data.user_email || '';
+        this.created_at = data.created_at || 0;
+        this.updated_at = data.updated_at || 0;
+    }
+}
+
 export class SignagePlaylist {
     public readonly id: string;
     public readonly created_at: number;
