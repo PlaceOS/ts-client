@@ -3,6 +3,10 @@ import { PlaceResource } from '../resources/resource';
 export interface WorktimePreference {
     /* Index of the day of the week. `0` being Sunday */
     day_of_week: 0 | 1 | 2 | 3 | 4 | 5 | 6;
+    blocks: WorktimeBlock[];
+}
+
+export interface WorktimeBlock {
     /* Start time of work hours. e.g. `7.5` being 7:30AM */
     start_time: number;
     /* End time of work hours. e.g. `18.5` being 6:30PM */
