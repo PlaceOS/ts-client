@@ -1,3 +1,5 @@
+import { MediaAnimation } from './media.class';
+
 export class SignagePlaylistMedia {
     public readonly id: string;
     public readonly playlist_id: string;
@@ -30,7 +32,7 @@ export class SignagePlaylist {
     public readonly orientation: string;
     public readonly play_count: number;
     public readonly play_through_count: number;
-    public readonly default_animation: string;
+    public readonly default_animation: MediaAnimation;
     public readonly random: boolean;
     public readonly enabled: boolean;
     public readonly default_duration: number;
@@ -50,7 +52,7 @@ export class SignagePlaylist {
         this.orientation = data.orientation || '';
         this.play_count = data.play_count || 0;
         this.play_through_count = data.play_through_count || 0;
-        this.default_animation = data.default_animation || '';
+        this.default_animation = data.default_animation || 'cut';
         this.random = data.random || false;
         this.enabled = data.enabled || false;
         this.default_duration = data.default_duration ?? 15;

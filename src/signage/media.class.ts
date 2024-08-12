@@ -1,11 +1,25 @@
 import { getUnixTime } from 'date-fns';
 
-export type MediaType = 'unknown' | 'image' | 'video' | 'audio' | 'text';
+export type MediaType =
+    | 'unknown'
+    | 'image'
+    | 'video'
+    | 'audio'
+    | 'plugin'
+    | 'webpage'
+    | 'externalimage';
+export type MediaAnimation =
+    | 'cut'
+    | 'crossfade'
+    | 'slidetop'
+    | 'slideleft'
+    | 'slideright'
+    | 'slidebottom';
 export type MediaOrientation =
+    | 'unspecified'
     | 'portrait'
     | 'landscape'
-    | 'square'
-    | 'unspecified';
+    | 'square';
 
 export class SignageMedia {
     public readonly id: string;
@@ -16,13 +30,9 @@ export class SignageMedia {
     public readonly authority_id: string;
     public readonly start_time: number;
     public readonly play_time: number;
-    public readonly animation: string;
+    public readonly animation: MediaAnimation;
     public readonly media_type: MediaType;
-    public readonly orientation:
-        | 'unspecified'
-        | 'portrait'
-        | 'landscape'
-        | 'square';
+    public readonly orientation: MediaOrientation;
     public readonly media_uri: string;
     public readonly media_id: string;
     public readonly thumbnail_id: string;
@@ -39,7 +49,7 @@ export class SignageMedia {
         this.authority_id = data.authority_id || '';
         this.start_time = data.start_time || 0;
         this.play_time = data.play_time || 0;
-        this.animation = data.animation || '';
+        this.animation = data.animation || 'cut';
         this.media_type = data.media_type || 'unknown';
         this.orientation = data.orientation || 'unspecified';
         this.media_uri = data.media_uri || '';
