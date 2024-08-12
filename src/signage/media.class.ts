@@ -37,8 +37,8 @@ export class SignageMedia {
     public readonly media_id: string;
     public readonly thumbnail_id: string;
     public readonly play_count: number;
-    public readonly valid_from: string;
-    public readonly valid_until: string;
+    public readonly valid_from: number;
+    public readonly valid_until: number;
 
     constructor(data: Partial<SignageMedia>) {
         this.id = data.id || '';
@@ -56,7 +56,7 @@ export class SignageMedia {
         this.media_id = data.media_id || '';
         this.thumbnail_id = data.thumbnail_id || '';
         this.play_count = data.play_count || 0;
-        this.valid_from = data.valid_from || '';
-        this.valid_until = data.valid_until || '';
+        this.valid_from = data.valid_from || getUnixTime(Date.now());
+        this.valid_until = data.valid_until || getUnixTime(Date.now() * 10);
     }
 }
