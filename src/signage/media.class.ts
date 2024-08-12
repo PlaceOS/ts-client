@@ -40,6 +40,16 @@ export class SignageMedia {
     public readonly valid_from: number;
     public readonly valid_until: number;
 
+    public get media_url() {
+        return this.media_id
+            ? `/api/engine/v2/uploads/${this.media_id}/url`
+            : this.media_uri;
+    }
+
+    public get thumbnail_url() {
+        return `/api/engine/v2/uploads/${this.thumbnail_id}/url`;
+    }
+
     constructor(data: Partial<SignageMedia>) {
         this.id = data.id || '';
         this.created_at = data.created_at || getUnixTime(Date.now());
