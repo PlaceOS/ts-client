@@ -44,6 +44,8 @@ export class PlaceZone extends PlaceResource {
     public readonly images: string[];
     /** Timezone of the associated real world location */
     public readonly timezone: string;
+    /** List of playlist IDs associated with the system */
+    public readonly playlists: readonly string[];
     /**
      * List of modules associated with the system.
      * Only available from the show method with the `complete` query parameter
@@ -66,6 +68,7 @@ export class PlaceZone extends PlaceResource {
         this.map_id = raw_data.map_id || '';
         this.timezone = raw_data.timezone || '';
         this.images = raw_data.images || [];
+        this.playlists = raw_data.playlists || [];
         if (typeof this.settings !== 'object') {
             (this as any).settings = [null, null, null, null];
         }
@@ -73,12 +76,14 @@ export class PlaceZone extends PlaceResource {
             if (!isNaN(Number(level)) && !this.settings[level]) {
                 this.settings[level] = new PlaceSettings({
                     parent_id: this.id,
-                    encryption_level: +level
+                    encryption_level: +level,
                 });
             }
         }
         if (raw_data.trigger_data && raw_data.trigger_data instanceof Array) {
-            this.trigger_list = raw_data.trigger_data.map(trigger => new PlaceTrigger(trigger));
+            this.trigger_list = raw_data.trigger_data.map(
+                (trigger) => new PlaceTrigger(trigger)
+            );
         }
     }
 }
