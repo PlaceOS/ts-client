@@ -30,6 +30,7 @@ export class SignageMedia {
     public readonly authority_id: string;
     public readonly start_time: number;
     public readonly play_time: number;
+    public readonly video_length: number;
     public readonly animation?: MediaAnimation;
     public readonly media_type: MediaType;
     public readonly orientation: MediaOrientation;
@@ -59,6 +60,7 @@ export class SignageMedia {
         this.authority_id = data.authority_id || '';
         this.start_time = data.start_time || 0;
         this.play_time = data.play_time || 0;
+        this.video_length = data.video_length || 0;
         this.animation = data.animation;
         this.media_type = data.media_type || 'unknown';
         this.orientation = data.orientation || 'unspecified';
