@@ -54,7 +54,7 @@ export class SignagePlaylist {
         this.play_through_count = data.play_through_count || 0;
         this.default_animation = data.default_animation || 'cut';
         this.random = data.random || false;
-        this.enabled = data.enabled || false;
+        this.enabled = data.enabled ?? true;
         this.default_duration = data.default_duration ?? 15;
         this.valid_from = data.valid_from || '';
         this.valid_until = data.valid_until || '';

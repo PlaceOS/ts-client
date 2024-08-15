@@ -1,4 +1,4 @@
-import { getUnixTime } from 'date-fns';
+import { addYears, getUnixTime } from 'date-fns';
 
 export type MediaType =
     | 'unknown'
@@ -30,15 +30,15 @@ export class SignageMedia {
     public readonly authority_id: string;
     public readonly start_time: number;
     public readonly play_time: number;
-    public readonly animation: MediaAnimation;
+    public readonly animation?: MediaAnimation;
     public readonly media_type: MediaType;
     public readonly orientation: MediaOrientation;
     public readonly media_uri: string;
     public readonly media_id: string;
     public readonly thumbnail_id: string;
     public readonly play_count: number;
-    public readonly valid_from: number;
-    public readonly valid_until: number;
+    public readonly valid_from: string;
+    public readonly valid_until: string;
 
     public get media_url() {
         return this.media_id
@@ -59,14 +59,15 @@ export class SignageMedia {
         this.authority_id = data.authority_id || '';
         this.start_time = data.start_time || 0;
         this.play_time = data.play_time || 0;
-        this.animation = data.animation || 'cut';
+        this.animation = data.animation;
         this.media_type = data.media_type || 'unknown';
         this.orientation = data.orientation || 'unspecified';
         this.media_uri = data.media_uri || '';
         this.media_id = data.media_id || '';
         this.thumbnail_id = data.thumbnail_id || '';
         this.play_count = data.play_count || 0;
-        this.valid_from = data.valid_from || getUnixTime(Date.now());
-        this.valid_until = data.valid_until || getUnixTime(Date.now() * 10);
+        this.valid_from = data.valid_from || new Date().toISOString();
+        this.valid_until =
+            data.valid_until || addYears(Date.now(), 10).toISOString();
     }
 }
