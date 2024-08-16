@@ -36,11 +36,11 @@ export class SignagePlaylist {
     public readonly random: boolean;
     public readonly enabled: boolean;
     public readonly default_duration: number;
-    public readonly valid_from: string;
-    public readonly valid_until: string;
     public readonly play_hours: string;
     public readonly play_at: string;
     public readonly play_cron: string;
+    public readonly valid_from?: number;
+    public readonly valid_until?: number;
 
     constructor(data: Partial<SignagePlaylist>) {
         this.id = data.id || '';
@@ -56,8 +56,8 @@ export class SignagePlaylist {
         this.random = data.random || false;
         this.enabled = data.enabled ?? true;
         this.default_duration = data.default_duration ?? 15;
-        this.valid_from = data.valid_from || '';
-        this.valid_until = data.valid_until || '';
+        this.valid_from = data.valid_from;
+        this.valid_until = data.valid_until;
         this.play_hours = data.play_hours || '';
         this.play_at = data.play_at || '';
         this.play_cron = data.play_cron || '';
