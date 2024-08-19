@@ -289,7 +289,7 @@ export {
     listSignagePlaylistMedia,
     updateSignagePlaylistMedia,
 } from './signage/functions';
-export { SignageMedia } from './signage/media.class';
+export { SignageMedia, MediaAnimation } from './signage/media.class';
 export {
     SignagePlaylist,
     SignagePlaylistMedia,
