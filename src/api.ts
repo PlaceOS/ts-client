@@ -1,9 +1,10 @@
 /* istanbul ignore file */
 
-export { get, post, put, patch, del } from './http/functions';
+export { get, post, put, patch, del, responseHeaders } from './http/functions';
 export {
     HttpError,
     HttpOptions,
+    HttpJsonOptions,
     HttpResponse,
     HttpResponseType,
     MockHttpRequest,

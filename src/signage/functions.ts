@@ -3,6 +3,7 @@ import { SignageMedia } from './media.class';
 import { SignagePlaylist, SignagePlaylistMedia } from './playlist.class';
 import { SignageMediaQueryOptions, SignageMetrics } from './interfaces';
 import { task } from '../resources/functions';
+import { HttpJsonOptions } from 'src/http/interfaces';
 
 /**
  * @private
@@ -16,9 +17,10 @@ const PATH = 'signage';
  */
 export function showSignage(
     id: string,
-    query_params: SignageMediaQueryOptions = {}
+    query_params: SignageMediaQueryOptions = {},
+    options?: HttpJsonOptions
 ) {
-    return show({ id, query_params, fn: (r) => r, path: `${PATH}` });
+    return show({ id, query_params, fn: (r) => r, path: `${PATH}` }, options);
 }
 
 /**
