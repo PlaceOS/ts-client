@@ -8,13 +8,16 @@ export type MediaType =
     | 'plugin'
     | 'webpage'
     | 'externalimage';
-export type MediaAnimation =
-    | 'cut'
-    | 'crossfade'
-    | 'slidetop'
-    | 'slideleft'
-    | 'slideright'
-    | 'slidebottom';
+
+export enum MediaAnimation {
+    Cut = 0,
+    CrossFade = 1,
+    SlideTop = 2,
+    SlideLeft = 3,
+    SlideRight = 4,
+    SlideBottom = 5,
+}
+
 export type MediaOrientation =
     | 'unspecified'
     | 'portrait'

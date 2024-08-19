@@ -52,7 +52,7 @@ export class SignagePlaylist {
         this.orientation = data.orientation || '';
         this.play_count = data.play_count || 0;
         this.play_through_count = data.play_through_count || 0;
-        this.default_animation = data.default_animation || 'cut';
+        this.default_animation = data.default_animation || MediaAnimation.Cut;
         this.random = data.random || false;
         this.enabled = data.enabled ?? true;
         this.default_duration = data.default_duration ?? 15;
