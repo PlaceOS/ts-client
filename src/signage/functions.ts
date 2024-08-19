@@ -20,7 +20,7 @@ export function showSignage(
     query_params: SignageMediaQueryOptions = {},
     options?: HttpJsonOptions
 ) {
-    return show({ id, query_params, fn: (r) => r, path: `${PATH}` }, options);
+    return show({ id, query_params, fn: (r) => r, path: `${PATH}`, options });
 }
 
 /**

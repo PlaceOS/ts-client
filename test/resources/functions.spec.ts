@@ -9,7 +9,7 @@ describe('Resource API', () => {
 
     async function testRequest<T>(
         method: 'get' | 'post' | 'patch' | 'put' | 'del',
-        fn: (...args: any[]) => Observable<T>,
+        func: (...args: any[]) => Observable<T>,
         result: any,
         test1: any[],
         test2: any[]
@@ -19,7 +19,7 @@ describe('Resource API', () => {
             .mockReturnValueOnce(of(result))
             .mockReturnValueOnce(of(result))
             .mockImplementationOnce(() => throwError('An Error Value'));
-        const value: any = await fn({
+        const value: any = await func({
             fn: (_: any) => _,
             path: 'resource',
             ...test1[0],
@@ -27,7 +27,7 @@ describe('Resource API', () => {
         jest.runOnlyPendingTimers();
         expect(value.data ? value.data : value).toEqual(item || []);
         // Test request with parameters
-        await fn({
+        await func({
             fn: (_: any) => _,
             path: 'resource',
             ...test2[0],
@@ -35,7 +35,7 @@ describe('Resource API', () => {
         jest.runOnlyPendingTimers();
         // Test error handling
         try {
-            await fn({
+            await func({
                 fn: (_: any) => _,
                 path: 'resource',
                 ...test1[0],
@@ -97,10 +97,10 @@ describe('Resource API', () => {
             [{}],
             [{ query_params: { test: true } }]
         );
-        expect(Http.get).toBeCalledWith(
+        expect(Http.get).toHaveBeenCalledWith(
             'http://localhost/api/engine/v2/resource'
         );
-        expect(Http.get).toBeCalledWith(
+        expect(Http.get).toHaveBeenCalledWith(
             'http://localhost/api/engine/v2/resource?test=true'
         );
     });
@@ -131,7 +131,6 @@ describe('Resource API', () => {
     });
 
     it('should allow for grabbing the show endpoint for an item', async () => {
-        expect.assertions(4);
         const item = { id: 'test', name: 'Test' };
         await testRequest(
             'get',
@@ -140,11 +139,13 @@ describe('Resource API', () => {
             [{ id: 'test' }],
             [{ id: 'test', query_params: { test: true } }]
         );
-        expect(Http.get).toBeCalledWith(
-            'http://localhost/api/engine/v2/resource/test'
+        expect(Http.get).toHaveBeenCalledWith(
+            'http://localhost/api/engine/v2/resource/test',
+            undefined
         );
-        expect(Http.get).toBeCalledWith(
-            'http://localhost/api/engine/v2/resource/test?test=true'
+        expect(Http.get).toHaveBeenCalledWith(
+            'http://localhost/api/engine/v2/resource/test?test=true',
+            undefined
         );
     });
 
@@ -158,7 +159,7 @@ describe('Resource API', () => {
             [{ form_data: item }],
             [{ form_data: item }]
         );
-        expect(Http.post).toBeCalledWith(
+        expect(Http.post).toHaveBeenCalledWith(
             'http://localhost/api/engine/v2/resource',
             item
         );
@@ -173,11 +174,11 @@ describe('Resource API', () => {
             [{ id: 'test', task_name: 'a_task' }],
             [{ id: 'test', task_name: 'a_task', form_data: { test: true } }]
         );
-        expect(Http.post).toBeCalledWith(
+        expect(Http.post).toHaveBeenCalledWith(
             'http://localhost/api/engine/v2/resource/test/a_task',
             undefined
         );
-        expect(Http.post).toBeCalledWith(
+        expect(Http.post).toHaveBeenCalledWith(
             'http://localhost/api/engine/v2/resource/test/a_task',
             {
                 test: true,
@@ -195,11 +196,11 @@ describe('Resource API', () => {
             [{ id: 'test', form_data: item }],
             [{ id: 'test', form_data: item }]
         );
-        expect(Http.patch).toBeCalledWith(
+        expect(Http.patch).toHaveBeenCalledWith(
             'http://localhost/api/engine/v2/resource/test?version=0',
             item
         );
-        // expect(Http.put).toBeCalledWith(
+        // expect(Http.put).toHaveBeenCalledWith(
         //     'http://localhost/api/engine/v2/resource/test?version=0',
         //     item
         // );
@@ -215,10 +216,10 @@ describe('Resource API', () => {
             [{ id: 'test' }],
             [{ id: 'test', query_params: { test: true } }]
         );
-        expect(Http.del).toBeCalledWith(
+        expect(Http.del).toHaveBeenCalledWith(
             'http://localhost/api/engine/v2/resource/test'
         );
-        expect(Http.del).toBeCalledWith(
+        expect(Http.del).toHaveBeenCalledWith(
             'http://localhost/api/engine/v2/resource/test?test=true'
         );
     });
@@ -239,13 +240,13 @@ describe('Resource API', () => {
                 },
             ]
         );
-        expect(Http.get).toBeCalledWith(
+        expect(Http.get).toHaveBeenCalledWith(
             'http://localhost/api/engine/v2/resource/test/a_task',
             {
                 response_type: 'json',
             }
         );
-        expect(Http.get).toBeCalledWith(
+        expect(Http.get).toHaveBeenCalledWith(
             'http://localhost/api/engine/v2/resource/test/a_task?test=true',
             {
                 response_type: 'json',

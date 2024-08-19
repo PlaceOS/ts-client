@@ -13,7 +13,6 @@ import {
     TaskParameters,
     UpdateParameters,
 } from './interface';
-import { HttpJsonOptions } from 'src/http/interfaces';
 
 /** Total number of items returned by the last basic index query */
 export function requestTotal(name: string): number {
@@ -114,11 +113,8 @@ export function query<T>(q: QueryParameters<T>): QueryResponse<T> {
  * @param id ID of the item
  * @param query_params Map of query paramaters to add to the request URL
  */
-export function show<T>(
-    details: ShowParameters<T>,
-    options?: HttpJsonOptions
-): Observable<T> {
-    const { query_params, id, path, fn } = details;
+export function show<T>(details: ShowParameters<T>): Observable<T> {
+    const { query_params, id, path, fn, options } = details;
     const query_str = toQueryString(query_params);
     const url = `${apiEndpoint()}/${path}/${id}${
         query_str ? '?' + query_str : ''

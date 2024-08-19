@@ -1,3 +1,4 @@
+import { HttpJsonOptions } from 'src/api';
 import { HashMap } from '../utilities/types';
 
 /* tslint:disable */
@@ -52,6 +53,7 @@ export interface QueryParameters<T> {
     fn?: (data: Partial<T>) => T;
     path: string;
     endpoint?: string;
+    options?: HttpJsonOptions;
 }
 
 export interface ShowParameters<T> extends QueryParameters<T> {
