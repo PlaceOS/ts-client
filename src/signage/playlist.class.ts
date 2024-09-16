@@ -55,7 +55,7 @@ export class SignagePlaylist {
         this.default_animation = data.default_animation || MediaAnimation.Cut;
         this.random = data.random || false;
         this.enabled = data.enabled ?? true;
-        this.default_duration = data.default_duration ?? 15;
+        this.default_duration = data.default_duration ?? 15 * 1000;
         this.valid_from = data.valid_from;
         this.valid_until = data.valid_until;
         this.play_hours = data.play_hours || '';
