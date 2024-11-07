@@ -47,6 +47,8 @@ export interface PlaceAuthority {
     readonly metrics?: string;
     /** DSN for Sentry integration */
     readonly sentry_dsn?: string;
+    /** List of email domains associated with the authority */
+    readonly email_domains?: string[];
 }
 
 export interface PlaceAuthOptions {

@@ -14,6 +14,8 @@ export class PlaceDomain extends PlaceResource {
     public readonly config: HashMap;
     /** Internal settings for the domain */
     public readonly internals: HashMap;
+    /** List of email domains associated with the domain */
+    public readonly email_domains: string[];
 
     constructor(raw_data: Partial<PlaceDomain> = {}) {
         super(raw_data);
@@ -23,5 +25,6 @@ export class PlaceDomain extends PlaceResource {
         this.logout_url = raw_data.logout_url || '';
         this.config = raw_data.config || {};
         this.internals = raw_data.internals || {};
+        this.email_domains = raw_data.email_domains || [];
     }
 }
