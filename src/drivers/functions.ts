@@ -1,4 +1,11 @@
-import { create, query, remove, show, task, update } from '../resources/functions';
+import {
+    create,
+    query,
+    remove,
+    show,
+    task,
+    update,
+} from '../resources/functions';
 import { HashMap } from '../utilities/types';
 import { PlaceDriver } from './driver';
 import { PlaceDriverQueryOptions } from './interfaces';
@@ -42,7 +49,14 @@ export function updateDriver(
     form_data: Partial<PlaceDriver>,
     method: 'put' | 'patch' = 'patch'
 ) {
-    return update({ id, form_data, query_params: {}, method, fn: process, path: PATH });
+    return update({
+        id,
+        form_data,
+        query_params: {},
+        method,
+        fn: process,
+        path: PATH,
+    });
 }
 
 /**
@@ -69,6 +83,14 @@ export function removeDriver(id: string, query_params: HashMap = {}) {
  */
 export function recompileDriver(id: string) {
     return task({ id, task_name: 'recompile', path: PATH });
+}
+
+/**
+ * Request a reload of the driver's binary
+ * @param id ID of the driver
+ */
+export function reloadDriver(id: string) {
+    return task({ id, task_name: 'reload', path: PATH });
 }
 
 /**

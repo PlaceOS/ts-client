@@ -56,6 +56,13 @@ describe('Drivers API', () => {
         expect(item).toBeFalsy();
     });
 
+    it('should allow recompiling drivers', async () => {
+        const spy = jest.spyOn(Resources, 'task');
+        spy.mockImplementation(() => of());
+        const item = await SERVICE.reloadDriver('1').toPromise();
+        expect(item).toBeFalsy();
+    });
+
     it('should allow checking driver is compiled', async () => {
         const spy = jest.spyOn(Resources, 'task');
         spy.mockImplementation(() => of());

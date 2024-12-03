@@ -58,6 +58,7 @@ export {
     updateDriver,
     removeDriver,
     recompileDriver,
+    reloadDriver,
     isDriverCompiled,
 } from './drivers/functions';
 export { PlaceDriver } from './drivers/driver';
