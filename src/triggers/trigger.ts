@@ -36,6 +36,8 @@ export class PlaceTrigger extends PlaceResource {
     public readonly control_system_id: string;
     /** ID of the zone associated with the trigger */
     public readonly zone_id: string;
+    /** ID of the Parent trigger */
+    public readonly trigger_id: string;
     /** List of playlist IDs associated with the system */
     public readonly playlists: readonly string[];
 
@@ -100,5 +102,6 @@ export class PlaceTrigger extends PlaceResource {
         this.activated_count =
             raw_data.activated_count || raw_data.trigger_count || 0;
         this.playlists = raw_data.playlists || [];
+        this.trigger_id = raw_data.trigger_id || '';
     }
 }
