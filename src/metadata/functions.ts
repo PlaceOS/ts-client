@@ -33,6 +33,23 @@ export function listMetadata(
     });
 }
 
+export function flatten<T = any>(an_array: T[]) {
+    const stack = [...an_array];
+    const res = [];
+    while (stack.length) {
+        // pop value from stack
+        const next = stack.pop();
+        if (Array.isArray(next)) {
+            // push back array items, won't modify the original input
+            stack.push(...next);
+        } else {
+            res.push(next);
+        }
+    }
+    // reverse to restore input order
+    return res.reverse();
+}
+
 /**
  * List the metadata history for a database item
  * @param id ID of the item to retrieve metadata
@@ -40,15 +57,19 @@ export function listMetadata(
  */
 export function listMetadataHistory(
     id: string,
-    form_data: HashMap = {}
+    query_params: HashMap = {}
 ): Observable<PlaceMetadata[]> {
     return task({
         id,
-        task_name: 'history',
-        form_data,
+        task_name: `history`,
+        form_data: query_params,
         method: 'get',
         callback: (list: HashMap) =>
-            Object.keys(list).map((key: string) => process(list[key])) as any,
+            flatten(
+                Object.keys(list).map((key: string) =>
+                    list[key].map((i: any) => process(i))
+                ) as Array<PlaceMetadata[]>
+            ),
         path: PATH,
     });
 }

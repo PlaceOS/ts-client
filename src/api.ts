@@ -94,6 +94,7 @@ export {
     addMetadata,
     removeMetadata,
     listChildMetadata,
+    listMetadataHistory,
 } from './metadata/functions';
 export { PlaceMetadata } from './metadata/metadata';
 export {
