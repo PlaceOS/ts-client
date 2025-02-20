@@ -33,7 +33,7 @@ export function listMetadata(
     });
 }
 
-export function flatten<T = any>(an_array: T[]) {
+function flatten<T = any>(an_array: T[]): T {
     const stack = [...an_array];
     const res = [];
     while (stack.length) {
@@ -47,7 +47,7 @@ export function flatten<T = any>(an_array: T[]) {
         }
     }
     // reverse to restore input order
-    return res.reverse();
+    return res.reverse() as T;
 }
 
 /**
