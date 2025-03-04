@@ -57,8 +57,7 @@ jobs:
 
     - name: Publish generated content to GitHub Pages
       uses: peaceiris/actions-gh-pages@v4.0.0
-      env:
-        PERSONAL_TOKEN: ${{ secrets.GH_TOKEN }}
-        PUBLISH_BRANCH: gh-pages
-        PUBLISH_DIR: ./docs
+      with:
+        github_token: ${{ secrets.GH_TOKEN }}
+        publish_dir: ./docs
 
