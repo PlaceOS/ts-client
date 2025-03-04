@@ -60,7 +60,7 @@ export class PlaceModule extends PlaceResource {
         PlaceSettings | null,
         PlaceSettings | null,
         PlaceSettings | null,
-        PlaceSettings | null
+        PlaceSettings | null,
     ] = [null, null, null, null];
     /** Whether the module has a runtime error */
     public readonly has_runtime_error: boolean;
@@ -90,7 +90,7 @@ export class PlaceModule extends PlaceResource {
         this.running = raw_data.running || false;
         this.updated_at = raw_data.updated_at || 0;
         this.system = new PlaceSystem(
-            raw_data.control_system || raw_data.system
+            raw_data.control_system || raw_data.system,
         );
         this.has_runtime_error = raw_data.has_runtime_error || false;
         this.error_timestamp = raw_data.error_timestamp || 0;

@@ -40,7 +40,7 @@ const _response_headers: HashMap<HashMap<string>> = {};
 export function responseHeaders(
     url: string,
     /* istanbul ignore next */
-    headers: HashMap<HashMap<string>> = _response_headers
+    headers: HashMap<HashMap<string>> = _response_headers,
 ): HashMap<string> {
     return headers[url] || {};
 }
@@ -52,7 +52,7 @@ export function responseHeaders(
  */
 export function get(
     url: string,
-    options?: HttpJsonOptions
+    options?: HttpJsonOptions,
 ): Observable<HashMap>;
 export function get(url: string, options?: HttpTextOptions): Observable<string>;
 export function get(
@@ -61,8 +61,8 @@ export function get(
     handler: (
         m: HttpVerb,
         url: string,
-        opts: HttpOptions
-    ) => Observable<HttpResponse> = request
+        opts: HttpOptions,
+    ) => Observable<HttpResponse> = request,
 ): Observable<HttpResponse> {
     /* istanbul ignore else */
     if (!options) {
@@ -80,12 +80,12 @@ export function get(
 export function post(
     url: string,
     body: any,
-    options?: HttpJsonOptions
+    options?: HttpJsonOptions,
 ): Observable<HashMap>;
 export function post(
     url: string,
     body: any,
-    options?: HttpTextOptions
+    options?: HttpTextOptions,
 ): Observable<string>;
 export function post(
     url: string,
@@ -94,8 +94,8 @@ export function post(
     handler: (
         m: HttpVerb,
         url: string,
-        opts: HttpOptions
-    ) => Observable<HttpResponse> = request
+        opts: HttpOptions,
+    ) => Observable<HttpResponse> = request,
 ): Observable<HttpResponse> {
     /* istanbul ignore else */
     if (!options) {
@@ -113,12 +113,12 @@ export function post(
 export function put(
     url: string,
     body: any,
-    options?: HttpJsonOptions
+    options?: HttpJsonOptions,
 ): Observable<HashMap>;
 export function put(
     url: string,
     body: any,
-    options?: HttpTextOptions
+    options?: HttpTextOptions,
 ): Observable<string>;
 export function put(
     url: string,
@@ -127,8 +127,8 @@ export function put(
     handler: (
         m: HttpVerb,
         url: string,
-        opts: HttpOptions
-    ) => Observable<HttpResponse> = request
+        opts: HttpOptions,
+    ) => Observable<HttpResponse> = request,
 ): Observable<HttpResponse> {
     /* istanbul ignore else */
     if (!options) {
@@ -146,12 +146,12 @@ export function put(
 export function patch(
     url: string,
     body: any,
-    options?: HttpJsonOptions
+    options?: HttpJsonOptions,
 ): Observable<HashMap>;
 export function patch(
     url: string,
     body: any,
-    options?: HttpTextOptions
+    options?: HttpTextOptions,
 ): Observable<string>;
 export function patch(
     url: string,
@@ -160,8 +160,8 @@ export function patch(
     handler: (
         m: HttpVerb,
         url: string,
-        opts: HttpOptions
-    ) => Observable<HttpResponse> = request
+        opts: HttpOptions,
+    ) => Observable<HttpResponse> = request,
 ): Observable<HttpResponse> {
     /* istanbul ignore else */
     if (!options) {
@@ -177,7 +177,7 @@ export function patch(
  */
 export function del(
     url: string,
-    options?: HttpJsonOptions
+    options?: HttpJsonOptions,
 ): Observable<HashMap>;
 export function del(url: string, options?: HttpTextOptions): Observable<string>;
 export function del(url: string, options?: HttpVoidOptions): Observable<void>;
@@ -187,8 +187,8 @@ export function del(
     handler: (
         m: HttpVerb,
         url: string,
-        opts: HttpOptions
-    ) => Observable<HttpResponse> = request
+        opts: HttpOptions,
+    ) => Observable<HttpResponse> = request,
 ): Observable<HttpResponse> {
     /* istanbul ignore else */
     if (!options) {
@@ -206,7 +206,7 @@ export function del(
 export async function transform(
     resp: Response,
     type: HttpResponseType,
-    headers: HashMap<HashMap<string>> = _response_headers
+    headers: HashMap<HashMap<string>> = _response_headers,
 ): Promise<HttpResponse> {
     /* istanbul ignore else */
     if (resp.headers) {
@@ -215,7 +215,7 @@ export async function transform(
             resp.headers.forEach((v, k) => (map[k.toLowerCase()] = v));
         } else {
             Object.keys(resp.headers).forEach(
-                (k) => (map[k.toLowerCase()] = (resp as any).headers[k])
+                (k) => (map[k.toLowerCase()] = (resp as any).headers[k]),
             );
         }
         headers[resp.url || ''] = map;
@@ -235,7 +235,7 @@ const reloadAuth = () => {
     invalidateToken();
     refreshAuthority().then(
         () => null,
-        () => setTimeout(() => reloadAuth(), 1000)
+        () => setTimeout(() => reloadAuth(), 1000),
     );
 };
 
@@ -254,12 +254,12 @@ export function request(
     mock_handler: (
         m: HttpVerb,
         url: string,
-        body?: any
+        body?: any,
     ) => Observable<HttpResponse> | null = mockRequest,
     success: (
         e: Response,
-        t: HttpResponseType
-    ) => Promise<HttpResponse> = transform
+        t: HttpResponseType,
+    ) => Promise<HttpResponse> = transform,
 ): Observable<HttpResponse> {
     if (is_mock()) {
         const request_obs = mock_handler(method, url, options?.body);
@@ -304,8 +304,8 @@ export function request(
                     log('HTTP', 'Auth error', error);
                     reloadAuth();
                     return of(error);
-                })
-            )
-        )
+                }),
+            ),
+        ),
     );
 }

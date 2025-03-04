@@ -1,4 +1,4 @@
-import { describe, beforeEach, afterEach, test, expect, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { MockHttpRequestHandlerOptions } from '../../src/http/interfaces';
 
 import * as MockHttp from '../../src/http/mock';

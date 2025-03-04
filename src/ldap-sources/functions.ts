@@ -1,11 +1,5 @@
 import { PlaceAuthSourceQueryOptions } from '../auth-sources/interfaces';
-import {
-    create,
-    query,
-    remove,
-    show,
-    update
-} from '../resources/functions';
+import { create, query, remove, show, update } from '../resources/functions';
 import { HashMap } from '../utilities/types';
 import { PlaceLDAPSource } from './ldap-source';
 
@@ -23,7 +17,9 @@ function process(item: Partial<PlaceLDAPSource>) {
  * Query the available LDAP sources
  * @param query_params Query parameters to add the to request URL
  */
-export function queryLDAPSources(query_params: PlaceAuthSourceQueryOptions = {}) {
+export function queryLDAPSources(
+    query_params: PlaceAuthSourceQueryOptions = {},
+) {
     return query({ query_params, fn: process, path: PATH });
 }
 
@@ -46,9 +42,16 @@ export function showLDAPSource(id: string, query_params: HashMap = {}) {
 export function updateLDAPSource(
     id: string,
     form_data: Partial<PlaceLDAPSource>,
-    method: 'put' | 'patch' = 'patch'
+    method: 'put' | 'patch' = 'patch',
 ) {
-    return update({ id, form_data, query_params: {}, method, fn: process, path: PATH });
+    return update({
+        id,
+        form_data,
+        query_params: {},
+        method,
+        fn: process,
+        path: PATH,
+    });
 }
 
 /**
@@ -57,7 +60,7 @@ export function updateLDAPSource(
  * @param query_params Query parameters to add the to request URL
  */
 export function addLDAPSource(form_data: Partial<PlaceLDAPSource>) {
-    return create({form_data, query_params: {}, fn: process, path: PATH});
+    return create({ form_data, query_params: {}, fn: process, path: PATH });
 }
 
 /**

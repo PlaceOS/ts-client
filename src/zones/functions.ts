@@ -49,7 +49,7 @@ export function showZone(id: string, query_params: PlaceZoneShowOptions = {}) {
 export function updateZone(
     id: string,
     form_data: Partial<PlaceZone>,
-    method: 'put' | 'patch' = 'patch'
+    method: 'put' | 'patch' = 'patch',
 ) {
     return update({
         id,
@@ -105,12 +105,12 @@ export function executeOnZone(
     method: string,
     module: string,
     index: number = 1,
-    args: any[] = []
+    args: any[] = [],
 ): Observable<HashMap> {
     return task({
         id,
         task_name: `exec/${encodeURIComponent(
-            module + '_' + index
+            module + '_' + index,
         )}/${encodeURIComponent(method)}`,
         form_data: args,
         path: PATH,

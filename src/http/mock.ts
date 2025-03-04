@@ -3,8 +3,8 @@ import { delay } from 'rxjs/operators';
 
 import { convertPairStringToMap, log } from '../utilities/general';
 import { HashMap } from '../utilities/types';
-import { HttpVerb } from './interfaces';
 import {
+    HttpVerb,
     MockHttpRequest,
     MockHttpRequestHandler,
     MockHttpRequestHandlerOptions,
@@ -25,7 +25,7 @@ const _handlers: HashMap<MockHttpRequestHandler> = {};
  */
 export function registerMockEndpoint<T>(
     handler_ops: MockHttpRequestHandlerOptions,
-    handler_map: HashMap<MockHttpRequestHandler> = _handlers
+    handler_map: HashMap<MockHttpRequestHandler> = _handlers,
 ) {
     deregisterMockEndpoint(handler_ops.method, handler_ops.path, handler_map);
     const key = `${handler_ops.method}|${handler_ops.path}`;
@@ -37,7 +37,7 @@ export function registerMockEndpoint<T>(
         ...handler_ops,
         path_parts,
         path_structure: path_parts.map((i: string) =>
-            i[0] === ':' ? i.replace(':', '') : ''
+            i[0] === ':' ? i.replace(':', '') : '',
         ),
     };
     handler_map[key] = handler;
@@ -53,7 +53,7 @@ export function registerMockEndpoint<T>(
 export function deregisterMockEndpoint(
     method: string,
     url: string,
-    handler_map: HashMap<MockHttpRequestHandler> = _handlers
+    handler_map: HashMap<MockHttpRequestHandler> = _handlers,
 ) {
     const key = `${method}|${url}`;
     if (handler_map[key]) {
@@ -68,7 +68,7 @@ export function deregisterMockEndpoint(
  * @param handler_map Handler map to clear. Defaults to the global handler map
  */
 export function clearMockEndpoints(
-    handler_map: HashMap<MockHttpRequestHandler> = _handlers
+    handler_map: HashMap<MockHttpRequestHandler> = _handlers,
 ) {
     for (const key in handler_map) {
         if (handler_map[key]) {
@@ -90,7 +90,7 @@ export function mockRequest<T>(
     method: HttpVerb,
     url: string,
     body?: any,
-    handler_map: HashMap<MockHttpRequestHandler> = _handlers
+    handler_map: HashMap<MockHttpRequestHandler> = _handlers,
 ): Observable<T> | null {
     const handler = findRequestHandler(method, url, handler_map);
     if (handler) {
@@ -110,7 +110,7 @@ export function mockRequest<T>(
 export function findRequestHandler(
     method: HttpVerb,
     url: string,
-    handler_map: HashMap<MockHttpRequestHandler> = _handlers
+    handler_map: HashMap<MockHttpRequestHandler> = _handlers,
 ): MockHttpRequestHandler | null {
     const path = url
         .replace(/(http|https)?:\/\/[a-zA-Z0-9.]*:?([0-9]*)?/g, '')
@@ -118,7 +118,7 @@ export function findRequestHandler(
         .split('?')[0];
     const route_parts = path.split('/');
     const method_handlers: MockHttpRequestHandler[] = Object.keys(
-        handler_map
+        handler_map,
     ).reduce<MockHttpRequestHandler[]>((l, i) => {
         if (i.indexOf(`${method}|`) === 0) {
             l.push(handler_map[i]);
@@ -156,7 +156,7 @@ export function findRequestHandler(
 export function processRequest<T = any>(
     url: string,
     handler: MockHttpRequestHandler<T>,
-    body?: any
+    body?: any,
 ): MockHttpRequest {
     const parts = url
         .replace(/(http|https):\/\/[a-zA-Z0-9.]*:?([0-9]*)?/g, '')
@@ -194,7 +194,7 @@ export function processRequest<T = any>(
  */
 export function onMockRequest(
     handler: MockHttpRequestHandler,
-    request: MockHttpRequest
+    request: MockHttpRequest,
 ) {
     const result = handler.callback
         ? handler.callback(request)

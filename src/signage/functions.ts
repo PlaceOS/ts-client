@@ -1,9 +1,9 @@
 import { create, query, remove, show, update } from '../api';
+import { HttpJsonOptions } from '../http/interfaces';
+import { task } from '../resources/functions';
+import { SignageMediaQueryOptions, SignageMetrics } from './interfaces';
 import { SignageMedia } from './media.class';
 import { SignagePlaylist, SignagePlaylistMedia } from './playlist.class';
-import { SignageMediaQueryOptions, SignageMetrics } from './interfaces';
-import { task } from '../resources/functions';
-import { HttpJsonOptions } from '../http/interfaces';
 
 /**
  * @private

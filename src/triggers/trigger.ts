@@ -1,7 +1,7 @@
-import { TriggerActions, TriggerConditions } from './interfaces';
 import { HttpVerb } from '../http/interfaces';
 import { PlaceResource } from '../resources/resource';
 import { PlaceSystem } from '../systems/system';
+import { TriggerActions, TriggerConditions } from './interfaces';
 
 /**
  * @hidden

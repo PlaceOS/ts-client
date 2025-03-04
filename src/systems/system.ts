@@ -16,7 +16,7 @@ export class PlaceSystem extends PlaceResource {
         PlaceSettings | null,
         PlaceSettings | null,
         PlaceSettings | null,
-        PlaceSettings | null
+        PlaceSettings | null,
     ] = [null, null, null, null];
     /** Display name of the system */
     public readonly display_name: string;
@@ -98,7 +98,7 @@ export class PlaceSystem extends PlaceResource {
         }
         if (raw_data.module_data && raw_data.module_data instanceof Array) {
             this.module_list = raw_data.module_data.map(
-                (mod) => new PlaceModule(mod)
+                (mod) => new PlaceModule(mod),
             );
         }
     }

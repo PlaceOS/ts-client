@@ -1,4 +1,11 @@
-import { create, query, remove, show, task, update } from '../resources/functions';
+import {
+    create,
+    query,
+    remove,
+    show,
+    task,
+    update,
+} from '../resources/functions';
 import { HashMap } from '../utilities/types';
 import { PlaceSettingsQueryOptions } from './interfaces';
 import { PlaceSettings } from './settings';
@@ -41,9 +48,16 @@ export function updateSettings(
     id: string,
     form_data: Partial<PlaceSettings>,
     query_params: HashMap = {},
-    method: 'put' | 'patch' = 'patch'
+    method: 'put' | 'patch' = 'patch',
 ) {
-    return update({ id, form_data, query_params, method, fn: process, path: PATH });
+    return update({
+        id,
+        form_data,
+        query_params,
+        method,
+        fn: process,
+        path: PATH,
+    });
 }
 
 /**
@@ -51,7 +65,10 @@ export function updateSettings(
  * @param form_data Settings data
  * @param query_params Query parameters to add the to request URL
  */
-export function addSettings(form_data: Partial<PlaceSettings>, query_params: HashMap = {}) {
+export function addSettings(
+    form_data: Partial<PlaceSettings>,
+    query_params: HashMap = {},
+) {
     return create({ form_data, query_params, fn: process, path: PATH });
 }
 

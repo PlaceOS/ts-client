@@ -1,5 +1,5 @@
-import { describe, beforeEach, afterEach, test, expect, vi } from 'vitest';
 import { of } from 'rxjs';
+import { describe, expect, test, vi } from 'vitest';
 import * as SERVICE from '../../src/oauth-sources/functions';
 import { PlaceOAuthSource } from '../../src/oauth-sources/oauth-source';
 import * as Resources from '../../src/resources/functions';

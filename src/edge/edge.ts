@@ -1,7 +1,6 @@
 import { PlaceResource } from '../resources/resource';
 
 export class PlaceEdge extends PlaceResource {
-
     public readonly description: string;
     public readonly secret: string;
     public readonly x_api_key: string;

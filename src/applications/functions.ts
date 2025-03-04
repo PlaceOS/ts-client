@@ -1,10 +1,4 @@
-import {
-    create,
-    query,
-    remove,
-    show,
-    update
-} from '../resources/functions';
+import { create, query, remove, show, update } from '../resources/functions';
 import { HashMap } from '../utilities/types';
 import { PlaceApplication } from './application';
 import { PlaceApplicationQueryOptions } from './interfaces';
@@ -23,7 +17,9 @@ function process(item: Partial<PlaceApplication>) {
  * Query the available applications
  * @param query_params Query parameters to add the to request URL
  */
-export function queryApplications(query_params: PlaceApplicationQueryOptions = {}) {
+export function queryApplications(
+    query_params: PlaceApplicationQueryOptions = {},
+) {
     return query({ query_params, fn: process, path: PATH });
 }
 
@@ -46,9 +42,16 @@ export function showApplication(id: string, query_params: HashMap = {}) {
 export function updateApplication(
     id: string,
     form_data: Partial<PlaceApplication>,
-    method: 'put' | 'patch' = 'patch'
+    method: 'put' | 'patch' = 'patch',
 ) {
-    return update({ id, form_data, query_params: {}, method, fn: process, path: PATH });
+    return update({
+        id,
+        form_data,
+        query_params: {},
+        method,
+        fn: process,
+        path: PATH,
+    });
 }
 
 /**
@@ -57,7 +60,7 @@ export function updateApplication(
  * @param query_params Query parameters to add the to request URL
  */
 export function addApplication(form_data: Partial<PlaceApplication>) {
-    return create({form_data, query_params: {}, fn: process, path: PATH});
+    return create({ form_data, query_params: {}, fn: process, path: PATH });
 }
 
 /**

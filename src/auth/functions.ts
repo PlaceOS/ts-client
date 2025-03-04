@@ -5,6 +5,7 @@ import { fromFetch } from 'rxjs/fetch';
 import { map } from 'rxjs/operators';
 import { Md5 } from 'ts-md5';
 
+import { addHours, addSeconds, addYears, isBefore } from 'date-fns';
 import { AbortControllerStub } from '../utilities/abort-controller';
 import { toQueryString } from '../utilities/api';
 import {
@@ -15,9 +16,9 @@ import {
 import {
     generateNonce,
     getFragments,
+    isNestedFrame,
     log,
     removeFragment,
-    isNestedFrame,
 } from '../utilities/general';
 import { HashMap } from '../utilities/types';
 import {
@@ -27,7 +28,6 @@ import {
     PlaceAuthority,
     PlaceTokenResponse,
 } from './interfaces';
-import { addHours, addSeconds, addYears, isBefore } from 'date-fns';
 
 /**
  * @private
@@ -138,7 +138,7 @@ export function apiKey() {
 /** Manually set an access token */
 export function setToken(
     new_token: string,
-    expires_at: number = addHours(new Date(), 2).valueOf()
+    expires_at: number = addHours(new Date(), 2).valueOf(),
 ) {
     if (_options.ignore_api_key && new_token === 'x-api-key') return;
     _storage.setItem(`${_client_id}_expires_at`, `${expires_at}`);
@@ -161,9 +161,9 @@ export function token(return_expired: boolean = true): string {
                 're-authorise',
                 () =>
                     authorise().catch((e) =>
-                        log('Auth', `Failed to get token: ${e}`)
+                        log('Auth', `Failed to get token: ${e}`),
                     ),
-                200 * Math.min(20, _failed_count)
+                200 * Math.min(20, _failed_count),
             );
         }
         if (!return_expired) {
@@ -245,7 +245,7 @@ export function isFixedDevice(): boolean {
  */
 export function checkStoreForAuthParam(
     name: string,
-    store: boolean = true
+    store: boolean = true,
 ): string {
     const fragments = getFragments();
     let param = fragments[name];
@@ -320,7 +320,7 @@ export function invalidateToken(): void {
  */
 export function authorise(
     state?: string,
-    api_authority: PlaceAuthority = _authority as PlaceAuthority
+    api_authority: PlaceAuthority = _authority as PlaceAuthority,
 ): Promise<string> {
     /* istanbul ignore else */
     if (!_promises.authorise) {
@@ -351,7 +351,7 @@ export function authorise(
                     if (_options && _options.auth_type === 'password') {
                         log('Auth', 'Logging in with credentials.');
                         generateTokenWithCredentials(_options).then(
-                            ...token_handlers
+                            ...token_handlers,
                         );
                         _failed_count = 0;
                     } else if (_code || refreshToken()) {
@@ -359,7 +359,7 @@ export function authorise(
                             'Auth',
                             `Generating token with ${
                                 _code ? 'code' : 'refresh token'
-                            }`
+                            }`,
                         );
                         generateToken().then(...token_handlers);
                         _failed_count = 0;
@@ -367,7 +367,7 @@ export function authorise(
                         if (api_authority!.session) {
                             log(
                                 'Auth',
-                                'Users has session. Authorising application...'
+                                'Users has session. Authorising application...',
                             );
                             sendToAuthorize(state).then(...token_handlers);
                         } else {
@@ -436,21 +436,21 @@ export function loadAuthority(tries: number = 0): Promise<void> {
                         delete _promises.load_authority;
                         loadAuthority(tries).then((_) => resolve());
                     },
-                    300 * Math.min(20, ++tries)
+                    300 * Math.min(20, ++tries),
                 );
             };
             fromFetch(
                 `${secure ? 'https:' : 'http:'}//${host()}/auth/authority`,
                 {
                     credentials: 'same-origin',
-                }
+                },
             ).subscribe(async (resp) => {
                 if (!resp.ok) {
                     return on_error(await resp.text().catch((_) => _));
                 }
                 _authority = (await resp.json()) as PlaceAuthority;
                 _route = !/[2-9]\.[0-9]+\.[0-9]+/g.test(
-                    _authority.version || ''
+                    _authority.version || '',
                 )
                     ? `/control/api`
                     : `/api/engine/v2`;
@@ -466,7 +466,7 @@ export function loadAuthority(tries: number = 0): Promise<void> {
                         'Auth',
                         `Config Keys: ${
                             Object.keys(_authority.config || {}).length
-                        }`
+                        }`,
                     );
                 }
                 log('Auth', ``, [], 'groupEnd');
@@ -535,7 +535,7 @@ export function authorizeWithIFrame(url: string): Promise<void> {
                     _code = data.code || '';
                     generateToken().then(
                         (_) => resolve(_),
-                        (_) => reject(_)
+                        (_) => reject(_),
                     );
                 }
             };
@@ -545,7 +545,7 @@ export function authorizeWithIFrame(url: string): Promise<void> {
                     log('Auth', 'Unable to resolve iFrame after 15 seconds...');
                     reject();
                 },
-                15 * 1000
+                15 * 1000,
             );
             window.addEventListener('message', callback);
             iframe.onerror = (_) => {
@@ -572,7 +572,7 @@ export function sendToLogin(api_authority: PlaceAuthority): void {
         // Redirect to login form
         const url = api_authority!.login_url?.replace(
             '{{url}}',
-            encodeURIComponent(window.location?.href)
+            encodeURIComponent(window.location?.href),
         );
         setTimeout(() => window.location?.assign(url), 300);
         _redirecting = true;
@@ -620,7 +620,7 @@ export function checkForAuthParameters(): Promise<boolean> {
                 sessionStorage
             ) {
                 fragments = JSON.parse(
-                    sessionStorage.getItem('ENGINE.auth.params') || '{}'
+                    sessionStorage.getItem('ENGINE.auth.params') || '{}',
                 );
             }
             if (
@@ -638,7 +638,7 @@ export function checkForAuthParameters(): Promise<boolean> {
                 if (fragments.refresh_token) {
                     _storage.setItem(
                         `${_client_id}_refresh_token`,
-                        fragments.refresh_token
+                        fragments.refresh_token,
                     );
                     removeFragment('refresh_token');
                 }
@@ -661,7 +661,7 @@ export function checkForAuthParameters(): Promise<boolean> {
             timeout(
                 'check_params_promise',
                 () => delete _promises.check_params,
-                50
+                50,
             );
         });
     }
@@ -715,7 +715,7 @@ export function generateChallenge(length: number = 43) {
             () =>
                 AVAILABLE_CHARS[
                     Math.floor(Math.random() * AVAILABLE_CHARS.length)
-                ]
+                ],
         )
         .join('');
     const uint8array = base64.base64ToBytes(base64.base64encode(challenge));
@@ -829,7 +829,7 @@ export function generateTokenWithCredentials(options: PlaceAuthOptions) {
  */
 export function generateTokenWithUrl(
     url: string,
-    body: string = ''
+    body: string = '',
 ): Promise<void> {
     /* istanbul ignore else */
     if (!_promises.generate_tokens) {
@@ -868,7 +868,7 @@ export function generateTokenWithUrl(
 export function _storeTokenDetails(details: PlaceTokenResponse) {
     const expires_at = addSeconds(
         new Date(),
-        Math.max(60, parseInt(details.expires_in, 10) - 300)
+        Math.max(60, parseInt(details.expires_in, 10) - 300),
     );
     log('Auth', 'Tokens generated storing...');
     if (isTrusted()) {
@@ -876,7 +876,7 @@ export function _storeTokenDetails(details: PlaceTokenResponse) {
         if (details.access_token) {
             _storage.setItem(
                 `${_client_id}_access_token`,
-                details.access_token
+                details.access_token,
             );
             removeFragment('access_token');
         }
@@ -884,7 +884,7 @@ export function _storeTokenDetails(details: PlaceTokenResponse) {
         if (details.refresh_token) {
             _storage.setItem(
                 `${_client_id}_refresh_token`,
-                details.refresh_token
+                details.refresh_token,
             );
             removeFragment('refresh_token');
         }

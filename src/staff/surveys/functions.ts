@@ -16,7 +16,7 @@ const PATH = '/api/staff/v1/surveys';
 export function querySurveys(query_params: SurveyQueryOptions = {}) {
     const query = toQueryString(query_params);
     return get(`${PATH}${query ? '?' + query : ''}`).pipe(
-        map((l: any) => l.map((_: any) => new Survey(_)))
+        map((l: any) => l.map((_: any) => new Survey(_))),
     );
 }
 
@@ -28,7 +28,7 @@ export function querySurveys(query_params: SurveyQueryOptions = {}) {
 export function showSurvey(id: string, query_params: SurveyShowOptions = {}) {
     const query = toQueryString(query_params);
     return get(`${PATH}/${id}${query ? '?' + query : ''}`).pipe(
-        map((l: any) => new Survey(l))
+        map((l: any) => new Survey(l)),
     );
 }
 
@@ -42,10 +42,10 @@ export function showSurvey(id: string, query_params: SurveyShowOptions = {}) {
 export function updateSurvey(
     id: string,
     form_data: Partial<Survey>,
-    method: 'put' | 'patch' = 'patch'
+    method: 'put' | 'patch' = 'patch',
 ) {
     return (method === 'put' ? put : patch)(`${PATH}/${id}`, form_data).pipe(
-        map((l: any) => new Survey(l))
+        map((l: any) => new Survey(l)),
     );
 }
 
@@ -55,9 +55,7 @@ export function updateSurvey(
  * @param query_params Query parameters to add the to request URL
  */
 export function addSurvey(form_data: Partial<Survey>) {
-    return post(`${PATH}`, form_data).pipe(
-        map((l: any) => new Survey(l))
-    );
+    return post(`${PATH}`, form_data).pipe(map((l: any) => new Survey(l)));
 }
 
 /**
@@ -67,7 +65,7 @@ export function addSurvey(form_data: Partial<Survey>) {
  */
 export function removeSurvey(
     id: string,
-    query_params: Record<string, any> = {}
+    query_params: Record<string, any> = {},
 ) {
     const query = toQueryString(query_params);
     return del(`${PATH}/${id}${query ? '?' + query : ''}`);

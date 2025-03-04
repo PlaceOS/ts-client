@@ -1,14 +1,14 @@
-import { describe, beforeEach, afterEach, test, expect, vi } from 'vitest';
 import { Subject } from 'rxjs';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
-import { HashMap } from '../../src/utilities/types';
 import { PlaceResponse } from '../../src/realtime/interfaces';
+import { HashMap } from '../../src/utilities/types';
 
 import * as rxjs from 'rxjs/webSocket';
 import * as Auth from '../../src/auth/functions';
-import * as Utils from '../../src/utilities/general';
-import * as mock_ws from '../../src/realtime/mock';
 import * as ws from '../../src/realtime/functions';
+import * as mock_ws from '../../src/realtime/mock';
+import * as Utils from '../../src/utilities/general';
 
 vi.mock('../../src/auth/functions');
 

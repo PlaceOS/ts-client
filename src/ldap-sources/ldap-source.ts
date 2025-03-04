@@ -1,4 +1,3 @@
-
 import { PlaceResource } from '../resources/resource';
 
 export class PlaceLDAPSource extends PlaceResource {

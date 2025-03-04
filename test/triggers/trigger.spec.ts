@@ -1,11 +1,11 @@
-import { describe, beforeEach, afterEach, test, expect, vi } from 'vitest';
-import { PlaceTrigger } from '../../src/triggers/trigger';
+import { beforeEach, describe, expect, test } from 'vitest';
 import {
     TriggerActions,
     TriggerConditionOperator,
     TriggerConditions,
     TriggerTimeConditionType,
 } from '../../src/triggers/interfaces';
+import { PlaceTrigger } from '../../src/triggers/trigger';
 
 describe('PlaceTrigger', () => {
     let trigger: PlaceTrigger;

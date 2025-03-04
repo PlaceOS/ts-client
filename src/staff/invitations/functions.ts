@@ -16,7 +16,7 @@ const PATH = '/api/staff/v1/surveys/invitations';
 export function queryInvitations(query_params: InvitationQueryOptions = {}) {
     const query = toQueryString(query_params);
     return get(`${PATH}${query ? '?' + query : ''}`).pipe(
-        map((l: any) => l.map((_: any) => new SurveyInvitation(_)))
+        map((l: any) => l.map((_: any) => new SurveyInvitation(_))),
     );
 }
 
@@ -27,11 +27,11 @@ export function queryInvitations(query_params: InvitationQueryOptions = {}) {
  */
 export function showInvitation(
     token: string,
-    query_params: InvitationShowOptions = {}
+    query_params: InvitationShowOptions = {},
 ) {
     const query = toQueryString(query_params);
     return get(`${PATH}/${token}${query ? '?' + query : ''}`).pipe(
-        map((l: any) => new SurveyInvitation(l))
+        map((l: any) => new SurveyInvitation(l)),
     );
 }
 
@@ -45,10 +45,10 @@ export function showInvitation(
 export function updateInvitation(
     token: string,
     form_data: Partial<SurveyInvitation>,
-    method: 'put' | 'patch' = 'patch'
+    method: 'put' | 'patch' = 'patch',
 ) {
     return (method === 'put' ? put : patch)(`${PATH}/${token}`, form_data).pipe(
-        map((l: any) => new SurveyInvitation(l))
+        map((l: any) => new SurveyInvitation(l)),
     );
 }
 
@@ -59,7 +59,7 @@ export function updateInvitation(
  */
 export function addInvitation(form_data: Partial<SurveyInvitation>) {
     return post(`${PATH}`, form_data).pipe(
-        map((l: any) => new SurveyInvitation(l))
+        map((l: any) => new SurveyInvitation(l)),
     );
 }
 
@@ -70,7 +70,7 @@ export function addInvitation(form_data: Partial<SurveyInvitation>) {
  */
 export function removeInvitation(
     token: string,
-    query_params: Record<string, any> = {}
+    query_params: Record<string, any> = {},
 ) {
     const query = toQueryString(query_params);
     return del(`${PATH}/${token}${query ? '?' + query : ''}`);

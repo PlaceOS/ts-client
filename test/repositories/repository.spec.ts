@@ -1,6 +1,6 @@
-import { describe, beforeEach, afterEach, test, expect, vi } from 'vitest';
-import { PlaceRepository } from '../../src/repositories/repository';
+import { beforeEach, describe, expect, test } from 'vitest';
 import { PlaceRepositoryType } from '../../src/repositories/interfaces';
+import { PlaceRepository } from '../../src/repositories/repository';
 import { generateMockRepository } from '../../src/repositories/utilities';
 
 describe('PlaceRepository', () => {

@@ -1,4 +1,4 @@
-import { describe, beforeEach, afterEach, test, expect } from 'vitest';
+import { beforeEach, describe, expect, test } from 'vitest';
 import { PlaceZone } from '../../src/zones/zone';
 
 describe('PlaceZone', () => {

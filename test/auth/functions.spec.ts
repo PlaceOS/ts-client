@@ -1,6 +1,6 @@
-import { describe, beforeEach, afterEach, test, expect, vi } from 'vitest';
 import { Observable } from 'rxjs';
 import { Md5 } from 'ts-md5';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import * as Auth from '../../src/auth/functions';
 import { PlaceAuthority } from '../../src/auth/interfaces';
 

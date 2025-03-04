@@ -1,4 +1,4 @@
-import { describe, beforeEach, afterEach, test, expect, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { getModule, getSystem } from '../../src/realtime/binding';
 import { PlaceModuleBinding } from '../../src/realtime/module';
 import { PlaceSystemBinding } from '../../src/realtime/system';

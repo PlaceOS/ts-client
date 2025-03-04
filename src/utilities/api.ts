@@ -14,7 +14,7 @@ export function toQueryString(map: HashMap) {
                 map[key] !== null
             ) {
                 str += `${str ? '&' : ''}${key}=${encodeURIComponent(
-                    map[key]
+                    map[key],
                 )}`;
             }
         }

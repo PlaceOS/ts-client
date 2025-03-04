@@ -1,4 +1,4 @@
-import { describe, beforeEach, afterEach, test, expect, vi } from 'vitest';
+import { beforeEach, describe, expect, test } from 'vitest';
 import { PlaceProcess } from '../../src/clusters/process';
 
 describe('Cluster Process', () => {

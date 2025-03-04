@@ -47,7 +47,7 @@ export function showDriver(id: string, query_params: HashMap = {}) {
 export function updateDriver(
     id: string,
     form_data: Partial<PlaceDriver>,
-    method: 'put' | 'patch' = 'patch'
+    method: 'put' | 'patch' = 'patch',
 ) {
     return update({
         id,

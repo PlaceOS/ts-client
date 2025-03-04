@@ -36,7 +36,7 @@ export function queryTriggers(query_params: PlaceResourceQueryOptions = {}) {
  */
 export function showTrigger(
     id: string,
-    query_params: PlaceResourceQueryOptions = {}
+    query_params: PlaceResourceQueryOptions = {},
 ) {
     return show({ id, query_params, fn: process, path: PATH });
 }
@@ -51,7 +51,7 @@ export function showTrigger(
 export function updateTrigger(
     id: string,
     form_data: Partial<PlaceTrigger>,
-    method: 'put' | 'patch' = 'patch'
+    method: 'put' | 'patch' = 'patch',
 ) {
     return update({
         id,

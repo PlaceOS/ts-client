@@ -28,7 +28,7 @@ export function getSystem(system_id: string): PlaceSystemBinding {
 export function getModule(
     system_id: string,
     module_id: string,
-    index: number = 1
+    index: number = 1,
 ): PlaceModuleBinding {
     const system = getSystem(system_id);
     return system.module(module_id, index);

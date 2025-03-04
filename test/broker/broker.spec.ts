@@ -1,4 +1,4 @@
-import { describe, beforeEach, afterEach, test, expect, vi } from 'vitest';
+import { beforeEach, describe, expect, test } from 'vitest';
 import { AuthType, PlaceMQTTBroker } from '../../src/broker/broker';
 
 describe('PlaceMQTTBroker', () => {

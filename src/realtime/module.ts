@@ -7,7 +7,10 @@ export class PlaceModuleBinding {
     /** Mapping of module bindings */
     private _bindings: HashMap<PlaceVariableBinding> = {};
 
-    constructor(private _system: PlaceSystemBinding, private _id: string) {}
+    constructor(
+        private _system: PlaceSystemBinding,
+        private _id: string,
+    ) {}
 
     public get id(): string {
         return `${this.name}_${this.index}`;
@@ -51,7 +54,7 @@ export class PlaceModuleBinding {
     public execute<T = any>(
         method: string,
         args?: any[],
-        timeout_delay: number = REQUEST_TIMEOUT
+        timeout_delay: number = REQUEST_TIMEOUT,
     ): Promise<T> {
         return execute<T>(
             {
@@ -61,7 +64,7 @@ export class PlaceModuleBinding {
                 name: method,
                 args,
             },
-            timeout_delay
+            timeout_delay,
         );
     }
 }

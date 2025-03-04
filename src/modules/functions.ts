@@ -49,7 +49,7 @@ export function showModule(id: string, query_params: HashMap = {}) {
 export function updateModule(
     id: string,
     form_data: Partial<PlaceModule>,
-    method: 'put' | 'patch' = 'patch'
+    method: 'put' | 'patch' = 'patch',
 ) {
     return update({
         id,
@@ -119,7 +119,7 @@ export function moduleState(id: string): Observable<HashMap> {
  */
 export function lookupModuleState(
     id: string,
-    key: string
+    key: string,
 ): Observable<HashMap> {
     return task({ id, task_name: `state${key}`, method: 'get', path: PATH });
 }

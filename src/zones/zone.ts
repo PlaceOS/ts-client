@@ -16,7 +16,7 @@ export class PlaceZone extends PlaceResource {
         PlaceSettings | null,
         PlaceSettings | null,
         PlaceSettings | null,
-        PlaceSettings | null
+        PlaceSettings | null,
     ] = [null, null, null, null];
     /** Description of the zone's purpose */
     public readonly description: string;
@@ -82,7 +82,7 @@ export class PlaceZone extends PlaceResource {
         }
         if (raw_data.trigger_data && raw_data.trigger_data instanceof Array) {
             this.trigger_list = raw_data.trigger_data.map(
-                (trigger) => new PlaceTrigger(trigger)
+                (trigger) => new PlaceTrigger(trigger),
             );
         }
     }

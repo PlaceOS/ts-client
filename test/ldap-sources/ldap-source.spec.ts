@@ -1,4 +1,4 @@
-import { describe, beforeEach, afterEach, test, expect, vi } from 'vitest';
+import { beforeEach, describe, expect, test } from 'vitest';
 import { PlaceLDAPSource } from '../../src/ldap-sources/ldap-source';
 
 describe('PlaceLdapSource', () => {

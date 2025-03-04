@@ -1,5 +1,5 @@
-import { describe, beforeEach, afterEach, test, expect, vi } from 'vitest';
 import { of } from 'rxjs';
+import { describe, expect, test, vi } from 'vitest';
 import { PlaceCluster } from '../../src/clusters/cluster';
 import * as SERVICE from '../../src/clusters/functions';
 import { PlaceProcess } from '../../src/clusters/process';

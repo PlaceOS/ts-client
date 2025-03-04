@@ -37,7 +37,7 @@ export function querySystems(query_params: PlaceSystemsQueryOptions = {}) {
  * @param query_params Query parameters to add the to request URL
  */
 export function querySystemsWithEmails(
-    query_params: PlaceSystemsQueryOptions = {}
+    query_params: PlaceSystemsQueryOptions = {},
 ) {
     return query({ query_params, fn: process, path: `${PATH}/with_emails` });
 }
@@ -49,7 +49,7 @@ export function querySystemsWithEmails(
  */
 export function showSystem(
     id: string,
-    query_params: PlaceSystemsQueryOptions = {}
+    query_params: PlaceSystemsQueryOptions = {},
 ) {
     return show({ id, query_params, fn: process, path: PATH });
 }
@@ -64,7 +64,7 @@ export function showSystem(
 export function updateSystem(
     id: string,
     form_data: Partial<PlaceSystem>,
-    method: 'put' | 'patch' = 'patch'
+    method: 'put' | 'patch' = 'patch',
 ) {
     return update({
         id,
@@ -102,7 +102,7 @@ export function removeSystem(id: string, query_params: HashMap = {}) {
 export function addSystemModule(
     id: string,
     module_id: string,
-    data: HashMap = {}
+    data: HashMap = {},
 ): Observable<PlaceSystem> {
     return task({
         id,
@@ -121,7 +121,7 @@ export function addSystemModule(
  */
 export function removeSystemModule(
     id: string,
-    module_id: string
+    module_id: string,
 ): Observable<PlaceSystem> {
     return task({
         id,
@@ -171,7 +171,7 @@ export function executeOnSystem(
     method: string,
     module: string,
     index: number = 1,
-    args: any[] = []
+    args: any[] = [],
 ): Observable<HashMap> {
     return task({
         id,
@@ -191,7 +191,7 @@ export function executeOnSystem(
 export function systemModuleState(
     id: string,
     module: string,
-    index: number = 1
+    index: number = 1,
 ): Observable<HashMap> {
     return task({
         id,
@@ -212,7 +212,7 @@ export function lookupSystemModuleState(
     id: string,
     module: string,
     index: number = 1,
-    lookup: string
+    lookup: string,
 ): Observable<HashMap> {
     return task({
         id,
@@ -231,7 +231,7 @@ export function lookupSystemModuleState(
 export function functionList(
     id: string,
     module: string,
-    index: number = 1
+    index: number = 1,
 ): Observable<PlaceModuleFunctionMap> {
     return task({
         id,
@@ -248,7 +248,7 @@ export function functionList(
  */
 export function moduleCount(
     id: string,
-    module: string
+    module: string,
 ): Observable<{ count: number }> {
     return task({
         id,
@@ -298,7 +298,7 @@ export function listSystemTriggers(id: string) {
  */
 export function addSystemTrigger(
     id: string,
-    data: Partial<PlaceTrigger>
+    data: Partial<PlaceTrigger>,
 ): Observable<PlaceTrigger> {
     return task({
         id,
@@ -317,7 +317,7 @@ export function addSystemTrigger(
  */
 export function removeSystemTrigger(
     id: string,
-    trigger_id: string
+    trigger_id: string,
 ): Observable<void> {
     return task({
         id,

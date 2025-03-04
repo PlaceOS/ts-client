@@ -1,4 +1,3 @@
-
 import { PlaceResource } from '../resources/resource';
 import { EncryptionLevel } from './interfaces';
 

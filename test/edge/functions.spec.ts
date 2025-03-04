@@ -1,8 +1,8 @@
-import { describe, beforeEach, afterEach, test, expect, vi } from 'vitest';
 import { of } from 'rxjs';
-import * as Resources from '../../src/resources/functions';
-import * as SERVICE from '../../src/edge/functions';
+import { describe, expect, test, vi } from 'vitest';
 import { PlaceEdge } from '../../src/edge/edge';
+import * as SERVICE from '../../src/edge/functions';
+import * as Resources from '../../src/resources/functions';
 
 describe('SAML Auth Sources API', () => {
     test('should allow querying Edges', async () => {

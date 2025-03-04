@@ -1,11 +1,4 @@
 import { Observable } from 'rxjs';
-import {
-    GitCommitDetails,
-    PlaceRepositoryCommitQuery,
-    PlaceRepositoryDetailsQuery,
-    PlaceRepositoryPullQuery,
-} from './interfaces';
-import { PlaceRepository } from './repository';
 import { PlaceDriverDetails } from '../drivers/interfaces';
 import {
     create,
@@ -17,6 +10,13 @@ import {
 } from '../resources/functions';
 import { PlaceResourceQueryOptions } from '../resources/interface';
 import { HashMap } from '../utilities/types';
+import {
+    GitCommitDetails,
+    PlaceRepositoryCommitQuery,
+    PlaceRepositoryDetailsQuery,
+    PlaceRepositoryPullQuery,
+} from './interfaces';
+import { PlaceRepository } from './repository';
 
 /**
  * @private
@@ -33,7 +33,7 @@ function process(item: Partial<PlaceRepository>) {
  * @param query_params Query parameters to add the to request URL
  */
 export function queryRepositories(
-    query_params: PlaceResourceQueryOptions = {}
+    query_params: PlaceResourceQueryOptions = {},
 ) {
     return query({ query_params, fn: process, path: PATH });
 }
@@ -57,7 +57,7 @@ export function showRepository(id: string, query_params: HashMap = {}) {
 export function updateRepository(
     id: string,
     form_data: Partial<PlaceRepository>,
-    method: 'put' | 'patch' = 'patch'
+    method: 'put' | 'patch' = 'patch',
 ) {
     return update({
         id,
@@ -92,7 +92,7 @@ export function removeRepository(id: string, query_params: HashMap = {}) {
  * @param query_params Addition query parameters to pass to the request
  */
 export function listInterfaceRepositories(
-    query_params: HashMap = {}
+    query_params: HashMap = {},
 ): Observable<string[]> {
     return show({
         id: 'interfaces',
@@ -106,7 +106,7 @@ export function listInterfaceRepositories(
  * @param query_params Details about the repository
  */
 export function listRemoteRepositoryDefaultBranch(
-    query_params: RepositoryDetails
+    query_params: RepositoryDetails,
 ): Observable<string> {
     return show({
         id: 'remote_default_branch',
@@ -117,11 +117,11 @@ export function listRemoteRepositoryDefaultBranch(
 
 export interface RepositoryDetails {
     /** Git URL of the remote repository */
-    repository_url: string,
+    repository_url: string;
     /** Username required to access the repository */
-    username?: string,
+    username?: string;
     /** Password for the required user */
-    password?: string,
+    password?: string;
 }
 
 /**
@@ -129,7 +129,7 @@ export interface RepositoryDetails {
  * @param query_params Details about the repository
  */
 export function listRemoteRepositoryBranches(
-    query_params: RepositoryDetails
+    query_params: RepositoryDetails,
 ): Observable<string[]> {
     return show({
         id: 'remote_branches',
@@ -150,7 +150,7 @@ export interface RepositoryBranchDetails extends RepositoryDetails {
  * @param query_params Details about the repository
  */
 export function listRemoteRepositoryCommits(
-    query_params: RepositoryBranchDetails
+    query_params: RepositoryBranchDetails,
 ): Observable<GitCommitDetails[]> {
     return show({
         id: 'remote_commits',
@@ -164,7 +164,7 @@ export function listRemoteRepositoryCommits(
  * @param query_params Details about the repository
  */
 export function listRemoteRepositoryTags(
-    query_params: RepositoryDetails
+    query_params: RepositoryDetails,
 ): Observable<string[]> {
     return show({
         id: 'remote_tags',
@@ -180,7 +180,7 @@ export function listRemoteRepositoryTags(
  */
 export function listRepositoryDrivers(
     id: string,
-    query_params?: HashMap
+    query_params?: HashMap,
 ): Observable<string[]> {
     return task({
         id,
@@ -191,15 +191,14 @@ export function listRepositoryDrivers(
     });
 }
 
-
 /**
  * Get a list of all the releases for a repository
  * @param id ID of the repository
  * @param query Addition query parameters to pass to the request
  */
- export function listRepositoryReleases(
+export function listRepositoryReleases(
     id: string,
-    query_params?: HashMap
+    query_params?: HashMap,
 ): Observable<string[]> {
     return task({
         id,
@@ -217,7 +216,7 @@ export function listRepositoryDrivers(
  */
 export function listRepositoryCommits(
     id: string,
-    query_params?: PlaceRepositoryCommitQuery
+    query_params?: PlaceRepositoryCommitQuery,
 ): Observable<GitCommitDetails[]> {
     return task({
         id,
@@ -267,7 +266,6 @@ export function listRepositoryTags(id: string): Observable<string[]> {
     });
 }
 
-
 /**
  * Get the details for a given driver
  * @param id ID of the repository
@@ -275,7 +273,7 @@ export function listRepositoryTags(id: string): Observable<string[]> {
  */
 export function listRepositoryDriverDetails(
     id: string,
-    query_params: PlaceRepositoryDetailsQuery
+    query_params: PlaceRepositoryDetailsQuery,
 ): Observable<PlaceDriverDetails> {
     return task({
         id,
@@ -293,7 +291,7 @@ export function listRepositoryDriverDetails(
  */
 export function pullRepositoryChanges(
     id: string,
-    query_params?: PlaceRepositoryPullQuery
+    query_params?: PlaceRepositoryPullQuery,
 ): Observable<GitCommitDetails> {
     return task({
         id,

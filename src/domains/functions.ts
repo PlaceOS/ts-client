@@ -40,9 +40,16 @@ export function showDomain(id: string, query_params: HashMap = {}) {
 export function updateDomain(
     id: string,
     form_data: Partial<PlaceDomain>,
-    method: 'put' | 'patch' = 'patch'
+    method: 'put' | 'patch' = 'patch',
 ) {
-    return update({ id, form_data, query_params: {}, method, fn: process, path: PATH });
+    return update({
+        id,
+        form_data,
+        query_params: {},
+        method,
+        fn: process,
+        path: PATH,
+    });
 }
 
 /**

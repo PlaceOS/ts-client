@@ -15,6 +15,11 @@ import {
     refreshAuthority,
     token,
 } from '../auth/functions';
+import {
+    clearAsyncTimeout,
+    destroyWaitingAsync,
+    timeout,
+} from '../utilities/async';
 import { isMobileSafari, log, simplifiedTime } from '../utilities/general';
 import { HashMap } from '../utilities/types';
 import {
@@ -31,11 +36,6 @@ import {
 import { mockSystem } from './mock';
 import { MockPlaceWebsocketModule } from './mock-module';
 import { MockPlaceWebsocketSystem } from './mock-system';
-import {
-    timeout,
-    clearAsyncTimeout,
-    destroyWaitingAsync,
-} from '../utilities/async';
 
 /**
  * @private
@@ -186,12 +186,12 @@ export function connectionState(): Observable<[number, number]> {
  * @param binding_details Binding details
  */
 export function listen<T = any>(
-    binding_details: PlaceRequestOptions
+    binding_details: PlaceRequestOptions,
 ): Observable<T>;
 export function listen<T = any>(
     binding_details: PlaceRequestOptions,
     bindings: HashMap<BehaviorSubject<T>> = _binding,
-    observers: HashMap<Observable<T>> = _observers
+    observers: HashMap<Observable<T>> = _observers,
 ): Observable<T> {
     const key = `${binding_details.sys}|${binding_details.mod}_${binding_details.index}|${binding_details.name}`;
     /* istanbul ignore else */
@@ -209,7 +209,7 @@ export function listen<T = any>(
 export function value<T = any>(options: PlaceRequestOptions): T | undefined;
 export function value<T = any>(
     options: PlaceRequestOptions,
-    bindings: HashMap<BehaviorSubject<T>> = _binding
+    bindings: HashMap<BehaviorSubject<T>> = _binding,
 ): T | void {
     const key = `${options.sys}|${options.mod}_${options.index}|${options.name}`;
     if (bindings[key]) {
@@ -224,12 +224,12 @@ export function value<T = any>(
  */
 export function bind(
     options: PlaceRequestOptions,
-    timeout_delay?: number
+    timeout_delay?: number,
 ): Promise<void>;
 export function bind(
     options: PlaceRequestOptions,
     timeout_delay: number = 0,
-    post: (_: PlaceCommandRequest, t?: number) => Promise<void> = send
+    post: (_: PlaceCommandRequest, t?: number) => Promise<void> = send,
 ): Promise<void> {
     const request: PlaceCommandRequest = {
         id: ++REQUEST_COUNT,
@@ -245,12 +245,12 @@ export function bind(
  */
 export function unbind(
     options: PlaceRequestOptions,
-    timeout_delay?: number
+    timeout_delay?: number,
 ): Promise<void>;
 export function unbind(
     options: PlaceRequestOptions,
     timeout_delay: number = 0,
-    post: (_: PlaceCommandRequest, t?: number) => Promise<void> = send
+    post: (_: PlaceCommandRequest, t?: number) => Promise<void> = send,
 ): Promise<void> {
     const request: PlaceCommandRequest = {
         id: ++REQUEST_COUNT,
@@ -267,7 +267,7 @@ export function unbind(
 export function execute<T = void>(
     options: PlaceExecRequestOptions,
     timeout_delay: number = REQUEST_TIMEOUT,
-    post: (_: PlaceCommandRequest, t?: number) => Promise<T> = send
+    post: (_: PlaceCommandRequest, t?: number) => Promise<T> = send,
 ): Promise<T> {
     const request: PlaceCommandRequest = {
         id: ++REQUEST_COUNT,
@@ -283,12 +283,12 @@ export function execute<T = void>(
  */
 export function debug(
     options: PlaceRequestOptions,
-    timeout_delay?: number
+    timeout_delay?: number,
 ): Promise<void>;
 export function debug(
     options: PlaceRequestOptions,
     timeout_delay: number = REQUEST_TIMEOUT,
-    post: (_: PlaceCommandRequest, t?: number) => Promise<void> = send
+    post: (_: PlaceCommandRequest, t?: number) => Promise<void> = send,
 ): Promise<void> {
     const request: PlaceCommandRequest = {
         id: ++REQUEST_COUNT,
@@ -304,12 +304,12 @@ export function debug(
  */
 export function ignore(
     options: PlaceRequestOptions,
-    timeout_delay?: number
+    timeout_delay?: number,
 ): Promise<void>;
 export function ignore(
     options: PlaceRequestOptions,
     timeout_delay: number = REQUEST_TIMEOUT,
-    post: (_: PlaceCommandRequest, t?: number) => Promise<void> = send
+    post: (_: PlaceCommandRequest, t?: number) => Promise<void> = send,
 ): Promise<void> {
     const request: PlaceCommandRequest = {
         id: ++REQUEST_COUNT,
@@ -327,7 +327,7 @@ export function ignore(
 export function send<T = any>(
     request: PlaceCommandRequest,
     timeout_delay: number = REQUEST_TIMEOUT,
-    tries: number = 0
+    tries: number = 0,
 ): Promise<T> {
     const key = `${request.cmd}|${request.sys}|${request.mod}${request.index}|${
         request.name
@@ -341,7 +341,7 @@ export function send<T = any>(
                 (_requests[key] as any) = null;
                 send(request, timeout_delay, tries).then(
                     (_) => resolve(_),
-                    (_) => reject(_)
+                    (_) => reject(_),
                 );
             };
             if (_websocket && isConnected()) {
@@ -352,7 +352,7 @@ export function send<T = any>(
                 log(
                     'WS',
                     `[${request.cmd.toUpperCase()}](${request.id}) ${binding}`,
-                    request.args
+                    request.args,
                 );
                 _websocket.next(request);
                 if (timeout_delay > 0) {
@@ -363,7 +363,7 @@ export function send<T = any>(
                             delete _requests[key];
                             (_requests[key] as any) = null;
                         },
-                        timeout_delay
+                        timeout_delay,
                     );
                 }
             } else if (!_connection_promise) {
@@ -394,7 +394,7 @@ export function onMessage(message: PlaceResponse | 'pong'): void {
             log(
                 'WS',
                 `[DEBUG] ${message.mod}${message.klass || ''} →`,
-                message.msg
+                message.msg,
             );
             const meta = message.meta || { mod: '', index: '' };
             debug_events.next({
@@ -469,7 +469,7 @@ export function handleError(message: PlaceResponse) {
         'WS',
         `[ERROR] ${type}(${message.id}): ${message.msg}`,
         undefined,
-        'error'
+        'error',
     );
     const request = Object.keys(_requests)
         .map((key) => _requests[key])
@@ -492,7 +492,7 @@ export function handleNotify<T = any>(
     options: PlaceRequestOptions,
     updated_value: T,
     bindings: HashMap<BehaviorSubject<T>> = _binding,
-    observers: HashMap<Observable<T>> = _observers
+    observers: HashMap<Observable<T>> = _observers,
 ): void {
     const key = `${options.sys}|${options.mod}_${options.index}|${options.name}`;
     if (!bindings[key]) {
@@ -552,14 +552,14 @@ export function connect(tries: number = 0): Promise<void> {
                         _status.next(false);
                         // Try reconnecting after 1 second
                         reconnect();
-                    }
+                    },
                 );
                 if (_keep_alive) clearInterval(_keep_alive);
                 _last_pong = Date.now();
                 ping();
                 _keep_alive = setInterval(
                     () => ping(),
-                    KEEP_ALIVE * 1000
+                    KEEP_ALIVE * 1000,
                 ) as any;
                 clearHealthCheck();
                 _websocket_id += 1;
@@ -578,7 +578,7 @@ export function connect(tries: number = 0): Promise<void> {
                             1000 * Math.min(10, tries + 1)
                         }ms...`,
                         undefined,
-                        'error'
+                        'error',
                     );
                 } else {
                     log(
@@ -587,13 +587,16 @@ export function connect(tries: number = 0): Promise<void> {
                             1000 * Math.min(10, tries + 1)
                         }ms...`,
                         [!!token(), !!authority()],
-                        'info'
+                        'info',
                     );
                 }
-                setTimeout(() => {
-                    _connection_promise = null;
-                    connect(tries).then((_) => resolve(_));
-                }, 1000 * Math.min(10, ++tries));
+                setTimeout(
+                    () => {
+                        _connection_promise = null;
+                        connect(tries).then((_) => resolve(_));
+                    },
+                    1000 * Math.min(10, ++tries),
+                );
             }
         });
     }
@@ -628,7 +631,7 @@ export function createWebsocket() {
         'WS',
         `Creating websocket connection to ws${
             secure ? 's' : ''
-        }://${host()}${websocketRoute()}`
+        }://${host()}${websocketRoute()}`,
     );
     /* istanbul ignore next */
     return webSocket<any>({
@@ -666,13 +669,13 @@ export function reconnect() {
         'WS',
         `Reconnecting in ${Math.min(
             5000,
-            _connection_attempts * 300 || 1000
-        )}ms...`
+            _connection_attempts * 300 || 1000,
+        )}ms...`,
     );
     timeout(
         'reconnect',
         () => connect(),
-        Math.min(5000, (_connection_attempts + 1) * 300 || 1000)
+        Math.min(5000, (_connection_attempts + 1) * 300 || 1000),
     );
 }
 
@@ -722,7 +725,7 @@ export function clearHealthCheck() {
 export function createMockWebSocket() {
     const websocket = new Subject<PlaceResponse | PlaceCommandRequest>();
     websocket.subscribe((resp: PlaceResponse | PlaceCommandRequest) =>
-        onMessage(resp as PlaceResponse)
+        onMessage(resp as PlaceResponse),
     );
     return websocket;
 }
@@ -735,7 +738,7 @@ export function createMockWebSocket() {
 export function handleMockSend(
     request: PlaceCommandRequest,
     websocket: Subject<any>,
-    listeners: HashMap<Subscription>
+    listeners: HashMap<Subscription>,
 ) {
     const key = `${request.sys}|${request.mod}_${request.index}|${request.name}`;
     const system: MockPlaceWebsocketSystem = mockSystem(request.sys);
@@ -757,7 +760,7 @@ export function handleMockSend(
                                     meta: request,
                                 });
                             },
-                            Math.floor(Math.random() * 100 + 50) // Add natural delay before response
+                            Math.floor(Math.random() * 100 + 50), // Add natural delay before response
                         );
                     });
                 break;
@@ -783,7 +786,7 @@ export function handleMockSend(
                 } as PlaceResponse;
                 websocket.next(resp);
             },
-            10
+            10,
         );
     } else {
         // Error determining system or module
@@ -797,7 +800,7 @@ export function handleMockSend(
                         ? PlaceErrorCodes.SYS_NOT_FOUND
                         : PlaceErrorCodes.MOD_NOT_FOUND,
                 } as PlaceResponse),
-            10
+            10,
         );
     }
 }

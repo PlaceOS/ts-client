@@ -22,7 +22,7 @@ function process(item: Partial<PlaceMetadata>) {
  */
 export function listMetadata(
     id: string,
-    query_params: HashMap = {}
+    query_params: HashMap = {},
 ): Observable<PlaceMetadata[]> {
     return show({
         id,
@@ -57,7 +57,7 @@ function flatten<T = any>(an_array: T[]): T {
  */
 export function listMetadataHistory(
     id: string,
-    query_params: HashMap = {}
+    query_params: HashMap = {},
 ): Observable<PlaceMetadata[]> {
     return task({
         id,
@@ -67,8 +67,8 @@ export function listMetadataHistory(
         callback: (list: HashMap) =>
             flatten(
                 Object.keys(list).map((key: string) =>
-                    list[key].map((i: any) => process(i))
-                ) as Array<PlaceMetadata[]>
+                    list[key].map((i: any) => process(i)),
+                ) as Array<PlaceMetadata[]>,
             ),
         path: PATH,
     });
@@ -83,7 +83,7 @@ export function listMetadataHistory(
 export function showMetadata(
     id: string,
     name: string,
-    query_params: HashMap = {}
+    query_params: HashMap = {},
 ): Observable<PlaceMetadata> {
     return show({
         id,
@@ -103,7 +103,7 @@ export function showMetadata(
 export function updateMetadata(
     id: string,
     form_data: Partial<PlaceMetadata>,
-    method: 'put' | 'patch' = 'put'
+    method: 'put' | 'patch' = 'put',
 ) {
     return update({
         id,
@@ -135,7 +135,7 @@ export function removeMetadata(id: string, query_params: HashMap = {}) {
  */
 export function listChildMetadata(
     id: string,
-    query_params: PlaceZoneMetadataOptions
+    query_params: PlaceZoneMetadataOptions,
 ) {
     return task({
         id,
@@ -148,7 +148,7 @@ export function listChildMetadata(
                     new PlaceZoneMetadata({
                         ...item,
                         keys: Object.keys(item.metadata),
-                    })
+                    }),
             ),
         path: PATH,
     });

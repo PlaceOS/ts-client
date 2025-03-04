@@ -21,5 +21,5 @@ export class Survey {
 export interface SurveyPage {
     title: string;
     description?: string;
-    question_order: number[]; 
+    question_order: number[];
 }

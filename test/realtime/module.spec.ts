@@ -1,5 +1,5 @@
-import { describe, beforeEach, afterEach, test, expect, vi } from 'vitest';
 import { of } from 'rxjs';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { PlaceModuleBinding } from '../../src/realtime/module';
 import { PlaceVariableBinding } from '../../src/realtime/status-variable';

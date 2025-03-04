@@ -1,8 +1,8 @@
+import { query, remove, show } from '../resources/functions';
+import { HashMap } from '../utilities/types';
 import { PlaceCluster } from './cluster';
 import { PlaceClusterQueryOptions } from './interfaces';
 import { PlaceProcess } from './process';
-import { query, remove, show } from '../resources/functions';
-import { HashMap } from '../utilities/types';
 
 /**
  * @private
@@ -33,7 +33,7 @@ export function queryProcesses(id: string, query_params: HashMap = {}) {
         query_params,
         fn: (list: any) =>
             list.map(
-                (item: Partial<PlaceProcess>) => new PlaceProcess(id, item)
+                (item: Partial<PlaceProcess>) => new PlaceProcess(id, item),
             ),
         path: PATH,
     });

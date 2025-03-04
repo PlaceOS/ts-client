@@ -13,7 +13,7 @@ export abstract class PlaceResource {
     /** Version of the data */
     public readonly version: number;
 
-    constructor(raw_data:  Partial<PlaceResource> = {}) {
+    constructor(raw_data: Partial<PlaceResource> = {}) {
         this.id = raw_data.id || '';
         this.name = raw_data.name || '';
         this.created_at = raw_data.created_at || 0;

@@ -1,4 +1,4 @@
-import { describe, beforeEach, afterEach, test, expect, vi } from 'vitest';
+import { beforeEach, describe, expect, test } from 'vitest';
 import { PlaceOAuthSource } from '../../src/oauth-sources/oauth-source';
 
 describe('PlaceOAuthSource', () => {

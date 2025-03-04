@@ -17,7 +17,7 @@ export class PlaceMetadata {
     /** Metadata associated with this key. */
     public readonly details: HashMap | any[];
     /** List user groups allowed to edit the metadata */
-    public readonly editors: readonly string [];
+    public readonly editors: readonly string[];
     /** JSON schema associated with the metadata details */
     public readonly schema: string;
     /** Unix timestamp that the metadata was last modified at */
@@ -31,8 +31,11 @@ export class PlaceMetadata {
         this.id = data.id || data.parent_id || '';
         this.name = data.name || '';
         this.description = data.description || '';
-        try{
-            this.details = (typeof data.details === 'string' ? JSON.parse(data.details) : data.details) || {};
+        try {
+            this.details =
+                (typeof data.details === 'string'
+                    ? JSON.parse(data.details)
+                    : data.details) || {};
         } catch {
             this.details = data.details || {};
         }

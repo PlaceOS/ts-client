@@ -1,4 +1,4 @@
-import { describe, beforeEach, afterEach, test, expect, vi } from 'vitest';
+import { beforeEach, describe, expect, test } from 'vitest';
 import { PlaceZoneMetadata } from '../../src/metadata/zone-metadata';
 import { PlaceZone } from '../../src/zones/zone';
 

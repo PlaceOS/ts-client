@@ -1,4 +1,4 @@
-import { describe, beforeEach, afterEach, test, expect, vi } from 'vitest';
+import { beforeEach, describe, expect, test } from 'vitest';
 import { PlaceEdge } from '../../src/edge/edge';
 
 describe('PlaceEdge', () => {

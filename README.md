@@ -27,18 +27,17 @@ setup(config).then(() => doAfterAuthInitialised());
 The setup method returns a promise that resolves after the auth flow has completed.
 The setup method takes a `config` object with the following properties
 
-| Property       | Description                                             | Optional | Type                   | Example                   |
-| -------------- | ------------------------------------------------------- | -------- | ---------------------- | ------------------------- |
-| `host`         | Host name and port of the PlaceOS server                | Yes      | `string`               | `"dev.placeos.com:8080"`  |
-| `mock`         | Whether to initialise PlaceOS with mock services        | Yes      | `boolean`              | `true`                    |
-| `auth_uri`     | URI for authorising users session                       | No       | `string`               | `"/auth/oauth/authorize"` |
-| `token_uri`    | URI for generating new auth tokens                      | No       | `string`               | `"/auth/token"`           |
-| `redirect_uri` | URI to redirect user to after authorising session       | No       | `string`               | `"/oauth-resp.html"`      |
-| `scope`        | Scope of the user permissions needed by the application | No       | `string`               | `"admin"`                 |
-| `storage`      | Browser storage to use for storing user credentials     | Yes      | `"local" | "session"`  |                           |
-| `handle_login` | Whether PlaceOS should handle user login                | Yes      | `boolean`              | `true`                    |
-| `use_iframe`   | Use iFrame for authorization of application             | Yes      | `boolean`              | `false`                   |
-
+| Property       | Description                                             | Optional | Type      | Example                   |
+| -------------- | ------------------------------------------------------- | -------- | --------- | ------------------------- | --- |
+| `host`         | Host name and port of the PlaceOS server                | Yes      | `string`  | `"dev.placeos.com:8080"`  |
+| `mock`         | Whether to initialise PlaceOS with mock services        | Yes      | `boolean` | `true`                    |
+| `auth_uri`     | URI for authorising users session                       | No       | `string`  | `"/auth/oauth/authorize"` |
+| `token_uri`    | URI for generating new auth tokens                      | No       | `string`  | `"/auth/token"`           |
+| `redirect_uri` | URI to redirect user to after authorising session       | No       | `string`  | `"/oauth-resp.html"`      |
+| `scope`        | Scope of the user permissions needed by the application | No       | `string`  | `"admin"`                 |
+| `storage`      | Browser storage to use for storing user credentials     | Yes      | `"local"  | "session"`                |     |
+| `handle_login` | Whether PlaceOS should handle user login                | Yes      | `boolean` | `true`                    |
+| `use_iframe`   | Use iFrame for authorization of application             | Yes      | `boolean` | `false`                   |
 
 ### Websocket API
 
@@ -54,7 +53,7 @@ import { getModule } from '@placeos/ts-client';
 const my_mod = getModule('sys-death-star', 'TestModule', 3);
 const my_variable = my_mod.binding('power');
 const unbind = my_variable.bind();
-const sub = my_variable.listen(value => doSomething(value));
+const sub = my_variable.listen((value) => doSomething(value));
 ```
 
 This binds to the `power` status variable on the 3rd `TestModule` in the system `sys-death-star`.
@@ -84,33 +83,43 @@ Methods are provided for `brokers`, `drivers`, `metadata`, `modules`, `repositor
 
 ```typescript
 // Drivers CRUD
-addDriver(driver_data).subscribe(new_driver => doSomething(new_driver));
-showDriver(driver_id).subscribe(driver => doSomething(driver));
-updateDriver(driver_id, driver_data).subscribe(updated_driver => doSomething(updated_driver));
+addDriver(driver_data).subscribe((new_driver) => doSomething(new_driver));
+showDriver(driver_id).subscribe((driver) => doSomething(driver));
+updateDriver(driver_id, driver_data).subscribe((updated_driver) =>
+    doSomething(updated_driver),
+);
 removeDriver(driver_id).subscribe(() => doSomething());
 
 // Modules CRUD
-addModule(module_data).subscribe(new_module => doSomething(new_module));
-showModule(module_id).subscribe(mod => doSomething(mod));
-updateModule(module_id, module_data).subscribe(updated_module => doSomething(updated_module));
+addModule(module_data).subscribe((new_module) => doSomething(new_module));
+showModule(module_id).subscribe((mod) => doSomething(mod));
+updateModule(module_id, module_data).subscribe((updated_module) =>
+    doSomething(updated_module),
+);
 removeModule(module_id).subscribe(() => doSomething());
 
 // Systems CRUD
-addSystem(system_data).subscribe(new_system => doSomething(new_system));
-showSystem(system_id).subscribe(system => doSomething(system));
-updateSystem(system_id, system_data).subscribe(updated_system => doSomething(updated_system));
+addSystem(system_data).subscribe((new_system) => doSomething(new_system));
+showSystem(system_id).subscribe((system) => doSomething(system));
+updateSystem(system_id, system_data).subscribe((updated_system) =>
+    doSomething(updated_system),
+);
 removeSystem(system_id).subscribe(() => doSomething());
 
 // Users CRUD
-addUser(user_data).subscribe(new_user => doSomething(new_user));
-showUser(user_id).subscribe(user => doSomething(user));
-updateUser(user_id, user_data).subscribe(updated_user => doSomething(updated_user));
+addUser(user_data).subscribe((new_user) => doSomething(new_user));
+showUser(user_id).subscribe((user) => doSomething(user));
+updateUser(user_id, user_data).subscribe((updated_user) =>
+    doSomething(updated_user),
+);
 removeUser(user_id).subscribe(() => doSomething());
 
 // Zones CRUD
-addZone(zone_data).subscribe(new_zone => doSomething(new_zone));
-showZone(zone_id).subscribe(zone => doSomething(zone));
-updateZone(zone_id, zone_data).subscribe(updated_zone => doSomething(updated_zone));
+addZone(zone_data).subscribe((new_zone) => doSomething(new_zone));
+showZone(zone_id).subscribe((zone) => doSomething(zone));
+updateZone(zone_id, zone_data).subscribe((updated_zone) =>
+    doSomething(updated_zone),
+);
 removeZone(zone_id).subscribe(() => doSomething());
 ```
 
@@ -147,10 +156,13 @@ Objects returned by `show` and `query` methods are immutable.
 Therefore to change items you'll need to create a new object to store the changes.
 
 ```typescript
-showZone(zone_id).then(zone => {
+showZone(zone_id).then((zone) => {
     cosnole.log(zone.description); // Some Description
-    const zone_edited = new PlaceZone({ ...zone, description: 'New description' });
-    updateZone(zone_edited.id, zone_edited).then(updated_zone => {
+    const zone_edited = new PlaceZone({
+        ...zone,
+        description: 'New description',
+    });
+    updateZone(zone_edited.id, zone_edited).then((updated_zone) => {
         cosnole.log(updated_zone.description); // New description
     });
 });
@@ -177,14 +189,14 @@ registerSystem('my-system', {
     MyModule: [
         {
             power: true,
-            $power_on: function() {
+            $power_on: function () {
                 this.power = true;
             },
-            $power_off: function() {
+            $power_off: function () {
                 this.power = false;
-            }
-        }
-    ]
+            },
+        },
+    ],
 });
 ```
 
@@ -196,7 +208,7 @@ Once initialised interactions with a system are performed in the same manner as 
 const my_mod = getModule('my-system', 'MyModule', 1);
 const my_variable = my_mod.binding('power');
 const unbind = my_variable.bind();
-const sub = my_variable.listen(value => doSomething(value)); // Emits true
+const sub = my_variable.listen((value) => doSomething(value)); // Emits true
 my_mod.execute('power_off'); // The listen callback will now emit false
 ```
 
@@ -228,7 +240,7 @@ registerMockEndpoint({
     path: '/api/engine/v2/systems',
     metadata: {},
     method: 'GET',
-    callback: request => my_mock_systems
+    callback: (request) => my_mock_systems,
 });
 ```
 
@@ -253,7 +265,7 @@ registerMockEndpoint({
         if (request.route_params.id) {
             ...
         }
-        throw { status: 404, message: 'Invalid system ID' }; 
+        throw { status: 404, message: 'Invalid system ID' };
     }
 });
 ```
@@ -279,6 +291,7 @@ It is possible to use `ts-client` with Node JS.
 It requires an addition setup step before the library can be used loading the library.
 
 ### Javascript:
+
 ```javascript
 const ts_client = require('@placeos/ts-client');
 
@@ -291,6 +304,7 @@ async function setupPlaceOS() {
 ```
 
 ### Typescript:
+
 ```typescript
 import { preSetupNode, setup } from '@placeos/ts-client';
 

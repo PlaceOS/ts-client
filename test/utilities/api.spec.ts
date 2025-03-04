@@ -1,4 +1,4 @@
-import { describe, beforeEach, afterEach, test, expect } from 'vitest';
+import { describe, expect, test } from 'vitest';
 import { toQueryString } from '../../src/utilities/api';
 
 describe('API Utilities', () => {

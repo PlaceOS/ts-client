@@ -1,4 +1,4 @@
-import { describe, beforeEach, afterEach, test, expect, vi } from 'vitest';
+import { beforeEach, describe, expect, test } from 'vitest';
 import { MockPlaceWebsocketModule } from '../../src/realtime/mock-module';
 import { MockPlaceWebsocketSystem } from '../../src/realtime/mock-system';
 

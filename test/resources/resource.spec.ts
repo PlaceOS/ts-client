@@ -1,4 +1,4 @@
-import { describe, beforeEach, afterEach, test, expect, vi } from 'vitest';
+import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { PlaceResource } from '../../src/resources/resource';
 
 class Resource extends PlaceResource {}

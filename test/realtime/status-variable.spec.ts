@@ -1,5 +1,5 @@
-import { describe, beforeEach, afterEach, test, expect, vi } from 'vitest';
 import { BehaviorSubject } from 'rxjs';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { PlaceVariableBinding } from '../../src/realtime/status-variable';
 

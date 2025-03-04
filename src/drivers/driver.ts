@@ -37,7 +37,7 @@ export class PlaceDriver extends PlaceResource {
         PlaceSettings | null,
         PlaceSettings | null,
         PlaceSettings | null,
-        PlaceSettings | null
+        PlaceSettings | null,
     ];
 
     constructor(raw_data: Partial<PlaceDriver> = {}) {

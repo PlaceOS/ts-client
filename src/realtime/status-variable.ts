@@ -23,7 +23,10 @@ export class PlaceVariableBinding<T = any> {
     /** Number of bindings to restore on reconnection */
     private _stale_bindings: number = 0;
 
-    constructor(private _module: PlaceModuleBinding, _name: string) {
+    constructor(
+        private _module: PlaceModuleBinding,
+        _name: string,
+    ) {
         this.name = _name;
         // Listen for state changes in the websocket connection
         status()
@@ -37,12 +40,12 @@ export class PlaceVariableBinding<T = any> {
                     this.rebind();
                 } else if (!connected) {
                     clearAsyncTimeout(
-                        `rebind:${JSON.stringify(this.binding())}`
+                        `rebind:${JSON.stringify(this.binding())}`,
                     );
                     log(
                         'VAR',
                         'Binding dropped due to disconnection, re-binding when possible.',
-                        this.binding()
+                        this.binding(),
                     );
                     this._stale_bindings =
                         this._binding_count || this._stale_bindings;
@@ -117,7 +120,7 @@ export class PlaceVariableBinding<T = any> {
                 this._binding_count = this._stale_bindings || 1;
                 this._stale_bindings = 0;
             },
-            100
+            100,
         );
     }
 

@@ -16,7 +16,7 @@ const PATH = '/api/staff/v1/surveys/answers';
 export function queryAnswers(query_params: AnswerQueryOptions = {}) {
     const query = toQueryString(query_params);
     return get(`${PATH}${query ? '?' + query : ''}`).pipe(
-        map((l: any) => l.map((_: any) => new SurveyAnswer(_)))
+        map((l: any) => l.map((_: any) => new SurveyAnswer(_))),
     );
 }
 
@@ -27,6 +27,6 @@ export function queryAnswers(query_params: AnswerQueryOptions = {}) {
  */
 export function addAnswer(form_data: Partial<SurveyAnswer>[]) {
     return post(`${PATH}`, form_data).pipe(
-        map((l: any) => l.map((_: any) => new SurveyAnswer(_)))
+        map((l: any) => l.map((_: any) => new SurveyAnswer(_))),
     );
 }

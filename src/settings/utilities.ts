@@ -19,7 +19,7 @@ export function generateMockSettings(overrides: any = {}) {
         }-${Math.floor(Math.random() * 999_999_999)}`,
         created_at: Math.floor(created / 1000),
         updated_at: Math.floor(
-            created / 1000 + Math.floor(Math.random() * 20) * 15 * 60
+            created / 1000 + Math.floor(Math.random() * 20) * 15 * 60,
         ),
         encryption_level: Math.floor(Math.random() * 4),
         settings_string: '',

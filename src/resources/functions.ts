@@ -100,10 +100,10 @@ export function query<T>(q: QueryParameters<T>): QueryResponse<T> {
                     resp && resp instanceof Array
                         ? resp.map((i) => (fn || pass_fn)(i))
                         : resp && !(resp instanceof Array) && resp.results
-                        ? (resp.results as HashMap[]).map((i) => process(i))
-                        : [],
+                          ? (resp.results as HashMap[]).map((i) => process(i))
+                          : [],
             } as any;
-        })
+        }),
     );
 }
 
@@ -133,7 +133,7 @@ export function create<T>(details: CreateParameters<T>): Observable<T> {
     const query_str = toQueryString(query_params);
     const url = `${apiEndpoint()}/${path}${query_str ? '?' + query_str : ''}`;
     const observable = post(url, form_data).pipe(
-        map((resp: any) => (fn || pass_fn)(resp))
+        map((resp: any) => (fn || pass_fn)(resp)),
     );
     return observable;
 }
@@ -157,10 +157,10 @@ export function task<T = any>(details: TaskParameters<T>): Observable<T> {
                   `${url}${query_str ? '?' + query_str : ''}`,
                   {
                       response_type: 'json',
-                  }
+                  },
               );
     return request.pipe(
-        map((resp: HashMap) => (callback || ((_: any) => _))(resp))
+        map((resp: HashMap) => (callback || ((_: any) => _))(resp)),
     );
 }
 
@@ -181,7 +181,7 @@ export function update<T>(details: UpdateParameters<T>): Observable<T> {
         query_str ? '?' + query_str : ''
     }`;
     return (method === 'put' ? put : patch)(url, form_data).pipe(
-        map((resp: any) => (fn || pass_fn)(resp))
+        map((resp: any) => (fn || pass_fn)(resp)),
     );
 }
 
@@ -207,7 +207,7 @@ export function remove(details: RemoveParameters): Observable<HashMap> {
  */
 export function handleHeaders(url: string, query_str: string, name: string) {
     const headers = responseHeaders(
-        url[0] === '/' ? `${location.origin}${url}` : url
+        url[0] === '/' ? `${location.origin}${url}` : url,
     );
     const details: { total: number; next: HashMap<string> | null } = {
         total: 0,

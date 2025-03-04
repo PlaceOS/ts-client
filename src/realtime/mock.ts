@@ -8,7 +8,10 @@ import { MockPlaceWebsocketSystem } from './mock-system';
 const _mock_systems: HashMap<MockPlaceWebsocketSystem> = {};
 
 /** Register a mock system for websocket bindings */
-export function registerSystem(id: string, details: HashMap<HashMap[]>): MockPlaceWebsocketSystem {
+export function registerSystem(
+    id: string,
+    details: HashMap<HashMap[]>,
+): MockPlaceWebsocketSystem {
     _mock_systems[id] = new MockPlaceWebsocketSystem(details);
     return _mock_systems[id];
 }

@@ -1,5 +1,5 @@
-import { describe, beforeEach, afterEach, test, expect, vi } from 'vitest';
 import { of } from 'rxjs';
+import { describe, expect, test, vi } from 'vitest';
 import { PlaceDriver } from '../../src/drivers/driver';
 import * as SERVICE from '../../src/drivers/functions';
 import * as Resources from '../../src/resources/functions';

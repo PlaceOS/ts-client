@@ -1,9 +1,9 @@
 /* istanbul ignore file */
 
 export * from './api';
-export * from './staff';
 export * from './auth';
 export * from './realtime';
+export * from './staff';
 
 export * from './utilities/general';
 // export * from './utilities/nodejs';

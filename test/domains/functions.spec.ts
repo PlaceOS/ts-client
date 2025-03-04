@@ -1,5 +1,5 @@
-import { describe, beforeEach, afterEach, test, expect, vi } from 'vitest';
 import { of } from 'rxjs';
+import { describe, expect, test, vi } from 'vitest';
 import { PlaceDomain } from '../../src/domains/domain';
 import * as SERVICE from '../../src/domains/functions';
 import * as Resources from '../../src/resources/functions';

@@ -1,5 +1,12 @@
 import { PlaceAuthSourceQueryOptions } from '../auth-sources/interfaces';
-import { create, query, remove, show, task, update } from '../resources/functions';
+import {
+    create,
+    query,
+    remove,
+    show,
+    task,
+    update,
+} from '../resources/functions';
 import { HashMap } from '../utilities/types';
 import { PlaceEdge } from './edge';
 
@@ -40,9 +47,16 @@ export function showEdge(id: string, query_params: HashMap = {}) {
 export function updateEdge(
     id: string,
     form_data: Partial<PlaceEdge>,
-    method: 'put' | 'patch' = 'patch'
+    method: 'put' | 'patch' = 'patch',
 ) {
-    return update({ id, form_data, query_params: {}, method, fn: process, path: PATH });
+    return update({
+        id,
+        form_data,
+        query_params: {},
+        method,
+        fn: process,
+        path: PATH,
+    });
 }
 
 /**

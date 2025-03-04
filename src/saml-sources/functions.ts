@@ -17,7 +17,9 @@ function process(item: Partial<PlaceSAMLSource>) {
  * Query the available SAML sources
  * @param query_params Query parameters to add the to request URL
  */
-export function querySAMLSources(query_params: PlaceAuthSourceQueryOptions = {}) {
+export function querySAMLSources(
+    query_params: PlaceAuthSourceQueryOptions = {},
+) {
     return query({ query_params, fn: process, path: PATH });
 }
 
@@ -40,9 +42,16 @@ export function showSAMLSource(id: string, query_params: HashMap = {}) {
 export function updateSAMLSource(
     id: string,
     form_data: Partial<PlaceSAMLSource>,
-    method: 'put' | 'patch' = 'patch'
+    method: 'put' | 'patch' = 'patch',
 ) {
-    return update({ id, form_data, query_params: {}, method, fn: process, path: PATH });
+    return update({
+        id,
+        form_data,
+        query_params: {},
+        method,
+        fn: process,
+        path: PATH,
+    });
 }
 
 /**

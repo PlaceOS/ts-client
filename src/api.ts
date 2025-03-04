@@ -1,301 +1,301 @@
 /* istanbul ignore file */
 
-export { get, post, put, patch, del, responseHeaders } from './http/functions';
+export { del, get, patch, post, put, responseHeaders } from './http/functions';
 export type {
     HttpError,
-    HttpOptions,
     HttpJsonOptions,
+    HttpOptions,
     HttpResponse,
     HttpResponseType,
     MockHttpRequest,
     MockHttpRequestHandler,
     MockHttpRequestHandlerOptions,
 } from './http/interfaces';
-export { registerMockEndpoint, deregisterMockEndpoint } from './http/mock';
+export { deregisterMockEndpoint, registerMockEndpoint } from './http/mock';
 
-export {
-    queryApplications,
-    showApplication,
-    addApplication,
-    updateApplication,
-    removeApplication,
-} from './applications/functions';
 export { PlaceApplication } from './applications/application';
+export {
+    addApplication,
+    queryApplications,
+    removeApplication,
+    showApplication,
+    updateApplication,
+} from './applications/functions';
 export type { PlaceApplicationQueryOptions } from './applications/interfaces';
 export type { PlaceAuthSourceQueryOptions } from './auth-sources/interfaces';
 
-export { PlaceMQTTBroker, AuthType } from './broker/broker';
+export { AuthType, PlaceMQTTBroker } from './broker/broker';
 export {
-    queryBrokers,
-    showBroker,
     addBroker,
-    updateBroker,
+    queryBrokers,
     removeBroker,
+    showBroker,
+    updateBroker,
 } from './broker/functions';
 
+export { PlaceCluster } from './clusters/cluster';
 export {
     queryClusters,
     queryProcesses,
     terminateProcess,
 } from './clusters/functions';
-export { PlaceCluster } from './clusters/cluster';
-export { PlaceProcess } from './clusters/process';
 export type { PlaceClusterQueryOptions } from './clusters/interfaces';
+export { PlaceProcess } from './clusters/process';
 
-export {
-    queryDomains,
-    showDomain,
-    addDomain,
-    updateDomain,
-    removeDomain,
-} from './domains/functions';
 export { PlaceDomain } from './domains/domain';
-
 export {
-    queryDrivers,
-    showDriver,
+    addDomain,
+    queryDomains,
+    removeDomain,
+    showDomain,
+    updateDomain,
+} from './domains/functions';
+
+export { PlaceDriver } from './drivers/driver';
+export { PlaceDriverRole } from './drivers/enums';
+export {
     addDriver,
-    updateDriver,
-    removeDriver,
+    isDriverCompiled,
+    queryDrivers,
     recompileDriver,
     reloadDriver,
-    isDriverCompiled,
+    removeDriver,
+    showDriver,
+    updateDriver,
 } from './drivers/functions';
-export { PlaceDriver } from './drivers/driver';
 export type {
-    PlaceDriverQueryOptions,
     PlaceDriverDetails,
+    PlaceDriverQueryOptions,
 } from './drivers/interfaces';
-export { PlaceDriverRole } from './drivers/enums';
 
 export { PlaceEdge } from './edge/edge';
 export {
-    queryEdges,
-    showEdge,
     addEdge,
-    updateEdge,
+    queryEdges,
     removeEdge,
     retrieveEdgeToken,
+    showEdge,
+    updateEdge,
 } from './edge/functions';
 
 export {
-    queryLDAPSources,
-    showLDAPSource,
     addLDAPSource,
-    updateLDAPSource,
+    queryLDAPSources,
     removeLDAPSource,
+    showLDAPSource,
+    updateLDAPSource,
 } from './ldap-sources/functions';
 export { PlaceLDAPSource } from './ldap-sources/ldap-source';
 
 export {
+    addMetadata,
+    listChildMetadata,
     listMetadata,
+    listMetadataHistory,
+    removeMetadata,
     showMetadata,
     updateMetadata,
-    addMetadata,
-    removeMetadata,
-    listChildMetadata,
-    listMetadataHistory,
 } from './metadata/functions';
-export { PlaceMetadata } from './metadata/metadata';
 export type {
     PlaceMetadataOptions,
     PlaceZoneMetadataOptions,
 } from './metadata/interfaces';
+export { PlaceMetadata } from './metadata/metadata';
 export { PlaceZoneMetadata } from './metadata/zone-metadata';
 
 export {
-    queryModules,
-    showModule,
     addModule,
-    updateModule,
+    loadModule,
+    lookupModuleState,
+    moduleRuntimeError,
+    moduleSettings,
+    moduleState,
+    queryModules,
     removeModule,
+    showModule,
     startModule,
     stopModule,
-    moduleState,
-    moduleSettings,
-    lookupModuleState,
-    loadModule,
-    moduleRuntimeError,
+    updateModule,
 } from './modules/functions';
-export { PlaceModule } from './modules/module';
 export type {
-    PlaceModuleQueryOptions,
     PlaceModulePingOptions,
+    PlaceModuleQueryOptions,
 } from './modules/interfaces';
+export { PlaceModule } from './modules/module';
 
 export {
-    queryOAuthSources,
-    showOAuthSource,
     addOAuthSource,
-    updateOAuthSource,
+    queryOAuthSources,
     removeOAuthSource,
+    showOAuthSource,
+    updateOAuthSource,
 } from './oauth-sources/functions';
 export { PlaceOAuthSource } from './oauth-sources/oauth-source';
 
 export {
-    queryRepositories,
-    showRepository,
     addRepository,
-    updateRepository,
-    removeRepository,
     listInterfaceRepositories,
     listRepositoryBranches,
     listRepositoryCommits,
     listRepositoryDriverDetails,
     listRepositoryDrivers,
     pullRepositoryChanges,
+    queryRepositories,
+    removeRepository,
+    showRepository,
+    updateRepository,
 } from './repositories/functions';
-export { PlaceRepository } from './repositories/repository';
 export { PlaceRepositoryType } from './repositories/interfaces';
 export type {
-    PlaceRepositoryCommitQuery,
     GitCommitDetails,
+    PlaceRepositoryCommit,
+    PlaceRepositoryCommitQuery,
     PlaceRepositoryDetailsQuery,
     PlaceRepositoryPullQuery,
-    PlaceRepositoryCommit,
 } from './repositories/interfaces';
+export { PlaceRepository } from './repositories/repository';
 
 export {
-    query,
-    show,
     create,
-    update,
+    lastRequestTotal,
+    query,
     remove,
     requestTotal,
-    lastRequestTotal,
+    show,
+    update,
 } from './resources/functions';
 
 export {
-    querySAMLSources,
-    showSAMLSource,
     addSAMLSource,
-    updateSAMLSource,
+    querySAMLSources,
     removeSAMLSource,
+    showSAMLSource,
+    updateSAMLSource,
 } from './saml-sources/functions';
 export { PlaceSAMLSource } from './saml-sources/saml-source';
 export type { PlaceSamlRequestAttribute } from './saml-sources/saml-source';
 
 export {
-    querySettings,
-    showSettings,
     addSettings,
-    updateSettings,
+    querySettings,
     removeSettings,
     settingsHistory,
+    showSettings,
+    updateSettings,
 } from './settings/functions';
-export { PlaceSettings } from './settings/settings';
 export { EncryptionLevel } from './settings/interfaces';
 export type { PlaceSettingsQueryOptions } from './settings/interfaces';
+export { PlaceSettings } from './settings/settings';
 
 export {
-    querySystems,
-    querySystemsWithEmails,
-    showSystem,
     addSystem,
-    updateSystem,
-    removeSystem,
     addSystemModule,
     addSystemTrigger,
+    executeOnSystem,
+    functionList,
+    listSystemTriggers,
+    listSystemZones,
+    lookupSystemModuleState,
+    querySystems,
+    querySystemsWithEmails,
+    removeSystem,
     removeSystemModule,
     removeSystemTrigger,
+    showSystem,
     startSystem,
     stopSystem,
     systemModuleState,
     systemSettings,
-    listSystemTriggers,
-    listSystemZones,
-    lookupSystemModuleState,
-    executeOnSystem,
-    functionList,
+    updateSystem,
 } from './systems/functions';
-export { PlaceSystem } from './systems/system';
 export type {
-    PlaceModuleFunctionMap,
     PlaceModuleFunction,
-    PlaceSystemsQueryOptions,
+    PlaceModuleFunctionMap,
     PlaceSystemShowOptions,
+    PlaceSystemsQueryOptions,
 } from './systems/interfaces';
+export { PlaceSystem } from './systems/system';
 
 export {
-    queryTriggers,
-    showTrigger,
     addTrigger,
-    updateTrigger,
-    removeTrigger,
     listTriggerInstances,
+    queryTriggers,
+    removeTrigger,
+    showTrigger,
+    updateTrigger,
 } from './triggers/functions';
-export { PlaceTrigger } from './triggers/trigger';
 export {
     TriggerConditionOperator,
     TriggerTimeConditionType,
     TriggerWebhookType,
 } from './triggers/interfaces';
 export type {
-    TriggerActions,
-    TriggerMailer,
-    TriggerFunction,
     ExecuteArgs,
-    TriggerConditions,
+    TriggerActions,
+    TriggerAtTimeCondition,
     TriggerComparison,
-    TriggerConditionValue,
     TriggerConditionConstant,
+    TriggerConditionValue,
+    TriggerConditions,
+    TriggerCronTimeCondition,
+    TriggerFunction,
+    TriggerMailer,
     TriggerStatusVariable,
     TriggerTimeCondition,
-    TriggerAtTimeCondition,
-    TriggerCronTimeCondition,
     TriggerWebhook,
 } from './triggers/interfaces';
+export { PlaceTrigger } from './triggers/trigger';
 
 export {
-    queryUsers,
-    showUser,
     addUser,
-    updateUser,
-    removeUser,
     currentUser,
+    queryUsers,
+    removeUser,
+    showUser,
+    updateUser,
 } from './users/functions';
+export type { PlaceUserQueryOptions } from './users/interfaces';
 export { PlaceUser } from './users/user';
 export type { WorktimePreference } from './users/user';
-export type { PlaceUserQueryOptions } from './users/interfaces';
 
 export {
-    queryZones,
-    showZone,
     addZone,
-    updateZone,
-    removeZone,
-    listZoneTriggers,
     executeOnZone,
+    listZoneTriggers,
+    queryZones,
+    removeZone,
+    showZone,
+    updateZone,
 } from './zones/functions';
-export { PlaceZone } from './zones/zone';
 export type {
     PlaceZoneQueryOptions,
     PlaceZoneShowOptions,
 } from './zones/interfaces';
+export { PlaceZone } from './zones/zone';
 
 export {
-    showSignage,
-    showSignageMetrics,
-    querySignageMedia,
-    showSignageMedia,
-    updateSignageMedia,
     addSignageMedia,
-    removeSignageMedia,
-    querySignagePlaylists,
-    showSignagePlaylist,
-    updateSignagePlaylist,
     addSignagePlaylist,
-    removeSignagePlaylist,
-    listSignagePlaylistMediaRevisions,
     listSignagePlaylistMedia,
+    listSignagePlaylistMediaRevisions,
+    querySignageMedia,
+    querySignagePlaylists,
+    removeSignageMedia,
+    removeSignagePlaylist,
+    showSignage,
+    showSignageMedia,
+    showSignageMetrics,
+    showSignagePlaylist,
+    updateSignageMedia,
+    updateSignagePlaylist,
     updateSignagePlaylistMedia,
 } from './signage/functions';
-export { SignageMedia, MediaAnimation } from './signage/media.class';
-export {
-    SignagePlaylist,
-    SignagePlaylistMedia,
-} from './signage/playlist.class';
 export type {
     SignageMediaQueryOptions,
     SignageMetrics,
 } from './signage/interfaces';
+export { MediaAnimation, SignageMedia } from './signage/media.class';
+export {
+    SignagePlaylist,
+    SignagePlaylistMedia,
+} from './signage/playlist.class';

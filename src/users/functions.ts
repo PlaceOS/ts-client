@@ -48,9 +48,16 @@ export function currentUser(query_params: PlaceUserQueryOptions = {}) {
 export function updateUser(
     id: string,
     form_data: Partial<PlaceUser>,
-    method: 'put' | 'patch' = 'patch'
+    method: 'put' | 'patch' = 'patch',
 ) {
-    return update({ id, form_data, query_params: {}, method, fn: process, path: PATH });
+    return update({
+        id,
+        form_data,
+        query_params: {},
+        method,
+        fn: process,
+        path: PATH,
+    });
 }
 
 /**

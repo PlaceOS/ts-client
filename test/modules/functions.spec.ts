@@ -1,5 +1,5 @@
-import { describe, beforeEach, afterEach, test, expect, vi } from 'vitest';
 import { of } from 'rxjs';
+import { describe, expect, test, vi } from 'vitest';
 import * as SERVICE from '../../src/modules/functions';
 import { PlaceModule } from '../../src/modules/module';
 import * as Resources from '../../src/resources/functions';
