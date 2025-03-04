@@ -1,3 +1,4 @@
+import { describe, beforeEach, afterEach, test, expect, vi } from 'vitest';
 import { PlaceDriver } from '../../src/drivers/driver';
 import { PlaceDriverRole } from '../../src/drivers/enums';
 import { PlaceSettings } from '../../src/settings/settings';
@@ -25,12 +26,12 @@ describe('PlaceDriver', () => {
         });
     });
 
-    it('should create instance', () => {
+    test('should create instance', () => {
         expect(driver).toBeTruthy();
         expect(driver).toBeInstanceOf(PlaceDriver);
     });
 
-    it('should expose properties', () => {
+    test('should expose properties', () => {
         expect(driver.description).toBe('In a galaxy far far away...');
         expect(driver.module_name).toBe('SteamShip');
         expect(driver.role).toBe(PlaceDriverRole.Logic);
@@ -45,7 +46,7 @@ describe('PlaceDriver', () => {
         expect(driver.created_at).toEqual(999);
     });
 
-    it('should handle no settings', () => {
+    test('should handle no settings', () => {
         driver = new PlaceDriver();
         expect(driver.settings).toBeInstanceOf(Array);
         expect(driver.settings[0]).toBeInstanceOf(PlaceSettings);

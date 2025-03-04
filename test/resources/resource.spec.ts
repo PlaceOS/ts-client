@@ -1,3 +1,4 @@
+import { describe, beforeEach, afterEach, test, expect, vi } from 'vitest';
 import { PlaceResource } from '../../src/resources/resource';
 
 class Resource extends PlaceResource {}
@@ -8,9 +9,9 @@ describe('PlaceResource', () => {
 
     beforeEach(() => {
         service = {
-            add: jest.fn(),
-            delete: jest.fn(),
-            update: jest.fn(),
+            add: vi.fn(),
+            delete: vi.fn(),
+            update: vi.fn(),
         };
         service.add.mockReturnValue(Promise.resolve());
         service.delete.mockReturnValue(Promise.resolve());
@@ -23,19 +24,19 @@ describe('PlaceResource', () => {
         });
     });
 
-    it('should expose id', () => {
+    test('should expose id', () => {
         expect(resource.id).toBe('test');
     });
 
-    it('should expose name', () => {
+    test('should expose name', () => {
         expect(resource.name).toBe('Test');
     });
 
-    it('should expose creation time', () => {
+    test('should expose creation time', () => {
         expect(resource.created_at).toEqual(999);
     });
 
-    it('should expose updated time', () => {
+    test('should expose updated time', () => {
         expect(resource.updated_at).toEqual(999);
     });
 });

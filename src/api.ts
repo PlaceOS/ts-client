@@ -1,7 +1,7 @@
 /* istanbul ignore file */
 
 export { get, post, put, patch, del, responseHeaders } from './http/functions';
-export {
+export type {
     HttpError,
     HttpOptions,
     HttpJsonOptions,
@@ -21,8 +21,8 @@ export {
     removeApplication,
 } from './applications/functions';
 export { PlaceApplication } from './applications/application';
-export { PlaceApplicationQueryOptions } from './applications/interfaces';
-export { PlaceAuthSourceQueryOptions } from './auth-sources/interfaces';
+export type { PlaceApplicationQueryOptions } from './applications/interfaces';
+export type { PlaceAuthSourceQueryOptions } from './auth-sources/interfaces';
 
 export { PlaceMQTTBroker, AuthType } from './broker/broker';
 export {
@@ -40,7 +40,7 @@ export {
 } from './clusters/functions';
 export { PlaceCluster } from './clusters/cluster';
 export { PlaceProcess } from './clusters/process';
-export { PlaceClusterQueryOptions } from './clusters/interfaces';
+export type { PlaceClusterQueryOptions } from './clusters/interfaces';
 
 export {
     queryDomains,
@@ -62,7 +62,7 @@ export {
     isDriverCompiled,
 } from './drivers/functions';
 export { PlaceDriver } from './drivers/driver';
-export {
+export type {
     PlaceDriverQueryOptions,
     PlaceDriverDetails,
 } from './drivers/interfaces';
@@ -97,7 +97,7 @@ export {
     listMetadataHistory,
 } from './metadata/functions';
 export { PlaceMetadata } from './metadata/metadata';
-export {
+export type {
     PlaceMetadataOptions,
     PlaceZoneMetadataOptions,
 } from './metadata/interfaces';
@@ -118,7 +118,7 @@ export {
     moduleRuntimeError,
 } from './modules/functions';
 export { PlaceModule } from './modules/module';
-export {
+export type {
     PlaceModuleQueryOptions,
     PlaceModulePingOptions,
 } from './modules/interfaces';
@@ -146,8 +146,8 @@ export {
     pullRepositoryChanges,
 } from './repositories/functions';
 export { PlaceRepository } from './repositories/repository';
-export {
-    PlaceRepositoryType,
+export { PlaceRepositoryType } from './repositories/interfaces';
+export type {
     PlaceRepositoryCommitQuery,
     GitCommitDetails,
     PlaceRepositoryDetailsQuery,
@@ -172,10 +172,8 @@ export {
     updateSAMLSource,
     removeSAMLSource,
 } from './saml-sources/functions';
-export {
-    PlaceSAMLSource,
-    PlaceSamlRequestAttribute,
-} from './saml-sources/saml-source';
+export { PlaceSAMLSource } from './saml-sources/saml-source';
+export type { PlaceSamlRequestAttribute } from './saml-sources/saml-source';
 
 export {
     querySettings,
@@ -186,10 +184,8 @@ export {
     settingsHistory,
 } from './settings/functions';
 export { PlaceSettings } from './settings/settings';
-export {
-    PlaceSettingsQueryOptions,
-    EncryptionLevel,
-} from './settings/interfaces';
+export { EncryptionLevel } from './settings/interfaces';
+export type { PlaceSettingsQueryOptions } from './settings/interfaces';
 
 export {
     querySystems,
@@ -213,7 +209,7 @@ export {
     functionList,
 } from './systems/functions';
 export { PlaceSystem } from './systems/system';
-export {
+export type {
     PlaceModuleFunctionMap,
     PlaceModuleFunction,
     PlaceSystemsQueryOptions,
@@ -230,22 +226,24 @@ export {
 } from './triggers/functions';
 export { PlaceTrigger } from './triggers/trigger';
 export {
+    TriggerConditionOperator,
+    TriggerTimeConditionType,
+    TriggerWebhookType,
+} from './triggers/interfaces';
+export type {
     TriggerActions,
     TriggerMailer,
     TriggerFunction,
     ExecuteArgs,
     TriggerConditions,
     TriggerComparison,
-    TriggerConditionOperator,
     TriggerConditionValue,
     TriggerConditionConstant,
     TriggerStatusVariable,
     TriggerTimeCondition,
     TriggerAtTimeCondition,
     TriggerCronTimeCondition,
-    TriggerTimeConditionType,
     TriggerWebhook,
-    TriggerWebhookType,
 } from './triggers/interfaces';
 
 export {
@@ -256,8 +254,9 @@ export {
     removeUser,
     currentUser,
 } from './users/functions';
-export { PlaceUser, WorktimePreference } from './users/user';
-export { PlaceUserQueryOptions } from './users/interfaces';
+export { PlaceUser } from './users/user';
+export type { WorktimePreference } from './users/user';
+export type { PlaceUserQueryOptions } from './users/interfaces';
 
 export {
     queryZones,
@@ -269,7 +268,7 @@ export {
     executeOnZone,
 } from './zones/functions';
 export { PlaceZone } from './zones/zone';
-export {
+export type {
     PlaceZoneQueryOptions,
     PlaceZoneShowOptions,
 } from './zones/interfaces';
@@ -296,4 +295,7 @@ export {
     SignagePlaylist,
     SignagePlaylistMedia,
 } from './signage/playlist.class';
-export { SignageMediaQueryOptions, SignageMetrics } from './signage/interfaces';
+export type {
+    SignageMediaQueryOptions,
+    SignageMetrics,
+} from './signage/interfaces';

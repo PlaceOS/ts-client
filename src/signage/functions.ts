@@ -3,7 +3,7 @@ import { SignageMedia } from './media.class';
 import { SignagePlaylist, SignagePlaylistMedia } from './playlist.class';
 import { SignageMediaQueryOptions, SignageMetrics } from './interfaces';
 import { task } from '../resources/functions';
-import { HttpJsonOptions } from 'src/http/interfaces';
+import { HttpJsonOptions } from '../http/interfaces';
 
 /**
  * @private
@@ -18,7 +18,7 @@ const PATH = 'signage';
 export function showSignage(
     id: string,
     query_params: SignageMediaQueryOptions = {},
-    options?: HttpJsonOptions
+    options?: HttpJsonOptions,
 ) {
     return show({ id, query_params, fn: (r) => r, path: `${PATH}`, options });
 }
@@ -64,7 +64,7 @@ export function querySignageMedia(query_params: SignageMediaQueryOptions = {}) {
  */
 export function showSignageMedia(
     id: string,
-    query_params: SignageMediaQueryOptions = {}
+    query_params: SignageMediaQueryOptions = {},
 ) {
     return show({ id, query_params, fn: processMedia, path: MEDIA_PATH });
 }
@@ -79,7 +79,7 @@ export function showSignageMedia(
 export function updateSignageMedia(
     id: string,
     form_data: Partial<SignageMedia>,
-    method: 'put' | 'patch' = 'patch'
+    method: 'put' | 'patch' = 'patch',
 ) {
     return update({
         id,
@@ -112,7 +112,7 @@ export function addSignageMedia(form_data: Partial<SignageMedia>) {
  */
 export function removeSignageMedia(
     id: string,
-    query_params: Record<string, any> = {}
+    query_params: Record<string, any> = {},
 ) {
     return remove({ id, query_params, path: MEDIA_PATH });
 }
@@ -132,7 +132,7 @@ function processPlaylist(item: Partial<SignagePlaylist>) {
  * @param query_params Query parameters to add the to request URL
  */
 export function querySignagePlaylists(
-    query_params: SignageMediaQueryOptions = {}
+    query_params: SignageMediaQueryOptions = {},
 ) {
     return query({ query_params, fn: processPlaylist, path: PLAYLISTS_PATH });
 }
@@ -144,7 +144,7 @@ export function querySignagePlaylists(
  */
 export function showSignagePlaylist(
     id: string,
-    query_params: SignageMediaQueryOptions = {}
+    query_params: SignageMediaQueryOptions = {},
 ) {
     return show({
         id,
@@ -164,7 +164,7 @@ export function showSignagePlaylist(
 export function updateSignagePlaylist(
     id: string,
     form_data: Partial<SignagePlaylist>,
-    method: 'put' | 'patch' = 'patch'
+    method: 'put' | 'patch' = 'patch',
 ) {
     return update({
         id,
@@ -197,7 +197,7 @@ export function addSignagePlaylist(form_data: Partial<SignagePlaylist>) {
  */
 export function removeSignagePlaylist(
     id: string,
-    query_params: Record<string, any> = {}
+    query_params: Record<string, any> = {},
 ) {
     return remove({ id, query_params, path: PLAYLISTS_PATH });
 }
@@ -209,7 +209,7 @@ export function removeSignagePlaylist(
  */
 export function listSignagePlaylistMedia(
     id: string,
-    query_params: SignageMediaQueryOptions = {}
+    query_params: SignageMediaQueryOptions = {},
 ) {
     return task({
         id,
@@ -229,7 +229,7 @@ export function listSignagePlaylistMedia(
  */
 export function listSignagePlaylistMediaRevisions(
     id: string,
-    query_params: SignageMediaQueryOptions = {}
+    query_params: SignageMediaQueryOptions = {},
 ) {
     return task({
         id,
@@ -238,7 +238,7 @@ export function listSignagePlaylistMediaRevisions(
         method: 'get',
         callback: (list: SignagePlaylistMedia[]) =>
             list.map(
-                (item: SignagePlaylistMedia) => new SignagePlaylistMedia(item)
+                (item: SignagePlaylistMedia) => new SignagePlaylistMedia(item),
             ),
         path: PLAYLISTS_PATH,
     });

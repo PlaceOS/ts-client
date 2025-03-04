@@ -1,4 +1,4 @@
-import { PlaceResourceQueryOptions } from 'src/resources/interface';
+import { PlaceResourceQueryOptions } from '../resources/interface';
 
 export interface SignageMetrics {
     play_through_counts: Record<string, number>;

@@ -1,3 +1,4 @@
+import { describe, beforeEach, afterEach, test, expect, vi } from 'vitest';
 import { PlaceZoneMetadata } from '../../src/metadata/zone-metadata';
 import { PlaceZone } from '../../src/zones/zone';
 
@@ -12,13 +13,13 @@ describe('PlaceMetadata', () => {
         });
     });
 
-    it('should create instance', () => {
+    test('should create instance', () => {
         expect(metadata).toBeTruthy();
         expect(metadata).toBeInstanceOf(PlaceZoneMetadata);
         new PlaceZoneMetadata();
     });
 
-    it('should expose properties', () => {
+    test('should expose properties', () => {
         expect(metadata.zone).toBeInstanceOf(PlaceZone);
         expect(metadata.keys).toBeInstanceOf(Array);
         expect(metadata.metadata).toBeInstanceOf(Object);

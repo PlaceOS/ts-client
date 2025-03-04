@@ -1,3 +1,4 @@
+import { describe, beforeEach, afterEach, test, expect, vi } from 'vitest';
 import { PlaceModuleBinding } from '../../src/realtime/module';
 import { PlaceSystemBinding } from '../../src/realtime/system';
 
@@ -5,23 +6,23 @@ describe('PlaceSystemBinding', () => {
     let system: PlaceSystemBinding;
 
     beforeEach(() => {
-        jest.useFakeTimers();
+        vi.useFakeTimers();
         system = new PlaceSystemBinding('sys-A0');
     });
 
     afterEach(() => {
-        jest.useRealTimers();
+        vi.useRealTimers();
     });
 
-    it('should create an instance', () => {
+    test('should create an instance', () => {
         expect(system).toBeTruthy();
     });
 
-    it('should have an ID', () => {
+    test('should have an ID', () => {
         expect(system.id).toBe('sys-A0');
     });
 
-    it('should return modules', () => {
+    test('should return modules', () => {
         expect(() => system.module('')).toThrow();
         const test = system.module('Test');
         expect(test).toBeInstanceOf(PlaceModuleBinding);

@@ -1,3 +1,4 @@
+import { describe, beforeEach, afterEach, test, expect, vi } from 'vitest';
 import { MockPlaceWebsocketModule } from '../../src/realtime/mock-module';
 import { MockPlaceWebsocketSystem } from '../../src/realtime/mock-system';
 
@@ -27,11 +28,11 @@ describe('MockPlaceWebsocketSystem', () => {
         system = new MockPlaceWebsocketSystem(system_metadata);
     });
 
-    it('should create an instance', () => {
+    test('should create an instance', () => {
         expect(system).toBeTruthy();
     });
 
-    it('should expose the modules', () => {
+    test('should expose the modules', () => {
         expect(system.Bookings[0]).toBeInstanceOf(MockPlaceWebsocketModule);
         expect(system.Other[0]).toBeInstanceOf(MockPlaceWebsocketModule);
         expect(system.Other[1]).toBeInstanceOf(MockPlaceWebsocketModule);

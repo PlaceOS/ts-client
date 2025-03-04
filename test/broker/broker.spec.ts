@@ -1,7 +1,5 @@
-import {
-    AuthType,
-    PlaceMQTTBroker,
-} from '../../src/broker/broker';
+import { describe, beforeEach, afterEach, test, expect, vi } from 'vitest';
+import { AuthType, PlaceMQTTBroker } from '../../src/broker/broker';
 
 describe('PlaceMQTTBroker', () => {
     let broker: PlaceMQTTBroker;
@@ -24,12 +22,12 @@ describe('PlaceMQTTBroker', () => {
         });
     });
 
-    it('should create instance', () => {
+    test('should create instance', () => {
         expect(broker).toBeTruthy();
         expect(broker).toBeInstanceOf(PlaceMQTTBroker);
     });
 
-    it('should expose properties', () => {
+    test('should expose properties', () => {
         expect(broker.host).toBe('broker.place.tech');
         expect(broker.port).toBe(12345);
         expect(broker.tls).toBeTruthy();
@@ -41,7 +39,7 @@ describe('PlaceMQTTBroker', () => {
         expect(broker.description).toBe('In a galaxy far far away...');
     });
 
-    it('should allow converting to JSON object', () => {
+    test('should allow converting to JSON object', () => {
         expect(broker.toJSON()).toBeTruthy();
     });
 });

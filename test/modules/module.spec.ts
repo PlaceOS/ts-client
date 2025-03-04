@@ -1,3 +1,4 @@
+import { describe, beforeEach, afterEach, test, expect, vi } from 'vitest';
 import { PlaceDriverRole } from '../../src/drivers/enums';
 import { PlaceModule } from '../../src/modules/module';
 
@@ -25,13 +26,13 @@ describe('PlaceModule', () => {
         });
     });
 
-    it('should create instance', () => {
+    test('should create instance', () => {
         expect(module).toBeTruthy();
         expect(module).toBeInstanceOf(PlaceModule);
         expect(new PlaceModule()).toBeInstanceOf(PlaceModule);
     });
 
-    it('should expose properties', () => {
+    test('should expose properties', () => {
         expect(module.driver_id).toBe('dep-001');
         expect(module.control_system_id).toBe('sys-001');
         expect(module.system_id).toBe('sys-001');
@@ -48,7 +49,7 @@ describe('PlaceModule', () => {
         expect(module.ignore_connected).toBe(false);
     });
 
-    it('should remove system id for non-logic modules', () => {
+    test('should remove system id for non-logic modules', () => {
         module = new PlaceModule({
             control_system_id: 'sys-test',
             role: PlaceDriverRole.Logic,

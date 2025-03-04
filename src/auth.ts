@@ -27,7 +27,7 @@ export {
     setToken,
     setAPI_Key,
 } from './auth/functions';
-export {
+export type {
     PlaceAuthority,
     PlaceAuthOptions,
     PlaceTokenResponse,

@@ -1,3 +1,5 @@
+import { describe, beforeEach, afterEach, test, expect, vi } from 'vitest';
+
 import { PlaceSAMLSource } from '../../src/saml-sources/saml-source';
 
 describe('PlaceSamlSource', () => {
@@ -12,16 +14,16 @@ describe('PlaceSamlSource', () => {
         });
     });
 
-    it('should create instance', () => {
+    test('should create instance', () => {
         expect(auth_source).toBeTruthy();
         expect(auth_source).toBeInstanceOf(PlaceSAMLSource);
     });
 
-    it('should not allow editing the authority ID', () => {
+    test('should not allow editing the authority ID', () => {
         expect(auth_source.authority_id).toBe('test-authority');
     });
 
-    it('should allow editing fields', () => {
+    test('should allow editing fields', () => {
         expect(auth_source.idp_cert).toBe('test');
     });
 });

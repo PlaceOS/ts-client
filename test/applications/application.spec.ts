@@ -1,3 +1,4 @@
+import { describe, beforeEach, afterEach, test, expect, vi } from 'vitest';
 import { PlaceApplication } from '../../src/applications/application';
 
 describe('PlaceApplication', () => {
@@ -16,32 +17,32 @@ describe('PlaceApplication', () => {
         });
     });
 
-    it('should create instance', () => {
+    test('should create instance', () => {
         expect(application).toBeTruthy();
         expect(application).toBeInstanceOf(PlaceApplication);
     });
 
-    it('should expose owner ID', () => {
+    test('should expose owner ID', () => {
         expect(application.owner_id).toBe('test-man');
     });
 
-    it('should expose scopes', () => {
+    test('should expose scopes', () => {
         expect(application.scopes).toBe('office,building,over,there');
     });
 
-    it('should expose redirect_uri', () => {
+    test('should expose redirect_uri', () => {
         expect(application.redirect_uri).toBe('https://over.yonder/oauth.html');
     });
 
-    it('should expose skip_authorization', () => {
+    test('should expose skip_authorization', () => {
         expect(application.skip_authorization).toBe(true);
     });
 
-    it('should expose unique ID', () => {
+    test('should expose unique ID', () => {
         expect(application.uid).toBe('no-so-unique');
     });
 
-    it('should expose secret', () => {
+    test('should expose secret', () => {
         expect(application.secret).toBe("Shhh... It's a secret");
     });
 });

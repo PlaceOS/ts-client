@@ -2,7 +2,7 @@ const store: Record<string, string> = {};
 
 /** istanbul ignore */
 export async function preSetupNode() {
-    const global_space: any = global;
+    const global_space: any = globalThis;
     global_space.debug = true;
     global_space.document = {};
     global_space.navigator = {};

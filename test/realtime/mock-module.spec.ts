@@ -1,3 +1,4 @@
+import { describe, beforeEach, afterEach, test, expect, vi } from 'vitest';
 import { MockPlaceWebsocketModule } from '../../src/realtime/mock-module';
 
 class TestModule {
@@ -9,7 +10,7 @@ class TestModule {
 
 describe('MockPlaceWebsocketModule', () => {
     let module: MockPlaceWebsocketModule;
-    let test: MockPlaceWebsocketModule;
+    let test_mod: MockPlaceWebsocketModule;
     const system = {
         Bookings: [
             {
@@ -35,74 +36,73 @@ describe('MockPlaceWebsocketModule', () => {
     beforeEach(() => {
         module = new MockPlaceWebsocketModule(
             system as any,
-            system.Bookings[0]
+            system.Bookings[0],
         );
-        test = new MockPlaceWebsocketModule(
-            system as any,
-            system.Test[0]
-        );
+        test_mod = new MockPlaceWebsocketModule(system as any, system.Test[0]);
     });
 
-    it('should create an instance', () => {
+    test('should create an instance', () => {
         expect(module).toBeTruthy();
-        expect(test).toBeTruthy();
+        expect(test_mod).toBeTruthy();
     });
 
-    it('should allow getting binding values', () => {
+    test('should allow getting binding values', () => {
         expect(module.test).toBe(10);
     });
 
-    it('should allow setting binding values', () => {
+    test('should allow setting binding values', () => {
         expect(module.test).toBe(10);
         module.test = 20;
         expect(module.test).toBe(20);
     });
 
-    it('should allow listening to binding values', done => {
-        let test_count = 0;
-        module.listen('test').subscribe((value: any) => {
-            if (test_count === 0) {
-                expect(value).toBe(10);
-                test_count++;
-            } else if (test_count === 1) {
-                expect(value).toBe(20);
-                done();
-            }
-        });
-        setTimeout(() => (module.test = 20));
-    });
+    test('should allow listening to binding values', () =>
+        new Promise<void>((resolve) => {
+            let test_count = 0;
+            module.listen('test').subscribe((value: any) => {
+                if (test_count === 0) {
+                    expect(value).toBe(10);
+                    test_count++;
+                } else if (test_count === 1) {
+                    expect(value).toBe(20);
+                    resolve();
+                }
+            });
+            setTimeout(() => (module.test = 20));
+        }));
 
-    it('should allow listening to non-predefined binding values', done => {
-        let test_count = 0;
-        module.listen('other_test').subscribe((value: any) => {
-            if (test_count === 0) {
-                expect(value).toBe(null);
-                test_count++;
-            } else if (test_count === 1) {
-                expect(value).toBe(20);
-                done();
-            }
-        });
-        setTimeout(() => (module.other_test = 20));
-    });
+    test('should allow listening to non-predefined binding values', () =>
+        new Promise<void>((resolve) => {
+            let test_count = 0;
+            module.listen('other_test').subscribe((value: any) => {
+                if (test_count === 0) {
+                    expect(value).toBe(null);
+                    test_count++;
+                } else if (test_count === 1) {
+                    expect(value).toBe(20);
+                    resolve();
+                }
+            });
+            setTimeout(() => (module.other_test = 20));
+        }));
 
-    it('should allow for executing methods', () => {
+    test('should allow for executing methods', () => {
         expect(module.call('method')).toBe(10);
         expect(module.call('methodWithOneArg', [10])).toBe(11);
         expect(module.call('methodWithTwoArgs', [10, 11])).toBe(21);
         expect(module.call('falseFn')).toBe(null);
     });
 
-    it('should remove namespace from value bindings', () => {
+    test('should remove namespace from value bindings', () => {
         expect(module.namespaceTest).toBe(99);
     });
 
-    it('should namespace executable methods', () => {
+    test('should namespace executable methods', () => {
         expect(module.namespaceTestFn).toBeUndefined();
         expect(module.call('namespaceTestFn')).toBe(1);
     });
 
-    it('should allow for access to parent system', () => {
+    test('should allow for access to parent system', () => {
         expect(module.call('updateOtherModule')).toBe(20);
         expect(system.Other[0].test).toBe(19);
     });

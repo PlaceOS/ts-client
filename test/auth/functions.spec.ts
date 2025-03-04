@@ -1,3 +1,4 @@
+import { describe, beforeEach, afterEach, test, expect, vi } from 'vitest';
 import { Observable } from 'rxjs';
 import { Md5 } from 'ts-md5';
 import * as Auth from '../../src/auth/functions';
@@ -8,7 +9,7 @@ describe('Auth', () => {
         Object.defineProperty(window, 'location', {
             writable: true,
             value: {
-                assign: jest.fn(),
+                assign: vi.fn(),
                 protocol: 'http:',
                 origin: 'http://undefined',
                 href: 'http://undefined',
@@ -16,14 +17,14 @@ describe('Auth', () => {
                 hostname: 'undefined',
             },
         });
-        window.fetch = jest.fn().mockImplementation(async () => ({
+        window.fetch = vi.fn().mockImplementation(async () => ({
             ok: true,
             json: async () =>
                 ({
                     version: '1.0.0',
                     login_url: '/login?continue={{url}}',
                     session: true,
-                } as PlaceAuthority),
+                }) as PlaceAuthority,
         }));
     });
 
@@ -32,7 +33,7 @@ describe('Auth', () => {
         Auth.cleanupAuth();
     });
 
-    it('should allow setting up auth', async () => {
+    test('should allow setting up auth', async () => {
         await Auth.setup({
             auth_uri: '',
             token_uri: '',
@@ -45,7 +46,7 @@ describe('Auth', () => {
         expect(client_id).toBe(Auth.clientId());
     });
 
-    it('should allow setting up auth with username and password', async () => {
+    test('should allow setting up auth with username and password', async () => {
         await Auth.setup({
             auth_uri: '',
             token_uri: '',
@@ -56,14 +57,14 @@ describe('Auth', () => {
         expect(Auth.authority()).toBeTruthy();
     });
 
-    it('should expose the API endpoint', () => {
+    test('should expose the API endpoint', () => {
         expect(Auth.apiEndpoint()).toBe(
-            `${location.origin}${Auth.httpRoute()}`
+            `${location.origin}${Auth.httpRoute()}`,
         );
     });
 
-    // it('should expose the API route', async () => {
-    //     jest.useFakeTimers();
+    // test('should expose the API route', async () => {
+    //     vi.useFakeTimers();
     //     expect(Auth.httpRoute()).toBe('/api/engine/v2');
     //     const promise = Auth.setup({
     //         auth_uri: '',
@@ -71,13 +72,13 @@ describe('Auth', () => {
     //         redirect_uri: '',
     //         scope: 'public',
     //     });
-    //     jest.runOnlyPendingTimers();
+    //     vi.runOnlyPendingTimers();
     //     await promise;
     //     expect(Auth.httpRoute()).toBe('/control/api');
-    //     jest.useRealTimers();
+    //     vi.useRealTimers();
     // });
 
-    it('should expose the options', () => {
+    test('should expose the options', () => {
         expect(Auth.isMock()).toBe(false);
         expect(Auth.isSecure()).toBe(false);
         expect(Auth.isOnline()).toBe(false);
@@ -105,7 +106,7 @@ describe('Auth', () => {
         expect(Auth.onlineState()).toBeInstanceOf(Observable);
     });
 
-    it('should expose the API token', async () => {
+    test('should expose the API token', async () => {
         expect(Auth.token()).toBeFalsy();
         const options = {
             auth_uri: '',
@@ -122,7 +123,7 @@ describe('Auth', () => {
         expect(Auth.token()).toBe('test');
     });
 
-    it('should clear expired tokens', async () => {
+    test('should clear expired tokens', async () => {
         window.location.search = '?access_token=test&expires_in=3600';
         const options = {
             auth_uri: '',
@@ -134,13 +135,13 @@ describe('Auth', () => {
         expect(Auth.token()).toBe('test');
         localStorage.setItem(
             `${Auth.clientId()}_expires_at`,
-            `${new Date().getTime() - 3600}`
+            `${new Date().getTime() - 3600}`,
         );
         expect(Auth.token()).toBe('test');
         expect(Auth.token()).toBe('');
     });
 
-    it('should expose the refresh token', async () => {
+    test('should expose the refresh token', async () => {
         window.location.search = '?code=test';
         const options = {
             auth_uri: '',
@@ -156,7 +157,7 @@ describe('Auth', () => {
                         version: '1.0.0',
                         login_url: '/login?continue={{url}}',
                         session: true,
-                    } as PlaceAuthority),
+                    }) as PlaceAuthority,
             }))
             .mockImplementationOnce(async () => ({
                 ok: true,
@@ -172,7 +173,7 @@ describe('Auth', () => {
         // expect(Auth.refreshToken()).toBe('tomorrow');
     });
 
-    it('should expose the authority', async () => {
+    test('should expose the authority', async () => {
         expect(Auth.authority()).toBeFalsy();
         const promise = Auth.setup({
             auth_uri: '',
@@ -184,7 +185,7 @@ describe('Auth', () => {
         expect(Auth.authority()).toBeTruthy();
     });
 
-    it('should allow using session storage', async () => {
+    test('should allow using session storage', async () => {
         window.location.search =
             '?access_token=test&expires_in=3600&trust=true';
         await Auth.setup({
@@ -196,14 +197,14 @@ describe('Auth', () => {
         });
         expect(Auth.token()).toBe('test');
         expect(
-            localStorage.getItem(`${Auth.clientId()}_access_token`)
+            localStorage.getItem(`${Auth.clientId()}_access_token`),
         ).toBeNull();
         expect(sessionStorage.getItem(`${Auth.clientId()}_access_token`)).toBe(
-            'test'
+            'test',
         );
     });
 
-    it('should handle refresh token in URL', async () => {
+    test('should handle refresh token in URL', async () => {
         window.location.search =
             '?access_token=test&refresh_token=hehe&expires_in=3600&state=;^_^&&trust=true';
         await Auth.setup({
@@ -214,22 +215,22 @@ describe('Auth', () => {
         });
         expect(Auth.token()).toBe('test');
         expect(localStorage.getItem(`${Auth.clientId()}_access_token`)).toBe(
-            'test'
+            'test',
         );
         expect(localStorage.getItem(`${Auth.clientId()}_refresh_token`)).toBe(
-            'hehe'
+            'hehe',
         );
     });
 
-    it('should fail to authorise before authority loaded', async () => {
+    test('should fail to authorise before authority loaded', async () => {
         expect.assertions(1);
         await Auth.authorise().catch((err) => {
             expect(err).toBe('Authority is not loaded');
         });
     });
 
-    // it('should redirect to login when user has no session', async (done) => {
-    //     window.fetch = jest.fn().mockImplementation(async () => ({
+    // test('should redirect to login when user has no session', async (done) => {
+    //     window.fetch = vi.fn().mockImplementation(async () => ({
     //         ok: true,
     //         json: async () =>
     //             ({
@@ -248,9 +249,9 @@ describe('Auth', () => {
     //     }, 400);
     // });
 
-    // it('should handle logging out', async (done) => {
+    // test('should handle logging out', async (done) => {
     //     window.location.search = '?access_token=test&expires_in=3600';
-    //     const spy = jest.spyOn(location, 'assign');
+    //     const spy = vi.spyOn(location, 'assign');
     //     await Auth.setup({
     //         auth_uri: '',
     //         token_uri: '',
@@ -268,8 +269,8 @@ describe('Auth', () => {
     //     }, 400);
     // });
 
-    // it('should allow refreshing the authority', async () => {
-    //     jest.useFakeTimers();
+    // test('should allow refreshing the authority', async () => {
+    //     vi.useFakeTimers();
     //     expect(Auth.authority()).toBeFalsy();
     //     await Auth.setup({
     //         auth_uri: '',
@@ -278,7 +279,7 @@ describe('Auth', () => {
     //         scope: 'public',
     //     });
     //     expect(Auth.authority()).toBeTruthy();
-    //     window.fetch = jest.fn().mockImplementation(async () => ({
+    //     window.fetch = vi.fn().mockImplementation(async () => ({
     //         ok: true,
     //         json: async () =>
     //             ({
@@ -287,13 +288,13 @@ describe('Auth', () => {
     //                 session: true,
     //             } as PlaceAuthority),
     //     }));
-    //     jest.runOnlyPendingTimers();
+    //     vi.runOnlyPendingTimers();
     //     await Auth.refreshAuthority();
     //     expect(Auth.authority()?.version).toBe('2.0.0');
-    //     jest.useRealTimers();
+    //     vi.useRealTimers();
     // });
 
-    // it('should handle error when loading authority', async () => {
+    // test('should handle error when loading authority', async () => {
     //     window.fetch = jest
     //         .fn()
     //         .mockImplementationOnce(async () => ({
@@ -318,27 +319,28 @@ describe('Auth', () => {
     //     expect(Auth.authority()).toBeTruthy();
     // });
 
-    it('should allow listening to changes to token', (done) => {
-        (async () => {
-            window.location.search = '?access_token=test&expires_in=3600';
-            Auth.listenForToken().subscribe((token) => {
-                if (token) {
-                    done();
-                }
-            });
-            await Auth.setup({
-                auth_uri: '',
-                token_uri: '',
-                redirect_uri: '',
-                secure: true,
-                scope: 'public',
-            });
-        })();
-    });
+    test('should allow listening to changes to token', () =>
+        new Promise<void>((resolve) => {
+            (async () => {
+                window.location.search = '?access_token=test&expires_in=3600';
+                Auth.listenForToken().subscribe((token) => {
+                    if (token) {
+                        resolve();
+                    }
+                });
+                await Auth.setup({
+                    auth_uri: '',
+                    token_uri: '',
+                    redirect_uri: '',
+                    secure: true,
+                    scope: 'public',
+                });
+            })();
+        }));
 
-    it('should allow generating challenge pairs', () => {
-        (window as any).TextEncoder = jest.fn(() => ({
-            encode: jest.fn((_: any) => _),
+    test('should allow generating challenge pairs', () => {
+        (window as any).TextEncoder = vi.fn(() => ({
+            encode: vi.fn((_: any) => _),
         }));
         const { challenge, verify } = Auth.generateChallenge();
         expect(challenge).toBeTruthy();

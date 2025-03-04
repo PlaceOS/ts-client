@@ -1,3 +1,4 @@
+import { describe, beforeEach, afterEach, test, expect, vi } from 'vitest';
 import { PlaceLDAPSource } from '../../src/ldap-sources/ldap-source';
 
 describe('PlaceLdapSource', () => {
@@ -12,16 +13,16 @@ describe('PlaceLdapSource', () => {
         });
     });
 
-    it('should create instance', () => {
+    test('should create instance', () => {
         expect(auth_source).toBeTruthy();
         expect(auth_source).toBeInstanceOf(PlaceLDAPSource);
     });
 
-    it('should not allow editing the authority ID', () => {
+    test('should not allow editing the authority ID', () => {
         expect(auth_source.authority_id).toBe('test-authority');
     });
 
-    it('should allow editing fields', () => {
+    test('should allow editing fields', () => {
         expect(auth_source.host).toBe('test');
     });
 });

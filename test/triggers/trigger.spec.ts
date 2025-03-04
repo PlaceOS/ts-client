@@ -1,3 +1,4 @@
+import { describe, beforeEach, afterEach, test, expect, vi } from 'vitest';
 import { PlaceTrigger } from '../../src/triggers/trigger';
 import {
     TriggerActions,
@@ -47,13 +48,13 @@ describe('PlaceTrigger', () => {
         });
     });
 
-    it('should create instance', () => {
+    test('should create instance', () => {
         expect(trigger).toBeTruthy();
         expect(trigger).toBeInstanceOf(PlaceTrigger);
         expect(new PlaceTrigger()).toBeInstanceOf(PlaceTrigger);
     });
 
-    it('should expose properties', () => {
+    test('should expose properties', () => {
         expect(trigger.system_id).toBe('sys-42');
         expect(trigger.description).toBe('In a galaxy far far away...');
         expect(trigger.debounce_period).toBe(1000);
@@ -65,7 +66,7 @@ describe('PlaceTrigger', () => {
         expect(trigger.conditions).toEqual(conditions);
     });
 
-    it('should have default values', () => {
+    test('should have default values', () => {
         trigger = new PlaceTrigger({});
         expect(trigger.actions).toBeInstanceOf(Object);
         expect(trigger.conditions).toBeInstanceOf(Object);

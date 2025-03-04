@@ -1,11 +1,12 @@
+import { describe, beforeEach, afterEach, test, expect, vi } from 'vitest';
 import { of } from 'rxjs';
 import { PlaceDriver } from '../../src/drivers/driver';
 import * as SERVICE from '../../src/drivers/functions';
 import * as Resources from '../../src/resources/functions';
 
 describe('Drivers API', () => {
-    it('should allow querying drivers', async () => {
-        const spy = jest.spyOn(Resources, 'query');
+    test('should allow querying drivers', async () => {
+        const spy = vi.spyOn(Resources, 'query');
         spy.mockImplementation((_) => of({ data: [_.fn!({})] } as any));
         let list = await SERVICE.queryDrivers().toPromise();
         expect(list).toBeTruthy();
@@ -14,8 +15,8 @@ describe('Drivers API', () => {
         list = await SERVICE.queryDrivers({}).toPromise();
     });
 
-    it('should allow showing driver details', async () => {
-        const spy = jest.spyOn(Resources, 'show');
+    test('should allow showing driver details', async () => {
+        const spy = vi.spyOn(Resources, 'show');
         spy.mockImplementation((_) => of(_.fn!({})));
         let item = await SERVICE.showDriver('1').toPromise();
         expect(item).toBeInstanceOf(PlaceDriver);
@@ -23,8 +24,8 @@ describe('Drivers API', () => {
         expect(item).toBeInstanceOf(PlaceDriver);
     });
 
-    it('should allow creating new drivers', async () => {
-        const spy = jest.spyOn(Resources, 'create');
+    test('should allow creating new drivers', async () => {
+        const spy = vi.spyOn(Resources, 'create');
         spy.mockImplementation((_) => of(_.fn!({})));
         let item = await SERVICE.addDriver({}).toPromise();
         expect(item).toBeInstanceOf(PlaceDriver);
@@ -32,8 +33,8 @@ describe('Drivers API', () => {
         expect(item).toBeInstanceOf(PlaceDriver);
     });
 
-    it('should allow updating driver details', async () => {
-        const spy = jest.spyOn(Resources, 'update');
+    test('should allow updating driver details', async () => {
+        const spy = vi.spyOn(Resources, 'update');
         spy.mockImplementation((_) => of(_.fn!({}) as any));
         let item = await SERVICE.updateDriver('1', {}).toPromise();
         expect(item).toBeInstanceOf(PlaceDriver);
@@ -41,30 +42,30 @@ describe('Drivers API', () => {
         expect(item).toBeInstanceOf(PlaceDriver);
     });
 
-    it('should allow removing drivers', async () => {
-        const spy = jest.spyOn(Resources, 'remove');
+    test('should allow removing drivers', async () => {
+        const spy = vi.spyOn(Resources, 'remove');
         spy.mockImplementation(() => of());
         let item = await SERVICE.removeDriver('1', {}).toPromise();
         item = await SERVICE.removeDriver('1').toPromise();
         expect(item).toBeFalsy();
     });
 
-    it('should allow recompiling drivers', async () => {
-        const spy = jest.spyOn(Resources, 'task');
+    test('should allow recompiling drivers', async () => {
+        const spy = vi.spyOn(Resources, 'task');
         spy.mockImplementation(() => of());
         const item = await SERVICE.recompileDriver('1').toPromise();
         expect(item).toBeFalsy();
     });
 
-    it('should allow recompiling drivers', async () => {
-        const spy = jest.spyOn(Resources, 'task');
+    test('should allow recompiling drivers', async () => {
+        const spy = vi.spyOn(Resources, 'task');
         spy.mockImplementation(() => of());
         const item = await SERVICE.reloadDriver('1').toPromise();
         expect(item).toBeFalsy();
     });
 
-    it('should allow checking driver is compiled', async () => {
-        const spy = jest.spyOn(Resources, 'task');
+    test('should allow checking driver is compiled', async () => {
+        const spy = vi.spyOn(Resources, 'task');
         spy.mockImplementation(() => of());
         const item = await SERVICE.isDriverCompiled('1').toPromise();
         expect(item).toBeFalsy();

@@ -1,13 +1,14 @@
+import { describe, beforeEach, afterEach, test, expect } from 'vitest';
 import { toQueryString } from '../../src/utilities/api';
 
 describe('API Utilities', () => {
     describe('generattoQueryStringeNonce', () => {
-        it('converts object into URL query string', () => {
+        test('converts object into URL query string', () => {
             // Check method
             expect(toQueryString({ test: 'value' })).toBe('test=value');
             // Multiple properties
             expect(toQueryString({ test: 'new_value', other: 'person' })).toBe(
-                'test=new_value&other=person'
+                'test=new_value&other=person',
             );
             // Number properties
             expect(toQueryString({ number: 9 })).toBe('number=9');

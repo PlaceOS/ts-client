@@ -1,3 +1,4 @@
+import { describe, beforeEach, afterEach, test, expect, vi } from 'vitest';
 import {
     deregisterSystem,
     mockSystem,
@@ -10,8 +11,8 @@ import * as ws from '../../src/realtime/functions';
 
 describe('MockEngineWebsocket', () => {
     beforeEach(() => {
-        jest.spyOn(Auth, 'isMock').mockReturnValue(true);
-        jest.spyOn(Auth, 'authority').mockReturnValue({} as any);
+        vi.spyOn(Auth, 'isMock').mockReturnValue(true);
+        vi.spyOn(Auth, 'authority').mockReturnValue({} as any);
         registerSystem('sys-A0', {
             Test: [
                 {
@@ -30,7 +31,7 @@ describe('MockEngineWebsocket', () => {
         ws.cleanupRealtime();
     });
 
-    it('should bind to mock system modules', (done) => {
+    test('should bind to mock system modules', (done) => {
         let checked = false;
         const binding = { sys: 'sys-A0', mod: 'Test', index: 1, name: 'test' };
         ws.listen(binding).subscribe((value) => {
@@ -43,7 +44,7 @@ describe('MockEngineWebsocket', () => {
         ws.bind(binding);
     });
 
-    it('post binding value updates', (done) => {
+    test('post binding value updates', (done) => {
         let checked = false;
         const binding = { sys: 'sys-A0', mod: 'Test', index: 1, name: 'test' };
         let count = 0;
@@ -60,7 +61,7 @@ describe('MockEngineWebsocket', () => {
         ws.bind(binding);
     });
 
-    it('should unbind from mock system modules', (done) => {
+    test('should unbind from mock system modules', (done) => {
         const binding = { sys: 'sys-A0', mod: 'Test', index: 1, name: 'test' };
         ws.listen(binding).subscribe((value) => {
             if (value) {
@@ -77,7 +78,7 @@ describe('MockEngineWebsocket', () => {
         ws.bind(binding);
     });
 
-    it('should exec mock system module methods', (done) => {
+    test('should exec mock system module methods', (done) => {
         const binding = { sys: 'sys-A0', mod: 'Test', index: 1, name: 'test' };
         ws.listen(binding)
             .pipe(first((_) => _))
@@ -93,7 +94,7 @@ describe('MockEngineWebsocket', () => {
         ws.bind(binding);
     });
 
-    it('should error if binding module not found', (done) => {
+    test('should error if binding module not found', (done) => {
         const binding = {
             sys: 'sys-A0',
             mod: 'Testing',
@@ -103,7 +104,7 @@ describe('MockEngineWebsocket', () => {
         ws.bind(binding).then(null, () => done());
     });
 
-    it('should error if binding system not found', (done) => {
+    test('should error if binding system not found', (done) => {
         const binding = { sys: 'sys-B0', mod: 'Test', index: 1, name: 'test' };
         ws.bind(binding).then(null, () => done());
     });

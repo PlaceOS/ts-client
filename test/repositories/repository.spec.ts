@@ -1,3 +1,4 @@
+import { describe, beforeEach, afterEach, test, expect, vi } from 'vitest';
 import { PlaceRepository } from '../../src/repositories/repository';
 import { PlaceRepositoryType } from '../../src/repositories/interfaces';
 import { generateMockRepository } from '../../src/repositories/utilities';
@@ -13,12 +14,12 @@ describe('PlaceRepository', () => {
         repository = new PlaceRepository(mock_data);
     });
 
-    it('should create instance', () => {
+    test('should create instance', () => {
         expect(repository).toBeTruthy();
         expect(repository).toBeInstanceOf(PlaceRepository);
     });
 
-    it('should expose properties', () => {
+    test('should expose properties', () => {
         expect(repository.commit_hash).toBe(mock_data.commit_hash);
         expect(repository.folder_name).toBe(mock_data.folder_name);
         expect(repository.description).toBe(mock_data.description);

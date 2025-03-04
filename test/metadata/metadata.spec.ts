@@ -1,3 +1,4 @@
+import { describe, beforeEach, afterEach, test, expect, vi } from 'vitest';
 import { PlaceMetadata } from '../../src/metadata/metadata';
 
 describe('PlaceMetadata', () => {
@@ -12,12 +13,12 @@ describe('PlaceMetadata', () => {
         });
     });
 
-    it('should create instance', () => {
+    test('should create instance', () => {
         expect(metadata).toBeTruthy();
         expect(metadata).toBeInstanceOf(PlaceMetadata);
     });
 
-    it('should expose properties', () => {
+    test('should expose properties', () => {
         expect(metadata.id).toBe('dep-test');
         expect(metadata.name).toBe('catering');
         expect(metadata.description).toBe('In a galaxy far far away...');

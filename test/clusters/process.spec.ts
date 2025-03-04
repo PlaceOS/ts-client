@@ -1,3 +1,4 @@
+import { describe, beforeEach, afterEach, test, expect, vi } from 'vitest';
 import { PlaceProcess } from '../../src/clusters/process';
 
 describe('Cluster Process', () => {
@@ -18,22 +19,22 @@ describe('Cluster Process', () => {
         });
     });
 
-    it('should create instance', () => {
+    test('should create instance', () => {
         expect(process).toBeTruthy();
         expect(process).toBeInstanceOf(PlaceProcess);
     });
 
-    it('should expose ID', () => {
+    test('should expose ID', () => {
         expect(process.id).toBe(
-            '/app/bin/drivers/drivers_aca_private_helper_fe33588'
+            '/app/bin/drivers/drivers_aca_private_helper_fe33588',
         );
     });
 
-    it('should allow generating display string for memory usage', () => {
+    test('should allow generating display string for memory usage', () => {
         expect(process.used_memory).toBe('90.30 MB');
     });
 
-    it('should allow generating display string for memory total', () => {
+    test('should allow generating display string for memory total', () => {
         expect(process.total_memory).toBe('7.78 GB');
     });
 });

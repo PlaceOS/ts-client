@@ -1,3 +1,4 @@
+import { describe, beforeEach, afterEach, test, expect, vi } from 'vitest';
 import { PlaceSystem } from '../../src/systems/system';
 
 describe('PlaceSystem', () => {
@@ -23,56 +24,57 @@ describe('PlaceSystem', () => {
         });
     });
 
-    it('should have module data', done => {
-        setTimeout(() => {
-            expect(system.module_list).toBeTruthy();
-            expect(system.module_list.length).toBe(1);
-            done();
-        }, 1);
-    });
+    test('should have module data', () =>
+        new Promise<void>((resolve) => {
+            setTimeout(() => {
+                expect(system.module_list).toBeTruthy();
+                expect(system.module_list.length).toBe(1);
+                resolve();
+            }, 1);
+        }));
 
-    it('should create instance', () => {
+    test('should create instance', () => {
         expect(system).toBeTruthy();
         expect(system).toBeInstanceOf(PlaceSystem);
     });
 
-    it('should expose description', () => {
+    test('should expose description', () => {
         expect(system.description).toBe('A description');
     });
 
-    it('should expose email', () => {
+    test('should expose email', () => {
         expect(system.email).toBe('system@placeos.com');
     });
 
-    it('should expose capacity', () => {
+    test('should expose capacity', () => {
         expect(system.capacity).toBe(10);
     });
 
-    it('should expose features', () => {
+    test('should expose features', () => {
         expect(system.features).toBe(features);
     });
 
-    it('should expose bookable', () => {
+    test('should expose bookable', () => {
         expect(system.bookable).toBe(true);
     });
 
-    it('should expose installed_ui_devices', () => {
+    test('should expose installed_ui_devices', () => {
         expect(system.installed_ui_devices).toBe(4);
     });
 
-    it('should expose support_url', () => {
+    test('should expose support_url', () => {
         expect(system.support_url).toBe('/support/test');
     });
 
-    it('should expose module list', () => {
+    test('should expose module list', () => {
         expect(system.modules).toEqual(modules);
     });
 
-    it('should expose zone list', () => {
+    test('should expose zone list', () => {
         expect(system.zones).toEqual(zones);
     });
 
-    it('should expose settings', () => {
+    test('should expose settings', () => {
         expect(system.settings).toBeInstanceOf(Object);
     });
 });

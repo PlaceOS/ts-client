@@ -1,21 +1,22 @@
+import { describe, beforeEach, afterEach, test, expect, vi } from 'vitest';
 import { Observable, of, throwError } from 'rxjs';
 import * as Http from '../../src/http/functions';
 import * as Resource from '../../src/resources/functions';
 
-jest.mock('../../src/http/functions');
+vi.mock('../../src/http/functions');
 
 describe('Resource API', () => {
-    let resp_header_spy: jest.SpyInstance;
+    let resp_header_spy: any;
 
     async function testRequest<T>(
         method: 'get' | 'post' | 'patch' | 'put' | 'del',
         func: (...args: any[]) => Observable<T>,
         result: any,
         test1: any[],
-        test2: any[]
+        test2: any[],
     ) {
         const item = result.hasOwnProperty('results') ? result.results : result;
-        (Http[method] as jest.Mock)
+        (Http[method] as any)
             .mockReturnValueOnce(of(result))
             .mockReturnValueOnce(of(result))
             .mockImplementationOnce(() => throwError('An Error Value'));
@@ -24,7 +25,7 @@ describe('Resource API', () => {
             path: 'resource',
             ...test1[0],
         }).toPromise();
-        jest.runOnlyPendingTimers();
+        vi.runOnlyPendingTimers();
         expect(value.data ? value.data : value).toEqual(item || []);
         // Test request with parameters
         await func({
@@ -32,7 +33,7 @@ describe('Resource API', () => {
             path: 'resource',
             ...test2[0],
         }).toPromise();
-        jest.runOnlyPendingTimers();
+        vi.runOnlyPendingTimers();
         // Test error handling
         try {
             await func({
@@ -44,13 +45,13 @@ describe('Resource API', () => {
         } catch (e) {
             expect(e).toBe('An Error Value');
         }
-        jest.runOnlyPendingTimers();
+        vi.runOnlyPendingTimers();
     }
 
     beforeEach(() => {
-        jest.useFakeTimers();
-        resp_header_spy = jest.spyOn(Http, 'responseHeaders');
-        window.fetch = jest.fn().mockImplementation(async () => ({
+        vi.useFakeTimers();
+        resp_header_spy = vi.spyOn(Http, 'responseHeaders');
+        window.fetch = vi.fn().mockImplementation(async () => ({
             json: async () => ({
                 version: '1.0.0',
                 login_url: '/login?continue={{url}}',
@@ -59,21 +60,21 @@ describe('Resource API', () => {
     });
 
     afterEach(() => {
-        jest.useRealTimers();
+        vi.useRealTimers();
         Resource.cleanupAPI();
         const methods: any[] = ['get', 'post', 'patch', 'put', 'del'];
         for (const method of methods) {
-            ((Http as any)[method] as jest.Mock).mockReset();
-            ((Http as any)[method] as jest.Mock).mockRestore();
+            (Http as any)[method].mockReset();
+            (Http as any)[method].mockRestore();
         }
     });
 
-    it('should return 0 from total requests by default', () => {
+    test('should return 0 from total requests by default', () => {
         expect(Resource.requestTotal('any')).toBe(0);
         expect(Resource.lastRequestTotal('any')).toBe(0);
     });
 
-    it('should allow querying the index endpoint', async () => {
+    test('should allow querying the index endpoint', async () => {
         expect.assertions(8);
         const item = { id: 'test', name: 'Test' };
         await testRequest(
@@ -81,31 +82,31 @@ describe('Resource API', () => {
             Resource.query,
             { results: [item] },
             [{}],
-            [{ query_params: { cache: 100, test: true } }]
+            [{ query_params: { cache: 100, test: true } }],
         );
         await testRequest(
             'get',
             Resource.query,
             { total: 10, results: [item] },
             [{}],
-            [{ query_params: { test: true } }]
+            [{ query_params: { test: true } }],
         );
         await testRequest(
             'get',
             Resource.query,
             { total: 10, results: [] },
             [{}],
-            [{ query_params: { test: true } }]
+            [{ query_params: { test: true } }],
         );
         expect(Http.get).toHaveBeenCalledWith(
-            'http://localhost/api/engine/v2/resource'
+            'http://localhost:3000/api/engine/v2/resource',
         );
         expect(Http.get).toHaveBeenCalledWith(
-            'http://localhost/api/engine/v2/resource?test=true'
+            'http://localhost:3000/api/engine/v2/resource?test=true',
         );
     });
 
-    it('should save index request totals', async () => {
+    test('should save index request totals', async () => {
         expect.assertions(6);
         const item = { id: 'test', name: 'Test' };
         const headers = { 'x-total-count': '10' };
@@ -115,7 +116,7 @@ describe('Resource API', () => {
             Resource.query,
             { total: 10, results: [item] },
             [{ query_params: { offset: 10 } }],
-            [{ query_params: { offset: 10 } }]
+            [{ query_params: { offset: 10 } }],
         );
         headers['x-total-count'] = '25';
         resp_header_spy.mockReturnValue(headers);
@@ -124,32 +125,32 @@ describe('Resource API', () => {
             Resource.query,
             { total: 25, results: [item] },
             [{ query_params: { test: true } }],
-            [{ query_params: { test: true } }]
+            [{ query_params: { test: true } }],
         );
         expect(Resource.requestTotal('resource')).toBe(10);
         expect(Resource.lastRequestTotal('resource')).toBe(25);
     });
 
-    it('should allow for grabbing the show endpoint for an item', async () => {
+    test('should allow for grabbing the show endpoint for an item', async () => {
         const item = { id: 'test', name: 'Test' };
         await testRequest(
             'get',
             Resource.show,
             item,
             [{ id: 'test' }],
-            [{ id: 'test', query_params: { test: true } }]
+            [{ id: 'test', query_params: { test: true } }],
         );
         expect(Http.get).toHaveBeenCalledWith(
-            'http://localhost/api/engine/v2/resource/test',
-            undefined
+            'http://localhost:3000/api/engine/v2/resource/test',
+            undefined,
         );
         expect(Http.get).toHaveBeenCalledWith(
-            'http://localhost/api/engine/v2/resource/test?test=true',
-            undefined
+            'http://localhost:3000/api/engine/v2/resource/test?test=true',
+            undefined,
         );
     });
 
-    it('should allow adding new items', async () => {
+    test('should allow adding new items', async () => {
         expect.assertions(3);
         const item = { id: 'test', name: 'Test' };
         await testRequest(
@@ -157,36 +158,36 @@ describe('Resource API', () => {
             Resource.create,
             item,
             [{ form_data: item }],
-            [{ form_data: item }]
+            [{ form_data: item }],
         );
         expect(Http.post).toHaveBeenCalledWith(
-            'http://localhost/api/engine/v2/resource',
-            item
+            'http://localhost:3000/api/engine/v2/resource',
+            item,
         );
     });
 
-    it('should allow running POST tasks on items', async () => {
+    test('should allow running POST tasks on items', async () => {
         expect.assertions(4);
         await testRequest(
             'post',
             Resource.task,
             'success',
             [{ id: 'test', task_name: 'a_task' }],
-            [{ id: 'test', task_name: 'a_task', form_data: { test: true } }]
+            [{ id: 'test', task_name: 'a_task', form_data: { test: true } }],
         );
         expect(Http.post).toHaveBeenCalledWith(
-            'http://localhost/api/engine/v2/resource/test/a_task',
-            undefined
+            'http://localhost:3000/api/engine/v2/resource/test/a_task',
+            undefined,
         );
         expect(Http.post).toHaveBeenCalledWith(
-            'http://localhost/api/engine/v2/resource/test/a_task',
+            'http://localhost:3000/api/engine/v2/resource/test/a_task',
             {
                 test: true,
-            }
+            },
         );
     });
 
-    it('should allow updating items', async () => {
+    test('should allow updating items', async () => {
         expect.assertions(3);
         const item = { id: 'test', name: 'Test' };
         await testRequest(
@@ -194,19 +195,19 @@ describe('Resource API', () => {
             Resource.update,
             item,
             [{ id: 'test', form_data: item }],
-            [{ id: 'test', form_data: item }]
+            [{ id: 'test', form_data: item }],
         );
         expect(Http.patch).toHaveBeenCalledWith(
-            'http://localhost/api/engine/v2/resource/test?version=0',
-            item
+            'http://localhost:3000/api/engine/v2/resource/test?version=0',
+            item,
         );
         // expect(Http.put).toHaveBeenCalledWith(
-        //     'http://localhost/api/engine/v2/resource/test?version=0',
+        //     'http://localhost:3000/api/engine/v2/resource/test?version=0',
         //     item
         // );
     });
 
-    it('should allow deleting items', async () => {
+    test('should allow deleting items', async () => {
         expect.assertions(4);
         const item = { id: 'test', name: 'Test' };
         await testRequest(
@@ -214,17 +215,17 @@ describe('Resource API', () => {
             Resource.remove,
             item,
             [{ id: 'test' }],
-            [{ id: 'test', query_params: { test: true } }]
+            [{ id: 'test', query_params: { test: true } }],
         );
         expect(Http.del).toHaveBeenCalledWith(
-            'http://localhost/api/engine/v2/resource/test'
+            'http://localhost:3000/api/engine/v2/resource/test',
         );
         expect(Http.del).toHaveBeenCalledWith(
-            'http://localhost/api/engine/v2/resource/test?test=true'
+            'http://localhost:3000/api/engine/v2/resource/test?test=true',
         );
     });
 
-    it('should allow running GET tasks on items', async () => {
+    test('should allow running GET tasks on items', async () => {
         expect.assertions(4);
         await testRequest(
             'get',
@@ -238,23 +239,23 @@ describe('Resource API', () => {
                     form_data: { test: true },
                     method: 'get',
                 },
-            ]
+            ],
         );
         expect(Http.get).toHaveBeenCalledWith(
-            'http://localhost/api/engine/v2/resource/test/a_task',
+            'http://localhost:3000/api/engine/v2/resource/test/a_task',
             {
                 response_type: 'json',
-            }
+            },
         );
         expect(Http.get).toHaveBeenCalledWith(
-            'http://localhost/api/engine/v2/resource/test/a_task?test=true',
+            'http://localhost:3000/api/engine/v2/resource/test/a_task?test=true',
             {
                 response_type: 'json',
-            }
+            },
         );
     });
 
-    it('should allow getting the next page', () => {
+    test('should allow getting the next page', () => {
         expect(Resource.next()).toBeFalsy();
     });
 });

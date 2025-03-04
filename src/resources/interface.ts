@@ -1,4 +1,4 @@
-import { HttpJsonOptions } from 'src/api';
+import { HttpJsonOptions } from '../api';
 import { HashMap } from '../utilities/types';
 
 /* tslint:disable */
@@ -30,7 +30,7 @@ export interface ResourceService<T = any> {
         id: string,
         data: HashMap,
         fields?: HashMap,
-        type?: 'put' | 'patch'
+        type?: 'put' | 'patch',
     ) => Promise<T>;
     delete: (id: string) => Promise<void>;
 }

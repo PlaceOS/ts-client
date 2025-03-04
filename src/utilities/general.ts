@@ -5,6 +5,7 @@ declare global {
         debug: boolean;
     }
 }
+
 /**
  * @hidden
  */
@@ -32,7 +33,7 @@ export function log(
     msg: string,
     args?: any,
     out: ConsoleIOStream = 'debug',
-    color?: string
+    color?: string,
 ) {
     if (window.debug) {
         const clr = color ? color : '#009688';
@@ -42,7 +43,7 @@ export function log(
                 console[out](
                     `%c[PlaceOS]%c[${type}] %c${msg}`,
                     ...COLOURS,
-                    args
+                    args,
                 );
             } else {
                 console[out](`[PlaceOS][${type}] ${msg}`, args);
@@ -110,7 +111,7 @@ export function convertPairStringToMap(str: string): HashMap<string> {
         const split_pair = str_pair.split('=');
         if (split_pair[1]) {
             map[decodeURIComponent(split_pair[0])] = decodeURIComponent(
-                split_pair[1]
+                split_pair[1],
             );
         }
     }
@@ -132,7 +133,7 @@ export function generateNonce(length: number = 40): string {
     let nonce = '';
     for (let i = 0; i < length; i++) {
         nonce += NONCE_CHARS.charAt(
-            Math.floor(Math.random() * NONCE_CHARS.length)
+            Math.floor(Math.random() * NONCE_CHARS.length),
         );
     }
     return nonce;
@@ -158,7 +159,7 @@ export function removeFragment(name: string) {
         window.history?.replaceState(
             null,
             '',
-            `${window.location?.pathname}${new_hash}${new_search}`
+            `${window.location?.pathname}${new_hash}${new_search}`,
         );
 }
 
@@ -244,7 +245,7 @@ export function isNestedFrame() {
 
 export function simplifiedTime(
     time: number = Date.now(),
-    interval: number = 60 * 1000
+    interval: number = 60 * 1000,
 ) {
     return Math.floor(time / interval);
 }

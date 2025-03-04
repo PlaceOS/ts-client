@@ -1,3 +1,4 @@
+import { describe, beforeEach, afterEach, test, expect, vi } from 'vitest';
 import { PlaceEdge } from '../../src/edge/edge';
 
 describe('PlaceEdge', () => {
@@ -12,12 +13,12 @@ describe('PlaceEdge', () => {
         });
     });
 
-    it('should create instance', () => {
+    test('should create instance', () => {
         expect(edge).toBeTruthy();
         expect(edge).toBeInstanceOf(PlaceEdge);
     });
 
-    it('should expose properties', () => {
+    test('should expose properties', () => {
         expect(edge.name).toBe('Test');
         expect(edge.description).toBe('A Description');
     });

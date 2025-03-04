@@ -14,7 +14,8 @@ export {
     debug_events,
     connectionState,
 } from './realtime/functions';
-export {
+export { PlaceErrorCodes, PlaceLogLevel } from './realtime/interfaces';
+export type {
     PlaceCommand,
     PlaceCommandRequest,
     PlaceCommandRequestMetadata,
@@ -22,9 +23,7 @@ export {
     PlaceExecRequestOptions,
     PlaceWebsocketOptions,
     PlaceResponse,
-    PlaceErrorCodes,
     SimpleNetworkError,
-    PlaceLogLevel,
     PlaceDebugEvent,
 } from './realtime/interfaces';
 export { getSystem, getModule } from './realtime/binding';
