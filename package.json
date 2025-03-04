@@ -33,7 +33,7 @@
         "test:cov": "vitest run --coverage",
         "format": "prettier --write .",
         "semantic-release": "semantic-release",
-        "prepare": "npm run build && node ./copy-file.js"
+        "prepare": "npm run build && node ./scripts/copy-file.js"
     },
     "peerDependencies": {
         "date-fns": "^4.1.0",
