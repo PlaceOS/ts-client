@@ -27,17 +27,17 @@ setup(config).then(() => doAfterAuthInitialised());
 The setup method returns a promise that resolves after the auth flow has completed.
 The setup method takes a `config` object with the following properties
 
-| Property       | Description                                             | Optional | Type      | Example                   |
+| Property       | Description                                             | Optional | Type      | Example                   |     |
 | -------------- | ------------------------------------------------------- | -------- | --------- | ------------------------- | --- |
-| `host`         | Host name and port of the PlaceOS server                | Yes      | `string`  | `"dev.placeos.com:8080"`  |
-| `mock`         | Whether to initialise PlaceOS with mock services        | Yes      | `boolean` | `true`                    |
-| `auth_uri`     | URI for authorising users session                       | No       | `string`  | `"/auth/oauth/authorize"` |
-| `token_uri`    | URI for generating new auth tokens                      | No       | `string`  | `"/auth/token"`           |
-| `redirect_uri` | URI to redirect user to after authorising session       | No       | `string`  | `"/oauth-resp.html"`      |
-| `scope`        | Scope of the user permissions needed by the application | No       | `string`  | `"admin"`                 |
+| `host`         | Host name and port of the PlaceOS server                | Yes      | `string`  | `"dev.placeos.com:8080"`  |     |
+| `mock`         | Whether to initialise PlaceOS with mock services        | Yes      | `boolean` | `true`                    |     |
+| `auth_uri`     | URI for authorising users session                       | No       | `string`  | `"/auth/oauth/authorize"` |     |
+| `token_uri`    | URI for generating new auth tokens                      | No       | `string`  | `"/auth/token"`           |     |
+| `redirect_uri` | URI to redirect user to after authorising session       | No       | `string`  | `"/oauth-resp.html"`      |     |
+| `scope`        | Scope of the user permissions needed by the application | No       | `string`  | `"admin"`                 |     |
 | `storage`      | Browser storage to use for storing user credentials     | Yes      | `"local"  | "session"`                |     |
-| `handle_login` | Whether PlaceOS should handle user login                | Yes      | `boolean` | `true`                    |
-| `use_iframe`   | Use iFrame for authorization of application             | Yes      | `boolean` | `false`                   |
+| `handle_login` | Whether PlaceOS should handle user login                | Yes      | `boolean` | `true`                    |     |
+| `use_iframe`   | Use iFrame for authorization of application             | Yes      | `boolean` | `false`                   |     |
 
 ### Websocket API
 
