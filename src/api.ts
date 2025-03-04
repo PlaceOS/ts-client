@@ -167,7 +167,9 @@ export {
     requestTotal,
     show,
     update,
+    type QueryResponse,
 } from './resources/functions';
+export { PlaceResource } from './resources/resource';
 
 export {
     addSAMLSource,
