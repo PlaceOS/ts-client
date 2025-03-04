@@ -10,17 +10,92 @@
 
 <p>The setup method returns a promise that resolves after the auth flow has completed.
 The setup method takes a <code>config</code> object with the following properties</p>
-<p>| Property       | Description                                             | Optional | Type      | Example                   |
-| -------------- | ------------------------------------------------------- | -------- | --------- | ------------------------- | --- |
-| <code>host</code>         | Host name and port of the PlaceOS server                | Yes      | <code>string</code>  | <code>&quot;dev.placeos.com:8080&quot;</code>  |
-| <code>mock</code>         | Whether to initialise PlaceOS with mock services        | Yes      | <code>boolean</code> | <code>true</code>                    |
-| <code>auth_uri</code>     | URI for authorising users session                       | No       | <code>string</code>  | <code>&quot;/auth/oauth/authorize&quot;</code> |
-| <code>token_uri</code>    | URI for generating new auth tokens                      | No       | <code>string</code>  | <code>&quot;/auth/token&quot;</code>           |
-| <code>redirect_uri</code> | URI to redirect user to after authorising session       | No       | <code>string</code>  | <code>&quot;/oauth-resp.html&quot;</code>      |
-| <code>scope</code>        | Scope of the user permissions needed by the application | No       | <code>string</code>  | <code>&quot;admin&quot;</code>                 |
-| <code>storage</code>      | Browser storage to use for storing user credentials     | Yes      | <code>&quot;local&quot;  | &quot;session&quot;</code>                |     |
-| <code>handle_login</code> | Whether PlaceOS should handle user login                | Yes      | <code>boolean</code> | <code>true</code>                    |
-| <code>use_iframe</code>   | Use iFrame for authorization of application             | Yes      | <code>boolean</code> | <code>false</code>                   |</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Description</th>
+<th>Optional</th>
+<th>Type</th>
+<th>Example</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>host</code></td>
+<td>Host name and port of the PlaceOS server</td>
+<td>Yes</td>
+<td><code>string</code></td>
+<td><code>&quot;dev.placeos.com:8080&quot;</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>mock</code></td>
+<td>Whether to initialise PlaceOS with mock services</td>
+<td>Yes</td>
+<td><code>boolean</code></td>
+<td><code>true</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>auth_uri</code></td>
+<td>URI for authorising users session</td>
+<td>No</td>
+<td><code>string</code></td>
+<td><code>&quot;/auth/oauth/authorize&quot;</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>token_uri</code></td>
+<td>URI for generating new auth tokens</td>
+<td>No</td>
+<td><code>string</code></td>
+<td><code>&quot;/auth/token&quot;</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>redirect_uri</code></td>
+<td>URI to redirect user to after authorising session</td>
+<td>No</td>
+<td><code>string</code></td>
+<td><code>&quot;/oauth-resp.html&quot;</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>scope</code></td>
+<td>Scope of the user permissions needed by the application</td>
+<td>No</td>
+<td><code>string</code></td>
+<td><code>&quot;admin&quot;</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>storage</code></td>
+<td>Browser storage to use for storing user credentials</td>
+<td>Yes</td>
+<td>`&quot;local&quot;</td>
+<td>&quot;session&quot;`</td>
+<td></td>
+</tr>
+<tr>
+<td><code>handle_login</code></td>
+<td>Whether PlaceOS should handle user login</td>
+<td>Yes</td>
+<td><code>boolean</code></td>
+<td><code>true</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>use_iframe</code></td>
+<td>Use iFrame for authorization of application</td>
+<td>Yes</td>
+<td><code>boolean</code></td>
+<td><code>false</code></td>
+<td></td>
+</tr>
+</tbody>
+</table>
 <a id="websocket-api" class="tsd-anchor"></a><h3 class="tsd-anchor-link">Websocket API<a href="#websocket-api" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><p><code>PlaceOS</code> exposes a websocket API through the <code>realtime</code> entrypoint.</p>
 <p>The <code>realtime</code> entrypoint to provides methods for real-time interaction with modules running on PlaceOS. It provides an interface to build efficient, responsive user interfaces, monitoring systems and other extensions which require live, two-way or asynchronous interaction.</p>
 <p>Once PlaceOS has initialised you can listen to values on modules</p>
