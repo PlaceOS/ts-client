@@ -135,8 +135,12 @@ export { PlaceOAuthSource } from './oauth-sources/oauth-source';
 export {
     addRepository,
     listInterfaceRepositories,
+    listRemoteRepositoryBranches,
+    listRemoteRepositoryCommits,
+    listRemoteRepositoryDefaultBranch,
     listRepositoryBranches,
     listRepositoryCommits,
+    listRepositoryDefaultBranch,
     listRepositoryDriverDetails,
     listRepositoryDrivers,
     pullRepositoryChanges,
