@@ -305,3 +305,46 @@ export {
     SignagePlaylist,
     SignagePlaylistMedia,
 } from './signage/playlist.class';
+
+export { addAnswer, queryAnswers } from './staff/answers/functions';
+export type { AnswerQueryOptions } from './staff/answers/interfaces';
+export { SurveyAnswer } from './staff/answers/model';
+
+export {
+    addInvitation,
+    queryInvitations,
+    removeInvitation,
+    showInvitation,
+    updateInvitation,
+} from './staff/invitations/functions';
+export type {
+    InvitationQueryOptions,
+    InvitationShowOptions,
+} from './staff/invitations/interfaces';
+export { SurveyInvitation } from './staff/invitations/model';
+
+export {
+    addQuestion,
+    queryQuestions,
+    removeQuestion,
+    showQuestion,
+    updateQuestion,
+} from './staff/questions/functions';
+export type {
+    QuestionQueryOptions,
+    QuestionShowOptions,
+} from './staff/questions/interfaces';
+export { SurveyQuestion } from './staff/questions/model';
+
+export {
+    addSurvey,
+    querySurveys,
+    removeSurvey,
+    showSurvey,
+    updateSurvey,
+} from './staff/surveys/functions';
+export type {
+    SurveyQueryOptions,
+    SurveyShowOptions,
+} from './staff/surveys/interfaces';
+export { Survey, type SurveyPage } from './staff/surveys/model';
