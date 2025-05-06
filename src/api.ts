@@ -267,6 +267,7 @@ export type { WorktimePreference } from './users/user';
 export {
     addZone,
     executeOnZone,
+    listZoneTags,
     listZoneTriggers,
     queryZones,
     removeZone,

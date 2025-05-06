@@ -31,6 +31,19 @@ export function queryZones(query_params: PlaceZoneQueryOptions = {}) {
 }
 
 /**
+ * List the set of tags on the existing zones
+ * @param query_params
+ */
+export function listZoneTags(query_params: PlaceZoneQueryOptions = {}) {
+    return show<string[]>({
+        id: 'tags',
+        query_params,
+        fn: (i) => i as string[],
+        path: PATH,
+    });
+}
+
+/**
  * Get the data for an application
  * @param id ID of the application to retrieve
  * @param query_params Query parameters to add the to request URL
