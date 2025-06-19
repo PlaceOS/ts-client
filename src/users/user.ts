@@ -59,6 +59,8 @@ export class PlaceUser extends PlaceResource {
     public readonly work_preferences: WorktimePreference[];
     /** Overrides of the worktime preferences for the user */
     public readonly work_overrides: Record<string, WorktimePreference>;
+    /** ID of the user's photo in the PlaceOS uploads service */
+    public readonly photo_upload_id: string;
     /** Password */
     protected password = '';
     /** Password */
@@ -84,6 +86,7 @@ export class PlaceUser extends PlaceResource {
         this.card_number = raw_data.card_number || '';
         this.groups = raw_data.groups || [];
         this.department = raw_data.department || '';
+        this.photo_upload_id = raw_data.photo_upload_id || '';
         this.work_preferences = raw_data.work_preferences || [];
         this.work_overrides = raw_data.work_overrides || ({} as any);
     }
