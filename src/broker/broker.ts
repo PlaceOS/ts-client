@@ -7,6 +7,7 @@ export enum AuthType {
 }
 
 export class PlaceMQTTBroker extends PlaceResource {
+    public readonly id: string;
     public readonly auth_type: AuthType;
     /** Details of the Broker */
     public readonly description: string;
@@ -29,6 +30,7 @@ export class PlaceMQTTBroker extends PlaceResource {
 
     constructor(data: Partial<PlaceMQTTBroker> = {}) {
         super();
+        this.id = data.id || '';
         this.auth_type = data.auth_type || AuthType.UserPassword;
         this.description = data.description || '';
         this.host = data.host || '';
