@@ -389,7 +389,15 @@ export function authorise(
  * Logout and clear user credentials for the application
  */
 export function logout(): void {
-    const done = () => {
+    const url = _authority ? _authority.logout_url : '/logout';
+    fetch(url, {
+        method: 'GET',
+        redirect: 'manual',
+        headers: {
+            Authorization: 'Bearer ' + token(),
+        },
+    }).then((response) => {
+        const location = response.headers.get('Location') || url;
         // Remove user credentials
         for (let i = 0; i < _storage.length; i++) {
             const key = _storage.key(i);
@@ -397,12 +405,8 @@ export function logout(): void {
                 _storage.removeItem(key);
             }
         }
-        // Redirect user to logout URL
-        const url = _authority ? _authority.logout_url : '/logout';
-        setTimeout(() => window.location?.assign(url), 300);
-        _online.next(false);
-    };
-    revokeToken().then(done, done);
+        window.location?.assign(location);
+    });
 }
 
 /**
