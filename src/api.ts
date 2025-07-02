@@ -22,6 +22,7 @@ export {
     updateApplication,
 } from './applications/functions';
 export type { PlaceApplicationQueryOptions } from './applications/interfaces';
+
 export type { PlaceAuthSourceQueryOptions } from './auth-sources/interfaces';
 
 export { AuthType, PlaceMQTTBroker } from './broker/broker';
