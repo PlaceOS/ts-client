@@ -61,6 +61,8 @@ export class PlaceUser extends PlaceResource {
     public readonly work_overrides: Record<string, WorktimePreference>;
     /** ID of the user's photo in the PlaceOS uploads service */
     public readonly photo_upload_id: string;
+    /** Whether the user has opted in to location tracking */
+    public readonly locatable: boolean;
     /** Password */
     protected password = '';
     /** Password */
@@ -89,5 +91,6 @@ export class PlaceUser extends PlaceResource {
         this.photo_upload_id = raw_data.photo_upload_id || '';
         this.work_preferences = raw_data.work_preferences || [];
         this.work_overrides = raw_data.work_overrides || ({} as any);
+        this.locatable = raw_data.locatable ?? true;
     }
 }
