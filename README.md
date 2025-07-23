@@ -38,6 +38,15 @@ The setup method takes a `config` object with the following properties
 | `storage`      | Browser storage to use for storing user credentials     | Yes      | `"local"  | "session"`                |     |
 | `handle_login` | Whether PlaceOS should handle user login                | Yes      | `boolean` | `true`                    |     |
 | `use_iframe`   | Use iFrame for authorization of application             | Yes      | `boolean` | `false`                   |     |
+| `secure`       | Force requests to backend to be secure i.e. HTTPS/WSS   | Yes      | `boolean` | `false`                   |     |
+
+#### Local Development with live environments
+
+You will not be able to use SSO for local development by default.
+To solve this you will either need to:
+- Reverse proxy the development UI through the live environment
+- Reverse proxy the `/login` endpoint from the live environment to the local development environment
+- Use an API key to authenticate with the backend
 
 ### Websocket API
 
