@@ -35,7 +35,7 @@ The setup method takes a `config` object with the following properties
 | `token_uri`      | URI for generating new auth tokens                      | No       | `string`                  | `"/auth/token"`            |
 | `redirect_uri`   | URI to redirect user to after authorising session       | No       | `string`                  | `"/oauth-resp.html"`       |
 | `scope`          | Scope of the user permissions needed by the application | No       | `string`                  | `"admin"`                  |
-| `storage`        | Browser storage to use for storing user credentials     | Yes      | `"local" | "session"`     | "session"`                 |
+| `storage`        | Browser storage to use for storing user credentials     | Yes      | `"local" \| "session"`     | "session"`                 |
 | `handle_login`   | Whether PlaceOS should handle user login                | Yes      | `boolean`                 | `true`                     |
 | `use_iframe`     | Use iFrame for authorization of application             | Yes      | `boolean`                 | `false`                    |
 | `secure`         | Force requests to backend to be secure i.e. HTTPS/WSS   | Yes      | `boolean`                 | `false`                    |
@@ -43,7 +43,7 @@ The setup method takes a `config` object with the following properties
 | `token_header`   | Force all requests to use headers for auth over cookies | Yes      | `boolean`                 | `false`                    |
 | `username`       | Username to use for basic authentication                | Yes      | `string`                  | `"user@place.os"`          |
 | `password`       | Password to use for basic authentication                | Yes      | `string`                  | `"hard-to-guest-password"` |
-| `auth_type`      | Type of authenication to perform                        | Yes      | `"implicit" | "password"` | `"auth_code"`              |
+| `auth_type`      | Type of authenication to perform                        | Yes      | `"implicit" \| "password"` | `"auth_code"`              |
 
 #### Local Development with live environments
 
