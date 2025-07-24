@@ -18,7 +18,6 @@ The setup method takes a <code>config</code> object with the following propertie
 <th>Optional</th>
 <th>Type</th>
 <th>Example</th>
-<th></th>
 </tr>
 </thead>
 <tbody>
@@ -28,7 +27,6 @@ The setup method takes a <code>config</code> object with the following propertie
 <td>Yes</td>
 <td><code>string</code></td>
 <td><code>&quot;dev.placeos.com:8080&quot;</code></td>
-<td></td>
 </tr>
 <tr>
 <td><code>mock</code></td>
@@ -36,7 +34,6 @@ The setup method takes a <code>config</code> object with the following propertie
 <td>Yes</td>
 <td><code>boolean</code></td>
 <td><code>true</code></td>
-<td></td>
 </tr>
 <tr>
 <td><code>auth_uri</code></td>
@@ -44,7 +41,6 @@ The setup method takes a <code>config</code> object with the following propertie
 <td>No</td>
 <td><code>string</code></td>
 <td><code>&quot;/auth/oauth/authorize&quot;</code></td>
-<td></td>
 </tr>
 <tr>
 <td><code>token_uri</code></td>
@@ -52,7 +48,6 @@ The setup method takes a <code>config</code> object with the following propertie
 <td>No</td>
 <td><code>string</code></td>
 <td><code>&quot;/auth/token&quot;</code></td>
-<td></td>
 </tr>
 <tr>
 <td><code>redirect_uri</code></td>
@@ -60,7 +55,6 @@ The setup method takes a <code>config</code> object with the following propertie
 <td>No</td>
 <td><code>string</code></td>
 <td><code>&quot;/oauth-resp.html&quot;</code></td>
-<td></td>
 </tr>
 <tr>
 <td><code>scope</code></td>
@@ -68,7 +62,6 @@ The setup method takes a <code>config</code> object with the following propertie
 <td>No</td>
 <td><code>string</code></td>
 <td><code>&quot;admin&quot;</code></td>
-<td></td>
 </tr>
 <tr>
 <td><code>storage</code></td>
@@ -76,7 +69,6 @@ The setup method takes a <code>config</code> object with the following propertie
 <td>Yes</td>
 <td>`&quot;local&quot;</td>
 <td>&quot;session&quot;`</td>
-<td></td>
 </tr>
 <tr>
 <td><code>handle_login</code></td>
@@ -84,7 +76,6 @@ The setup method takes a <code>config</code> object with the following propertie
 <td>Yes</td>
 <td><code>boolean</code></td>
 <td><code>true</code></td>
-<td></td>
 </tr>
 <tr>
 <td><code>use_iframe</code></td>
@@ -92,7 +83,6 @@ The setup method takes a <code>config</code> object with the following propertie
 <td>Yes</td>
 <td><code>boolean</code></td>
 <td><code>false</code></td>
-<td></td>
 </tr>
 <tr>
 <td><code>secure</code></td>
@@ -100,7 +90,41 @@ The setup method takes a <code>config</code> object with the following propertie
 <td>Yes</td>
 <td><code>boolean</code></td>
 <td><code>false</code></td>
-<td></td>
+</tr>
+<tr>
+<td><code>ignore_api_key</code></td>
+<td>Ignore set API keys when authenticating requests</td>
+<td>Yes</td>
+<td><code>boolean</code></td>
+<td><code>false</code></td>
+</tr>
+<tr>
+<td><code>token_header</code></td>
+<td>Force all requests to use headers for auth over cookies</td>
+<td>Yes</td>
+<td><code>boolean</code></td>
+<td><code>false</code></td>
+</tr>
+<tr>
+<td><code>username</code></td>
+<td>Username to use for basic authentication</td>
+<td>Yes</td>
+<td><code>string</code></td>
+<td><code>&quot;user@place.os&quot;</code></td>
+</tr>
+<tr>
+<td><code>password</code></td>
+<td>Password to use for basic authentication</td>
+<td>Yes</td>
+<td><code>string</code></td>
+<td><code>&quot;hard-to-guest-password&quot;</code></td>
+</tr>
+<tr>
+<td><code>auth_type</code></td>
+<td>Type of authenication to perform</td>
+<td>Yes</td>
+<td>`&quot;implicit&quot;</td>
+<td>&quot;password&quot;`</td>
 </tr>
 </tbody>
 </table>
@@ -108,9 +132,10 @@ The setup method takes a <code>config</code> object with the following propertie
 To solve this you will either need to:</p>
 <ul>
 <li>Reverse proxy the development UI through the live environment</li>
-<li>Reverse proxy the <code>/login</code> endpoint from the live environment to the local development environment</li>
+<li>Reverse proxy the <code>/login</code> endpoint from the live environment to the local development environment then perform basic login instead</li>
 <li>Use an API key to authenticate with the backend</li>
 </ul>
+<p>If you're not proxying the local development UI through the live server it is recommended to reverse proxy all the API endpoints to prevent any possible CORS issues.</p>
 <a id="websocket-api" class="tsd-anchor"></a><h3 class="tsd-anchor-link">Websocket API<a href="#websocket-api" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/icons.svg#icon-anchor"></use></svg></a></h3><p><code>PlaceOS</code> exposes a websocket API through the <code>realtime</code> entrypoint.</p>
 <p>The <code>realtime</code> entrypoint to provides methods for real-time interaction with modules running on PlaceOS. It provides an interface to build efficient, responsive user interfaces, monitoring systems and other extensions which require live, two-way or asynchronous interaction.</p>
 <p>Once PlaceOS has initialised you can listen to values on modules</p>
