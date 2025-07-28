@@ -5,6 +5,7 @@
 /tmp
 /out-tsc
 /docs
+placeos-ts-client-*.tgz
 
 # dependencies
 /node_modules

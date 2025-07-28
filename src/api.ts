@@ -284,6 +284,7 @@ export { PlaceZone } from './zones/zone';
 export {
     addSignageMedia,
     addSignagePlaylist,
+    approveSignagePlaylist,
     listSignagePlaylistMedia,
     listSignagePlaylistMediaRevisions,
     querySignageMedia,

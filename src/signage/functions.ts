@@ -245,6 +245,19 @@ export function listSignagePlaylistMediaRevisions(
 }
 
 /**
+ * Approve the latest revision of the media list for a playlist
+ * @param id ID of the playlist to approve
+ */
+export function approveSignagePlaylist(id: string) {
+    return task({
+        id,
+        task_name: 'media/approve',
+        method: 'post',
+        path: PLAYLISTS_PATH,
+    });
+}
+
+/**
  * Update the media for a playlist
  * @param id ID of the playlist
  * @param form_data New list of media IDs for the playlist
