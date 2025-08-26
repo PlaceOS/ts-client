@@ -1,4 +1,4 @@
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { distinctUntilChanged } from 'rxjs/operators';
 import { clearAsyncTimeout, timeout } from '../utilities/async';
 import { log } from '../utilities/general';
@@ -65,11 +65,18 @@ export class PlaceVariableBinding<T = any> {
     }
 
     /**
-     * Subscribe to changes of the variable's binding value
-     * @param next Callback for changes to the bindings value
+     * Get an observable that emits the current value of the binding
      */
     public listen(): Observable<T> {
         return listen(this.binding());
+    }
+
+    /**
+     * Subscribe to changes of the variable's binding value
+     * @param next Callback for changes to the bindings value
+     */
+    public subscribe(next: (value: T) => void): Subscription {
+        return this.listen().subscribe(next);
     }
 
     /**
