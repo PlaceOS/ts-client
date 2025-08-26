@@ -69,7 +69,7 @@ import { getModule } from '@placeos/ts-client';
 const my_mod = getModule('sys-death-star', 'TestModule', 3);
 const my_variable = my_mod.binding('power');
 const unbind = my_variable.bind();
-const sub = my_variable.listen((value) => doSomething(value));
+const sub = my_variable.subscribe((value) => doSomething(value));
 ```
 
 This binds to the `power` status variable on the 3rd `TestModule` in the system `sys-death-star`.
@@ -224,7 +224,7 @@ Once initialised interactions with a system are performed in the same manner as 
 const my_mod = getModule('my-system', 'MyModule', 1);
 const my_variable = my_mod.binding('power');
 const unbind = my_variable.bind();
-const sub = my_variable.listen((value) => doSomething(value)); // Emits true
+const sub = my_variable.subscribe((value) => doSomething(value)); // Emits true
 my_mod.execute('power_off'); // The listen callback will now emit false
 ```
 
