@@ -80,6 +80,15 @@ export class PlaceVariableBinding<T = any> {
         return this.listen().subscribe(next);
     }
 
+    public bindThenSubscribe(next: (value: T) => void): Subscription {
+        const unbind = this.bind();
+        return this.listen().subscribe({
+            next,
+            complete: () => unbind(),
+            error: () => unbind(),
+        });
+    }
+
     /**
      * Bind to the status variable's value
      */
