@@ -38,8 +38,20 @@ export class PlaceModuleBinding {
     /**
      * Get binding with the given name
      * @param name Name of the binding
+     * @deprecated Use `variable` instead
      */
     public binding<T = any>(name: string) {
+        if (!this._bindings[name]) {
+            this._bindings[name] = new PlaceVariableBinding<T>(this, name);
+        }
+        return this._bindings[name] as PlaceVariableBinding<T>;
+    }
+
+    /**
+     * Get binding with the given name
+     * @param name Name of the binding
+     */
+    public variable<T = any>(name: string) {
         if (!this._bindings[name]) {
             this._bindings[name] = new PlaceVariableBinding<T>(this, name);
         }

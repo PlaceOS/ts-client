@@ -72,7 +72,8 @@ export class PlaceVariableBinding<T = any> {
     }
 
     /**
-     * Subscribe to changes of the variable's binding value
+     * Subscribe to changes of the variable's binding value.
+     * Note: Initial value emitted may be `undefined`
      * @param next Callback for changes to the bindings value
      */
     public subscribe(next: (value: T) => void): Subscription {
