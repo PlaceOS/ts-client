@@ -18,6 +18,8 @@ export class PlaceRepository extends PlaceResource {
     public readonly username: string;
     /** Password to connect to repository with */
     public readonly password: string;
+    /** Root path of the repository to serve at the `folder_name` path */
+    public readonly root_path: string;
     /** Repository type */
     public get type() {
         return this.repo_type;
@@ -33,5 +35,6 @@ export class PlaceRepository extends PlaceResource {
         this.repo_type = raw_data.repo_type || PlaceRepositoryType.Driver;
         this.username = raw_data.username || '';
         this.password = raw_data.password || '';
+        this.root_path = raw_data.root_path || '';
     }
 }
