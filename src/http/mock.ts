@@ -86,12 +86,12 @@ export function clearMockEndpoints(
  * @param handler_map Handler map to query for the request handler.
  *  Defaults to the global handler map
  */
-export function mockRequest<T>(
+export function mockRequest(
     method: HttpVerb,
     url: string,
     body?: any,
     handler_map: HashMap<MockHttpRequestHandler> = _handlers,
-): Observable<T> | null {
+): Observable<HashMap | string | void> | null {
     const handler = findRequestHandler(method, url, handler_map);
     if (handler) {
         const request = processRequest(url, handler, body);
@@ -113,7 +113,7 @@ export function findRequestHandler(
     handler_map: HashMap<MockHttpRequestHandler> = _handlers,
 ): MockHttpRequestHandler | null {
     const path = url
-        .replace(/(http|https)?:\/\/[a-zA-Z0-9.]*:?([0-9]*)?/g, '')
+        .replace(/(http|https):\/\/[a-zA-Z0-9.]*:?([0-9]*)?/g, '')
         .replace(/^\//, '')
         .split('?')[0];
     const route_parts = path.split('/');
@@ -161,16 +161,16 @@ export function processRequest<T = any>(
     const parts = url
         .replace(/(http|https):\/\/[a-zA-Z0-9.]*:?([0-9]*)?/g, '')
         .split('?');
-    const path = parts[0].replace(/^\//g, '');
+    const path = parts[0].replace(/^\//, '');
     const query = parts[1] || '';
     const query_params = convertPairStringToMap(query);
     // Grab route parameters from URL
     const route_parts = path.split('/');
     const route_params: HashMap = {};
-    for (const part of handler.path_structure) {
-        if (part) {
-            route_params[part] =
-                route_parts[handler.path_structure.indexOf(part)];
+    for (let i = 0; i < handler.path_structure.length; i++) {
+        const paramName = handler.path_structure[i];
+        if (paramName) {
+            route_params[paramName] = route_parts[i];
         }
     }
     const request = {
@@ -196,13 +196,27 @@ export function onMockRequest(
     handler: MockHttpRequestHandler,
     request: MockHttpRequest,
 ) {
-    const result = handler.callback
-        ? handler.callback(request)
-        : handler.metadata;
+    let result;
+    try {
+        result = handler.callback
+            ? handler.callback(request)
+            : handler.metadata;
+    } catch (error) {
+        log('HTTP(M)', `ERROR ${request.method}:`, [request.url, error]);
+        throw error;
+    }
     const variance = handler.delay_variance || 100;
     const delay_value = handler.delay || 300;
     const delay_time =
         Math.floor(Math.random() * variance - variance / 2) + delay_value;
     log('HTTP(M)', `RESP ${request.method}:`, [request.url, result]);
     return from([result]).pipe(delay(Math.max(200, delay_time)));
+}
+
+/**
+ * Get a list of the method + endpoints that have been mocked
+ * @returns List of the method + endpoint that have been mocked
+ */
+export function listMockedEndpoints(): string[] {
+    return Object.keys(_handlers);
 }

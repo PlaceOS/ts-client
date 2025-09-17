@@ -1,6 +1,6 @@
-import { Observable, of, throwError } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { fromFetch } from 'rxjs/fetch';
-import { filter, mergeMap, retryWhen, switchMap, take } from 'rxjs/operators';
+import { filter, retry, switchMap, take } from 'rxjs/operators';
 
 import {
     apiKey,
@@ -225,17 +225,26 @@ export async function transform(
             return await resp.json().catch(() => ({}));
         case 'text':
             return await resp.text();
+        case 'void':
+            return;
+        default:
+            return await resp.json().catch(() => ({}));
     }
 }
 
 /**
  * @private
  */
-const reloadAuth = () => {
+const reloadAuth = (): Promise<void> => {
     invalidateToken();
-    refreshAuthority().then(
-        () => null,
-        () => setTimeout(() => reloadAuth(), 1000),
+    return refreshAuthority().then(
+        () => Promise.resolve(),
+        () =>
+            new Promise<void>((resolve) => {
+                setTimeout(() => {
+                    reloadAuth().then(() => resolve());
+                }, 1000);
+            }),
     );
 };
 
@@ -255,7 +264,7 @@ export function request(
         m: HttpVerb,
         url: string,
         body?: any,
-    ) => Observable<HttpResponse> | null = mockRequest,
+    ) => Observable<HashMap | string | void> | null = mockRequest,
     success: (
         e: Response,
         t: HttpResponseType,
@@ -268,7 +277,9 @@ export function request(
         }
     }
     options.headers = options.headers || {};
-    options.headers['Content-Type'] = `application/json`;
+    if (!options.headers['Content-Type'] && !options.headers['content-type']) {
+        options.headers['Content-Type'] = `application/json`;
+    }
     return listenForToken().pipe(
         filter((_) => _),
         take(1),
@@ -278,34 +289,57 @@ export function request(
             } else {
                 options.headers!.Authorization = `Bearer ${token()}`;
             }
-            return fromFetch(url, {
+            const fetchOptions: any = {
                 ...options,
-                body: JSON.stringify(options.body),
                 method,
                 credentials: 'same-origin',
-            });
+            };
+
+            // Only add body for methods that support it and when body exists
+            if (
+                ['POST', 'PUT', 'PATCH'].includes(method) &&
+                options.body !== undefined
+            ) {
+                fetchOptions.body =
+                    typeof options.body === 'string'
+                        ? options.body
+                        : JSON.stringify(options.body);
+            }
+
+            return fromFetch(url, fetchOptions) as Observable<Response>;
         }),
-        switchMap((resp) => {
+        switchMap((resp: Response) => {
             if (resp.ok) {
                 return success(resp, options.response_type as any);
             }
             return throwError(resp);
         }),
-        retryWhen((attempts: Observable<any>) =>
-            attempts.pipe(
-                mergeMap((error, i) => {
+        retry({
+            count: 4,
+            delay: (error, retry_count) => {
+                return new Observable<number>((subscriber) => {
                     if (error.status === 511) {
                         sendToLogin(authority()!);
-                        return of(error);
+                        subscriber.error(error);
+                        return;
                     }
-                    if (i + 1 > 4 || error.status !== 401) {
-                        return throwError(error || {});
+                    if (error.status !== 401) {
+                        subscriber.error(error || {});
+                        return;
                     }
                     log('HTTP', 'Auth error', error);
-                    reloadAuth();
-                    return of(error);
-                }),
-            ),
-        ),
+                    // Wait for auth refresh before retrying with exponential backoff
+                    const delay_ms = Math.pow(2, retry_count - 1) * 1000; // Exponential backoff: 1s, 2s, 4s, 8s
+                    reloadAuth()
+                        .then(() => {
+                            subscriber.next(delay_ms);
+                            subscriber.complete();
+                        })
+                        .catch(() => {
+                            subscriber.error(error);
+                        });
+                });
+            },
+        }),
     );
 }
