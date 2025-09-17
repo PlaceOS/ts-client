@@ -11,7 +11,11 @@ export type {
     MockHttpRequestHandler,
     MockHttpRequestHandlerOptions,
 } from './http/interfaces';
-export { deregisterMockEndpoint, registerMockEndpoint } from './http/mock';
+export {
+    deregisterMockEndpoint,
+    registerMockEndpoint,
+    setMockNotFoundHandler,
+} from './http/mock';
 
 export { PlaceApplication } from './applications/application';
 export {

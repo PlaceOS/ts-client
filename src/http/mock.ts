@@ -1,4 +1,4 @@
-import { from, Observable } from 'rxjs';
+import { from, Observable, throwError } from 'rxjs';
 import { delay } from 'rxjs/operators';
 
 import { convertPairStringToMap, log } from '../utilities/general';
@@ -14,6 +14,27 @@ import {
  * @private
  */
 const _handlers: HashMap<MockHttpRequestHandler> = {};
+
+let _error_handler: (
+    method: HttpVerb,
+    url: string,
+) => Observable<never> | null = (method: HttpVerb, url: string) => {
+    const error = new Error(`Mock endpoint not found: ${method} ${url}`);
+    (error as any).status = 404;
+    log('HTTP(M)', `404 ${method}:`, url);
+    return throwError(error);
+};
+
+/**
+ * Change the handler for not found endpoints
+ * Return `null` if you want to make the real request
+ * @param handler_fn Function to handle not found mocked endpoints
+ */
+export function setMockNotFoundHandler(
+    handler_fn: (method: HttpVerb, url: string) => Observable<never> | null,
+) {
+    _error_handler = handler_fn;
+}
 
 /**
  * Register handler for http endpoint
@@ -80,7 +101,7 @@ export function clearMockEndpoints(
 /**
  * @private
  * Perform mock request for the given method and URL.
- * Returns `null` if no handler for URL and method
+ * Returns a 404 error if no handler for URL and method
  * @param method Http Verb for request
  * @param url URL to perform request on
  * @param handler_map Handler map to query for the request handler.
@@ -92,15 +113,13 @@ export function mockRequest(
     body?: any,
     handler_map: HashMap<MockHttpRequestHandler> = _handlers,
 ): Observable<HashMap | string | void> | null {
-    if (window.debug) {
-        console.log('Resolving request:', method, url, body);
-    }
     const handler = findRequestHandler(method, url, handler_map);
     if (handler) {
         const request = processRequest(url, handler, body);
         return onMockRequest(handler, request);
     }
-    return null;
+    // Return 404 error when no handler is found
+    return _error_handler(method, url);
 }
 
 /**
