@@ -51,7 +51,7 @@ export function registerMockEndpoint<T>(
     deregisterMockEndpoint(handler_ops.method, handler_ops.path, handler_map);
     const key = `${handler_ops.method}|${handler_ops.path}`;
     const path_parts = handler_ops.path
-        .replace(/(http|https):\/\/[a-zA-Z0-9.]*:?([0-9]*)?/g, '') // Remove URL origin
+        .replace(/(http|https):\/\/[a-zA-Z0-9.-]*:?([0-9]*)?/g, '') // Remove URL origin
         .replace(/^\//, '')
         .split('/');
     const handler: MockHttpRequestHandler<T> = {
@@ -135,7 +135,7 @@ export function findRequestHandler(
     handler_map: HashMap<MockHttpRequestHandler> = _handlers,
 ): MockHttpRequestHandler | null {
     const path = url
-        .replace(/(http|https):\/\/[a-zA-Z0-9.]*:?([0-9]*)?/g, '')
+        .replace(/(http|https):\/\/[a-zA-Z0-9.-]*:?([0-9]*)?/g, '')
         .replace(/^\//, '')
         .split('?')[0];
     const route_parts = path.split('/');
@@ -181,7 +181,7 @@ export function processRequest<T = any>(
     body?: any,
 ): MockHttpRequest {
     const parts = url
-        .replace(/(http|https):\/\/[a-zA-Z0-9.]*:?([0-9]*)?/g, '')
+        .replace(/(http|https):\/\/[a-zA-Z0-9.-]*:?([0-9]*)?/g, '')
         .split('?');
     const path = parts[0].replace(/^\//, '');
     const query = parts[1] || '';
