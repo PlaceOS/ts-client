@@ -272,9 +272,7 @@ export function request(
 ): Observable<HttpResponse> {
     if (is_mock()) {
         const request_obs = mock_handler(method, url, options?.body);
-        if (request_obs) {
-            return request_obs;
-        }
+        if (request_obs) return request_obs;
     }
     options.headers = options.headers || {};
     if (!options.headers['Content-Type'] && !options.headers['content-type']) {

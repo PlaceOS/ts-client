@@ -92,6 +92,9 @@ export function mockRequest(
     body?: any,
     handler_map: HashMap<MockHttpRequestHandler> = _handlers,
 ): Observable<HashMap | string | void> | null {
+    if (window.debug) {
+        console.log('Resolving request:', method, url, body);
+    }
     const handler = findRequestHandler(method, url, handler_map);
     if (handler) {
         const request = processRequest(url, handler, body);
