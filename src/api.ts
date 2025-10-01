@@ -60,6 +60,7 @@ export { PlaceDriver } from './drivers/driver';
 export { PlaceDriverRole } from './drivers/enums';
 export {
     addDriver,
+    driverReadme,
     isDriverCompiled,
     queryDrivers,
     recompileDriver,
