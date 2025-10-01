@@ -100,3 +100,11 @@ export function reloadDriver(id: string) {
 export function isDriverCompiled(id: string) {
     return task({ id, task_name: 'compiled', method: 'get', path: PATH });
 }
+
+/**
+ * Get the drivers readme file if available
+ * @param id ID of the driver
+ */
+export function driverReadme(id: string) {
+    return task<string>({ id, task_name: 'readme', method: 'get', path: PATH });
+}
