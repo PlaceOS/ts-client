@@ -17,6 +17,22 @@ export {
     setMockNotFoundHandler,
 } from './http/mock';
 
+export { PlaceAlert } from './alerts/alert';
+export { PlaceAlertDashboard } from './alerts/dashboard';
+export {
+    addAlert,
+    addAlertDashboard,
+    listDashboardAlerts,
+    queryAlertDashboards,
+    queryAlerts,
+    removeAlert,
+    removeAlertDashboard,
+    showAlert,
+    showAlertDashboard,
+    updateAlert,
+    updateAlertDashboard,
+} from './alerts/functions';
+
 export { PlaceApplication } from './applications/application';
 export {
     addApplication,
@@ -248,7 +264,6 @@ export type {
     TriggerComparison,
     TriggerConditionConstant,
     TriggerConditionValue,
-    TriggerConditions,
     TriggerCronTimeCondition,
     TriggerFunction,
     TriggerMailer,
@@ -256,6 +271,7 @@ export type {
     TriggerTimeCondition,
     TriggerWebhook,
 } from './triggers/interfaces';
+export type { TriggerConditions } from './triggers/interfaces';
 export { PlaceTrigger } from './triggers/trigger';
 
 export {
