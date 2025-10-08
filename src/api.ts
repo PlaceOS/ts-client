@@ -264,6 +264,7 @@ export type {
     TriggerComparison,
     TriggerConditionConstant,
     TriggerConditionValue,
+    TriggerConditions,
     TriggerCronTimeCondition,
     TriggerFunction,
     TriggerMailer,
@@ -271,7 +272,6 @@ export type {
     TriggerTimeCondition,
     TriggerWebhook,
 } from './triggers/interfaces';
-export type { TriggerConditions } from './triggers/interfaces';
 export { PlaceTrigger } from './triggers/trigger';
 
 export {
@@ -324,7 +324,11 @@ export type {
     SignageMediaQueryOptions,
     SignageMetrics,
 } from './signage/interfaces';
-export { MediaAnimation, SignageMedia } from './signage/media.class';
+export {
+    MediaAnimation,
+    SignageMedia,
+    type MediaOrientation,
+} from './signage/media.class';
 export {
     SignagePlaylist,
     SignagePlaylistMedia,
