@@ -23,6 +23,17 @@ export function queryClusters(query_params: PlaceClusterQueryOptions = {}) {
 }
 
 /**
+ * Get the details for a specified cluster
+ * @param id ID of the cluster to query
+ * @param query_params Query parameters to add the to request URL
+ */
+export function showCluster(
+    id: string,
+    query_params: PlaceClusterQueryOptions = {},
+) {
+    return show({ id, query_params, fn: process, path: PATH });
+}
+/**
  * Query the available process for a cluster
  * @param id ID of the cluster to query
  * @param query_params Query parameters to add the to request URL
