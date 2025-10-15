@@ -58,6 +58,7 @@ export { PlaceCluster } from './clusters/cluster';
 export {
     queryClusters,
     queryProcesses,
+    showCluster,
     terminateProcess,
 } from './clusters/functions';
 export type { PlaceClusterQueryOptions } from './clusters/interfaces';

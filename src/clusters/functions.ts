@@ -33,6 +33,7 @@ export function showCluster(
 ) {
     return show({ id, query_params, fn: process, path: PATH });
 }
+
 /**
  * Query the available process for a cluster
  * @param id ID of the cluster to query
