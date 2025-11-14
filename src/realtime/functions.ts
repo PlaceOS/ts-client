@@ -178,7 +178,7 @@ export function status(): Observable<boolean> {
  * @returns
  */
 export function connectionState(): Observable<[number, number]> {
-    return _observers._place_os_status;
+    return _observers._place_os_sync;
 }
 
 /**
