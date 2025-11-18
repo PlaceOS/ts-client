@@ -38,6 +38,14 @@ export class PlaceSystem extends PlaceResource {
     public readonly installed_ui_devices: number;
     /** Support URL for the system */
     public readonly support_url: string;
+    /** URL for the timetable UI linked to the system */
+    public readonly timetable_url: string;
+    /** URL for requesting snapshots of the assosiated camera */
+    public readonly camera_snapshot_url: string;
+    /** URL for managing the attached camera */
+    public readonly camera_url: string;
+    /** External booking URL for the system */
+    public readonly room_booking_url: string;
     /** ID on the SVG Map associated with this system */
     public readonly map_id: string;
     /** List of module IDs that belong to the system */
@@ -77,6 +85,10 @@ export class PlaceSystem extends PlaceResource {
         this.public = raw_data.public ?? false;
         this.installed_ui_devices = raw_data.installed_ui_devices || 0;
         this.support_url = raw_data.support_url || '';
+        this.camera_snapshot_url = raw_data.camera_snapshot_url || '';
+        this.camera_url = raw_data.camera_url || '';
+        this.timetable_url = raw_data.timetable_url || '';
+        this.room_booking_url = raw_data.room_booking_url || '';
         this.map_id = raw_data.map_id || '';
         this.modules = raw_data.modules || [];
         this.images = raw_data.images || [];
