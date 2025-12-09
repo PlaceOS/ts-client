@@ -85,7 +85,7 @@ export interface TaskParameters<T> {
     id: string;
     task_name: string;
     form_data?: any;
-    method?: 'post' | 'get' | 'del' | 'put';
+    method?: 'post' | 'get' | 'del' | 'put' | 'patch';
     callback?: (_: any) => T;
     path: string;
 }
