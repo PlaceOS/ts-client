@@ -50,7 +50,8 @@ describe('Alert Dashboards API', () => {
     test('should allow listing dashboard alerts', async () => {
         const spy = vi.spyOn(Resources, 'query');
         spy.mockImplementation((_) => of({ data: [_.fn!({})] } as any));
-        const list = await SERVICE.listDashboardAlerts('dashboard-1').toPromise();
+        const list =
+            await SERVICE.listDashboardAlerts('dashboard-1').toPromise();
         expect(list).toBeTruthy();
         expect(list.data.length).toBe(1);
         expect(list.data[0]).toBeInstanceOf(PlaceAlert);

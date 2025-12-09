@@ -377,3 +377,35 @@ export type {
     SurveyShowOptions,
 } from './staff/surveys/interfaces';
 export { Survey, type SurveyPage } from './staff/surveys/model';
+
+export {
+    PlaceAsset,
+    PlaceAssetCategory,
+    PlaceAssetPurchaseOrder,
+    PlaceAssetType,
+} from './assets/assets.class';
+export {
+    addAsset,
+    addAssetCategory,
+    addAssetPurchaseOrder,
+    addAssetType,
+    addAssets,
+    queryAssetCategories,
+    queryAssetPurchaseOrders,
+    queryAssetTypes,
+    queryAssets,
+    removeAsset,
+    removeAssetCategory,
+    removeAssetPurchaseOrder,
+    removeAssetType,
+    removeAssets,
+    showAsset,
+    showAssetCategory,
+    showAssetPurchaseOrder,
+    showAssetType,
+    updateAsset,
+    updateAssetCategory,
+    updateAssetPurchaseOrder,
+    updateAssetType,
+    updateAssets,
+} from './assets/functions';
