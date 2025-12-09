@@ -479,3 +479,21 @@ export {
     updateStorage,
 } from './storages/functions';
 export type { PlaceStorageQueryOptions } from './storages/interfaces';
+
+export {
+    queryWebrtcRooms,
+    showWebrtcRoom,
+    webrtcGuestEntry,
+    webrtcGuestExit,
+    webrtcKickUser,
+    webrtcSessionMembers,
+    webrtcSignallerUrl,
+    webrtcTransferUser,
+} from './webrtc/functions';
+export type {
+    PlaceGuestParticipant,
+    PlaceKickReason,
+    PlaceWebrtcMember,
+    PlaceWebrtcRoomDetails,
+    PlaceWebrtcRoomsQueryOptions,
+} from './webrtc/interfaces';
