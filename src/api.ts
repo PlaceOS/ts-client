@@ -449,3 +449,23 @@ export type {
     PlaceAssetQueryOptions,
     PlaceAssetTypeQueryOptions,
 } from './assets/interfaces';
+
+export { PlaceShortUrl } from './short-url/short-url.class';
+export {
+    addShortUrl,
+    generateQrCode,
+    getShortUrlQrCodeSvg,
+    qrCodeUrl,
+    queryShortUrls,
+    removeShortUrl,
+    shortUrlQrCodePngUrl,
+    shortUrlRedirectUrl,
+    showShortUrl,
+    updateShortUrl,
+} from './short-url/functions';
+export type {
+    PlaceQrCodeOptions,
+    PlaceShortUrlPngQrOptions,
+    PlaceShortUrlQueryOptions,
+    QrCodeFormat,
+} from './short-url/interfaces';

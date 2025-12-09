@@ -23,7 +23,7 @@ import {
     PlaceAssetPurchaseOrderQueryOptions,
     PlaceAssetQueryOptions,
     PlaceAssetTypeQueryOptions,
-} from './types';
+} from './interfaces';
 
 ///////////////////////////////////////////////////////////////
 //////////////////////////   Assets   /////////////////////////
