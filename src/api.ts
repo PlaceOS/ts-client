@@ -469,3 +469,13 @@ export type {
     PlaceShortUrlQueryOptions,
     QrCodeFormat,
 } from './short-url/interfaces';
+
+export { PlaceStorage, type StorageType } from './storages/storage.class';
+export {
+    addStorage,
+    queryStorages,
+    removeStorage,
+    showStorage,
+    updateStorage,
+} from './storages/functions';
+export type { PlaceStorageQueryOptions } from './storages/interfaces';
