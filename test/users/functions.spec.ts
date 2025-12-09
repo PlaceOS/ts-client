@@ -50,8 +50,8 @@ describe('Users API', () => {
     test('should allow removing users', async () => {
         const spy = vi.spyOn(Resources, 'remove');
         spy.mockImplementation(() => of());
-        let item = await SERVICE.removeUser('1', {}).toPromise();
+        let item = await SERVICE.removeUser('1').toPromise();
         expect(item).toBeFalsy();
-        item = await SERVICE.removeUser('1').toPromise();
+        item = await SERVICE.removeUser('1', { force_removal: true }).toPromise();
     });
 });

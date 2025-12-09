@@ -1,6 +1,9 @@
 import { create, query, remove, show, update } from '../resources/functions';
-import { HashMap } from '../utilities/types';
-import { PlaceUserQueryOptions } from './interfaces';
+import {
+    PlaceUserDeleteOptions,
+    PlaceUserQueryOptions,
+    PlaceUserShowOptions,
+} from './interfaces';
 import { PlaceUser } from './user';
 
 /**
@@ -22,11 +25,11 @@ export function queryUsers(query_params: PlaceUserQueryOptions = {}) {
 }
 
 /**
- * Get the data for a trigger
- * @param id ID of the trigger to retrieve
+ * Get the data for a user
+ * @param id ID of the user to retrieve
  * @param query_params Query parameters to add the to request URL
  */
-export function showUser(id: string, query_params: PlaceUserQueryOptions = {}) {
+export function showUser(id: string, query_params: PlaceUserShowOptions = {}) {
     return show({ id, query_params, fn: process, path: PATH });
 }
 
@@ -34,7 +37,7 @@ export function showUser(id: string, query_params: PlaceUserQueryOptions = {}) {
  * Get the data for the currently logged in user
  * @param query_params Query parameters to add the to request URL
  */
-export function currentUser(query_params: PlaceUserQueryOptions = {}) {
+export function currentUser(query_params: PlaceUserShowOptions = {}) {
     return show({ id: 'current', query_params, fn: process, path: PATH });
 }
 
@@ -70,10 +73,10 @@ export function addUser(form_data: Partial<PlaceUser>) {
 }
 
 /**
- * Remove an trigger from the database
- * @param id ID of the trigger
+ * Remove a user from the database
+ * @param id ID of the user
  * @param query_params Query parameters to add the to request URL
  */
-export function removeUser(id: string, query_params: HashMap = {}) {
+export function removeUser(id: string, query_params: PlaceUserDeleteOptions = {}) {
     return remove({ id, query_params, path: PATH });
 }

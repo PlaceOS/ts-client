@@ -1,6 +1,5 @@
 import { PlaceAuthSourceQueryOptions } from '../auth-sources/interfaces';
 import { create, query, remove, show, update } from '../resources/functions';
-import { HashMap } from '../utilities/types';
 import { PlaceSAMLSource } from './saml-source';
 
 /**
@@ -24,12 +23,11 @@ export function querySAMLSources(
 }
 
 /**
- * Get the data for an SAML source
+ * Get the data for a SAML source
  * @param id ID of the SAML source to retrieve
- * @param query_params Query parameters to add the to request URL
  */
-export function showSAMLSource(id: string, query_params: HashMap = {}) {
-    return show({ id, query_params, fn: process, path: PATH });
+export function showSAMLSource(id: string) {
+    return show({ id, query_params: {}, fn: process, path: PATH });
 }
 
 /**
@@ -64,10 +62,9 @@ export function addSAMLSource(form_data: Partial<PlaceSAMLSource>) {
 }
 
 /**
- * Remove an SAML source from the database
+ * Remove a SAML source from the database
  * @param id ID of the SAML source
- * @param query_params Query parameters to add the to request URL
  */
-export function removeSAMLSource(id: string, query_params: HashMap = {}) {
-    return remove({ id, query_params, path: PATH });
+export function removeSAMLSource(id: string) {
+    return remove({ id, query_params: {}, path: PATH });
 }

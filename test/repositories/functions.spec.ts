@@ -18,9 +18,8 @@ describe('Repositories API', () => {
     test('should allow showing repository details', async () => {
         const spy = vi.spyOn(Resources, 'show');
         spy.mockImplementation((_) => of(_.fn!({}) as any));
-        let item = await SERVICE.showRepository('1').toPromise();
+        const item = await SERVICE.showRepository('1').toPromise();
         expect(item).toBeInstanceOf(PlaceRepository);
-        item = await SERVICE.showRepository('1', {}).toPromise();
     });
 
     test('should allow creating new repositories', async () => {
@@ -42,9 +41,8 @@ describe('Repositories API', () => {
     test('should allow removing repositories', async () => {
         const spy = vi.spyOn(Resources, 'remove');
         spy.mockImplementation(() => of());
-        let item = await SERVICE.removeRepository('1', {}).toPromise();
+        const item = await SERVICE.removeRepository('1').toPromise();
         expect(item).toBeFalsy();
-        item = await SERVICE.removeRepository('1').toPromise();
     });
 
     test('should allow listing remote repository default branch', async () => {
@@ -86,9 +84,8 @@ describe('Repositories API', () => {
     test('should allow listing interface repositories', async () => {
         const spy = vi.spyOn(Resources, 'show');
         spy.mockImplementation(() => of({}));
-        let item = await SERVICE.listInterfaceRepositories().toPromise();
+        const item = await SERVICE.listInterfaceRepositories().toPromise();
         expect(item).toEqual({});
-        item = await SERVICE.listInterfaceRepositories({}).toPromise();
     });
 
     test('should allow listing repository drivers', async () => {

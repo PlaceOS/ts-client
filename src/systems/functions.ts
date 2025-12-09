@@ -11,7 +11,14 @@ import { PlaceSettings } from '../settings/settings';
 import { PlaceTrigger } from '../triggers/trigger';
 import { HashMap } from '../utilities/types';
 import { PlaceZone } from '../zones/zone';
-import { PlaceModuleFunctionMap, PlaceSystemsQueryOptions } from './interfaces';
+import {
+    PlaceModuleFunctionMap,
+    PlaceSystemShowOptions,
+    PlaceSystemsQueryOptions,
+    PlaceSystemsWithEmailsOptions,
+    PlaceSystemStartStopOptions,
+    PlaceSystemTriggersQueryOptions,
+} from './interfaces';
 import { PlaceSystem } from './system';
 
 /**
@@ -33,11 +40,11 @@ export function querySystems(query_params: PlaceSystemsQueryOptions = {}) {
 }
 
 /**
- * Query the available systems
+ * Query the available systems by email addresses
  * @param query_params Query parameters to add the to request URL
  */
 export function querySystemsWithEmails(
-    query_params: PlaceSystemsQueryOptions = {},
+    query_params: PlaceSystemsWithEmailsOptions,
 ) {
     return query({ query_params, fn: process, path: `${PATH}/with_emails` });
 }
@@ -49,7 +56,7 @@ export function querySystemsWithEmails(
  */
 export function showSystem(
     id: string,
-    query_params: PlaceSystemsQueryOptions = {},
+    query_params: PlaceSystemShowOptions = {},
 ) {
     return show({ id, query_params, fn: process, path: PATH });
 }
@@ -86,12 +93,11 @@ export function addSystem(form_data: Partial<PlaceSystem>) {
 }
 
 /**
- * Remove an system from the database
+ * Remove a system from the database
  * @param id ID of the system
- * @param query_params Query parameters to add the to request URL
  */
-export function removeSystem(id: string, query_params: HashMap = {}) {
-    return remove({ id, query_params, path: PATH });
+export function removeSystem(id: string) {
+    return remove({ id, query_params: {}, path: PATH });
 }
 
 /**
@@ -136,12 +142,16 @@ export function removeSystemModule(
 /**
  * Start the given system and clears any existing caches
  * @param id System ID
+ * @param query_params Query parameters to add the to request URL
  */
-export function startSystem(id: string): Observable<void> {
+export function startSystem(
+    id: string,
+    query_params: PlaceSystemStartStopOptions = {},
+): Observable<void> {
     return task<void>({
         id,
         task_name: 'start',
-        form_data: {},
+        form_data: query_params,
         path: PATH,
     });
 }
@@ -149,11 +159,16 @@ export function startSystem(id: string): Observable<void> {
 /**
  * Stops all modules in the given system
  * @param id System ID
+ * @param query_params Query parameters to add the to request URL
  */
-export function stopSystem(id: string): Observable<void> {
+export function stopSystem(
+    id: string,
+    query_params: PlaceSystemStartStopOptions = {},
+): Observable<void> {
     return task<void>({
         id,
         task_name: 'stop',
+        form_data: query_params,
         path: PATH,
     });
 }
@@ -282,10 +297,14 @@ export function listSystemZones(id: string) {
 /**
  * Get list of triggers for system
  * @param id System ID
+ * @param query_params Query parameters to add the to request URL
  */
-export function listSystemTriggers(id: string) {
+export function listSystemTriggers(
+    id: string,
+    query_params: PlaceSystemTriggersQueryOptions = {},
+) {
     return query({
-        query_params: {},
+        query_params,
         fn: (i: HashMap) => new PlaceTrigger(i),
         path: `${PATH}/${id}/triggers`,
     });

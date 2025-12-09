@@ -1,7 +1,12 @@
 import { Observable } from 'rxjs';
 import { create, remove, show, task, update } from '../resources/functions';
 import { HashMap } from '../utilities/types';
-import { PlaceZoneMetadataOptions } from './interfaces';
+import {
+    PlaceMetadataDeleteOptions,
+    PlaceMetadataHistoryOptions,
+    PlaceMetadataOptions,
+    PlaceZoneMetadataOptions,
+} from './interfaces';
 import { PlaceMetadata } from './metadata';
 import { PlaceZoneMetadata } from './zone-metadata';
 
@@ -22,7 +27,7 @@ function process(item: Partial<PlaceMetadata>) {
  */
 export function listMetadata(
     id: string,
-    query_params: HashMap = {},
+    query_params: PlaceMetadataOptions = {},
 ): Observable<PlaceMetadata[]> {
     return show({
         id,
@@ -53,11 +58,11 @@ function flatten<T = any>(an_array: T[]): T {
 /**
  * List the metadata history for a database item
  * @param id ID of the item to retrieve metadata
- * @param form_data Data to pass to the request URL.
+ * @param query_params Query parameters to add to the request URL.
  */
 export function listMetadataHistory(
     id: string,
-    query_params: HashMap = {},
+    query_params: PlaceMetadataHistoryOptions = {},
 ): Observable<PlaceMetadata[]> {
     return task({
         id,
@@ -78,16 +83,14 @@ export function listMetadataHistory(
  * Get a metadata field for a database item
  * @param id ID of the item to retrieve metadata
  * @param name Name of the metadata field to retrieve
- * @param query_params Query parameters to add the to request URL.
  */
 export function showMetadata(
     id: string,
     name: string,
-    query_params: HashMap = {},
 ): Observable<PlaceMetadata> {
     return show({
         id,
-        query_params: { ...query_params, name },
+        query_params: { name },
         fn: (data: HashMap) => process(data[name]),
         path: PATH,
     });
@@ -120,11 +123,14 @@ export function addMetadata(form_data: Partial<PlaceMetadata>) {
 }
 
 /**
- * Remove an metadata from the database
+ * Remove metadata from the database
  * @param id ID of the item associated with the metadata
- * @param query_params Query parameters to add the to request URL
+ * @param query_params Query parameters including the metadata key name (required)
  */
-export function removeMetadata(id: string, query_params: HashMap = {}) {
+export function removeMetadata(
+    id: string,
+    query_params: PlaceMetadataDeleteOptions,
+) {
     return remove({ id, query_params, path: PATH });
 }
 

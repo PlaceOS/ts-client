@@ -1,7 +1,11 @@
 import { create, query, remove, show, update } from '../api';
-import { PlaceResourceQueryOptions } from '../resources/interface';
 import { PlaceAlert } from './alert';
 import { PlaceAlertDashboard } from './dashboard';
+import {
+    PlaceAlertDashboardQueryOptions,
+    PlaceAlertQueryOptions,
+    PlaceAlertShowOptions,
+} from './interfaces';
 
 ///////////////////////////////////////////////////////////////
 /////////////////////   Alert Dashboards   ////////////////////
@@ -22,7 +26,7 @@ function processDashboard(item: Partial<PlaceAlertDashboard>) {
  * @param query_params Query parameters to add the to request URL
  */
 export function queryAlertDashboards(
-    query_params: PlaceResourceQueryOptions = {},
+    query_params: PlaceAlertDashboardQueryOptions = {},
 ) {
     return query({
         query_params,
@@ -34,15 +38,11 @@ export function queryAlertDashboards(
 /**
  * Get the data for an alert dashboard
  * @param id ID of the alert dashboard to retrieve
- * @param query_params Query parameters to add the to request URL
  */
-export function showAlertDashboard(
-    id: string,
-    query_params: Record<string, any> = {},
-) {
+export function showAlertDashboard(id: string) {
     return show({
         id,
-        query_params,
+        query_params: {},
         fn: processDashboard,
         path: DASHBOARD_PATH,
     });
@@ -87,13 +87,9 @@ export function addAlertDashboard(form_data: Partial<PlaceAlertDashboard>) {
 /**
  * Remove an alert dashboard from the database
  * @param id ID of the alert dashboard
- * @param query_params Query parameters to add the to request URL
  */
-export function removeAlertDashboard(
-    id: string,
-    query_params: Record<string, any> = {},
-) {
-    return remove({ id, query_params, path: DASHBOARD_PATH });
+export function removeAlertDashboard(id: string) {
+    return remove({ id, query_params: {}, path: DASHBOARD_PATH });
 }
 
 /**
@@ -126,7 +122,7 @@ function processAlert(item: Partial<PlaceAlert>) {
  * Query the available alerts
  * @param query_params Query parameters to add the to request URL
  */
-export function queryAlerts(query_params: PlaceResourceQueryOptions = {}) {
+export function queryAlerts(query_params: PlaceAlertQueryOptions = {}) {
     return query({
         query_params,
         fn: processAlert,
@@ -139,7 +135,7 @@ export function queryAlerts(query_params: PlaceResourceQueryOptions = {}) {
  * @param id ID of the alert to retrieve
  * @param query_params Query parameters to add the to request URL
  */
-export function showAlert(id: string, query_params: Record<string, any> = {}) {
+export function showAlert(id: string, query_params: PlaceAlertShowOptions = {}) {
     return show({
         id,
         query_params,
@@ -187,11 +183,7 @@ export function addAlert(form_data: Partial<PlaceAlert>) {
 /**
  * Remove an alert from the database
  * @param id ID of the alert
- * @param query_params Query parameters to add the to request URL
  */
-export function removeAlert(
-    id: string,
-    query_params: Record<string, any> = {},
-) {
-    return remove({ id, query_params, path: ALERT_PATH });
+export function removeAlert(id: string) {
+    return remove({ id, query_params: {}, path: ALERT_PATH });
 }

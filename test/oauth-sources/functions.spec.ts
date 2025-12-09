@@ -17,9 +17,8 @@ describe('OAuthSources API', () => {
     test('should allow showing oauth source details', async () => {
         const spy = vi.spyOn(Resources, 'show');
         spy.mockImplementation((_) => of(_.fn!({}) as any));
-        let item = await SERVICE.showOAuthSource('1').toPromise();
+        const item = await SERVICE.showOAuthSource('1').toPromise();
         expect(item).toBeInstanceOf(PlaceOAuthSource);
-        item = await SERVICE.showOAuthSource('1', {}).toPromise();
     });
 
     test('should allow creating new oauth sources', async () => {
@@ -41,8 +40,7 @@ describe('OAuthSources API', () => {
     test('should allow removing oauth sources', async () => {
         const spy = vi.spyOn(Resources, 'remove');
         spy.mockImplementation(() => of());
-        let item = await SERVICE.removeOAuthSource('1').toPromise();
+        const item = await SERVICE.removeOAuthSource('1').toPromise();
         expect(item).toBeFalsy();
-        item = await SERVICE.removeOAuthSource('1', {}).toPromise();
     });
 });

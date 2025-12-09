@@ -6,9 +6,8 @@ import {
     task,
     update,
 } from '../resources/functions';
-import { HashMap } from '../utilities/types';
 import { PlaceDriver } from './driver';
-import { PlaceDriverQueryOptions } from './interfaces';
+import { PlaceDriverQueryOptions, PlaceDriverShowOptions } from './interfaces';
 
 /**
  * @private
@@ -33,7 +32,7 @@ export function queryDrivers(query_params: PlaceDriverQueryOptions = {}) {
  * @param id ID of the driver to retrieve
  * @param query_params Query parameters to add the to request URL
  */
-export function showDriver(id: string, query_params: HashMap = {}) {
+export function showDriver(id: string, query_params: PlaceDriverShowOptions = {}) {
     return show({ id, query_params, fn: process, path: PATH });
 }
 
@@ -71,10 +70,9 @@ export function addDriver(form_data: Partial<PlaceDriver>) {
 /**
  * Remove a driver from the database
  * @param id ID of the driver
- * @param query_params Query parameters to add the to request URL
  */
-export function removeDriver(id: string, query_params: HashMap = {}) {
-    return remove({ id, query_params, path: PATH });
+export function removeDriver(id: string) {
+    return remove({ id, query_params: {}, path: PATH });
 }
 
 /**

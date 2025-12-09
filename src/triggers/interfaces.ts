@@ -1,4 +1,14 @@
+import { PlaceResourceQueryOptions } from '../resources/interface';
 import { HashMap } from '../utilities/types';
+
+/** Mapping of available query parameters for the triggers index endpoint */
+export interface PlaceTriggerQueryOptions extends PlaceResourceQueryOptions {}
+
+/** Mapping of available query parameters for the triggers show endpoint */
+export interface PlaceTriggerShowOptions {
+    /** Return the instances associated with this trigger */
+    instances?: boolean;
+}
 
 export interface TriggerActions {
     /** List of functions to execute when the trigger is activated */

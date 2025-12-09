@@ -7,7 +7,10 @@ import {
     update,
 } from '../resources/functions';
 import { HashMap } from '../utilities/types';
-import { PlaceSettingsQueryOptions } from './interfaces';
+import {
+    PlaceSettingsHistoryOptions,
+    PlaceSettingsQueryOptions,
+} from './interfaces';
 import { PlaceSettings } from './settings';
 
 /**
@@ -31,10 +34,9 @@ export function querySettings(query_params: PlaceSettingsQueryOptions = {}) {
 /**
  * Get the data for settings
  * @param id ID of the settings to retrieve
- * @param query_params Query parameters to add the to request URL
  */
-export function showSettings(id: string, query_params: HashMap = {}) {
-    return show({ id, query_params, fn: process, path: PATH });
+export function showSettings(id: string) {
+    return show({ id, query_params: {}, fn: process, path: PATH });
 }
 
 /**
@@ -73,20 +75,22 @@ export function addSettings(
 }
 
 /**
- * Remove an settings from the database
+ * Remove settings from the database
  * @param id ID of the settings
- * @param query_params Query parameters to add the to request URL
  */
-export function removeSettings(id: string, query_params: HashMap = {}) {
-    return remove({ id, query_params, path: PATH });
+export function removeSettings(id: string) {
+    return remove({ id, query_params: {}, path: PATH });
 }
 
 /**
- * Get historical version of settings
+ * Get historical versions of settings
  * @param id ID of the settings to retrieve
  * @param query_params Query parameters to add the to request URL
  */
-export function settingsHistory(id: string, query_params: HashMap = {}) {
+export function settingsHistory(
+    id: string,
+    query_params: PlaceSettingsHistoryOptions = {},
+) {
     return task({
         id,
         task_name: 'history',

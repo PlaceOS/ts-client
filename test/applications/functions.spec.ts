@@ -18,9 +18,8 @@ describe('Applications API', () => {
     test('should allow showing application details', async () => {
         const spy = vi.spyOn(Resources, 'show');
         spy.mockImplementation((_) => of(_.fn!({}) as any));
-        let item = await SERVICE.showApplication('1').toPromise();
+        const item = await SERVICE.showApplication('1').toPromise();
         expect(item).toBeInstanceOf(PlaceApplication);
-        item = await SERVICE.showApplication('1', {}).toPromise();
     });
 
     test('should allow creating new applications', async () => {
@@ -41,8 +40,7 @@ describe('Applications API', () => {
     test('should allow removing applications', async () => {
         const spy = vi.spyOn(Resources, 'remove');
         spy.mockImplementation(() => of());
-        let item = await SERVICE.removeApplication('1', {}).toPromise();
+        const item = await SERVICE.removeApplication('1').toPromise();
         expect(item).toBeFalsy();
-        item = await SERVICE.removeApplication('1').toPromise();
     });
 });

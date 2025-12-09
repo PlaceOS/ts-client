@@ -1,6 +1,5 @@
 import { PlaceAuthSourceQueryOptions } from '../auth-sources/interfaces';
 import { create, query, remove, show, update } from '../resources/functions';
-import { HashMap } from '../utilities/types';
 import { PlaceOAuthSource } from './oauth-source';
 
 /**
@@ -26,10 +25,9 @@ export function queryOAuthSources(
 /**
  * Get the data for an OAuth source
  * @param id ID of the OAuth source to retrieve
- * @param query_params Query parameters to add the to request URL
  */
-export function showOAuthSource(id: string, query_params: HashMap = {}) {
-    return show({ id, query_params, fn: process, path: PATH });
+export function showOAuthSource(id: string) {
+    return show({ id, query_params: {}, fn: process, path: PATH });
 }
 
 /**
@@ -66,8 +64,7 @@ export function addOAuthSource(form_data: Partial<PlaceOAuthSource>) {
 /**
  * Remove an OAuth source from the database
  * @param id ID of the OAuth source
- * @param query_params Query parameters to add the to request URL
  */
-export function removeOAuthSource(id: string, query_params: HashMap = {}) {
-    return remove({ id, query_params, path: PATH });
+export function removeOAuthSource(id: string) {
+    return remove({ id, query_params: {}, path: PATH });
 }

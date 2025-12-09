@@ -20,7 +20,7 @@ describe('Drivers API', () => {
         spy.mockImplementation((_) => of(_.fn!({})));
         let item = await SERVICE.showDriver('1').toPromise();
         expect(item).toBeInstanceOf(PlaceDriver);
-        item = await SERVICE.showDriver('1', {}).toPromise();
+        item = await SERVICE.showDriver('1', { compilation_status: true }).toPromise();
         expect(item).toBeInstanceOf(PlaceDriver);
     });
 
@@ -45,8 +45,7 @@ describe('Drivers API', () => {
     test('should allow removing drivers', async () => {
         const spy = vi.spyOn(Resources, 'remove');
         spy.mockImplementation(() => of());
-        let item = await SERVICE.removeDriver('1', {}).toPromise();
-        item = await SERVICE.removeDriver('1').toPromise();
+        const item = await SERVICE.removeDriver('1').toPromise();
         expect(item).toBeFalsy();
     });
 

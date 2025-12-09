@@ -19,9 +19,8 @@ describe('Alert Dashboards API', () => {
     test('should allow showing alert dashboard details', async () => {
         const spy = vi.spyOn(Resources, 'show');
         spy.mockImplementation((_) => of(_.fn!({}) as any));
-        let item = await SERVICE.showAlertDashboard('1').toPromise();
+        const item = await SERVICE.showAlertDashboard('1').toPromise();
         expect(item).toBeInstanceOf(PlaceAlertDashboard);
-        item = await SERVICE.showAlertDashboard('1', {}).toPromise();
     });
 
     test('should allow creating new alert dashboards', async () => {
@@ -42,9 +41,8 @@ describe('Alert Dashboards API', () => {
     test('should allow removing alert dashboards', async () => {
         const spy = vi.spyOn(Resources, 'remove');
         spy.mockImplementation(() => of());
-        let item = await SERVICE.removeAlertDashboard('1', {}).toPromise();
+        const item = await SERVICE.removeAlertDashboard('1').toPromise();
         expect(item).toBeFalsy();
-        item = await SERVICE.removeAlertDashboard('1').toPromise();
     });
 
     test('should allow listing dashboard alerts', async () => {
@@ -95,8 +93,7 @@ describe('Alerts API', () => {
     test('should allow removing alerts', async () => {
         const spy = vi.spyOn(Resources, 'remove');
         spy.mockImplementation(() => of());
-        let item = await SERVICE.removeAlert('1', {}).toPromise();
+        const item = await SERVICE.removeAlert('1').toPromise();
         expect(item).toBeFalsy();
-        item = await SERVICE.removeAlert('1').toPromise();
     });
 });

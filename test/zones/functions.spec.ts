@@ -45,9 +45,8 @@ describe('Zones API', () => {
     test('should allow removing zones', async () => {
         const spy = vi.spyOn(Resources, 'remove');
         spy.mockImplementation(() => of());
-        let item = await SERVICE.removeZone('1').toPromise();
+        const item = await SERVICE.removeZone('1').toPromise();
         expect(item).toBeFalsy();
-        item = await SERVICE.removeZone('1', {}).toPromise();
     });
 
     test("should allow listing zone's triggers", async () => {

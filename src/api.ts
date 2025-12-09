@@ -32,6 +32,11 @@ export {
     updateAlert,
     updateAlertDashboard,
 } from './alerts/functions';
+export type {
+    PlaceAlertDashboardQueryOptions,
+    PlaceAlertQueryOptions,
+    PlaceAlertShowOptions,
+} from './alerts/interfaces';
 
 export { PlaceApplication } from './applications/application';
 export {
@@ -61,7 +66,11 @@ export {
     showCluster,
     terminateProcess,
 } from './clusters/functions';
-export type { PlaceClusterQueryOptions } from './clusters/interfaces';
+export type {
+    PlaceClusterQueryOptions,
+    PlaceClusterShowOptions,
+    PlaceClusterTerminateOptions,
+} from './clusters/interfaces';
 export { PlaceProcess } from './clusters/process';
 
 export { PlaceDomain } from './domains/domain';
@@ -89,6 +98,7 @@ export {
 export type {
     PlaceDriverDetails,
     PlaceDriverQueryOptions,
+    PlaceDriverShowOptions,
 } from './drivers/interfaces';
 
 export { PlaceEdge } from './edge/edge';
@@ -120,6 +130,8 @@ export {
     updateMetadata,
 } from './metadata/functions';
 export type {
+    PlaceMetadataDeleteOptions,
+    PlaceMetadataHistoryOptions,
     PlaceMetadataOptions,
     PlaceZoneMetadataOptions,
 } from './metadata/interfaces';
@@ -143,6 +155,7 @@ export {
 export type {
     PlaceModulePingOptions,
     PlaceModuleQueryOptions,
+    PlaceModuleShowOptions,
 } from './modules/interfaces';
 export { PlaceModule } from './modules/module';
 
@@ -175,10 +188,14 @@ export {
 export { PlaceRepositoryType } from './repositories/interfaces';
 export type {
     GitCommitDetails,
+    PlaceRemoteRepositoryCommitsQuery,
+    PlaceRemoteRepositoryQuery,
     PlaceRepositoryCommit,
     PlaceRepositoryCommitQuery,
     PlaceRepositoryDetailsQuery,
+    PlaceRepositoryFoldersQuery,
     PlaceRepositoryPullQuery,
+    PlaceRepositoryQueryOptions,
 } from './repositories/interfaces';
 export { PlaceRepository } from './repositories/repository';
 
@@ -192,6 +209,7 @@ export {
     update,
     type QueryResponse,
 } from './resources/functions';
+export type { PlaceResourceQueryOptions } from './resources/interface';
 export { PlaceResource } from './resources/resource';
 
 export {
@@ -213,7 +231,10 @@ export {
     updateSettings,
 } from './settings/functions';
 export { EncryptionLevel } from './settings/interfaces';
-export type { PlaceSettingsQueryOptions } from './settings/interfaces';
+export type {
+    PlaceSettingsHistoryOptions,
+    PlaceSettingsQueryOptions,
+} from './settings/interfaces';
 export { PlaceSettings } from './settings/settings';
 
 export {
@@ -241,7 +262,11 @@ export type {
     PlaceModuleFunction,
     PlaceModuleFunctionMap,
     PlaceSystemShowOptions,
+    PlaceSystemStartStopOptions,
+    PlaceSystemTriggersQueryOptions,
+    PlaceSystemUpdateOptions,
     PlaceSystemsQueryOptions,
+    PlaceSystemsWithEmailsOptions,
 } from './systems/interfaces';
 export { PlaceSystem } from './systems/system';
 
@@ -260,6 +285,8 @@ export {
 } from './triggers/interfaces';
 export type {
     ExecuteArgs,
+    PlaceTriggerQueryOptions,
+    PlaceTriggerShowOptions,
     TriggerActions,
     TriggerAtTimeCondition,
     TriggerComparison,
@@ -283,7 +310,11 @@ export {
     showUser,
     updateUser,
 } from './users/functions';
-export type { PlaceUserQueryOptions } from './users/interfaces';
+export type {
+    PlaceUserDeleteOptions,
+    PlaceUserQueryOptions,
+    PlaceUserShowOptions,
+} from './users/interfaces';
 export { PlaceUser } from './users/user';
 export type { WorktimePreference } from './users/user';
 
@@ -298,6 +329,7 @@ export {
     updateZone,
 } from './zones/functions';
 export type {
+    PlaceZoneMetadataQueryOptions,
     PlaceZoneQueryOptions,
     PlaceZoneShowOptions,
 } from './zones/interfaces';
@@ -324,6 +356,8 @@ export {
 export type {
     SignageMediaQueryOptions,
     SignageMetrics,
+    SignagePlaylistQueryOptions,
+    SignagePlaylistRevisionsOptions,
 } from './signage/interfaces';
 export {
     MediaAnimation,
@@ -409,3 +443,9 @@ export {
     updateAssetType,
     updateAssets,
 } from './assets/functions';
+export type {
+    PlaceAssetCategoryQueryOptions,
+    PlaceAssetPurchaseOrderQueryOptions,
+    PlaceAssetQueryOptions,
+    PlaceAssetTypeQueryOptions,
+} from './assets/interfaces';

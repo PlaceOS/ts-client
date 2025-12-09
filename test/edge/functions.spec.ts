@@ -18,9 +18,8 @@ describe('SAML Auth Sources API', () => {
     test('should allow showing Edge details', async () => {
         const spy = vi.spyOn(Resources, 'show');
         spy.mockImplementation((_) => of(_.fn!({}) as any));
-        let item = await SERVICE.showEdge('1').toPromise();
+        const item = await SERVICE.showEdge('1').toPromise();
         expect(item).toBeInstanceOf(PlaceEdge);
-        item = await SERVICE.showEdge('1', {}).toPromise();
     });
 
     test('should allow creating new Edges', async () => {
@@ -42,17 +41,8 @@ describe('SAML Auth Sources API', () => {
     test('should allow removing Edges', async () => {
         const spy = vi.spyOn(Resources, 'remove');
         spy.mockImplementation(() => of());
-        let item = await SERVICE.removeEdge('1').toPromise();
+        const item = await SERVICE.removeEdge('1').toPromise();
         expect(item).toBeFalsy();
-        item = await SERVICE.removeEdge('1', {}).toPromise();
-    });
-
-    test('should allow removing Edges', async () => {
-        const spy = vi.spyOn(Resources, 'remove');
-        spy.mockImplementation(() => of());
-        let item = await SERVICE.removeEdge('1').toPromise();
-        expect(item).toBeFalsy();
-        item = await SERVICE.removeEdge('1', {}).toPromise();
     });
 
     test('should allow getting token for Edge', async () => {

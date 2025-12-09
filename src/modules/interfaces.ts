@@ -1,22 +1,25 @@
 import { PlaceResourceQueryOptions } from '../resources/interface';
 
-/** Mapping of available query paramters for the modules index */
+/** Mapping of available query parameters for the modules index endpoint */
 export interface PlaceModuleQueryOptions extends PlaceResourceQueryOptions {
-    /** Returns modules that are in the given system */
+    /** Only return modules updated before this time (unix epoch) */
+    as_of?: number;
+    /** Only return modules running in this system (query params are ignored if this is provided) */
     control_system_id?: string;
-    /** Returns modules with the given dependency */
-    driver_id?: string;
     /** Return results that connected state matches this value */
     connected?: boolean;
-    /** Return modules that are running or not stopped */
-    running?: boolean;
-    /** Returns modules that are not logic modules (i.e. they connect to a device or service) */
+    /** Only return instances of this driver */
+    driver_id?: string;
+    /** Do not return logic modules (return only modules that can exist in multiple systems) */
     no_logic?: boolean;
-    /**
-     * Returns modules that have not been updated since the
-     * value defined as seconds since UTC epoch
-     */
-    as_of?: number;
+    /** Return only running modules */
+    running?: boolean;
+}
+
+/** Mapping of available query parameters for the modules show endpoint */
+export interface PlaceModuleShowOptions {
+    /** Return the driver details along with the module */
+    complete?: boolean;
 }
 
 /** Place response from `ping` module task endpoint `/api/engine/v2/<mod_id>/ping` */

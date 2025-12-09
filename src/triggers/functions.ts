@@ -7,8 +7,10 @@ import {
     task,
     update,
 } from '../resources/functions';
-import { PlaceResourceQueryOptions } from '../resources/interface';
-import { HashMap } from '../utilities/types';
+import {
+    PlaceTriggerQueryOptions,
+    PlaceTriggerShowOptions,
+} from './interfaces';
 import { PlaceTrigger } from './trigger';
 
 /**
@@ -25,7 +27,7 @@ function process(item: Partial<PlaceTrigger>) {
  * Query the available triggers
  * @param query_params Query parameters to add the to request URL
  */
-export function queryTriggers(query_params: PlaceResourceQueryOptions = {}) {
+export function queryTriggers(query_params: PlaceTriggerQueryOptions = {}) {
     return query({ query_params, fn: process, path: PATH });
 }
 
@@ -36,7 +38,7 @@ export function queryTriggers(query_params: PlaceResourceQueryOptions = {}) {
  */
 export function showTrigger(
     id: string,
-    query_params: PlaceResourceQueryOptions = {},
+    query_params: PlaceTriggerShowOptions = {},
 ) {
     return show({ id, query_params, fn: process, path: PATH });
 }
@@ -73,12 +75,11 @@ export function addTrigger(form_data: Partial<PlaceTrigger>) {
 }
 
 /**
- * Remove an trigger from the database
+ * Remove a trigger from the database
  * @param id ID of the trigger
- * @param query_params Query parameters to add the to request URL
  */
-export function removeTrigger(id: string, query_params: HashMap = {}) {
-    return remove({ id, query_params, path: PATH });
+export function removeTrigger(id: string) {
+    return remove({ id, query_params: {}, path: PATH });
 }
 
 /**

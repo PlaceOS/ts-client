@@ -19,9 +19,8 @@ describe('SAML Auth Sources API', () => {
     test('should allow showing SAML source details', async () => {
         const spy = vi.spyOn(Resources, 'show');
         spy.mockImplementation((_) => of(_.fn!({}) as any));
-        let item = await SERVICE.showSAMLSource('1').toPromise();
+        const item = await SERVICE.showSAMLSource('1').toPromise();
         expect(item).toBeInstanceOf(PlaceSAMLSource);
-        item = await SERVICE.showSAMLSource('1', {}).toPromise();
     });
 
     test('should allow creating new SAML sources', async () => {
@@ -43,8 +42,7 @@ describe('SAML Auth Sources API', () => {
     test('should allow removing SAML sources', async () => {
         const spy = vi.spyOn(Resources, 'remove');
         spy.mockImplementation(() => of());
-        let item = await SERVICE.removeSAMLSource('1').toPromise();
+        const item = await SERVICE.removeSAMLSource('1').toPromise();
         expect(item).toBeFalsy();
-        item = await SERVICE.removeSAMLSource('1', {}).toPromise();
     });
 });

@@ -7,15 +7,20 @@ import { HashMap } from '../utilities/types';
 export interface PlaceResourceQueryOptions {
     /**
      * Search filter supporting the following syntax
-     * https://www.elastic.co/guide/en/elasticsearch/reference/5.5/query-dsl-simple-query-string-query.html
+     * https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-simple-query-string-query.html
      */
     q?: string;
-    /** Comma seperated list of fields to apply the query to */
+    /**
+     * Comma separated list of fields to search.
+     * Accepts wildcard expressions and boost relevance scores using caret ^ operator.
+     */
     fields?: string;
     /** Number of results to return. Defaults to `20`. Max `500` */
     limit?: number;
-    /** Offsets of the results to return. Max `10000` */
+    /** @deprecated Use `ref` for pagination. Offset of the results to return. Max `10000` */
     offset?: number;
+    /** Token for accessing the next page of results, provided in the `Link` header */
+    ref?: string;
     /** Number of milliseconds to cache the query response */
     cache?: number;
     /** Whether the request is a API poll request */

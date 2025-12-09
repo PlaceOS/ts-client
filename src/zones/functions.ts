@@ -7,6 +7,7 @@ import {
     task,
     update,
 } from '../resources/functions';
+import { PlaceResourceQueryOptions } from '../resources/interface';
 import { PlaceTrigger } from '../triggers/trigger';
 import { HashMap } from '../utilities/types';
 import { PlaceZoneQueryOptions, PlaceZoneShowOptions } from './interfaces';
@@ -84,12 +85,11 @@ export function addZone(form_data: Partial<PlaceZone>) {
 }
 
 /**
- * Remove an application from the database
- * @param id ID of the application
- * @param query_params Query parameters to add the to request URL
+ * Remove a zone from the database
+ * @param id ID of the zone
  */
-export function removeZone(id: string, query_params: HashMap = {}) {
-    return remove({ id, query_params, path: PATH });
+export function removeZone(id: string) {
+    return remove({ id, query_params: {}, path: PATH });
 }
 
 /**
@@ -97,7 +97,10 @@ export function removeZone(id: string, query_params: HashMap = {}) {
  * @param id ID of the zone
  * @param query_params Query parameters to add the to request URL
  */
-export function listZoneTriggers(id: string, query_params: HashMap = {}) {
+export function listZoneTriggers(
+    id: string,
+    query_params: PlaceResourceQueryOptions = {},
+) {
     return query({
         query_params,
         fn: (i: Partial<PlaceTrigger>) => new PlaceTrigger(i),

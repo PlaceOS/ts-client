@@ -17,3 +17,11 @@ export interface PlaceSettingsQueryOptions extends PlaceResourceQueryOptions {
     /** ID of the parent zone, system, module or driver to grab settings for */
     parent_id?: string;
 }
+
+/** Allowable query parameters for settings history endpoint */
+export interface PlaceSettingsHistoryOptions {
+    /** Maximum number of results to return */
+    limit?: number;
+    /** Starting offset of the result set for pagination */
+    offset?: number;
+}

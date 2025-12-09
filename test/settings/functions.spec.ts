@@ -18,9 +18,8 @@ describe('Settings API', () => {
     test('should allow showing settings details', async () => {
         const spy = vi.spyOn(Resources, 'show');
         spy.mockImplementation((_) => of(_.fn!({}) as any));
-        let item = await SERVICE.showSettings('1').toPromise();
+        const item = await SERVICE.showSettings('1').toPromise();
         expect(item).toBeInstanceOf(PlaceSettings);
-        item = await SERVICE.showSettings('1', {}).toPromise();
     });
 
     test('should allow creating new settings', async () => {
@@ -42,9 +41,8 @@ describe('Settings API', () => {
     test('should allow removing settings', async () => {
         const spy = vi.spyOn(Resources, 'remove');
         spy.mockImplementation(() => of());
-        let item = await SERVICE.removeSettings('1', {}).toPromise();
+        const item = await SERVICE.removeSettings('1').toPromise();
         expect(item).toBeFalsy();
-        item = await SERVICE.removeSettings('1').toPromise();
     });
 
     test('should allow getting settings history', async () => {

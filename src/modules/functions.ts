@@ -9,7 +9,11 @@ import {
 } from '../resources/functions';
 import { PlaceSettings } from '../settings/settings';
 import { HashMap } from '../utilities/types';
-import { PlaceModulePingOptions, PlaceModuleQueryOptions } from './interfaces';
+import {
+    PlaceModulePingOptions,
+    PlaceModuleQueryOptions,
+    PlaceModuleShowOptions,
+} from './interfaces';
 import { PlaceModule } from './module';
 
 /**
@@ -35,7 +39,7 @@ export function queryModules(query_params: PlaceModuleQueryOptions = {}) {
  * @param id ID of the module to retrieve
  * @param query_params Query parameters to add the to request URL
  */
-export function showModule(id: string, query_params: HashMap = {}) {
+export function showModule(id: string, query_params: PlaceModuleShowOptions = {}) {
     return show({ id, query_params, fn: process, path: PATH });
 }
 
@@ -73,10 +77,9 @@ export function addModule(form_data: Partial<PlaceModule>) {
 /**
  * Remove a module from the database
  * @param id ID of the module
- * @param query_params Query parameters to add the to request URL
  */
-export function removeModule(id: string, query_params: HashMap = {}) {
-    return remove({ id, query_params, path: PATH });
+export function removeModule(id: string) {
+    return remove({ id, query_params: {}, path: PATH });
 }
 
 /**
@@ -100,7 +103,7 @@ export function stopModule(id: string) {
  * @param id Module ID
  */
 export function pingModule(id: string): Observable<PlaceModulePingOptions> {
-    return task({ id, task_name: 'stop', path: PATH });
+    return task({ id, task_name: 'ping', method: 'post', path: PATH });
 }
 
 /**
@@ -121,7 +124,7 @@ export function lookupModuleState(
     id: string,
     key: string,
 ): Observable<HashMap> {
-    return task({ id, task_name: `state${key}`, method: 'get', path: PATH });
+    return task({ id, task_name: `state/${key}`, method: 'get', path: PATH });
 }
 
 /**

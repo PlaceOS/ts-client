@@ -8,13 +8,15 @@ import {
     task,
     update,
 } from '../resources/functions';
-import { PlaceResourceQueryOptions } from '../resources/interface';
 import { HashMap } from '../utilities/types';
 import {
     GitCommitDetails,
+    PlaceRemoteRepositoryCommitsQuery,
+    PlaceRemoteRepositoryQuery,
     PlaceRepositoryCommitQuery,
     PlaceRepositoryDetailsQuery,
     PlaceRepositoryPullQuery,
+    PlaceRepositoryQueryOptions,
 } from './interfaces';
 import { PlaceRepository } from './repository';
 
@@ -33,7 +35,7 @@ function process(item: Partial<PlaceRepository>) {
  * @param query_params Query parameters to add the to request URL
  */
 export function queryRepositories(
-    query_params: PlaceResourceQueryOptions = {},
+    query_params: PlaceRepositoryQueryOptions = {},
 ) {
     return query({ query_params, fn: process, path: PATH });
 }
@@ -41,10 +43,9 @@ export function queryRepositories(
 /**
  * Get the data for a repository
  * @param id ID of the repository to retrieve
- * @param query_params Query parameters to add the to request URL
  */
-export function showRepository(id: string, query_params: HashMap = {}) {
-    return show({ id, query_params, fn: process, path: PATH });
+export function showRepository(id: string) {
+    return show({ id, query_params: {}, fn: process, path: PATH });
 }
 
 /**
@@ -79,34 +80,30 @@ export function addRepository(form_data: Partial<PlaceRepository>) {
 }
 
 /**
- * Remove an repository from the database
+ * Remove a repository from the database
  * @param id ID of the repository
- * @param query_params Query parameters to add the to request URL
  */
-export function removeRepository(id: string, query_params: HashMap = {}) {
-    return remove({ id, query_params, path: PATH });
+export function removeRepository(id: string) {
+    return remove({ id, query_params: {}, path: PATH });
 }
 
 /**
  * Get a list of all the interfaces
- * @param query_params Addition query parameters to pass to the request
  */
-export function listInterfaceRepositories(
-    query_params: HashMap = {},
-): Observable<string[]> {
+export function listInterfaceRepositories(): Observable<string[]> {
     return show({
         id: 'interfaces',
-        query_params,
+        query_params: {},
         path: PATH,
     });
 }
 
 /**
- * Get name of the default branches for a new repository
+ * Get name of the default branch for a new repository
  * @param query_params Details about the repository
  */
 export function listRemoteRepositoryDefaultBranch(
-    query_params: RepositoryDetails,
+    query_params: PlaceRemoteRepositoryQuery,
 ): Observable<string> {
     return show({
         id: 'remote_default_branch',
@@ -115,21 +112,12 @@ export function listRemoteRepositoryDefaultBranch(
     });
 }
 
-export interface RepositoryDetails {
-    /** Git URL of the remote repository */
-    repository_url: string;
-    /** Username required to access the repository */
-    username?: string;
-    /** Password for the required user */
-    password?: string;
-}
-
 /**
  * Get a list of branches for a new repository
  * @param query_params Details about the repository
  */
 export function listRemoteRepositoryBranches(
-    query_params: RepositoryDetails,
+    query_params: PlaceRemoteRepositoryQuery,
 ): Observable<string[]> {
     return show({
         id: 'remote_branches',
@@ -138,19 +126,12 @@ export function listRemoteRepositoryBranches(
     });
 }
 
-export interface RepositoryBranchDetails extends RepositoryDetails {
-    /** Branch to grab details for. Defaults to the default branch */
-    branch?: string;
-    /** Number of commits to retrieve from the remote. Defaults to `50` */
-    depth?: number;
-}
-
 /**
  * Get a list of branch commits for a new repository
  * @param query_params Details about the repository
  */
 export function listRemoteRepositoryCommits(
-    query_params: RepositoryBranchDetails,
+    query_params: PlaceRemoteRepositoryCommitsQuery,
 ): Observable<GitCommitDetails[]> {
     return show({
         id: 'remote_commits',
@@ -164,7 +145,7 @@ export function listRemoteRepositoryCommits(
  * @param query_params Details about the repository
  */
 export function listRemoteRepositoryTags(
-    query_params: RepositoryDetails,
+    query_params: PlaceRemoteRepositoryQuery,
 ): Observable<string[]> {
     return show({
         id: 'remote_tags',

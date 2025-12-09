@@ -11,7 +11,6 @@ import {
     update,
 } from '../api';
 import { apiEndpoint } from '../auth';
-import { PlaceResourceQueryOptions } from '../resources/interface';
 import { toQueryString } from '../utilities/api';
 import {
     PlaceAsset,
@@ -19,6 +18,12 @@ import {
     PlaceAssetPurchaseOrder,
     PlaceAssetType,
 } from './assets.class';
+import {
+    PlaceAssetCategoryQueryOptions,
+    PlaceAssetPurchaseOrderQueryOptions,
+    PlaceAssetQueryOptions,
+    PlaceAssetTypeQueryOptions,
+} from './types';
 
 ///////////////////////////////////////////////////////////////
 //////////////////////////   Assets   /////////////////////////
@@ -38,7 +43,7 @@ function processAsset(item: Partial<PlaceAsset>) {
  * Query the available assets
  * @param query_params Query parameters to add the to request URL
  */
-export function queryAssets(query_params: PlaceResourceQueryOptions = {}) {
+export function queryAssets(query_params: PlaceAssetQueryOptions = {}) {
     return query({
         query_params,
         fn: processAsset,
@@ -173,7 +178,7 @@ function processAssetType(item: Partial<PlaceAssetType>) {
  * Query the available asset types
  * @param query_params Query parameters to add the to request URL
  */
-export function queryAssetTypes(query_params: PlaceResourceQueryOptions = {}) {
+export function queryAssetTypes(query_params: PlaceAssetTypeQueryOptions = {}) {
     return query({
         query_params,
         fn: processAssetType,
@@ -265,7 +270,7 @@ function processAssetCategory(item: Partial<PlaceAssetCategory>) {
  * @param query_params Query parameters to add the to request URL
  */
 export function queryAssetCategories(
-    query_params: PlaceResourceQueryOptions = {},
+    query_params: PlaceAssetCategoryQueryOptions = {},
 ) {
     return query({
         query_params,
@@ -358,7 +363,7 @@ function processAssetPurchaseOrder(item: Partial<PlaceAssetPurchaseOrder>) {
  * @param query_params Query parameters to add the to request URL
  */
 export function queryAssetPurchaseOrders(
-    query_params: PlaceResourceQueryOptions = {},
+    query_params: PlaceAssetPurchaseOrderQueryOptions = {},
 ) {
     return query({
         query_params,

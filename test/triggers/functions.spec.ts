@@ -40,7 +40,7 @@ describe('Triggers API', () => {
     test('should allow removing triggers', async () => {
         const spy = vi.spyOn(Resources, 'remove');
         spy.mockImplementation(() => of());
-        const item = await SERVICE.removeTrigger('1', {}).toPromise();
+        const item = await SERVICE.removeTrigger('1').toPromise();
         expect(item).toBeFalsy();
     });
 

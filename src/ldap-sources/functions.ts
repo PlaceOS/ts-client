@@ -1,6 +1,5 @@
 import { PlaceAuthSourceQueryOptions } from '../auth-sources/interfaces';
 import { create, query, remove, show, update } from '../resources/functions';
-import { HashMap } from '../utilities/types';
 import { PlaceLDAPSource } from './ldap-source';
 
 /**
@@ -26,10 +25,9 @@ export function queryLDAPSources(
 /**
  * Get the data for an LDAP source
  * @param id ID of the LDAP source to retrieve
- * @param query_params Query parameters to add the to request URL
  */
-export function showLDAPSource(id: string, query_params: HashMap = {}) {
-    return show({ id, query_params, fn: process, path: PATH });
+export function showLDAPSource(id: string) {
+    return show({ id, query_params: {}, fn: process, path: PATH });
 }
 
 /**
@@ -66,8 +64,7 @@ export function addLDAPSource(form_data: Partial<PlaceLDAPSource>) {
 /**
  * Remove an LDAP source from the database
  * @param id ID of the LDAP source
- * @param query_params Query parameters to add the to request URL
  */
-export function removeLDAPSource(id: string, query_params: HashMap = {}) {
-    return remove({ id, query_params, path: PATH });
+export function removeLDAPSource(id: string) {
+    return remove({ id, query_params: {}, path: PATH });
 }

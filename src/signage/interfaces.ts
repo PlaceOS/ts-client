@@ -6,8 +6,17 @@ export interface SignageMetrics {
     media_counts: Record<string, number>;
 }
 
-/** Allowable query parameters for systems index endpoint */
+/** Allowable query parameters for signage media index endpoint */
 export interface SignageMediaQueryOptions extends PlaceResourceQueryOptions {
     /** ID of the authority to filter the returned values on */
     authority_id?: string;
+}
+
+/** Allowable query parameters for signage playlists index endpoint */
+export interface SignagePlaylistQueryOptions extends PlaceResourceQueryOptions {}
+
+/** Allowable query parameters for signage playlist media revisions endpoint */
+export interface SignagePlaylistRevisionsOptions {
+    /** Maximum number of revisions to return */
+    limit?: number;
 }

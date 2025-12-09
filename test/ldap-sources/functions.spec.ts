@@ -38,7 +38,7 @@ describe('LDAPSources API', () => {
     test('should allow removing ldapsources', async () => {
         const spy = vi.spyOn(Resources, 'remove');
         spy.mockImplementation(() => of());
-        const item = await SERVICE.removeLDAPSource('1', {}).toPromise();
+        const item = await SERVICE.removeLDAPSource('1').toPromise();
         expect(item).toBeFalsy();
     });
 });

@@ -7,7 +7,6 @@ import {
     task,
     update,
 } from '../resources/functions';
-import { HashMap } from '../utilities/types';
 import { PlaceEdge } from './edge';
 
 /**
@@ -31,10 +30,9 @@ export function queryEdges(query_params: PlaceAuthSourceQueryOptions = {}) {
 /**
  * Get the data for an Edge
  * @param id ID of the Edge to retrieve
- * @param query_params Query parameters to add the to request URL
  */
-export function showEdge(id: string, query_params: HashMap = {}) {
-    return show({ id, query_params, fn: process, path: PATH });
+export function showEdge(id: string) {
+    return show({ id, query_params: {}, fn: process, path: PATH });
 }
 
 /**
@@ -71,22 +69,20 @@ export function addEdge(form_data: Partial<PlaceEdge>) {
 /**
  * Remove an Edge node from the database
  * @param id ID of the Edge
- * @param query_params Query parameters to add the to request URL
  */
-export function removeEdge(id: string, query_params: HashMap = {}) {
-    return remove({ id, query_params, path: PATH });
+export function removeEdge(id: string) {
+    return remove({ id, query_params: {}, path: PATH });
 }
 
 /**
  * Generate token for Edge connection
  * @param id ID of the Edge
- * @param query_params Query parameters to add the to request URL
  */
-export function retrieveEdgeToken(id: string, query_params: HashMap = {}) {
+export function retrieveEdgeToken(id: string) {
     return task<{ token: string }>({
         id,
         task_name: 'token',
-        form_data: query_params,
+        form_data: {},
         method: 'get',
         path: PATH,
     });

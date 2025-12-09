@@ -1,5 +1,4 @@
 import { create, query, remove, show, update } from '../resources/functions';
-import { HashMap } from '../utilities/types';
 import { PlaceApplication } from './application';
 import { PlaceApplicationQueryOptions } from './interfaces';
 
@@ -26,10 +25,9 @@ export function queryApplications(
 /**
  * Get the data for an application
  * @param id ID of the application to retrieve
- * @param query_params Query parameters to add the to request URL
  */
-export function showApplication(id: string, query_params: HashMap = {}) {
-    return show({ id, query_params, fn: process, path: PATH });
+export function showApplication(id: string) {
+    return show({ id, query_params: {}, fn: process, path: PATH });
 }
 
 /**
@@ -66,8 +64,7 @@ export function addApplication(form_data: Partial<PlaceApplication>) {
 /**
  * Remove an application from the database
  * @param id ID of the application
- * @param query_params Query parameters to add the to request URL
  */
-export function removeApplication(id: string, query_params: HashMap = {}) {
-    return remove({ id, query_params, path: PATH });
+export function removeApplication(id: string) {
+    return remove({ id, query_params: {}, path: PATH });
 }

@@ -30,6 +30,6 @@ describe('Cluster API', () => {
 
     test('should allow terminating processes', async () => {
         (Resources.remove as any) = vi.fn().mockImplementation(() => of());
-        await SERVICE.terminateProcess('1', '2').toPromise();
+        await SERVICE.terminateProcess('1', { driver: 'driver-1' }).toPromise();
     });
 });

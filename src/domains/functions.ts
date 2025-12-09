@@ -1,6 +1,5 @@
 import { create, query, remove, show, update } from '../resources/functions';
 import { PlaceResourceQueryOptions } from '../resources/interface';
-import { HashMap } from '../utilities/types';
 import { PlaceDomain } from './domain';
 
 /**
@@ -24,10 +23,9 @@ export function queryDomains(query_params: PlaceResourceQueryOptions = {}) {
 /**
  * Get the data for a domain
  * @param id ID of the domain to retrieve
- * @param query_params Query parameters to add the to request URL
  */
-export function showDomain(id: string, query_params: HashMap = {}) {
-    return show({ id, query_params, fn: process, path: PATH });
+export function showDomain(id: string) {
+    return show({ id, query_params: {}, fn: process, path: PATH });
 }
 
 /**
@@ -64,8 +62,7 @@ export function addDomain(form_data: Partial<PlaceDomain>) {
 /**
  * Remove a domain from the database
  * @param id ID of the domain
- * @param query_params Query parameters to add the to request URL
  */
-export function removeDomain(id: string, query_params: HashMap = {}) {
-    return remove({ id, query_params, path: PATH });
+export function removeDomain(id: string) {
+    return remove({ id, query_params: {}, path: PATH });
 }

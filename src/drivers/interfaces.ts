@@ -1,13 +1,17 @@
-/** Mapping of available query paramters for the dependencies index */
-export interface PlaceDriverQueryOptions {
-    /** Set maximum number of results to return. Defaults to `20` */
-    limit?: number;
-    /** Set number of results to skip. Defaults to `0` */
-    offset?: number;
-    /** Filter result by type of driver. One of either `ssh`, `device`, `service` or `logic` */
+import { PlaceResourceQueryOptions } from '../resources/interface';
+
+/** Mapping of available query parameters for the drivers index endpoint */
+export interface PlaceDriverQueryOptions extends PlaceResourceQueryOptions {
+    /** Filter result by type of driver */
     role?: 'ssh' | 'device' | 'service' | 'logic' | 'websocket';
     /** Only return drivers that have an update available */
     update_available?: boolean;
+}
+
+/** Mapping of available query parameters for the drivers show endpoint */
+export interface PlaceDriverShowOptions {
+    /** Check if the driver is compiled */
+    compilation_status?: boolean;
 }
 
 /** List of details that can be assigned to a new Driver */

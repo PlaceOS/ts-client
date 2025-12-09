@@ -43,9 +43,8 @@ describe('Modules API', () => {
     test('should allow removing modules', async () => {
         const spy = vi.spyOn(Resources, 'remove');
         spy.mockImplementation(() => of());
-        let item = await SERVICE.removeModule('1', {}).toPromise();
+        const item = await SERVICE.removeModule('1').toPromise();
         expect(item).toBeFalsy();
-        item = await SERVICE.removeModule('1').toPromise();
     });
 
     test('should allow starting a module', async () => {

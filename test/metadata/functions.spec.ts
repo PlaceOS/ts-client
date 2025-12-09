@@ -39,9 +39,8 @@ describe('Applications API', () => {
     test('should allow removing metadata', async () => {
         const spy = vi.spyOn(Resources, 'remove');
         spy.mockImplementation(() => of());
-        let item = await SERVICE.removeMetadata('1', {}).toPromise();
+        const item = await SERVICE.removeMetadata('1', { name: 'test' }).toPromise();
         expect(item).toBeFalsy();
-        item = await SERVICE.removeMetadata('1').toPromise();
     });
 
     test('should allow listing child zone metadata', async () => {
