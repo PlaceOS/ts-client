@@ -71,3 +71,21 @@ export interface PlaceSystemTriggersQueryOptions extends PlaceResourceQueryOptio
     /** Return triggers updated before the time specified (unix epoch) */
     as_of?: number;
 }
+
+/** Allowable query parameters for systems control endpoint */
+export interface PlaceSystemControlOptions {
+    /** Fixed device identifier */
+    fixed_device?: boolean;
+}
+
+/** Allowable query parameters for system metadata endpoint */
+export interface PlaceSystemMetadataOptions {
+    /** Name of the metadata key */
+    name?: string;
+}
+
+/** Allowable query parameters for system trigger show endpoint */
+export interface PlaceSystemTriggerShowOptions {
+    /** Return the full trigger details */
+    complete?: boolean;
+}

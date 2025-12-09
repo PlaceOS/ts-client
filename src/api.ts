@@ -61,6 +61,8 @@ export {
 
 export { PlaceCluster } from './clusters/cluster';
 export {
+    clusterRebalance,
+    clusterVersions,
     queryClusters,
     queryProcesses,
     showCluster,
@@ -70,12 +72,14 @@ export type {
     PlaceClusterQueryOptions,
     PlaceClusterShowOptions,
     PlaceClusterTerminateOptions,
+    PlaceClusterVersions,
 } from './clusters/interfaces';
 export { PlaceProcess } from './clusters/process';
 
 export { PlaceDomain } from './domains/domain';
 export {
     addDomain,
+    lookupDomainByEmail,
     queryDomains,
     removeDomain,
     showDomain,
@@ -104,6 +108,7 @@ export type {
 export { PlaceEdge } from './edge/edge';
 export {
     addEdge,
+    edgeControlUrl,
     queryEdges,
     removeEdge,
     retrieveEdgeToken,
@@ -140,6 +145,7 @@ export { PlaceZoneMetadata } from './metadata/zone-metadata';
 
 export {
     addModule,
+    executeOnModule,
     loadModule,
     lookupModuleState,
     moduleRuntimeError,
@@ -179,6 +185,7 @@ export {
     listRepositoryDefaultBranch,
     listRepositoryDriverDetails,
     listRepositoryDrivers,
+    listRepositoryFolders,
     pullRepositoryChanges,
     queryRepositories,
     removeRepository,
@@ -252,17 +259,24 @@ export {
     removeSystemModule,
     removeSystemTrigger,
     showSystem,
+    showSystemTrigger,
     startSystem,
     stopSystem,
+    systemControlUrl,
+    systemMetadata,
     systemModuleState,
     systemSettings,
     updateSystem,
+    updateSystemTrigger,
 } from './systems/functions';
 export type {
     PlaceModuleFunction,
     PlaceModuleFunctionMap,
+    PlaceSystemControlOptions,
+    PlaceSystemMetadataOptions,
     PlaceSystemShowOptions,
     PlaceSystemStartStopOptions,
+    PlaceSystemTriggerShowOptions,
     PlaceSystemTriggersQueryOptions,
     PlaceSystemUpdateOptions,
     PlaceSystemsQueryOptions,
@@ -305,13 +319,23 @@ export { PlaceTrigger } from './triggers/trigger';
 export {
     addUser,
     currentUser,
+    currentUserResourceToken,
+    queryUserGroups,
     queryUsers,
     removeUser,
+    removeUserResourceToken,
+    reviveUser,
+    searchUserMetadata,
     showUser,
     updateUser,
+    userMetadata,
+    userResourceToken,
 } from './users/functions';
 export type {
     PlaceUserDeleteOptions,
+    PlaceUserGroupsOptions,
+    PlaceUserMetadataOptions,
+    PlaceUserMetadataSearchOptions,
     PlaceUserQueryOptions,
     PlaceUserShowOptions,
 } from './users/interfaces';
@@ -327,6 +351,7 @@ export {
     removeZone,
     showZone,
     updateZone,
+    zoneMetadata,
 } from './zones/functions';
 export type {
     PlaceZoneMetadataQueryOptions,

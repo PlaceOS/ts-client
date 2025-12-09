@@ -1,4 +1,5 @@
 import { Observable } from 'rxjs';
+import { apiEndpoint } from '../auth/functions';
 import {
     create,
     query,
@@ -13,10 +14,13 @@ import { HashMap } from '../utilities/types';
 import { PlaceZone } from '../zones/zone';
 import {
     PlaceModuleFunctionMap,
+    PlaceSystemControlOptions,
+    PlaceSystemMetadataOptions,
     PlaceSystemShowOptions,
     PlaceSystemsQueryOptions,
     PlaceSystemsWithEmailsOptions,
     PlaceSystemStartStopOptions,
+    PlaceSystemTriggerShowOptions,
     PlaceSystemTriggersQueryOptions,
 } from './interfaces';
 import { PlaceSystem } from './system';
@@ -357,6 +361,83 @@ export function systemSettings(id: string): Observable<PlaceSettings[]> {
         method: 'get',
         callback: (list) =>
             list.map((item: Partial<PlaceSettings>) => new PlaceSettings(item)),
+        path: PATH,
+    });
+}
+
+/**
+ * Get the websocket API endpoint URL for system control.
+ * @param query_params Query parameters to add to the URL
+ */
+export function systemControlUrl(query_params: PlaceSystemControlOptions = {}): string {
+    const endpoint = apiEndpoint();
+    const wsProtocol = endpoint.startsWith('https') ? 'wss:' : 'ws:';
+    const httpProtocol = endpoint.startsWith('https') ? 'https:' : 'http:';
+    let url = endpoint.replace(httpProtocol, wsProtocol) + `${PATH}/control`;
+    if (query_params.fixed_device) {
+        url += `?fixed_device=${encodeURIComponent(String(query_params.fixed_device))}`;
+    }
+    return url;
+}
+
+/**
+ * Get metadata for the system
+ * @param id System ID
+ * @param query_params Query parameters to add to the request
+ */
+export function systemMetadata(
+    id: string,
+    query_params: PlaceSystemMetadataOptions = {},
+): Observable<HashMap> {
+    return task({
+        id,
+        task_name: 'metadata',
+        form_data: query_params,
+        method: 'get',
+        path: PATH,
+    });
+}
+
+/**
+ * Get a particular trigger instance
+ * @param sys_id System ID
+ * @param trig_id Trigger ID
+ * @param query_params Query parameters to add to the request
+ */
+export function showSystemTrigger(
+    sys_id: string,
+    trig_id: string,
+    query_params: PlaceSystemTriggerShowOptions = {},
+): Observable<PlaceTrigger> {
+    return task({
+        id: sys_id,
+        task_name: `triggers/${encodeURIComponent(trig_id)}`,
+        form_data: query_params,
+        method: 'get',
+        callback: (item: Partial<PlaceTrigger>) => new PlaceTrigger(item),
+        path: PATH,
+    });
+}
+
+/**
+ * Update the details of a trigger instance
+ * @param sys_id System ID
+ * @param trig_id Trigger ID
+ * @param data Values for trigger properties
+ * @param method HTTP verb to use on request. Defaults to `patch`
+ */
+export function updateSystemTrigger(
+    sys_id: string,
+    trig_id: string,
+    data: Partial<PlaceTrigger>,
+    method: 'put' | 'patch' = 'patch',
+): Observable<PlaceTrigger> {
+    return task({
+        id: sys_id,
+        task_name: `triggers/${encodeURIComponent(trig_id)}`,
+        form_data: data,
+        method,
+        callback: (item: Partial<PlaceTrigger>) => new PlaceTrigger(item),
         path: PATH,
     });
 }

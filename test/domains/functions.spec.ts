@@ -3,6 +3,8 @@ import { describe, expect, test, vi } from 'vitest';
 import { PlaceDomain } from '../../src/domains/domain';
 import * as SERVICE from '../../src/domains/functions';
 import * as Resources from '../../src/resources/functions';
+import * as Http from '../../src/http/functions';
+import * as Auth from '../../src/auth/functions';
 
 describe('Domains API', () => {
     test('should allow querying domain', async () => {
@@ -43,5 +45,16 @@ describe('Domains API', () => {
         spy.mockImplementation(() => of());
         const item = await SERVICE.removeDomain('1').toPromise();
         expect(item).toBeFalsy();
+    });
+
+    test('should allow looking up domain by email', async () => {
+        const authSpy = vi.spyOn(Auth, 'apiEndpoint');
+        authSpy.mockReturnValue('/api/engine/v2/');
+        const httpSpy = vi.spyOn(Http, 'get');
+        httpSpy.mockImplementation(() => of({ id: 'domain-1', name: 'Test Domain' }) as any);
+
+        const result = await SERVICE.lookupDomainByEmail('user@example.com').toPromise();
+        expect(result).toBeInstanceOf(PlaceDomain);
+        expect(httpSpy).toHaveBeenCalledWith('/api/engine/v2/domains/lookup/user%40example.com');
     });
 });

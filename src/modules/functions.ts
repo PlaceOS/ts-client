@@ -162,3 +162,22 @@ export function moduleRuntimeError(id: string) {
         path: PATH,
     });
 }
+
+/**
+ * Execute a command on a module
+ * @param id Module ID
+ * @param method Name of the method to execute
+ * @param args Array of arguments to pass to the executed method
+ */
+export function executeOnModule(
+    id: string,
+    method: string,
+    args: any[] = [],
+): Observable<HashMap> {
+    return task({
+        id,
+        task_name: `exec/${encodeURIComponent(method)}`,
+        form_data: args,
+        path: PATH,
+    });
+}

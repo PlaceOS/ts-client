@@ -21,3 +21,25 @@ export interface PlaceUserDeleteOptions {
     /** Force permanent removal of user */
     force_removal?: boolean;
 }
+
+/** Mapping of available query parameters for the users groups endpoint */
+export interface PlaceUserGroupsOptions {
+    /** Comma-separated list of email addresses */
+    emails: string;
+}
+
+/** Mapping of available query parameters for the users metadata search endpoint */
+export interface PlaceUserMetadataSearchOptions {
+    /** JSON Path query filter */
+    filter: string;
+    /** Maximum number of results to return */
+    limit?: number;
+    /** Offset for pagination */
+    offset?: number;
+}
+
+/** Mapping of available query parameters for the user metadata endpoint */
+export interface PlaceUserMetadataOptions {
+    /** Name of the metadata key */
+    name?: string;
+}

@@ -1,9 +1,15 @@
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { apiEndpoint } from '../auth/functions';
+import { get, post } from '../http/functions';
 import { query, remove, show } from '../resources/functions';
+import { HashMap } from '../utilities/types';
 import { PlaceCluster } from './cluster';
 import {
     PlaceClusterQueryOptions,
     PlaceClusterShowOptions,
     PlaceClusterTerminateOptions,
+    PlaceClusterVersions,
 } from './interfaces';
 import { PlaceProcess } from './process';
 
@@ -67,4 +73,20 @@ export function terminateProcess(
     query_params: PlaceClusterTerminateOptions,
 ) {
     return remove({ id, query_params, path: PATH });
+}
+
+/**
+ * Force the core nodes to perform a cluster rebalance
+ */
+export function clusterRebalance(): Observable<void> {
+    const url = `${apiEndpoint()}${PATH}/rebalance`;
+    return post(url, {}).pipe(map(() => undefined));
+}
+
+/**
+ * Get the core node versions
+ */
+export function clusterVersions(): Observable<PlaceClusterVersions> {
+    const url = `${apiEndpoint()}${PATH}/versions`;
+    return get(url).pipe(map((resp: HashMap) => resp as PlaceClusterVersions));
 }

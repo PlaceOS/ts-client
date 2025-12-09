@@ -1,3 +1,4 @@
+import { apiEndpoint } from '../auth/functions';
 import { PlaceAuthSourceQueryOptions } from '../auth-sources/interfaces';
 import {
     create,
@@ -86,4 +87,15 @@ export function retrieveEdgeToken(id: string) {
         method: 'get',
         path: PATH,
     });
+}
+
+/**
+ * Get the edge control websocket URL.
+ * This is the endpoint that edge devices use to connect to the cluster.
+ */
+export function edgeControlUrl(): string {
+    const endpoint = apiEndpoint();
+    const wsProtocol = endpoint.startsWith('https') ? 'wss:' : 'ws:';
+    const httpProtocol = endpoint.startsWith('https') ? 'https:' : 'http:';
+    return endpoint.replace(httpProtocol, wsProtocol) + `${PATH}/control`;
 }

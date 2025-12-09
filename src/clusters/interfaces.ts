@@ -19,3 +19,9 @@ export interface PlaceClusterTerminateOptions {
     /** The name of the driver to terminate (required) */
     driver: string;
 }
+
+/** Response from the cluster versions endpoint */
+export interface PlaceClusterVersions {
+    /** Map of node ID to version string */
+    [nodeId: string]: string;
+}

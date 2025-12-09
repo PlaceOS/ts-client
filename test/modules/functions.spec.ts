@@ -99,4 +99,12 @@ describe('Modules API', () => {
         expect(item).toBeTruthy();
         expect(item[0]).toBeInstanceOf(PlaceSettings);
     });
+
+    test('should allow executing a method on a module', async () => {
+        const spy = vi.spyOn(Resources, 'task');
+        spy.mockImplementation(() => of({ result: 'success' }));
+        let item = await SERVICE.executeOnModule('1', 'test_method').toPromise();
+        expect(item).toEqual({ result: 'success' });
+        item = await SERVICE.executeOnModule('1', 'test_method', ['arg1', 'arg2']).toPromise();
+    });
 });

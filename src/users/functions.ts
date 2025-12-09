@@ -1,6 +1,15 @@
-import { create, query, remove, show, update } from '../resources/functions';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { apiEndpoint } from '../auth/functions';
+import { del, get, post } from '../http/functions';
+import { create, query, remove, show, task, update } from '../resources/functions';
+import { toQueryString } from '../utilities/api';
+import { HashMap } from '../utilities/types';
 import {
     PlaceUserDeleteOptions,
+    PlaceUserGroupsOptions,
+    PlaceUserMetadataOptions,
+    PlaceUserMetadataSearchOptions,
     PlaceUserQueryOptions,
     PlaceUserShowOptions,
 } from './interfaces';
@@ -79,4 +88,87 @@ export function addUser(form_data: Partial<PlaceUser>) {
  */
 export function removeUser(id: string, query_params: PlaceUserDeleteOptions = {}) {
     return remove({ id, query_params, path: PATH });
+}
+
+/**
+ * Get the groups that users are in
+ * @param query_params Query parameters including email addresses
+ */
+export function queryUserGroups(
+    query_params: PlaceUserGroupsOptions,
+): Observable<HashMap<string[]>> {
+    const q = toQueryString(query_params);
+    const url = `${apiEndpoint()}${PATH}/groups${q ? '?' + q : ''}`;
+    return get(url).pipe(map((resp: HashMap) => resp as HashMap<string[]>));
+}
+
+/**
+ * Search user metadata with provided JSON Path query
+ * @param query_params Query parameters including filter
+ */
+export function searchUserMetadata(
+    query_params: PlaceUserMetadataSearchOptions,
+): Observable<HashMap[]> {
+    const q = toQueryString(query_params);
+    const url = `${apiEndpoint()}${PATH}/metadata/search${q ? '?' + q : ''}`;
+    return get(url).pipe(map((resp: HashMap) => resp as HashMap[]));
+}
+
+/**
+ * Obtain a token to the current user's SSO resources
+ */
+export function currentUserResourceToken(): Observable<{ token: string }> {
+    const url = `${apiEndpoint()}${PATH}/resource_token`;
+    return post(url, {}).pipe(map((resp: HashMap) => resp as { token: string }));
+}
+
+/**
+ * Get a user's metadata
+ * @param id User ID
+ * @param query_params Query parameters to add to the request
+ */
+export function userMetadata(
+    id: string,
+    query_params: PlaceUserMetadataOptions = {},
+): Observable<HashMap> {
+    return task({
+        id,
+        task_name: 'metadata',
+        form_data: query_params,
+        method: 'get',
+        path: PATH,
+    });
+}
+
+/**
+ * Remove the saved resource token of a user
+ * @param id User ID
+ */
+export function removeUserResourceToken(id: string): Observable<void> {
+    const url = `${apiEndpoint()}${PATH}/${encodeURIComponent(id)}/resource_token`;
+    return del(url, { response_type: 'void' });
+}
+
+/**
+ * Obtain a token to the specified user's SSO resources
+ * @param id User ID
+ */
+export function userResourceToken(id: string): Observable<{ token: string }> {
+    const url = `${apiEndpoint()}${PATH}/${encodeURIComponent(id)}/resource_token`;
+    return post(url, {}).pipe(map((resp: HashMap) => resp as { token: string }));
+}
+
+/**
+ * Undelete a user
+ * @param id User ID
+ */
+export function reviveUser(id: string): Observable<PlaceUser> {
+    return task({
+        id,
+        task_name: 'revive',
+        form_data: {},
+        method: 'post',
+        callback: (item: Partial<PlaceUser>) => process(item),
+        path: PATH,
+    });
 }

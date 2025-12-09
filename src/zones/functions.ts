@@ -10,7 +10,7 @@ import {
 import { PlaceResourceQueryOptions } from '../resources/interface';
 import { PlaceTrigger } from '../triggers/trigger';
 import { HashMap } from '../utilities/types';
-import { PlaceZoneQueryOptions, PlaceZoneShowOptions } from './interfaces';
+import { PlaceZoneMetadataQueryOptions, PlaceZoneQueryOptions, PlaceZoneShowOptions } from './interfaces';
 import { PlaceZone } from './zone';
 
 /**
@@ -129,6 +129,24 @@ export function executeOnZone(
             module + '_' + index,
         )}/${encodeURIComponent(method)}`,
         form_data: args,
+        path: PATH,
+    });
+}
+
+/**
+ * Get metadata associated with the selected zone
+ * @param id Zone ID
+ * @param query_params Query parameters to add to the request
+ */
+export function zoneMetadata(
+    id: string,
+    query_params: PlaceZoneMetadataQueryOptions = {},
+): Observable<HashMap> {
+    return task({
+        id,
+        task_name: 'metadata',
+        form_data: query_params,
+        method: 'get',
         path: PATH,
     });
 }

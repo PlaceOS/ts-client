@@ -147,4 +147,12 @@ describe('Repositories API', () => {
         const item = await SERVICE.pullRepositoryChanges('1').toPromise();
         expect(item).toEqual({});
     });
+
+    test('should allow listing repository folders', async () => {
+        const spy = vi.spyOn(Resources, 'task');
+        spy.mockImplementation(() => of(['src/', 'test/', 'lib/']));
+        let item = await SERVICE.listRepositoryFolders('1').toPromise();
+        expect(item).toEqual(['src/', 'test/', 'lib/']);
+        item = await SERVICE.listRepositoryFolders('1', { include_dots: true }).toPromise();
+    });
 });

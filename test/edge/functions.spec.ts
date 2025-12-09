@@ -3,8 +3,9 @@ import { describe, expect, test, vi } from 'vitest';
 import { PlaceEdge } from '../../src/edge/edge';
 import * as SERVICE from '../../src/edge/functions';
 import * as Resources from '../../src/resources/functions';
+import * as Auth from '../../src/auth/functions';
 
-describe('SAML Auth Sources API', () => {
+describe('Edge API', () => {
     test('should allow querying Edges', async () => {
         const spy = vi.spyOn(Resources, 'query');
         spy.mockImplementation((_) => of({ data: [_.fn!({})] } as any));
@@ -51,5 +52,21 @@ describe('SAML Auth Sources API', () => {
         const item = await SERVICE.retrieveEdgeToken('1').toPromise();
         expect(item).toBeTruthy();
         expect(item.token).toBe('s');
+    });
+
+    test('should generate correct edge control websocket URL for HTTPS', () => {
+        const authSpy = vi.spyOn(Auth, 'apiEndpoint');
+        authSpy.mockReturnValue('https://example.com/api/engine/v2/');
+
+        const url = SERVICE.edgeControlUrl();
+        expect(url).toBe('wss://example.com/api/engine/v2/edges/control');
+    });
+
+    test('should generate correct edge control websocket URL for HTTP', () => {
+        const authSpy = vi.spyOn(Auth, 'apiEndpoint');
+        authSpy.mockReturnValue('http://example.com/api/engine/v2/');
+
+        const url = SERVICE.edgeControlUrl();
+        expect(url).toBe('ws://example.com/api/engine/v2/edges/control');
     });
 });

@@ -15,6 +15,7 @@ import {
     PlaceRemoteRepositoryQuery,
     PlaceRepositoryCommitQuery,
     PlaceRepositoryDetailsQuery,
+    PlaceRepositoryFoldersQuery,
     PlaceRepositoryPullQuery,
     PlaceRepositoryQueryOptions,
 } from './interfaces';
@@ -279,6 +280,24 @@ export function pullRepositoryChanges(
         task_name: 'pull',
         form_data: query_params,
         method: 'post',
+        path: PATH,
+    });
+}
+
+/**
+ * Get the folder tree structure of a repository
+ * @param id ID of the repository
+ * @param query_params Query parameters to add to the request
+ */
+export function listRepositoryFolders(
+    id: string,
+    query_params?: PlaceRepositoryFoldersQuery,
+): Observable<string[]> {
+    return task({
+        id,
+        task_name: 'folders',
+        form_data: query_params,
+        method: 'get',
         path: PATH,
     });
 }

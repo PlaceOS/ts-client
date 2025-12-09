@@ -6,6 +6,7 @@ import * as SERVICE from '../../src/systems/functions';
 import { PlaceSystem } from '../../src/systems/system';
 import { PlaceTrigger } from '../../src/triggers/trigger';
 import { PlaceZone } from '../../src/zones/zone';
+import * as Auth from '../../src/auth/functions';
 
 vi.mock('../../src/resources/functions');
 
@@ -178,5 +179,56 @@ describe('Systems API', () => {
         const item = await SERVICE.systemSettings('1').toPromise();
         expect(item).toBeTruthy();
         expect(item?.[0]).toBeInstanceOf(PlaceSettings);
+    });
+
+    test('should generate correct system control websocket URL for HTTPS', () => {
+        const authSpy = vi.spyOn(Auth, 'apiEndpoint');
+        authSpy.mockReturnValue('https://example.com/api/engine/v2/');
+
+        const url = SERVICE.systemControlUrl();
+        expect(url).toBe('wss://example.com/api/engine/v2/systems/control');
+    });
+
+    test('should generate correct system control websocket URL for HTTP', () => {
+        const authSpy = vi.spyOn(Auth, 'apiEndpoint');
+        authSpy.mockReturnValue('http://example.com/api/engine/v2/');
+
+        const url = SERVICE.systemControlUrl();
+        expect(url).toBe('ws://example.com/api/engine/v2/systems/control');
+    });
+
+    test('should include fixed_device in system control URL', () => {
+        const authSpy = vi.spyOn(Auth, 'apiEndpoint');
+        authSpy.mockReturnValue('https://example.com/api/engine/v2/');
+
+        const url = SERVICE.systemControlUrl({ fixed_device: true });
+        expect(url).toBe('wss://example.com/api/engine/v2/systems/control?fixed_device=true');
+    });
+
+    test('should allow getting system metadata', async () => {
+        (Resources.task as any) = vi.fn().mockImplementation(() => of({ key: 'value' }));
+        let item = await SERVICE.systemMetadata('1').toPromise();
+        expect(item).toEqual({ key: 'value' });
+        item = await SERVICE.systemMetadata('1', { name: 'test' }).toPromise();
+    });
+
+    test('should allow showing a system trigger', async () => {
+        (Resources.task as any) = vi
+            .fn()
+            .mockImplementation((_) => of(_.callback({})));
+        let item = await SERVICE.showSystemTrigger('sys-1', 'trig-1').toPromise();
+        expect(item).toBeTruthy();
+        expect(item).toBeInstanceOf(PlaceTrigger);
+        item = await SERVICE.showSystemTrigger('sys-1', 'trig-1', { complete: true }).toPromise();
+    });
+
+    test('should allow updating a system trigger', async () => {
+        (Resources.task as any) = vi
+            .fn()
+            .mockImplementation((_) => of(_.callback({})));
+        let item = await SERVICE.updateSystemTrigger('sys-1', 'trig-1', {}).toPromise();
+        expect(item).toBeTruthy();
+        expect(item).toBeInstanceOf(PlaceTrigger);
+        item = await SERVICE.updateSystemTrigger('sys-1', 'trig-1', {}, 'put').toPromise();
     });
 });

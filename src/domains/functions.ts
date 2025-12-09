@@ -1,5 +1,10 @@
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { apiEndpoint } from '../auth/functions';
+import { get } from '../http/functions';
 import { create, query, remove, show, update } from '../resources/functions';
 import { PlaceResourceQueryOptions } from '../resources/interface';
+import { HashMap } from '../utilities/types';
 import { PlaceDomain } from './domain';
 
 /**
@@ -65,4 +70,13 @@ export function addDomain(form_data: Partial<PlaceDomain>) {
  */
 export function removeDomain(id: string) {
     return remove({ id, query_params: {}, path: PATH });
+}
+
+/**
+ * Find the domain name by looking into domain registered email domains
+ * @param email Email address to lookup
+ */
+export function lookupDomainByEmail(email: string): Observable<PlaceDomain> {
+    const url = `${apiEndpoint()}${PATH}/lookup/${encodeURIComponent(email)}`;
+    return get(url).pipe(map((resp: HashMap) => process(resp as Partial<PlaceDomain>)));
 }

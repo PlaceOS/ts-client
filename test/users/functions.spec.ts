@@ -3,6 +3,8 @@ import { describe, expect, test, vi } from 'vitest';
 import * as Resources from '../../src/resources/functions';
 import * as SERVICE from '../../src/users/functions';
 import { PlaceUser } from '../../src/users/user';
+import * as Http from '../../src/http/functions';
+import * as Auth from '../../src/auth/functions';
 
 describe('Users API', () => {
     test('should allow querying users', async () => {
@@ -53,5 +55,81 @@ describe('Users API', () => {
         let item = await SERVICE.removeUser('1').toPromise();
         expect(item).toBeFalsy();
         item = await SERVICE.removeUser('1', { force_removal: true }).toPromise();
+    });
+
+    test('should allow querying user groups', async () => {
+        const authSpy = vi.spyOn(Auth, 'apiEndpoint');
+        authSpy.mockReturnValue('/api/engine/v2/');
+        const httpSpy = vi.spyOn(Http, 'get');
+        httpSpy.mockImplementation(() => of({ 'user@example.com': ['group1', 'group2'] }) as any);
+
+        const result = await SERVICE.queryUserGroups({ emails: 'user@example.com' }).toPromise();
+        expect(result).toBeTruthy();
+        expect(result!['user@example.com']).toEqual(['group1', 'group2']);
+        expect(httpSpy).toHaveBeenCalledWith(expect.stringContaining('emails=user%40example.com'));
+    });
+
+    test('should allow searching user metadata', async () => {
+        const authSpy = vi.spyOn(Auth, 'apiEndpoint');
+        authSpy.mockReturnValue('/api/engine/v2/');
+        const httpSpy = vi.spyOn(Http, 'get');
+        httpSpy.mockImplementation(() => of([{ id: 'user-1', metadata: {} }]) as any);
+
+        const result = await SERVICE.searchUserMetadata({ filter: '$.department == "engineering"' }).toPromise();
+        expect(result).toBeTruthy();
+        expect(result!.length).toBe(1);
+        expect(httpSpy).toHaveBeenCalledWith(expect.stringContaining('metadata/search'));
+    });
+
+    test('should allow getting current user resource token', async () => {
+        const authSpy = vi.spyOn(Auth, 'apiEndpoint');
+        authSpy.mockReturnValue('/api/engine/v2/');
+        const httpSpy = vi.spyOn(Http, 'post');
+        httpSpy.mockImplementation(() => of({ token: 'abc123' }) as any);
+
+        const result = await SERVICE.currentUserResourceToken().toPromise();
+        expect(result).toBeTruthy();
+        expect(result!.token).toBe('abc123');
+        expect(httpSpy).toHaveBeenCalledWith('/api/engine/v2/users/resource_token', {});
+    });
+
+    test('should allow getting user metadata', async () => {
+        const spy = vi.spyOn(Resources, 'task');
+        spy.mockImplementation(() => of({ key: 'value' }));
+        let item = await SERVICE.userMetadata('1').toPromise();
+        expect(item).toEqual({ key: 'value' });
+        item = await SERVICE.userMetadata('1', { name: 'test' }).toPromise();
+    });
+
+    test('should allow removing user resource token', async () => {
+        const authSpy = vi.spyOn(Auth, 'apiEndpoint');
+        authSpy.mockReturnValue('/api/engine/v2/');
+        const httpSpy = vi.spyOn(Http, 'del');
+        httpSpy.mockImplementation(() => of(undefined) as any);
+
+        await SERVICE.removeUserResourceToken('user-1').toPromise();
+        expect(httpSpy).toHaveBeenCalledWith(
+            '/api/engine/v2/users/user-1/resource_token',
+            { response_type: 'void' }
+        );
+    });
+
+    test('should allow getting user resource token', async () => {
+        const authSpy = vi.spyOn(Auth, 'apiEndpoint');
+        authSpy.mockReturnValue('/api/engine/v2/');
+        const httpSpy = vi.spyOn(Http, 'post');
+        httpSpy.mockImplementation(() => of({ token: 'xyz789' }) as any);
+
+        const result = await SERVICE.userResourceToken('user-1').toPromise();
+        expect(result).toBeTruthy();
+        expect(result!.token).toBe('xyz789');
+        expect(httpSpy).toHaveBeenCalledWith('/api/engine/v2/users/user-1/resource_token', {});
+    });
+
+    test('should allow reviving a user', async () => {
+        const spy = vi.spyOn(Resources, 'task');
+        spy.mockImplementation((_: any) => of(_.callback({}) as any));
+        const item = await SERVICE.reviveUser('user-1').toPromise();
+        expect(item).toBeInstanceOf(PlaceUser);
     });
 });

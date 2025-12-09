@@ -58,4 +58,11 @@ describe('Zones API', () => {
         expect(item?.data[0]).toBeInstanceOf(PlaceTrigger);
         item = await SERVICE.listZoneTriggers('1', {}).toPromise();
     });
+
+    test('should allow getting zone metadata', async () => {
+        (Resources.task as any) = vi.fn().mockImplementation(() => of({ key: 'value' }));
+        let item = await SERVICE.zoneMetadata('1').toPromise();
+        expect(item).toEqual({ key: 'value' });
+        item = await SERVICE.zoneMetadata('1', { name: 'test' }).toPromise();
+    });
 });
