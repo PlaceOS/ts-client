@@ -24,6 +24,8 @@ export class PlaceAlert extends PlaceResource {
     public readonly alert_type: AlertType;
     // How often should this alert should be raised when triggered
     public readonly debounce_period: number;
+    // Whether condition checks should match any single condition to pass or all of them
+    public readonly any_match: boolean;
 
     constructor(data: Partial<PlaceAlert>) {
         super(data);
@@ -40,5 +42,6 @@ export class PlaceAlert extends PlaceResource {
         this.alert_dashboard_id = data.alert_dashboard_id || '';
         this.alert_dashboard_details =
             data.alert_dashboard_details || undefined;
+        this.any_match = data.any_match || false;
     }
 }

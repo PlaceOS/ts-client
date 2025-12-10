@@ -40,6 +40,8 @@ export class PlaceTrigger extends PlaceResource {
     public readonly trigger_id: string;
     /** List of playlist IDs associated with the system */
     public readonly playlists: readonly string[];
+    // Whether condition checks should match any single condition to pass or all of them
+    public readonly any_match: boolean;
 
     /** ID of the system associated with the trigger */
     public get system_id(): string {
@@ -103,5 +105,6 @@ export class PlaceTrigger extends PlaceResource {
             raw_data.activated_count || raw_data.trigger_count || 0;
         this.playlists = raw_data.playlists || [];
         this.trigger_id = raw_data.trigger_id || '';
+        this.any_match = raw_data.any_match || false;
     }
 }
