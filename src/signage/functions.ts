@@ -1,4 +1,5 @@
 import { create, query, remove, show, update } from '../api';
+import { apiEndpoint } from '../auth';
 import { HttpJsonOptions } from '../http/interfaces';
 import { task } from '../resources/functions';
 import { SignageMediaQueryOptions, SignageMetrics } from './interfaces';
@@ -115,6 +116,14 @@ export function removeSignageMedia(
     query_params: Record<string, any> = {},
 ) {
     return remove({ id, query_params, path: MEDIA_PATH });
+}
+
+/**
+ * Get the thumbnail URL for a media item.
+ * This is the endpoint resolves to the image for the media item's thumbnail.
+ */
+export function mediaThumbnail(id: string): string {
+    return `${apiEndpoint()}/${MEDIA_PATH}/${id}/thumbnail`;
 }
 
 /**
