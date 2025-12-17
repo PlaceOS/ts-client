@@ -366,6 +366,7 @@ export {
     approveSignagePlaylist,
     listSignagePlaylistMedia,
     listSignagePlaylistMediaRevisions,
+    mediaThumbnail,
     querySignageMedia,
     querySignagePlaylists,
     removeSignageMedia,
@@ -475,7 +476,6 @@ export type {
     PlaceAssetTypeQueryOptions,
 } from './assets/interfaces';
 
-export { PlaceShortUrl } from './short-url/short-url.class';
 export {
     addShortUrl,
     generateQrCode,
@@ -494,8 +494,8 @@ export type {
     PlaceShortUrlQueryOptions,
     QrCodeFormat,
 } from './short-url/interfaces';
+export { PlaceShortUrl } from './short-url/short-url.class';
 
-export { PlaceStorage, type StorageType } from './storages/storage.class';
 export {
     addStorage,
     queryStorages,
@@ -504,6 +504,7 @@ export {
     updateStorage,
 } from './storages/functions';
 export type { PlaceStorageQueryOptions } from './storages/interfaces';
+export { PlaceStorage, type StorageType } from './storages/storage.class';
 
 export {
     queryWebrtcRooms,
