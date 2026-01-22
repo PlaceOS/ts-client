@@ -23,6 +23,7 @@ export {
     refreshAuthority,
     refreshToken,
     setAPI_Key,
+    setStorage,
     setToken,
     setup,
     token,

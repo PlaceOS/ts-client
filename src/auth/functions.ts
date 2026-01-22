@@ -271,6 +271,10 @@ export function setup(options: PlaceAuthOptions): Promise<void> {
     return loadAuthority();
 }
 
+export function setStorage(type: 'session' | 'local'): void {
+    _storage = type === 'session' ? sessionStorage : localStorage;
+}
+
 /**
  * @private
  */
