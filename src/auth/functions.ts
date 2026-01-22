@@ -37,7 +37,7 @@ let _options: PlaceAuthOptions = {} as any;
  * @private
  * Browser key store to use for authentication credentials. Defaults to `localStorage`
  */
-let _storage: Storage;
+let _storage: Storage = localStorage;
 /**
  * @private
  * Authentication authority of for the current domain
