@@ -85,6 +85,8 @@ export interface PlaceAuthOptions {
     version?: 'ACA Engine' | 'PlaceOS';
     /** Whether X-API-KEY values should be ignored */
     ignore_api_key?: boolean;
+    /** Delay authentication by X milliseconds */
+    delay?: number;
 }
 
 export interface PlaceTokenResponse {

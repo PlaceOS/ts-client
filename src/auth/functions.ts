@@ -259,7 +259,7 @@ export function checkStoreForAuthParam(
 }
 
 /** Initialise authentication for the http and realtime APIs */
-export function setup(options: PlaceAuthOptions): Promise<void> {
+export async function setup(options: PlaceAuthOptions): Promise<void> {
     _options = options || _options;
     _options.token_header = _options.token_header ?? isNestedFrame();
     if (!window.AbortController) {
@@ -268,6 +268,7 @@ export function setup(options: PlaceAuthOptions): Promise<void> {
     // Intialise storage
     _storage = _options.storage === 'session' ? sessionStorage : localStorage;
     _client_id = Md5.hashStr(_options.redirect_uri, false);
+    if (_options.delay > 0) await lastValueFrom(timer(_options.delay));
     return loadAuthority();
 }
 
