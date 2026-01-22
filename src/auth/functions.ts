@@ -1,6 +1,6 @@
 import * as base64 from 'byte-base64';
 import * as sha256 from 'fast-sha256';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, lastValueFrom, timer } from 'rxjs';
 import { fromFetch } from 'rxjs/fetch';
 import { map } from 'rxjs/operators';
 import { Md5 } from 'ts-md5';
@@ -268,7 +268,9 @@ export async function setup(options: PlaceAuthOptions): Promise<void> {
     // Intialise storage
     _storage = _options.storage === 'session' ? sessionStorage : localStorage;
     _client_id = Md5.hashStr(_options.redirect_uri, false);
-    if (_options.delay > 0) await lastValueFrom(timer(_options.delay));
+    if (_options.delay && _options.delay > 0) {
+        await lastValueFrom(timer(_options.delay!));
+    }
     return loadAuthority();
 }
 
