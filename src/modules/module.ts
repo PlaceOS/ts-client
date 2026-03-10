@@ -1,3 +1,4 @@
+import { AlertSeverity } from '../alerts/alert';
 import { PlaceDriver } from '../drivers/driver';
 import { PlaceDriverRole } from '../drivers/enums';
 import { PlaceResource } from '../resources/resource';
@@ -66,6 +67,8 @@ export class PlaceModule extends PlaceResource {
     public readonly has_runtime_error: boolean;
     /** Timestamp of the last runtime error in ms since UTC epoch */
     public readonly error_timestamp: number;
+    /**  */
+    public readonly alert_level: AlertSeverity;
     /** ID of the system associated with the module */
     public get system_id(): string {
         return this.control_system_id;
@@ -96,6 +99,7 @@ export class PlaceModule extends PlaceResource {
         this.error_timestamp = raw_data.error_timestamp || 0;
         this.driver = new PlaceDriver(raw_data.dependency || raw_data.driver);
         this.settings = raw_data.settings || [null, null, null, null];
+        this.alert_level = raw_data.alert_level || 'medium';
         if (typeof this.settings !== 'object') {
             (this as any).settings = [null, null, null, null];
         }

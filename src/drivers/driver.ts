@@ -1,3 +1,4 @@
+import { AlertSeverity } from '../alerts/alert';
 import { PlaceResource } from '../resources/resource';
 import { EncryptionLevel } from '../settings/interfaces';
 import { PlaceSettings } from '../settings/settings';
@@ -32,6 +33,8 @@ export class PlaceDriver extends PlaceResource {
         author: string;
         date: string;
     };
+    /**  */
+    public readonly alert_level: AlertSeverity;
     /** Tuple of user settings of differring encryption levels for the driver */
     public readonly settings: [
         PlaceSettings | null,
@@ -54,6 +57,7 @@ export class PlaceDriver extends PlaceResource {
         this.commit = raw_data.commit || '';
         this.update_available = raw_data.update_available || false;
         this.update_info = raw_data.update_info;
+        this.alert_level = raw_data.alert_level || 'medium';
         this.settings = raw_data.settings || [null, null, null, null];
         if (typeof this.settings !== 'object') {
             (this as any).settings = [null, null, null, null];
