@@ -90,6 +90,25 @@ const _online_observer = _online.asObservable();
 
 let _failed_count = 0;
 
+/**
+ * @private
+ * Resolve a URL against the authority's domain if it is a relative path.
+ * If the URL is already absolute (starts with http:// or https://), return as-is.
+ * If the URL is relative (starts with /), prepend the protocol and authority domain.
+ */
+function resolveAuthorityUrl(url: string): string {
+    if (!url || url.startsWith('http://') || url.startsWith('https://')) {
+        return url;
+    }
+    const domain = _authority?.domain;
+    if (domain) {
+        const secure =
+            _options.secure || window.location?.protocol.indexOf('https') >= 0;
+        return `${secure ? 'https:' : 'http:'}//${domain}${url}`;
+    }
+    return url;
+}
+
 /** API Endpoint for the retrieved version of PlaceOS */
 export function apiEndpoint(): string {
     const secure =
@@ -398,7 +417,9 @@ export function authorise(
  * Logout and clear user credentials for the application
  */
 export function logout(): void {
-    const url = _authority ? _authority.logout_url : '/logout';
+    const url = resolveAuthorityUrl(
+        _authority ? _authority.logout_url : '/logout',
+    );
     fetch(url, {
         method: 'GET',
         redirect: 'manual',
@@ -582,10 +603,12 @@ export function sendToLogin(api_authority: PlaceAuthority): void {
     /* istanbul ignore else */
     if (_options.handle_login !== false && !_redirecting) {
         log('Auth', 'Redirecting to login page...');
-        // Redirect to login form
-        const url = api_authority!.login_url?.replace(
-            '{{url}}',
-            encodeURIComponent(window.location?.href),
+        // Redirect to login form, resolving relative URLs against the authority domain
+        const url = resolveAuthorityUrl(
+            api_authority!.login_url?.replace(
+                '{{url}}',
+                encodeURIComponent(window.location?.href),
+            ),
         );
         setTimeout(() => window.location?.assign(url), 300);
         _redirecting = true;
