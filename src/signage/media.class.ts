@@ -1,4 +1,5 @@
 import { getUnixTime } from 'date-fns';
+import { HashMap } from '../utilities/types';
 
 export type MediaType =
     | 'unknown'
@@ -7,7 +8,8 @@ export type MediaType =
     | 'audio'
     | 'plugin'
     | 'webpage'
-    | 'externalimage';
+    | 'externalimage'
+    | 'external_image';
 
 export enum MediaAnimation {
     Default = 0,
@@ -41,6 +43,8 @@ export class SignageMedia {
     public readonly media_uri: string;
     public readonly media_id: string;
     public readonly thumbnail_id: string;
+    public readonly plugin_id: string;
+    public readonly plugin_params: HashMap;
     public readonly play_count: number;
     public readonly valid_from?: number;
     public readonly valid_until?: number;
@@ -71,6 +75,8 @@ export class SignageMedia {
         this.media_uri = data.media_uri || '';
         this.media_id = data.media_id || '';
         this.thumbnail_id = data.thumbnail_id || '';
+        this.plugin_id = data.plugin_id || '';
+        this.plugin_params = data.plugin_params || {};
         this.play_count = data.play_count || 0;
         this.valid_from = data.valid_from;
         this.valid_until = data.valid_until;

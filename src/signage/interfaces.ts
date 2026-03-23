@@ -20,3 +20,6 @@ export interface SignagePlaylistRevisionsOptions {
     /** Maximum number of revisions to return */
     limit?: number;
 }
+
+/** Allowable query parameters for signage plugins index endpoint */
+export interface SignagePluginQueryOptions extends PlaceResourceQueryOptions {}

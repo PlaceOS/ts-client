@@ -363,37 +363,48 @@ export { PlaceZone } from './zones/zone';
 export {
     addSignageMedia,
     addSignagePlaylist,
+    addSignagePlugin,
     approveSignagePlaylist,
     listSignagePlaylistMedia,
     listSignagePlaylistMediaRevisions,
     mediaThumbnail,
     querySignageMedia,
     querySignagePlaylists,
+    querySignagePlugins,
     removeSignageMedia,
     removeSignagePlaylist,
+    removeSignagePlugin,
     showSignage,
     showSignageMedia,
     showSignageMetrics,
     showSignagePlaylist,
+    showSignagePlugin,
     updateSignageMedia,
     updateSignagePlaylist,
     updateSignagePlaylistMedia,
+    updateSignagePlugin,
 } from './signage/functions';
 export type {
     SignageMediaQueryOptions,
     SignageMetrics,
     SignagePlaylistQueryOptions,
     SignagePlaylistRevisionsOptions,
+    SignagePluginQueryOptions,
 } from './signage/interfaces';
 export {
     MediaAnimation,
     SignageMedia,
     type MediaOrientation,
+    type MediaType,
 } from './signage/media.class';
 export {
     SignagePlaylist,
     SignagePlaylistMedia,
 } from './signage/playlist.class';
+export {
+    SignagePlugin,
+    type SignagePlaybackType,
+} from './signage/plugin.class';
 
 export { addAnswer, queryAnswers } from './staff/answers/functions';
 export type { AnswerQueryOptions } from './staff/answers/interfaces';

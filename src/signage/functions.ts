@@ -2,9 +2,14 @@ import { create, query, remove, show, update } from '../api';
 import { apiEndpoint } from '../auth';
 import { HttpJsonOptions } from '../http/interfaces';
 import { task } from '../resources/functions';
-import { SignageMediaQueryOptions, SignageMetrics } from './interfaces';
+import {
+    SignageMediaQueryOptions,
+    SignageMetrics,
+    SignagePluginQueryOptions,
+} from './interfaces';
 import { SignageMedia } from './media.class';
 import { SignagePlaylist, SignagePlaylistMedia } from './playlist.class';
+import { SignagePlugin } from './plugin.class';
 
 /**
  * @private
@@ -281,4 +286,87 @@ export function updateSignagePlaylistMedia(id: string, form_data: string[]) {
         callback: (value: SignagePlaylistMedia) =>
             new SignagePlaylistMedia(value),
     });
+}
+
+/**
+ * @private
+ */
+const PLUGINS_PATH = 'signage/plugins';
+
+/** Convert raw server data to a signage plugin object */
+function processPlugin(item: Partial<SignagePlugin>) {
+    return new SignagePlugin(item);
+}
+
+/**
+ * Query the available signage plugins
+ * @param query_params Query parameters to add the to request URL
+ */
+export function querySignagePlugins(
+    query_params: SignagePluginQueryOptions = {},
+) {
+    return query({ query_params, fn: processPlugin, path: PLUGINS_PATH });
+}
+
+/**
+ * Get the data for a signage plugin
+ * @param id ID of the signage plugin to retrieve
+ * @param query_params Query parameters to add the to request URL
+ */
+export function showSignagePlugin(
+    id: string,
+    query_params: SignagePluginQueryOptions = {},
+) {
+    return show({
+        id,
+        query_params,
+        fn: processPlugin,
+        path: PLUGINS_PATH,
+    });
+}
+
+/**
+ * Update the signage plugin in the database
+ * @param id ID of the signage plugin
+ * @param form_data New values for the signage plugin
+ * @param method HTTP verb to use on request. Defaults to `patch`
+ */
+export function updateSignagePlugin(
+    id: string,
+    form_data: Partial<SignagePlugin>,
+    method: 'put' | 'patch' = 'patch',
+) {
+    return update({
+        id,
+        form_data,
+        query_params: {},
+        method,
+        fn: processPlugin,
+        path: PLUGINS_PATH,
+    });
+}
+
+/**
+ * Add a new signage plugin to the database
+ * @param form_data Signage plugin data
+ */
+export function addSignagePlugin(form_data: Partial<SignagePlugin>) {
+    return create({
+        form_data,
+        query_params: {},
+        fn: processPlugin,
+        path: PLUGINS_PATH,
+    });
+}
+
+/**
+ * Remove a signage plugin from the database
+ * @param id ID of the signage plugin
+ * @param query_params Query parameters to add the to request URL
+ */
+export function removeSignagePlugin(
+    id: string,
+    query_params: Record<string, any> = {},
+) {
+    return remove({ id, query_params, path: PLUGINS_PATH });
 }
