@@ -41,6 +41,8 @@ export class PlaceSystem extends PlaceResource {
     /** URL for the timetable UI linked to the system */
     public readonly timetable_url: string;
     /** URLs for requesting snapshots of the assosiated camera */
+    public readonly camera_snapshot_url: string;
+    /** URLs for requesting snapshots of the assosiated camera */
     public readonly camera_snapshot_urls: string[];
     /** URL for managing the attached camera */
     public readonly camera_url: string;
@@ -85,6 +87,7 @@ export class PlaceSystem extends PlaceResource {
         this.public = raw_data.public ?? false;
         this.installed_ui_devices = raw_data.installed_ui_devices || 0;
         this.support_url = raw_data.support_url || '';
+        this.camera_snapshot_url = raw_data.camera_snapshot_url || '';
         this.camera_snapshot_urls = raw_data.camera_snapshot_urls || [];
         this.camera_url = raw_data.camera_url || '';
         this.timetable_url = raw_data.timetable_url || '';
