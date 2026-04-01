@@ -4,7 +4,6 @@ import { apiEndpoint } from '../auth/functions';
 import { get } from '../http/functions';
 import { create, query, remove, show, update } from '../resources/functions';
 import { PlaceResourceQueryOptions } from '../resources/interface';
-import { HashMap } from '../utilities/types';
 import { PlaceDomain } from './domain';
 
 /**
@@ -73,10 +72,10 @@ export function removeDomain(id: string) {
 }
 
 /**
- * Find the domain name by looking into domain registered email domains
+ * Find the domain associated with a user's email address
  * @param email Email address to lookup
  */
-export function lookupDomainByEmail(email: string): Observable<PlaceDomain> {
+export function lookupDomainByEmail(email: string): Observable<string> {
     const url = `${apiEndpoint()}${PATH}/lookup/${encodeURIComponent(email)}`;
-    return get(url).pipe(map((resp: HashMap) => process(resp as Partial<PlaceDomain>)));
+    return get(url).pipe(map((resp) => `${resp}`));
 }
