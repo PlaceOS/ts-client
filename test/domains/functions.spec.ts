@@ -1,10 +1,10 @@
 import { of } from 'rxjs';
 import { describe, expect, test, vi } from 'vitest';
+import * as Auth from '../../src/auth/functions';
 import { PlaceDomain } from '../../src/domains/domain';
 import * as SERVICE from '../../src/domains/functions';
-import * as Resources from '../../src/resources/functions';
 import * as Http from '../../src/http/functions';
-import * as Auth from '../../src/auth/functions';
+import * as Resources from '../../src/resources/functions';
 
 describe('Domains API', () => {
     test('should allow querying domain', async () => {
@@ -51,10 +51,13 @@ describe('Domains API', () => {
         const authSpy = vi.spyOn(Auth, 'apiEndpoint');
         authSpy.mockReturnValue('/api/engine/v2/');
         const httpSpy = vi.spyOn(Http, 'get');
-        httpSpy.mockImplementation(() => of({ id: 'domain-1', name: 'Test Domain' }) as any);
+        httpSpy.mockImplementation(() => of('example.com') as any);
 
-        const result = await SERVICE.lookupDomainByEmail('user@example.com').toPromise();
-        expect(result).toBeInstanceOf(PlaceDomain);
-        expect(httpSpy).toHaveBeenCalledWith('/api/engine/v2/domains/lookup/user%40example.com');
+        const result =
+            await SERVICE.lookupDomainByEmail('user@example.com').toPromise();
+        expect(result).toBe('example.com');
+        expect(httpSpy).toHaveBeenCalledWith(
+            '/api/engine/v2/domains/lookup/user%40example.com',
+        );
     });
 });
