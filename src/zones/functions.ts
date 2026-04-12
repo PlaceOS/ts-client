@@ -10,7 +10,11 @@ import {
 import { PlaceResourceQueryOptions } from '../resources/interface';
 import { PlaceTrigger } from '../triggers/trigger';
 import { HashMap } from '../utilities/types';
-import { PlaceZoneMetadataQueryOptions, PlaceZoneQueryOptions, PlaceZoneShowOptions } from './interfaces';
+import {
+    PlaceZoneMetadataQueryOptions,
+    PlaceZoneQueryOptions,
+    PlaceZoneShowOptions,
+} from './interfaces';
 import { PlaceZone } from './zone';
 
 /**

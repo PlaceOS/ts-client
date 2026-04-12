@@ -36,6 +36,8 @@ export class PlaceZone extends PlaceResource {
     public readonly type: string;
     /** Count of resources associated with the zone */
     public readonly count: number;
+    /** Count of child zones for this zone */
+    public readonly children_count?: number;
     /** Amount of physical capacity associated with the zone */
     public readonly capacity: number;
     /** ID or URL of or in a map associated with the zone */
@@ -69,6 +71,8 @@ export class PlaceZone extends PlaceResource {
         this.timezone = raw_data.timezone || '';
         this.images = raw_data.images || [];
         this.playlists = raw_data.playlists || [];
+        if (isFinite(Number(raw_data.children_count)))
+            this.children_count = raw_data.children_count;
         if (typeof this.settings !== 'object') {
             (this as any).settings = [null, null, null, null];
         }
