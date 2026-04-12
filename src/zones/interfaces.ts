@@ -8,6 +8,8 @@ export interface PlaceZoneQueryOptions extends PlaceResourceQueryOptions {
     tags?: string;
     /** ID of the system to filter the results */
     control_system_id?: string;
+    /** Whether zones should include a count of their children */
+    include_children_count?: boolean;
 }
 
 /** Mapping of available query parameters for the zones show endpoint */
