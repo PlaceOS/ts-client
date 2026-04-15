@@ -119,7 +119,12 @@ export function mockRequest(
         return onMockRequest(handler, request);
     }
     // Return 404 error when no handler is found
-    return _error_handler(method, url);
+    try {
+        return _error_handler(method, url);
+    } catch (error) {
+        log('HTTP(M)', `ERROR ${method}:`, [url, error]);
+        return throwError(error);
+    }
 }
 
 /**
@@ -225,7 +230,7 @@ export function onMockRequest(
             : handler.metadata;
     } catch (error) {
         log('HTTP(M)', `ERROR ${request.method}:`, [request.url, error]);
-        throw error;
+        return throwError(error);
     }
     const variance = handler.delay_variance || 100;
     const delay_value = handler.delay || 300;

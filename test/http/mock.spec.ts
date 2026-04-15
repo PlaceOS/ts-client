@@ -1,3 +1,4 @@
+import { firstValueFrom, throwError } from 'rxjs';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { MockHttpRequestHandlerOptions } from '../../src/http/interfaces';
 
@@ -28,6 +29,11 @@ describe('MockHttp', () => {
 
     afterEach(() => {
         MockHttp.clearMockEndpoints();
+        MockHttp.setMockNotFoundHandler((method, url) => {
+            const error = new Error(`Mock endpoint not found: ${method} ${url}`);
+            (error as any).status = 404;
+            return throwError(error);
+        });
         vi.useRealTimers();
     });
 
@@ -123,4 +129,28 @@ describe('MockHttp', () => {
             })!.subscribe((_) => null);
             vi.runOnlyPendingTimers();
         }));
+
+    test('should return observable errors from handler callbacks', async () => {
+        const error = new Error('Callback failure');
+        MockHttp.registerMockEndpoint({
+            path: 'please/:get/me',
+            method: 'GET',
+            callback: () => {
+                throw error;
+            },
+        });
+        await expect(
+            firstValueFrom(MockHttp.mockRequest('GET', 'please/help/me')!),
+        ).rejects.toBe(error);
+    });
+
+    test('should return observable errors from not found handlers', async () => {
+        const error = new Error('Not found handler failure');
+        MockHttp.setMockNotFoundHandler(() => {
+            throw error;
+        });
+        await expect(
+            firstValueFrom(MockHttp.mockRequest('GET', 'missing/endpoint')!),
+        ).rejects.toBe(error);
+    });
 });

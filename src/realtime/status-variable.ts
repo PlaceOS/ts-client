@@ -83,7 +83,13 @@ export class PlaceVariableBinding<T = any> {
     public bindThenSubscribe(next: (value: T) => void): Subscription {
         const unbind = this.bind();
         return this.listen().subscribe({
-            next,
+            next: (v) => {
+                try {
+                    next(v);
+                } catch (e) {
+                    console.error(e);
+                }
+            },
             complete: () => unbind(),
             error: () => unbind(),
         });

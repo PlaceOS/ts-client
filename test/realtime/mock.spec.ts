@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
+import { PlaceErrorCodes } from '../../src/realtime/interfaces';
 import {
     deregisterSystem,
     mockSystem,
@@ -92,6 +93,36 @@ describe('MockEngineWebsocket', () => {
                 });
             });
         ws.bind(binding);
+    });
+
+    test('should reject when mock listener setup throws', async () => {
+        const binding = { sys: 'sys-A0', mod: 'Test', index: 1, name: 'test' };
+        (mockSystem('sys-A0').Test[0] as any).listen = () => {
+            throw new Error('Listener failure');
+        };
+        await expect(ws.bind(binding)).rejects.toMatchObject({
+            type: 'error',
+            code: PlaceErrorCodes.UNEXPECTED_FAILURE,
+            msg: 'Listener failure',
+        });
+    });
+
+    test('should reject when mock execute throws', async () => {
+        mockSystem('sys-A0').Test[0].$testCall = () => {
+            throw new Error('Execute failure');
+        };
+        await expect(
+            ws.execute({
+                sys: 'sys-A0',
+                mod: 'Test',
+                index: 1,
+                name: 'testCall',
+            }),
+        ).rejects.toMatchObject({
+            type: 'error',
+            code: PlaceErrorCodes.UNEXPECTED_FAILURE,
+            msg: 'Execute failure',
+        });
     });
 
     test('should error if binding module not found', (done) => {

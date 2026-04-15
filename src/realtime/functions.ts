@@ -730,6 +730,22 @@ export function createMockWebSocket() {
     return websocket;
 }
 
+function mockRealtimeError(
+    request: PlaceCommandRequest,
+    error: any,
+): PlaceResponse {
+    const message =
+        typeof error === 'string'
+            ? error
+            : error?.message || error?.msg || 'Mock realtime callback failed';
+    return {
+        id: request.id,
+        type: 'error',
+        code: error?.code || PlaceErrorCodes.UNEXPECTED_FAILURE,
+        msg: message,
+    } as PlaceResponse;
+}
+
 /**
  * @private
  * Send request to engine through the websocket connection
@@ -747,44 +763,73 @@ export function handleMockSend(
             ? system[request.mod][request.index - 1 || 0]
             : null;
     if (module) {
-        switch (request.cmd) {
-            case 'bind':
-                listeners[key] = module
-                    .listen(request.name)
-                    .subscribe((new_value) => {
-                        setTimeout(
-                            () => {
-                                websocket.next({
-                                    type: 'notify',
-                                    value: new_value,
-                                    meta: request,
-                                });
-                            },
-                            Math.floor(Math.random() * 100 + 50), // Add natural delay before response
-                        );
+        try {
+            switch (request.cmd) {
+                case 'bind':
+                    listeners[key] = module.listen(request.name).subscribe({
+                        next: (new_value) => {
+                            setTimeout(
+                                () => {
+                                    websocket.next({
+                                        type: 'notify',
+                                        value: new_value,
+                                        meta: request,
+                                    });
+                                },
+                                Math.floor(Math.random() * 100 + 50), // Add natural delay before response
+                            );
+                        },
+                        error: (error) => {
+                            log(
+                                'WS',
+                                `[MOCK ERROR](${request.id}) listener failed`,
+                                error,
+                                'error',
+                            );
+                            websocket.next(mockRealtimeError(request, error));
+                        },
                     });
-                break;
-            case 'unbind':
-                /* istanbul ignore else */
-                if (listeners[key]) {
-                    listeners[key].unsubscribe();
-                    delete listeners[key];
-                    clearAsyncTimeout(`${key}`);
-                }
-                break;
+                    break;
+                case 'unbind':
+                    /* istanbul ignore else */
+                    if (listeners[key]) {
+                        listeners[key].unsubscribe();
+                        delete listeners[key];
+                        clearAsyncTimeout(`${key}`);
+                    }
+                    break;
+            }
+        } catch (error) {
+            log('WS', `[MOCK ERROR](${request.id}) request failed`, error, 'error');
+            timeout(
+                `${request.id}-error`,
+                () => websocket.next(mockRealtimeError(request, error)),
+                10,
+            );
+            return;
         }
         timeout(
             `${request.id}-response`,
             () => {
-                const resp = {
-                    id: request.id,
-                    type: 'success',
-                    value:
-                        request.cmd === 'exec'
-                            ? module.call(request.name, request.args)
-                            : null,
-                } as PlaceResponse;
-                websocket.next(resp);
+                try {
+                    const resp = {
+                        id: request.id,
+                        type: 'success',
+                        value:
+                            request.cmd === 'exec'
+                                ? module.call(request.name, request.args)
+                                : null,
+                    } as PlaceResponse;
+                    websocket.next(resp);
+                } catch (error) {
+                    log(
+                        'WS',
+                        `[MOCK ERROR](${request.id}) execute failed`,
+                        error,
+                        'error',
+                    );
+                    websocket.next(mockRealtimeError(request, error));
+                }
             },
             10,
         );
