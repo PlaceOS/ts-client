@@ -112,7 +112,7 @@ export function edgeControlUrl(): string {
     const endpoint = apiEndpoint();
     const wsProtocol = endpoint.startsWith('https') ? 'wss:' : 'ws:';
     const httpProtocol = endpoint.startsWith('https') ? 'https:' : 'http:';
-    return endpoint.replace(httpProtocol, wsProtocol) + `/${PATH}/control`;
+    return `${endpoint.replace(httpProtocol, wsProtocol).replace(/\/$/, '')}/${PATH}/control`;
 }
 
 /** Get recent errors for all edges */

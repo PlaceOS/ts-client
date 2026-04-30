@@ -379,7 +379,7 @@ export function systemControlUrl(query_params: PlaceSystemControlOptions = {}): 
     const endpoint = apiEndpoint();
     const wsProtocol = endpoint.startsWith('https') ? 'wss:' : 'ws:';
     const httpProtocol = endpoint.startsWith('https') ? 'https:' : 'http:';
-    let url = endpoint.replace(httpProtocol, wsProtocol) + `/${PATH}/control`;
+    let url = `${endpoint.replace(httpProtocol, wsProtocol).replace(/\/$/, '')}/${PATH}/control`;
     if (query_params.fixed_device) {
         url += `?fixed_device=${encodeURIComponent(String(query_params.fixed_device))}`;
     }
