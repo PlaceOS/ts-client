@@ -2,15 +2,24 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { apiEndpoint } from '../auth/functions';
 import { del, get, post } from '../http/functions';
-import { create, query, remove, show, task, update } from '../resources/functions';
+import {
+    create,
+    query,
+    remove,
+    show,
+    task,
+    update,
+} from '../resources/functions';
 import { toQueryString } from '../utilities/api';
 import { HashMap } from '../utilities/types';
 import {
     PlaceUserDeleteOptions,
+    PlaceUserGroupResponse,
     PlaceUserGroupsOptions,
     PlaceUserMetadataOptions,
     PlaceUserMetadataSearchOptions,
     PlaceUserQueryOptions,
+    PlaceUserResourceToken,
     PlaceUserShowOptions,
 } from './interfaces';
 import { PlaceUser } from './user';
@@ -86,7 +95,10 @@ export function addUser(form_data: Partial<PlaceUser>) {
  * @param id ID of the user
  * @param query_params Query parameters to add the to request URL
  */
-export function removeUser(id: string, query_params: PlaceUserDeleteOptions = {}) {
+export function removeUser(
+    id: string,
+    query_params: PlaceUserDeleteOptions = {},
+) {
     return remove({ id, query_params, path: PATH });
 }
 
@@ -96,10 +108,12 @@ export function removeUser(id: string, query_params: PlaceUserDeleteOptions = {}
  */
 export function queryUserGroups(
     query_params: PlaceUserGroupsOptions,
-): Observable<HashMap<string[]>> {
+): Observable<PlaceUserGroupResponse[]> {
     const q = toQueryString(query_params);
     const url = `${apiEndpoint()}${PATH}/groups${q ? '?' + q : ''}`;
-    return get(url).pipe(map((resp: HashMap) => resp as HashMap<string[]>));
+    return get(url).pipe(
+        map((resp: HashMap) => resp as PlaceUserGroupResponse[]),
+    );
 }
 
 /**
@@ -108,18 +122,24 @@ export function queryUserGroups(
  */
 export function searchUserMetadata(
     query_params: PlaceUserMetadataSearchOptions,
-): Observable<HashMap[]> {
+): Observable<PlaceUser[]> {
     const q = toQueryString(query_params);
     const url = `${apiEndpoint()}${PATH}/metadata/search${q ? '?' + q : ''}`;
-    return get(url).pipe(map((resp: HashMap) => resp as HashMap[]));
+    return get(url).pipe(
+        map((resp: HashMap) =>
+            ((resp || []) as HashMap[]).map((item) => process(item)),
+        ),
+    );
 }
 
 /**
  * Obtain a token to the current user's SSO resources
  */
-export function currentUserResourceToken(): Observable<{ token: string }> {
+export function currentUserResourceToken(): Observable<PlaceUserResourceToken> {
     const url = `${apiEndpoint()}${PATH}/resource_token`;
-    return post(url, {}).pipe(map((resp: HashMap) => resp as { token: string }));
+    return post(url, {}).pipe(
+        map((resp: HashMap) => resp as PlaceUserResourceToken),
+    );
 }
 
 /**
@@ -153,9 +173,13 @@ export function removeUserResourceToken(id: string): Observable<void> {
  * Obtain a token to the specified user's SSO resources
  * @param id User ID
  */
-export function userResourceToken(id: string): Observable<{ token: string }> {
+export function userResourceToken(
+    id: string,
+): Observable<PlaceUserResourceToken> {
     const url = `${apiEndpoint()}${PATH}/${encodeURIComponent(id)}/resource_token`;
-    return post(url, {}).pipe(map((resp: HashMap) => resp as { token: string }));
+    return post(url, {}).pipe(
+        map((resp: HashMap) => resp as PlaceUserResourceToken),
+    );
 }
 
 /**

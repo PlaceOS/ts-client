@@ -117,6 +117,57 @@ export {
 } from './edge/functions';
 
 export {
+    acceptGroupInvitation,
+    addGroup,
+    addGroupInvitation,
+    currentGroups,
+    queryGroupHistory,
+    queryGroupInvitations,
+    queryGroups,
+    removeGroup,
+    removeGroupInvitation,
+    showGroup,
+    showGroupHistory,
+    showGroupInvitation,
+    updateGroup,
+} from './groups/functions';
+export { PlaceGroup } from './groups/group';
+export type { PlaceCurrentGroup } from './groups/group';
+export { PlaceGroupHistory } from './groups/group-history';
+export { PlaceGroupInvitation } from './groups/group-invitation';
+export type {
+    PlaceGroupInvitationCreatePayload,
+    PlaceGroupInvitationCreatedResponse,
+} from './groups/group-invitation';
+export type {
+    PlaceCurrentGroupQueryOptions,
+    PlaceGroupHistoryQueryOptions,
+    PlaceGroupInvitationQueryOptions,
+    PlaceGroupQueryOptions,
+} from './groups/interfaces';
+
+export {
+    addGroupUser,
+    queryGroupUsers,
+    removeGroupUser,
+    showGroupUser,
+    updateGroupUser,
+} from './group-users/functions';
+export { PlaceGroupUser } from './group-users/group-user';
+export type { PlaceGroupDetails } from './group-users/group-user';
+export type { PlaceGroupUserQueryOptions } from './group-users/interfaces';
+
+export {
+    addGroupZone,
+    queryGroupZones,
+    removeGroupZone,
+    showGroupZone,
+    updateGroupZone,
+} from './group-zones/functions';
+export { PlaceGroupZone } from './group-zones/group-zone';
+export type { PlaceGroupZoneQueryOptions } from './group-zones/interfaces';
+
+export {
     addLDAPSource,
     queryLDAPSources,
     removeLDAPSource,
@@ -333,10 +384,12 @@ export {
 } from './users/functions';
 export type {
     PlaceUserDeleteOptions,
+    PlaceUserGroupResponse,
     PlaceUserGroupsOptions,
     PlaceUserMetadataOptions,
     PlaceUserMetadataSearchOptions,
     PlaceUserQueryOptions,
+    PlaceUserResourceToken,
     PlaceUserShowOptions,
 } from './users/interfaces';
 export { PlaceUser } from './users/user';

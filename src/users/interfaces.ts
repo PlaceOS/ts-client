@@ -24,8 +24,24 @@ export interface PlaceUserDeleteOptions {
 
 /** Mapping of available query parameters for the users groups endpoint */
 export interface PlaceUserGroupsOptions {
-    /** Comma-separated list of email addresses */
-    emails: string;
+    /** List of email addresses */
+    emails: string | string[];
+}
+
+/** Response for the users groups endpoint */
+export interface PlaceUserGroupResponse {
+    /** ID of the user */
+    id?: string;
+    /** Groups associated with the user */
+    groups: string[];
+}
+
+/** Response for user resource token endpoints */
+export interface PlaceUserResourceToken {
+    /** Resource access token */
+    token: string;
+    /** Unix epoch timestamp when the token expires */
+    expires?: number;
 }
 
 /** Mapping of available query parameters for the users metadata search endpoint */
