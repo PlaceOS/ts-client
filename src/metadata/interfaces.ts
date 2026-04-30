@@ -25,3 +25,9 @@ export interface PlaceMetadataHistoryOptions {
     /** Starting offset of the result set for pagination */
     offset?: number;
 }
+
+/** Query options for bulk metadata lookup */
+export interface PlaceMetadataBulkOptions {
+    /** Comma separated list of parent/resource IDs */
+    parent_ids: string;
+}

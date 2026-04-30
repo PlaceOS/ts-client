@@ -1,7 +1,12 @@
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { apiEndpoint } from '../auth/functions';
+import { get } from '../http/functions';
 import { create, remove, show, task, update } from '../resources/functions';
+import { toQueryString } from '../utilities/api';
 import { HashMap } from '../utilities/types';
 import {
+    PlaceMetadataBulkOptions,
     PlaceMetadataDeleteOptions,
     PlaceMetadataHistoryOptions,
     PlaceMetadataOptions,
@@ -158,4 +163,21 @@ export function listChildMetadata(
             ),
         path: PATH,
     });
+}
+
+/** Fetch metadata with a specific name for multiple resources */
+export function bulkMetadata(
+    name: string,
+    query_params: PlaceMetadataBulkOptions,
+): Observable<Record<string, PlaceMetadata>> {
+    const q = toQueryString(query_params);
+    const url = `${apiEndpoint()}/${PATH}/${encodeURIComponent(name)}/bulk${q ? '?' + q : ''}`;
+    return get(url).pipe(
+        map((resp: HashMap) =>
+            Object.keys(resp || {}).reduce(
+                (map, key) => ({ ...map, [key]: process(resp[key]) }),
+                {} as Record<string, PlaceMetadata>,
+            ),
+        ),
+    );
 }

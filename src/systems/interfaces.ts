@@ -89,3 +89,5 @@ export interface PlaceSystemTriggerShowOptions {
     /** Return the full trigger details */
     complete?: boolean;
 }
+
+export interface PlaceSystemModuleTypes extends HashMap<number> {}

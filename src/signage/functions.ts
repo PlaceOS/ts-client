@@ -1,8 +1,11 @@
 import { create, query, remove, show, update } from '../api';
 import { apiEndpoint } from '../auth';
+import { post } from '../http/functions';
 import { HttpJsonOptions } from '../http/interfaces';
 import { task } from '../resources/functions';
+import { toQueryString } from '../utilities/api';
 import {
+    SignageShareOptions,
     SignageMediaQueryOptions,
     SignageMetrics,
     SignagePluginQueryOptions,
@@ -129,6 +132,12 @@ export function removeSignageMedia(
  */
 export function mediaThumbnail(id: string): string {
     return `${apiEndpoint()}/${MEDIA_PATH}/${id}/thumbnail`;
+}
+
+/** Share one or more media items into another signage group */
+export function shareSignageMedia(query_params: SignageShareOptions) {
+    const q = toQueryString(query_params);
+    return post(`${apiEndpoint()}/${MEDIA_PATH}/share${q ? '?' + q : ''}`, {});
 }
 
 /**
@@ -286,6 +295,12 @@ export function updateSignagePlaylistMedia(id: string, form_data: string[]) {
         callback: (value: SignagePlaylistMedia) =>
             new SignagePlaylistMedia(value),
     });
+}
+
+/** Share one or more playlists into another signage group */
+export function shareSignagePlaylists(query_params: SignageShareOptions) {
+    const q = toQueryString(query_params);
+    return post(`${apiEndpoint()}/${PLAYLISTS_PATH}/share${q ? '?' + q : ''}`, {});
 }
 
 /**

@@ -28,3 +28,10 @@ export interface SignagePlaylistRevisionsOptions {
 
 /** Allowable query parameters for signage plugins index endpoint */
 export interface SignagePluginQueryOptions extends PlaceResourceQueryOptions {}
+
+export interface SignageShareOptions {
+    /** Comma separated list of media or playlist IDs */
+    items: string;
+    /** Destination signage group ID */
+    to: string;
+}

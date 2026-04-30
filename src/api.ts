@@ -48,6 +48,22 @@ export {
 } from './applications/functions';
 export type { PlaceApplicationQueryOptions } from './applications/interfaces';
 
+export { PlaceApiKey } from './api-keys/api-key';
+export type { PlaceApiKeyPermission } from './api-keys/api-key';
+export {
+    addApiKey,
+    inspectApiKey,
+    queryApiKeys,
+    removeApiKey,
+    showApiKey,
+    updateApiKey,
+} from './api-keys/functions';
+export type {
+    PlaceApiKeyJwt,
+    PlaceApiKeyQueryOptions,
+    PlaceApiKeyScope,
+} from './api-keys/interfaces';
+
 export type { PlaceAuthSourceQueryOptions } from './auth-sources/interfaces';
 
 export { AuthType, PlaceMQTTBroker } from './broker/broker';
@@ -58,6 +74,14 @@ export {
     showBroker,
     updateBroker,
 } from './broker/functions';
+
+export { buildMonitor, cancelBuildJob } from './build-monitor/functions';
+export type {
+    BuildMonitorCancelStatus,
+    BuildMonitorQueryOptions,
+    BuildMonitorTaskState,
+    BuildMonitorTaskStatus,
+} from './build-monitor/interfaces';
 
 export { PlaceCluster } from './clusters/cluster';
 export {
@@ -108,13 +132,37 @@ export type {
 export { PlaceEdge } from './edge/edge';
 export {
     addEdge,
+    cleanupEdgeMonitoring,
+    edgeConnections,
+    edgeConnectionsFor,
     edgeControlUrl,
+    edgeErrors,
+    edgeErrorsFor,
+    edgeErrorsStreamUrl,
+    edgeErrorsStreamUrlFor,
+    edgeHealth,
+    edgeHealthFor,
+    edgeModuleFailures,
+    edgeModulesStreamUrl,
+    edgeModuleStatus,
+    edgeMonitoringSummary,
+    edgeStatistics,
     queryEdges,
     removeEdge,
     retrieveEdgeToken,
     showEdge,
     updateEdge,
 } from './edge/functions';
+export type {
+    PlaceEdgeConnectionMetrics,
+    PlaceEdgeCreateBody,
+    PlaceEdgeError,
+    PlaceEdgeErrorQueryOptions,
+    PlaceEdgeHealth,
+    PlaceEdgeModuleStatus,
+    PlaceEdgeMonitoringCleanupOptions,
+    PlaceEdgeStatistics,
+} from './edge/interfaces';
 
 export {
     acceptGroupInvitation,
@@ -178,6 +226,7 @@ export { PlaceLDAPSource } from './ldap-sources/ldap-source';
 
 export {
     addMetadata,
+    bulkMetadata,
     listChildMetadata,
     listMetadata,
     listMetadataHistory,
@@ -186,6 +235,7 @@ export {
     updateMetadata,
 } from './metadata/functions';
 export type {
+    PlaceMetadataBulkOptions,
     PlaceMetadataDeleteOptions,
     PlaceMetadataHistoryOptions,
     PlaceMetadataOptions,
@@ -225,6 +275,30 @@ export {
 } from './oauth-sources/functions';
 export { PlaceOAuthSource } from './oauth-sources/oauth-source';
 
+export { mqttAccess, mqttUser } from './mqtt/functions';
+export type { MqttAccessLevel, MqttAccessOptions } from './mqtt/interfaces';
+
+export {
+    listPublicEvents,
+    publicEventGuestToken,
+    registerPublicEvent,
+} from './public-events/functions';
+export type {
+    PublicEventQueryOptions,
+    PublicEventRegistrationRequest,
+    PublicEventTokenRequest,
+} from './public-events/interfaces';
+
+export {
+    googleNotification,
+    office365Notification,
+} from './push-notifications/functions';
+export type {
+    MicrosoftNotification,
+    MicrosoftNotificationEncryptedContent,
+    MicrosoftNotificationValue,
+} from './push-notifications/interfaces';
+
 export {
     addRepository,
     listInterfaceRepositories,
@@ -256,6 +330,23 @@ export type {
     PlaceRepositoryQueryOptions,
 } from './repositories/interfaces';
 export { PlaceRepository } from './repositories/repository';
+
+export {
+    apiScopes,
+    backfill,
+    coreVersions,
+    healthCheck,
+    platformInfo,
+    reindex,
+    serviceVersion,
+    signal,
+} from './root/functions';
+export type {
+    PlacePlatformInfo,
+    PlaceVersion,
+    ReindexOptions,
+    SignalOptions,
+} from './root/interfaces';
 
 export {
     create,
@@ -316,6 +407,7 @@ export {
     systemControlUrl,
     systemMetadata,
     systemModuleState,
+    systemModuleTypes,
     systemSettings,
     updateSystem,
     updateSystemTrigger,
@@ -325,6 +417,7 @@ export type {
     PlaceModuleFunctionMap,
     PlaceSystemControlOptions,
     PlaceSystemMetadataOptions,
+    PlaceSystemModuleTypes,
     PlaceSystemShowOptions,
     PlaceSystemStartStopOptions,
     PlaceSystemTriggerShowOptions,
@@ -366,6 +459,9 @@ export type {
     TriggerWebhook,
 } from './triggers/interfaces';
 export { PlaceTrigger } from './triggers/trigger';
+
+export { showWebhook } from './webhook/functions';
+export type { WebhookShowOptions } from './webhook/interfaces';
 
 export {
     addUser,
@@ -427,6 +523,8 @@ export {
     removeSignageMedia,
     removeSignagePlaylist,
     removeSignagePlugin,
+    shareSignageMedia,
+    shareSignagePlaylists,
     showSignage,
     showSignageMedia,
     showSignageMetrics,
@@ -443,6 +541,7 @@ export type {
     SignagePlaylistQueryOptions,
     SignagePlaylistRevisionsOptions,
     SignagePluginQueryOptions,
+    SignageShareOptions,
 } from './signage/interfaces';
 export {
     MediaAnimation,

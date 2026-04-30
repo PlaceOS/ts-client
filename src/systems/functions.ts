@@ -14,6 +14,7 @@ import { HashMap } from '../utilities/types';
 import { PlaceZone } from '../zones/zone';
 import {
     PlaceModuleFunctionMap,
+    PlaceSystemModuleTypes,
     PlaceSystemControlOptions,
     PlaceSystemMetadataOptions,
     PlaceSystemShowOptions,
@@ -286,6 +287,11 @@ export function moduleTypes(id: string): Observable<HashMap<number>> {
     return task({ id, task_name: 'count', method: 'get', path: PATH });
 }
 
+/** List types of modules and counts in the given system */
+export function systemModuleTypes(id: string): Observable<PlaceSystemModuleTypes> {
+    return task({ id, task_name: 'types', method: 'get', path: PATH });
+}
+
 /**
  * Get list of Zones for system
  * @param id System ID
@@ -373,7 +379,7 @@ export function systemControlUrl(query_params: PlaceSystemControlOptions = {}): 
     const endpoint = apiEndpoint();
     const wsProtocol = endpoint.startsWith('https') ? 'wss:' : 'ws:';
     const httpProtocol = endpoint.startsWith('https') ? 'https:' : 'http:';
-    let url = endpoint.replace(httpProtocol, wsProtocol) + `${PATH}/control`;
+    let url = endpoint.replace(httpProtocol, wsProtocol) + `/${PATH}/control`;
     if (query_params.fixed_device) {
         url += `?fixed_device=${encodeURIComponent(String(query_params.fixed_device))}`;
     }
