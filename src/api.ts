@@ -340,7 +340,7 @@ export type {
     PlaceUserShowOptions,
 } from './users/interfaces';
 export { PlaceUser } from './users/user';
-export type { WorktimePreference } from './users/user';
+export type { WorktimeBlock, WorktimePreference } from './users/user';
 
 export {
     addZone,

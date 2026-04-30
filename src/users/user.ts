@@ -27,6 +27,8 @@ export class PlaceUser extends PlaceResource {
     public readonly email: string;
     /** Phone number of the user */
     public readonly phone: string;
+    /** Display nickname of the user */
+    public readonly nickname: string;
     /** Country that the user resides in */
     public readonly country: string;
     /** Office building the user is associated */
@@ -37,6 +39,8 @@ export class PlaceUser extends PlaceResource {
     public readonly image: string;
     /** Additional metadata associated with the user */
     public readonly metadata: string;
+    /** Miscellaneous user data */
+    public readonly misc: string;
     /** Username credential of the user */
     public readonly login_name: string;
     /** Organisation ID of the user */
@@ -51,6 +55,8 @@ export class PlaceUser extends PlaceResource {
     public readonly sys_admin: boolean;
     /** Name of the active theme on the displayed UI */
     public readonly ui_theme: string;
+    /** Preferred language of the user */
+    public readonly preferred_language: string;
     /** Card Number associated with the user */
     public readonly card_number: string;
     /** Organisational department the user belongs */
@@ -74,10 +80,12 @@ export class PlaceUser extends PlaceResource {
         this.email = raw_data.email || '';
         this.email_digest = raw_data.email_digest || '';
         this.phone = raw_data.phone || '';
+        this.nickname = raw_data.nickname || '';
         this.country = raw_data.country || '';
         this.building = raw_data.building || '';
         this.image = raw_data.image || '';
         this.metadata = raw_data.metadata || '';
+        this.misc = raw_data.misc || '';
         this.login_name = raw_data.login_name || '';
         this.staff_id = raw_data.staff_id || '';
         this.first_name = raw_data.first_name || '';
@@ -85,6 +93,7 @@ export class PlaceUser extends PlaceResource {
         this.support = !!raw_data.support;
         this.sys_admin = !!raw_data.sys_admin;
         this.ui_theme = raw_data.ui_theme || '';
+        this.preferred_language = raw_data.preferred_language || '';
         this.card_number = raw_data.card_number || '';
         this.groups = raw_data.groups || [];
         this.department = raw_data.department || '';
