@@ -18,7 +18,7 @@ export function publicEventGuestToken(
     body: PublicEventTokenRequest,
 ): Observable<string> {
     const url = `${apiEndpoint()}/${PATH}/guest_token/${encodeURIComponent(system_id)}`;
-    return post(url, body, { response_type: 'text', skip_auth: true });
+    return post(url, body, { skip_auth: true }) as any;
 }
 
 /** List cached public events for a system */
