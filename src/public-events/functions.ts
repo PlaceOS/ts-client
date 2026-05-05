@@ -16,9 +16,9 @@ const PATH = 'public_events';
 export function publicEventGuestToken(
     system_id: string,
     body: PublicEventTokenRequest,
-): Observable<HashMap> {
+): Observable<string> {
     const url = `${apiEndpoint()}/${PATH}/guest_token/${encodeURIComponent(system_id)}`;
-    return post(url, body) as any;
+    return post(url, body, { response_type: 'text' });
 }
 
 /** List cached public events for a system */
