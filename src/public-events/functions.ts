@@ -18,7 +18,7 @@ export function publicEventGuestToken(
     body: PublicEventTokenRequest,
 ): Observable<string> {
     const url = `${apiEndpoint()}/${PATH}/guest_token/${encodeURIComponent(system_id)}`;
-    return post(url, body, { response_type: 'text' });
+    return post(url, body, { response_type: 'text', skip_auth: true });
 }
 
 /** List cached public events for a system */
@@ -28,7 +28,9 @@ export function listPublicEvents(
 ): Observable<HashMap[]> {
     const q = toQueryString(query_params);
     const url = `${apiEndpoint()}/${PATH}/${encodeURIComponent(system_id)}/events${q ? '?' + q : ''}`;
-    return get(url).pipe(map((resp: HashMap) => (resp || []) as HashMap[]));
+    return get(url, { skip_auth_flow: true }).pipe(
+        map((resp: HashMap) => (resp || []) as HashMap[]),
+    );
 }
 
 /** Register an external attendee for a public calendar event */
@@ -37,5 +39,5 @@ export function registerPublicEvent(
     body: PublicEventRegistrationRequest,
 ): Observable<HashMap> {
     const url = `${apiEndpoint()}/${PATH}/${encodeURIComponent(system_id)}/register`;
-    return post(url, body) as any;
+    return post(url, body, { skip_auth_flow: true }) as any;
 }

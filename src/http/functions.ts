@@ -278,34 +278,44 @@ export function request(
     if (!options.headers['Content-Type'] && !options.headers['content-type']) {
         options.headers['Content-Type'] = `application/json`;
     }
-    return listenForToken().pipe(
-        filter((_) => _),
-        take(1),
-        switchMap((_) => {
-            if (token() === 'x-api-key') {
-                options.headers!['X-API-Key'] = apiKey();
-            } else {
-                options.headers!.Authorization = `Bearer ${token()}`;
-            }
-            const fetchOptions: any = {
-                ...options,
-                method,
-                credentials: 'same-origin',
-            };
+    const fetchRequest = () => {
+        const fetchOptions: any = {
+            ...options,
+            method,
+            credentials: 'same-origin',
+        };
+        delete fetchOptions.response_type;
+        delete fetchOptions.skip_auth;
+        delete fetchOptions.skip_auth_flow;
 
-            // Only add body for methods that support it and when body exists
-            if (
-                ['POST', 'PUT', 'PATCH'].includes(method) &&
-                options.body !== undefined
-            ) {
-                fetchOptions.body =
-                    typeof options.body === 'string'
-                        ? options.body
-                        : JSON.stringify(options.body);
-            }
+        // Only add body for methods that support it and when body exists
+        if (
+            ['POST', 'PUT', 'PATCH'].includes(method) &&
+            options.body !== undefined
+        ) {
+            fetchOptions.body =
+                typeof options.body === 'string'
+                    ? options.body
+                    : JSON.stringify(options.body);
+        }
 
-            return fromFetch(url, fetchOptions) as Observable<Response>;
-        }),
+        return fromFetch(url, fetchOptions) as Observable<Response>;
+    };
+    const request_obs = options.skip_auth
+        ? fetchRequest()
+        : listenForToken().pipe(
+              filter((_) => _),
+              take(1),
+              switchMap((_) => {
+                  if (token() === 'x-api-key') {
+                      options.headers!['X-API-Key'] = apiKey();
+                  } else {
+                      options.headers!.Authorization = `Bearer ${token()}`;
+                  }
+                  return fetchRequest();
+              }),
+          );
+    return request_obs.pipe(
         switchMap((resp: Response) => {
             if (resp.ok) {
                 return success(resp, options.response_type as any);
@@ -316,6 +326,10 @@ export function request(
             count: 4,
             delay: (error, retry_count) => {
                 return new Observable<number>((subscriber) => {
+                    if (options.skip_auth || options.skip_auth_flow) {
+                        subscriber.error(error || {});
+                        return;
+                    }
                     if (error.status === 511) {
                         sendToLogin(authority()!);
                         subscriber.error(error);

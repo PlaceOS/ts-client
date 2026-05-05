@@ -11,6 +11,10 @@ export interface HttpOptions {
     headers?: HashMap<string>;
     body?: any;
     response_type?: HttpResponseType;
+    /** Skip auth token lookup and auth-refresh retries for public endpoints */
+    skip_auth?: boolean;
+    /** Attach auth when available, but do not trigger refresh/login recovery on failure */
+    skip_auth_flow?: boolean;
 }
 
 export interface HttpJsonOptions extends HttpOptions {

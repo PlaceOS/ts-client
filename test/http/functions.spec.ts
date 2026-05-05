@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { HttpError } from '../../src/http/interfaces';
 
-import { of } from 'rxjs';
+import { firstValueFrom, of } from 'rxjs';
 
 import * as Auth from '../../src/auth/functions';
 import * as Http from '../../src/http/functions';
@@ -71,6 +71,54 @@ describe('Http', () => {
             .toPromise()
             .catch((_) => _);
         expect(Auth.refreshAuthority).toBeCalled();
+    });
+
+    test('should skip token wait for unauthenticated requests', async () => {
+        expect.assertions(2);
+        (Auth as any).listenForToken = vi.fn(() => of(false));
+        (Auth as any).token = vi.fn();
+
+        await firstValueFrom(Http.request('GET', '_', { skip_auth: true }));
+
+        expect(window.fetch).toHaveBeenCalled();
+        expect(Auth.token).not.toHaveBeenCalled();
+    });
+
+    test('should not refresh auth for unauthenticated request failures', async () => {
+        expect.assertions(2);
+        window.fetch = vi.fn().mockImplementation(async () => ({
+            status: 401,
+            ok: false,
+            text: async () => 'Unauthorised',
+        }));
+
+        await expect(
+            firstValueFrom(Http.request('GET', '_', { skip_auth: true })),
+        ).rejects.toMatchObject({ status: 401 });
+        expect(Auth.refreshAuthority).not.toBeCalled();
+    });
+
+    test('should attach token without auth flow recovery when requested', async () => {
+        expect.assertions(3);
+        (Auth as any).token = vi.fn(() => 'public-token');
+        window.fetch = vi.fn().mockImplementation(async () => ({
+            status: 401,
+            ok: false,
+            text: async () => 'Unauthorised',
+        }));
+
+        await expect(
+            firstValueFrom(Http.request('GET', '_', { skip_auth_flow: true })),
+        ).rejects.toMatchObject({ status: 401 });
+        expect(window.fetch).toHaveBeenCalledWith(
+            '_',
+            expect.objectContaining({
+                headers: expect.objectContaining({
+                    Authorization: 'Bearer public-token',
+                }),
+            }),
+        );
+        expect(Auth.refreshAuthority).not.toBeCalled();
     });
 
     test('should expose response headers', () => {
