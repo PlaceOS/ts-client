@@ -67,6 +67,8 @@ export class PlaceSystem extends PlaceResource {
     public readonly signage: boolean;
     /** List of playlist IDs associated with the system */
     public readonly playlists: readonly string[];
+    /** List of security groups with access to the system */
+    public readonly security_groups: readonly string[];
     public readonly approval: boolean;
     /** Orientation of the signage system */
     public readonly orientation:
@@ -100,6 +102,7 @@ export class PlaceSystem extends PlaceResource {
         this.timezone = raw_data.timezone || '';
         this.signage = raw_data.signage || false;
         this.playlists = raw_data.playlists || [];
+        this.security_groups = raw_data.security_groups || [];
         this.orientation = raw_data.orientation || 'unspecified';
         this.approval = raw_data.approval || false;
         if (typeof this.settings !== 'object') {
