@@ -1,9 +1,10 @@
-import { MediaAnimation } from './media.class';
+import { MediaAnimation, SignageMedia } from './media.class';
 
 export class SignagePlaylistMedia {
     public readonly id: string;
     public readonly playlist_id: string;
     public readonly items: string[];
+    public readonly media: SignageMedia[];
     public readonly created_at: number;
     public readonly updated_at: number;
 
@@ -23,6 +24,7 @@ export class SignagePlaylistMedia {
         this.updated_at = data.updated_at || 0;
 
         this.items = data.items || [];
+        this.media = data.media || [];
 
         this.approved = !!data.approved;
         this.approved_by_id = data.approved_by_id || '';
