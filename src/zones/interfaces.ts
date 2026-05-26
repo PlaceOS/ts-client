@@ -16,6 +16,7 @@ export interface PlaceZoneQueryOptions extends PlaceResourceQueryOptions {
 export interface PlaceZoneShowOptions {
     /** Includes trigger data in the response (must have support or admin permissions) */
     complete?: boolean;
+
     /**
      * Returns the specified settings key if the key exists
      * in the zone (available to all authenticated users)
