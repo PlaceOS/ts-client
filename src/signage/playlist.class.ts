@@ -51,9 +51,10 @@ export class SignagePlaylist {
     public readonly random: boolean;
     public readonly enabled: boolean;
     public readonly default_duration: number;
-    public readonly play_hours: string;
-    public readonly play_at: string;
     public readonly play_cron: string;
+    public readonly play_period: number;
+    public readonly play_at: number;
+    public readonly play_takeover: boolean;
     public readonly valid_from?: number;
     public readonly valid_until?: number;
 
@@ -73,8 +74,9 @@ export class SignagePlaylist {
         this.default_duration = data.default_duration ?? 15 * 1000;
         this.valid_from = data.valid_from;
         this.valid_until = data.valid_until;
-        this.play_hours = data.play_hours || '';
-        this.play_at = data.play_at || '';
         this.play_cron = data.play_cron || '';
+        this.play_period = data.play_period ?? 0;
+        this.play_at = data.play_at ?? 0;
+        this.play_takeover = !!data.play_takeover;
     }
 }
