@@ -5,10 +5,10 @@ import { HttpJsonOptions } from '../http/interfaces';
 import { task } from '../resources/functions';
 import { toQueryString } from '../utilities/api';
 import {
-    SignageShareOptions,
     SignageMediaQueryOptions,
     SignageMetrics,
     SignagePluginQueryOptions,
+    SignageShareOptions,
 } from './interfaces';
 import { SignageMedia } from './media.class';
 import { SignagePlaylist, SignagePlaylistMedia } from './playlist.class';
@@ -281,6 +281,26 @@ export function approveSignagePlaylist(id: string) {
 }
 
 /**
+ * Request an approval for the latest revision of the media list for a playlist
+ * @param id ID of the playlist to approve
+ * @param group_id ID of the user group to message for approvals
+ * @param message Optional message to send to the approver
+ */
+export function requestApprovalSignagePlaylist(
+    id: string,
+    group_id: string,
+    message: string = '',
+) {
+    return task({
+        id,
+        task_name: `media/request_approval?group_id=${group_id}`,
+        method: 'post',
+        path: PLAYLISTS_PATH,
+        form_data: { message },
+    });
+}
+
+/**
  * Update the media for a playlist
  * @param id ID of the playlist
  * @param form_data New list of media IDs for the playlist
@@ -300,7 +320,10 @@ export function updateSignagePlaylistMedia(id: string, form_data: string[]) {
 /** Share one or more playlists into another signage group */
 export function shareSignagePlaylists(query_params: SignageShareOptions) {
     const q = toQueryString(query_params);
-    return post(`${apiEndpoint()}/${PLAYLISTS_PATH}/share${q ? '?' + q : ''}`, {});
+    return post(
+        `${apiEndpoint()}/${PLAYLISTS_PATH}/share${q ? '?' + q : ''}`,
+        {},
+    );
 }
 
 /**
