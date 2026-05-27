@@ -21,7 +21,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/placeos/ts-client.git"
+        "url": "https://github.com/PlaceOS/ts-client.git"
     },
     "publishConfig": {
         "provenance": true
