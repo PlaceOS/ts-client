@@ -290,13 +290,35 @@ export function requestApprovalSignagePlaylist(
     id: string,
     group_id: string,
     message: string = '',
+    approver_id: string = '',
 ) {
+    const q = toQueryString({ group_id, approver_id });
     return task({
         id,
-        task_name: `media/request_approval?group_id=${group_id}`,
+        task_name: `media/request_approval${q ? '?' + q : ''}`,
         method: 'post',
         path: PLAYLISTS_PATH,
         form_data: { message },
+    });
+}
+
+interface SignagePlaylistApprover {
+    id: string;
+    name: string;
+}
+
+/**
+ * List the approvers for the selected group of media list for a playlist
+ * @param group_id ID of the user group to list approvers for
+ */
+export function listSignagePlaylistApprovers(group_id: string) {
+    return show({
+        id: 'approvers',
+        query_params: { group_id },
+        fn: (r) => {
+            return r as SignagePlaylistApprover[];
+        },
+        path: PLAYLISTS_PATH,
     });
 }
 
