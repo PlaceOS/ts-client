@@ -514,6 +514,7 @@ export {
     addSignagePlaylist,
     addSignagePlugin,
     approveSignagePlaylist,
+    listSignagePlaylistApprovers,
     listSignagePlaylistMedia,
     listSignagePlaylistMediaRevisions,
     mediaThumbnail,
@@ -539,8 +540,10 @@ export {
 export type {
     SignageMediaQueryOptions,
     SignageMetrics,
+    SignagePlaylistApprover,
     SignagePlaylistQueryOptions,
     SignagePlaylistRevisionsOptions,
+    SignagePlaylistSchedule,
     SignagePluginQueryOptions,
     SignageShareOptions,
 } from './signage/interfaces';

@@ -1,11 +1,5 @@
+import { SignagePlaylistSchedule } from './interfaces';
 import { MediaAnimation, SignageMedia } from './media.class';
-
-export interface SignagePlaylistSchedule {
-    readonly play_cron: string;
-    readonly play_period: number;
-    readonly play_at?: number;
-    readonly play_takeover: boolean;
-}
 
 export class SignagePlaylistMedia {
     public readonly id: string;

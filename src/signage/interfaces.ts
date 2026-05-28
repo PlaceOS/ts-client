@@ -6,6 +6,18 @@ export interface SignageMetrics {
     media_counts: Record<string, number>;
 }
 
+export interface SignagePlaylistSchedule {
+    readonly play_cron: string;
+    readonly play_period: number;
+    readonly play_at?: number;
+    readonly play_takeover: boolean;
+}
+
+export interface SignagePlaylistApprover {
+    id: string;
+    name: string;
+}
+
 /** Allowable query parameters for signage media index endpoint */
 export interface SignageMediaQueryOptions extends PlaceResourceQueryOptions {
     /** ID of the authority to filter the returned values on */

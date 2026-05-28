@@ -7,6 +7,7 @@ import { toQueryString } from '../utilities/api';
 import {
     SignageMediaQueryOptions,
     SignageMetrics,
+    SignagePlaylistApprover,
     SignagePluginQueryOptions,
     SignageShareOptions,
 } from './interfaces';
@@ -300,11 +301,6 @@ export function requestApprovalSignagePlaylist(
         path: PLAYLISTS_PATH,
         form_data: { message },
     });
-}
-
-interface SignagePlaylistApprover {
-    id: string;
-    name: string;
 }
 
 /**
