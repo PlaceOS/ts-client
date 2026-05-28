@@ -1,5 +1,12 @@
 import { MediaAnimation, SignageMedia } from './media.class';
 
+export interface SignagePlaylistSchedule {
+    readonly play_cron: string;
+    readonly play_period: number;
+    readonly play_at?: number;
+    readonly play_takeover: boolean;
+}
+
 export class SignagePlaylistMedia {
     public readonly id: string;
     public readonly playlist_id: string;
@@ -55,6 +62,7 @@ export class SignagePlaylist {
     public readonly play_period: number;
     public readonly play_at: number;
     public readonly play_takeover: boolean;
+    public readonly additional_schedules: SignagePlaylistSchedule[];
     public readonly valid_from?: number;
     public readonly valid_until?: number;
 
@@ -78,5 +86,6 @@ export class SignagePlaylist {
         this.play_period = data.play_period ?? 0;
         this.play_at = data.play_at ?? 0;
         this.play_takeover = !!data.play_takeover;
+        this.additional_schedules = data.additional_schedules || [];
     }
 }
