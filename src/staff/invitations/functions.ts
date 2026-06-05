@@ -1,4 +1,3 @@
-import { map } from 'rxjs/operators';
 import { del, get, patch, post, put } from '../../api';
 import { toQueryString } from '../../utilities/api';
 import { InvitationQueryOptions, InvitationShowOptions } from './interfaces';
@@ -15,8 +14,8 @@ const PATH = '/api/staff/v1/surveys/invitations';
  */
 export function queryInvitations(query_params: InvitationQueryOptions = {}) {
     const query = toQueryString(query_params);
-    return get(`${PATH}${query ? '?' + query : ''}`).pipe(
-        map((l: any) => l.map((_: any) => new SurveyInvitation(_))),
+    return get(`${PATH}${query ? '?' + query : ''}`).then((l: any) =>
+        l.map((_: any) => new SurveyInvitation(_)),
     );
 }
 
@@ -30,8 +29,8 @@ export function showInvitation(
     query_params: InvitationShowOptions = {},
 ) {
     const query = toQueryString(query_params);
-    return get(`${PATH}/${token}${query ? '?' + query : ''}`).pipe(
-        map((l: any) => new SurveyInvitation(l)),
+    return get(`${PATH}/${token}${query ? '?' + query : ''}`).then(
+        (l: any) => new SurveyInvitation(l),
     );
 }
 
@@ -47,8 +46,8 @@ export function updateInvitation(
     form_data: Partial<SurveyInvitation>,
     method: 'put' | 'patch' = 'patch',
 ) {
-    return (method === 'put' ? put : patch)(`${PATH}/${token}`, form_data).pipe(
-        map((l: any) => new SurveyInvitation(l)),
+    return (method === 'put' ? put : patch)(`${PATH}/${token}`, form_data).then(
+        (l: any) => new SurveyInvitation(l),
     );
 }
 
@@ -58,9 +57,7 @@ export function updateInvitation(
  * @param query_params Query parameters to add the to request URL
  */
 export function addInvitation(form_data: Partial<SurveyInvitation>) {
-    return post(`${PATH}`, form_data).pipe(
-        map((l: any) => new SurveyInvitation(l)),
-    );
+    return post(`${PATH}`, form_data).then((l: any) => new SurveyInvitation(l));
 }
 
 /**

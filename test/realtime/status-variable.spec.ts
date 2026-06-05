@@ -1,7 +1,7 @@
-import { BehaviorSubject } from 'rxjs';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { PlaceVariableBinding } from '../../src/realtime/status-variable';
+import { WritableSignal, createSignal } from '../../src/utilities/signal';
 
 import * as ws from '../../src/realtime/functions';
 
@@ -11,24 +11,18 @@ describe('PlaceVariableBinding', () => {
     let status: PlaceVariableBinding;
     let fake_module: any;
     let fake_system: any;
-    let state_subject: BehaviorSubject<boolean>;
-    let status_value: BehaviorSubject<number>;
+    let state_subject: WritableSignal<boolean>;
+    let status_value: WritableSignal<number | undefined>;
 
     beforeEach(() => {
         vi.useFakeTimers();
-        state_subject = new BehaviorSubject<boolean>(false);
-        status_value = new BehaviorSubject<any>(undefined);
-        (ws as any).status.mockImplementation(() =>
-            state_subject.asObservable(),
-        );
+        state_subject = createSignal<boolean>(false);
+        status_value = createSignal<number | undefined>(undefined);
+        (ws as any).status.mockImplementation(() => state_subject.asReadonly());
         (ws as any).bind.mockImplementation((_: any) => Promise.resolve());
         (ws as any).unbind.mockImplementation((_: any) => Promise.resolve());
-        (ws as any).listen.mockImplementation(() =>
-            status_value.asObservable(),
-        );
-        (ws as any).value.mockImplementation((_: any) =>
-            status_value.getValue(),
-        );
+        (ws as any).listen.mockImplementation(() => status_value.asReadonly());
+        (ws as any).value.mockImplementation((_: any) => status_value.value);
         fake_system = { id: 'sys-A0' };
         fake_module = { system: fake_system, name: 'Test', index: 1 };
         status = new PlaceVariableBinding(fake_module, 'test');
@@ -86,7 +80,7 @@ describe('PlaceVariableBinding', () => {
 
     test('should expose the binding value', () => {
         expect(status.value).toBeUndefined();
-        status_value.next(10);
+        status_value.set(10);
         expect(status.value).toBe(10);
     });
 
@@ -98,20 +92,20 @@ describe('PlaceVariableBinding', () => {
                     resolve();
                 }
             });
-            status_value.next(10);
+            status_value.set(10);
         }));
 
     test('should rebind to bindings on websocket reconnect', () =>
         new Promise<void>((resolve) => {
             vi.useRealTimers();
-            state_subject.next(true);
-            state_subject.next(false);
+            state_subject.set(true);
+            state_subject.set(false);
             setTimeout(() => {
                 expect(ws.bind).not.toBeCalled();
                 status.bind();
                 setTimeout(() => {
-                    state_subject.next(false);
-                    state_subject.next(true);
+                    state_subject.set(false);
+                    state_subject.set(true);
                     setTimeout(() => {
                         expect(ws.bind).toBeCalled();
                         resolve();

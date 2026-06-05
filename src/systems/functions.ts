@@ -1,4 +1,3 @@
-import { Observable } from 'rxjs';
 import { apiEndpoint } from '../auth/functions';
 import {
     create,
@@ -14,13 +13,13 @@ import { HashMap } from '../utilities/types';
 import { PlaceZone } from '../zones/zone';
 import {
     PlaceModuleFunctionMap,
-    PlaceSystemModuleTypes,
     PlaceSystemControlOptions,
     PlaceSystemMetadataOptions,
+    PlaceSystemModuleTypes,
     PlaceSystemShowOptions,
     PlaceSystemsQueryOptions,
-    PlaceSystemsWithEmailsOptions,
     PlaceSystemStartStopOptions,
+    PlaceSystemsWithEmailsOptions,
     PlaceSystemTriggerShowOptions,
     PlaceSystemTriggersQueryOptions,
 } from './interfaces';
@@ -114,7 +113,7 @@ export function addSystemModule(
     id: string,
     module_id: string,
     data: HashMap = {},
-): Observable<PlaceSystem> {
+): Promise<PlaceSystem> {
     return task({
         id,
         task_name: `module/${module_id}`,
@@ -133,7 +132,7 @@ export function addSystemModule(
 export function removeSystemModule(
     id: string,
     module_id: string,
-): Observable<PlaceSystem> {
+): Promise<PlaceSystem> {
     return task({
         id,
         task_name: `module/${module_id}`,
@@ -152,7 +151,7 @@ export function removeSystemModule(
 export function startSystem(
     id: string,
     query_params: PlaceSystemStartStopOptions = {},
-): Observable<void> {
+): Promise<void> {
     return task<void>({
         id,
         task_name: 'start',
@@ -169,7 +168,7 @@ export function startSystem(
 export function stopSystem(
     id: string,
     query_params: PlaceSystemStartStopOptions = {},
-): Observable<void> {
+): Promise<void> {
     return task<void>({
         id,
         task_name: 'stop',
@@ -192,7 +191,7 @@ export function executeOnSystem(
     module: string,
     index: number = 1,
     args: any[] = [],
-): Observable<HashMap> {
+): Promise<HashMap> {
     return task({
         id,
         task_name: `${module}_${index}/${encodeURIComponent(method)}`,
@@ -212,7 +211,7 @@ export function systemModuleState(
     id: string,
     module: string,
     index: number = 1,
-): Observable<HashMap> {
+): Promise<HashMap> {
     return task({
         id,
         task_name: `${module}_${index}`,
@@ -233,7 +232,7 @@ export function lookupSystemModuleState(
     module: string,
     index: number = 1,
     lookup: string,
-): Observable<HashMap> {
+): Promise<HashMap> {
     return task({
         id,
         task_name: `${module}_${index}/${lookup}`,
@@ -252,7 +251,7 @@ export function functionList(
     id: string,
     module: string,
     index: number = 1,
-): Observable<PlaceModuleFunctionMap> {
+): Promise<PlaceModuleFunctionMap> {
     return task({
         id,
         task_name: `functions/${module}_${index}`,
@@ -269,7 +268,7 @@ export function functionList(
 export function moduleCount(
     id: string,
     module: string,
-): Observable<{ count: number }> {
+): Promise<{ count: number }> {
     return task({
         id,
         task_name: 'count',
@@ -283,12 +282,12 @@ export function moduleCount(
  * List types of modules and counts in the given system
  * @param id System ID
  */
-export function moduleTypes(id: string): Observable<HashMap<number>> {
+export function moduleTypes(id: string): Promise<HashMap<number>> {
     return task({ id, task_name: 'count', method: 'get', path: PATH });
 }
 
 /** List types of modules and counts in the given system */
-export function systemModuleTypes(id: string): Observable<PlaceSystemModuleTypes> {
+export function systemModuleTypes(id: string): Promise<PlaceSystemModuleTypes> {
     return task({ id, task_name: 'types', method: 'get', path: PATH });
 }
 
@@ -328,7 +327,7 @@ export function listSystemTriggers(
 export function addSystemTrigger(
     id: string,
     data: Partial<PlaceTrigger>,
-): Observable<PlaceTrigger> {
+): Promise<PlaceTrigger> {
     return task({
         id,
         task_name: 'triggers',
@@ -347,7 +346,7 @@ export function addSystemTrigger(
 export function removeSystemTrigger(
     id: string,
     trigger_id: string,
-): Observable<void> {
+): Promise<void> {
     return task({
         id,
         task_name: `triggers/${trigger_id}`,
@@ -360,7 +359,7 @@ export function removeSystemTrigger(
  * Fetch settings of modules, zones and drivers associated with the system
  * @param id System ID
  */
-export function systemSettings(id: string): Observable<PlaceSettings[]> {
+export function systemSettings(id: string): Promise<PlaceSettings[]> {
     return task({
         id,
         task_name: 'settings',
@@ -375,7 +374,9 @@ export function systemSettings(id: string): Observable<PlaceSettings[]> {
  * Get the websocket API endpoint URL for system control.
  * @param query_params Query parameters to add to the URL
  */
-export function systemControlUrl(query_params: PlaceSystemControlOptions = {}): string {
+export function systemControlUrl(
+    query_params: PlaceSystemControlOptions = {},
+): string {
     const endpoint = apiEndpoint();
     const wsProtocol = endpoint.startsWith('https') ? 'wss:' : 'ws:';
     const httpProtocol = endpoint.startsWith('https') ? 'https:' : 'http:';
@@ -394,7 +395,7 @@ export function systemControlUrl(query_params: PlaceSystemControlOptions = {}): 
 export function systemMetadata(
     id: string,
     query_params: PlaceSystemMetadataOptions = {},
-): Observable<HashMap> {
+): Promise<HashMap> {
     return task({
         id,
         task_name: 'metadata',
@@ -414,7 +415,7 @@ export function showSystemTrigger(
     sys_id: string,
     trig_id: string,
     query_params: PlaceSystemTriggerShowOptions = {},
-): Observable<PlaceTrigger> {
+): Promise<PlaceTrigger> {
     return task({
         id: sys_id,
         task_name: `triggers/${encodeURIComponent(trig_id)}`,
@@ -437,7 +438,7 @@ export function updateSystemTrigger(
     trig_id: string,
     data: Partial<PlaceTrigger>,
     method: 'put' | 'patch' = 'patch',
-): Observable<PlaceTrigger> {
+): Promise<PlaceTrigger> {
     return task({
         id: sys_id,
         task_name: `triggers/${encodeURIComponent(trig_id)}`,

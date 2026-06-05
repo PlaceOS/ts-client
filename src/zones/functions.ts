@@ -1,4 +1,3 @@
-import { Observable } from 'rxjs';
 import {
     create,
     query,
@@ -126,7 +125,7 @@ export function executeOnZone(
     module: string,
     index: number = 1,
     args: any[] = [],
-): Observable<HashMap> {
+): Promise<HashMap> {
     return task({
         id,
         task_name: `exec/${encodeURIComponent(
@@ -145,7 +144,7 @@ export function executeOnZone(
 export function zoneMetadata(
     id: string,
     query_params: PlaceZoneMetadataQueryOptions = {},
-): Observable<HashMap> {
+): Promise<HashMap> {
     return task({
         id,
         task_name: 'metadata',

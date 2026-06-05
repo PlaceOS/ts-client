@@ -57,6 +57,26 @@ export function log(
         }
     }
 }
+
+export function scoped_log(scope: string) {
+    const payload = (args: any[]) =>
+        args.length <= 0 ? undefined : args.length === 1 ? args[0] : args;
+    const write = (out: ConsoleIOStream, msg: string, args: any[]) =>
+        log(scope, msg, payload(args), out);
+    const logger = (msg: string, ...args: any) => write('debug', msg, args);
+    logger.debug = (msg: string, ...args: any) => write('debug', msg, args);
+    logger.info = (msg: string, ...args: any) => write('info', msg, args);
+    logger.error = (msg: string, ...args: any) => write('error', msg, args);
+    logger.warn = (msg: string, ...args: any) => write('warn', msg, args);
+    logger.log = (msg: string, ...args: any) => write('log', msg, args);
+    logger.group = (msg: string, ...args: any) => write('group', msg, args);
+    logger.groupCollapsed = (msg: string, ...args: any) =>
+        write('groupCollapsed', msg, args);
+    logger.groupEnd = (msg: string, ...args: any) =>
+        write('groupEnd', msg, args);
+    return logger;
+}
+
 /* istanbul ignore next */
 /**
  * @private

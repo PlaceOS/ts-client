@@ -1,5 +1,3 @@
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { apiEndpoint } from '../auth';
 import { get, post } from '../http/functions';
 import { toQueryString } from '../utilities/api';
@@ -23,10 +21,10 @@ const PATH = 'webrtc';
  */
 export function queryWebrtcRooms(
     query_params: PlaceWebrtcRoomsQueryOptions = {},
-): Observable<PlaceWebrtcRoomDetails[]> {
+): Promise<PlaceWebrtcRoomDetails[]> {
     const query = toQueryString(query_params);
     const url = `${apiEndpoint()}${PATH}/rooms${query ? '?' + query : ''}`;
-    return get(url).pipe(map((resp: HashMap) => resp as PlaceWebrtcRoomDetails[]));
+    return get(url).then((resp: HashMap) => resp as PlaceWebrtcRoomDetails[]);
 }
 
 /**
@@ -35,9 +33,9 @@ export function queryWebrtcRooms(
  */
 export function showWebrtcRoom(
     system_id: string,
-): Observable<PlaceWebrtcRoomDetails> {
+): Promise<PlaceWebrtcRoomDetails> {
     const url = `${apiEndpoint()}${PATH}/room/${encodeURIComponent(system_id)}`;
-    return get(url).pipe(map((resp: HashMap) => resp as PlaceWebrtcRoomDetails));
+    return get(url).then((resp: HashMap) => resp as PlaceWebrtcRoomDetails);
 }
 
 /**
@@ -46,9 +44,9 @@ export function showWebrtcRoom(
  */
 export function webrtcSessionMembers(
     session_id: string,
-): Observable<PlaceWebrtcMember[]> {
+): Promise<PlaceWebrtcMember[]> {
     const url = `${apiEndpoint()}${PATH}/members/${encodeURIComponent(session_id)}`;
-    return get(url).pipe(map((resp: HashMap) => resp as PlaceWebrtcMember[]));
+    return get(url).then((resp: HashMap) => resp as PlaceWebrtcMember[]);
 }
 
 /**
@@ -61,18 +59,18 @@ export function webrtcSessionMembers(
 export function webrtcGuestEntry(
     system_id: string,
     participant: PlaceGuestParticipant,
-): Observable<void> {
+): Promise<void> {
     const url = `${apiEndpoint()}${PATH}/guest_entry/${encodeURIComponent(system_id)}`;
-    return post(url, participant).pipe(map(() => undefined));
+    return post(url, participant).then(() => undefined);
 }
 
 /**
  * End a guest call gracefully.
  * This will remove the authentication token and close any open websockets.
  */
-export function webrtcGuestExit(): Observable<void> {
+export function webrtcGuestExit(): Promise<void> {
     const url = `${apiEndpoint()}${PATH}/guest/exit`;
-    return post(url, {}).pipe(map(() => undefined));
+    return post(url, {}).then(() => undefined);
 }
 
 /**
@@ -87,9 +85,9 @@ export function webrtcKickUser(
     user_id: string,
     session_id: string,
     reason: PlaceKickReason,
-): Observable<void> {
+): Promise<void> {
     const url = `${apiEndpoint()}${PATH}/kick/${encodeURIComponent(user_id)}/${encodeURIComponent(session_id)}`;
-    return post(url, reason).pipe(map(() => undefined));
+    return post(url, reason).then(() => undefined);
 }
 
 /**
@@ -103,9 +101,9 @@ export function webrtcTransferUser(
     user_id: string,
     session_id: string,
     connection_details?: Record<string, unknown>,
-): Observable<void> {
+): Promise<void> {
     const url = `${apiEndpoint()}${PATH}/transfer/${encodeURIComponent(user_id)}/${encodeURIComponent(session_id)}`;
-    return post(url, connection_details || {}).pipe(map(() => undefined));
+    return post(url, connection_details || {}).then(() => undefined);
 }
 
 /**

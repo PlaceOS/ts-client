@@ -1,32 +1,32 @@
-import { Subject } from 'rxjs';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { PlaceResponse } from '../../src/realtime/interfaces';
 import { HashMap } from '../../src/utilities/types';
 
-import * as rxjs from 'rxjs/webSocket';
 import * as Auth from '../../src/auth/functions';
 import * as ws from '../../src/realtime/functions';
 import * as mock_ws from '../../src/realtime/mock';
-import * as Utils from '../../src/utilities/general';
+import * as websocket from '../../src/utilities/websocket';
 
 vi.mock('../../src/auth/functions');
 
 const DELAY = Math.pow(2, 40);
 
 describe('Realtime API', () => {
-    let fake_socket: Subject<any>;
-    let another_fake_socket: Subject<any>;
+    let fake_socket: websocket.MemoryWebSocket<any>;
+    let another_fake_socket: websocket.MemoryWebSocket<any>;
     let ws_spy: any;
-    let log_spy: any;
+    let error_spy: any;
     let conn_spy: any;
     let count = 0;
+    let debug_state = false;
 
     beforeEach(() => {
         vi.useFakeTimers();
-        fake_socket = new Subject<any>();
-        another_fake_socket = new Subject<any>();
-        log_spy = vi.spyOn(Utils, 'log');
+        fake_socket = new websocket.MemoryWebSocket<any>();
+        another_fake_socket = new websocket.MemoryWebSocket<any>();
+        debug_state = window.debug;
+        error_spy = vi.spyOn(console, 'error').mockImplementation(() => null);
         (Auth as any).token = vi.fn().mockReturnValue('test');
         (Auth as any).apiEndpoint = vi.fn().mockReturnValue('/api/engine/v2');
         (Auth as any).authority = vi.fn().mockReturnValue({});
@@ -37,7 +37,7 @@ describe('Realtime API', () => {
         (Auth as any).invalidateToken = vi
             .fn()
             .mockImplementation(async () => null);
-        ws_spy = vi.spyOn(rxjs, 'webSocket');
+        ws_spy = vi.spyOn(websocket, 'webSocket');
         ws_spy
             .mockImplementationOnce(() => fake_socket)
             .mockImplementationOnce(() => another_fake_socket)
@@ -51,9 +51,10 @@ describe('Realtime API', () => {
 
     afterEach(() => {
         count = 0;
+        window.debug = debug_state;
         ws.cleanupRealtime();
         ws_spy.mockRestore();
-        log_spy.mockRestore();
+        error_spy.mockRestore();
         conn_spy.mockRestore();
         vi.useRealTimers();
     });
@@ -234,6 +235,7 @@ describe('Realtime API', () => {
         }));
 
     test('should handle engine errors', () => {
+        window.debug = true;
         fake_socket.next({
             id: 0,
             type: 'error',
@@ -278,17 +280,36 @@ describe('Realtime API', () => {
             msg: 'test error',
         } as PlaceResponse);
         vi.advanceTimersByTime(1000);
-        expect(log_spy).toBeCalledTimes(14);
+        expect(error_spy).toBeCalledTimes(7);
+        expect(error_spy).toHaveBeenCalledWith(
+            expect.stringContaining('[ERROR] PARSE ERROR(0): test error'),
+            expect.any(String),
+            expect.any(String),
+            expect.any(String),
+        );
+        expect(error_spy).toHaveBeenCalledWith(
+            expect.stringContaining(
+                '[ERROR] UNEXPECTED FAILURE(7): test error',
+            ),
+            expect.any(String),
+            expect.any(String),
+            expect.any(String),
+        );
     });
 
     test('should log error when engine message is invalid', () => {
+        window.debug = true;
         const message = {};
         fake_socket.next(message);
-        expect(log_spy).toBeCalledWith(
-            'WS',
-            'Invalid websocket message',
+        expect(error_spy).toHaveBeenCalledWith(
+            expect.stringContaining('[PlaceOS]'),
+            expect.any(String),
+            expect.any(String),
+            expect.any(String),
             message,
-            'error',
+        );
+        expect(error_spy.mock.calls[0][0]).toContain(
+            'Invalid websocket message',
         );
     });
 

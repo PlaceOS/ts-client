@@ -1,5 +1,3 @@
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { apiEndpoint } from '../auth/functions';
 import { get, post } from '../http/functions';
 import { query, remove, show } from '../resources/functions';
@@ -78,15 +76,15 @@ export function terminateProcess(
 /**
  * Force the core nodes to perform a cluster rebalance
  */
-export function clusterRebalance(): Observable<void> {
+export function clusterRebalance(): Promise<void> {
     const url = `${apiEndpoint()}${PATH}/rebalance`;
-    return post(url, {}).pipe(map(() => undefined));
+    return post(url, {}).then(() => undefined);
 }
 
 /**
  * Get the core node versions
  */
-export function clusterVersions(): Observable<PlaceClusterVersions> {
+export function clusterVersions(): Promise<PlaceClusterVersions> {
     const url = `${apiEndpoint()}${PATH}/versions`;
-    return get(url).pipe(map((resp: HashMap) => resp as PlaceClusterVersions));
+    return get(url).then((resp: HashMap) => resp as PlaceClusterVersions);
 }

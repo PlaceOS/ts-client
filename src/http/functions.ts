@@ -1,7 +1,3 @@
-import { Observable, throwError } from 'rxjs';
-import { fromFetch } from 'rxjs/fetch';
-import { filter, retry, switchMap, take } from 'rxjs/operators';
-
 import {
     apiKey,
     authority,
@@ -12,7 +8,8 @@ import {
     sendToLogin,
     token,
 } from '../auth/functions';
-import { log } from '../utilities/general';
+import { scoped_log } from '../utilities/general';
+import { waitForSignal } from '../utilities/signal';
 import { HashMap } from '../utilities/types';
 import {
     HttpJsonOptions,
@@ -24,6 +21,8 @@ import {
     HttpVoidOptions,
 } from './interfaces';
 import { mockRequest } from './mock';
+
+const log = scoped_log('HTTP');
 
 /**
  * Method store to allow attaching spies for testing
@@ -50,11 +49,8 @@ export function responseHeaders(
  * @param url URL of the GET endpoint
  * @param options Options to add to the request
  */
-export function get(
-    url: string,
-    options?: HttpJsonOptions,
-): Observable<HashMap>;
-export function get(url: string, options?: HttpTextOptions): Observable<string>;
+export function get(url: string, options?: HttpJsonOptions): Promise<HashMap>;
+export function get(url: string, options?: HttpTextOptions): Promise<string>;
 export function get(
     url: string,
     options?: HttpOptions,
@@ -62,8 +58,8 @@ export function get(
         m: HttpVerb,
         url: string,
         opts: HttpOptions,
-    ) => Observable<HttpResponse> = request,
-): Observable<HttpResponse> {
+    ) => Promise<HttpResponse> = request,
+): Promise<HttpResponse> {
     /* istanbul ignore else */
     if (!options) {
         options = { response_type: 'json' };
@@ -81,12 +77,12 @@ export function post(
     url: string,
     body: any,
     options?: HttpJsonOptions,
-): Observable<HashMap>;
+): Promise<HashMap>;
 export function post(
     url: string,
     body: any,
     options?: HttpTextOptions,
-): Observable<string>;
+): Promise<string>;
 export function post(
     url: string,
     body: any,
@@ -95,8 +91,8 @@ export function post(
         m: HttpVerb,
         url: string,
         opts: HttpOptions,
-    ) => Observable<HttpResponse> = request,
-): Observable<HttpResponse> {
+    ) => Promise<HttpResponse> = request,
+): Promise<HttpResponse> {
     /* istanbul ignore else */
     if (!options) {
         options = { response_type: 'json' };
@@ -114,12 +110,12 @@ export function put(
     url: string,
     body: any,
     options?: HttpJsonOptions,
-): Observable<HashMap>;
+): Promise<HashMap>;
 export function put(
     url: string,
     body: any,
     options?: HttpTextOptions,
-): Observable<string>;
+): Promise<string>;
 export function put(
     url: string,
     body: any,
@@ -128,8 +124,8 @@ export function put(
         m: HttpVerb,
         url: string,
         opts: HttpOptions,
-    ) => Observable<HttpResponse> = request,
-): Observable<HttpResponse> {
+    ) => Promise<HttpResponse> = request,
+): Promise<HttpResponse> {
     /* istanbul ignore else */
     if (!options) {
         options = { response_type: 'json' };
@@ -147,12 +143,12 @@ export function patch(
     url: string,
     body: any,
     options?: HttpJsonOptions,
-): Observable<HashMap>;
+): Promise<HashMap>;
 export function patch(
     url: string,
     body: any,
     options?: HttpTextOptions,
-): Observable<string>;
+): Promise<string>;
 export function patch(
     url: string,
     body: any,
@@ -161,8 +157,8 @@ export function patch(
         m: HttpVerb,
         url: string,
         opts: HttpOptions,
-    ) => Observable<HttpResponse> = request,
-): Observable<HttpResponse> {
+    ) => Promise<HttpResponse> = request,
+): Promise<HttpResponse> {
     /* istanbul ignore else */
     if (!options) {
         options = { response_type: 'json' };
@@ -175,12 +171,9 @@ export function patch(
  * @param url URL of the DELETE endpoint
  * @param options Options to add to the request
  */
-export function del(
-    url: string,
-    options?: HttpJsonOptions,
-): Observable<HashMap>;
-export function del(url: string, options?: HttpTextOptions): Observable<string>;
-export function del(url: string, options?: HttpVoidOptions): Observable<void>;
+export function del(url: string, options?: HttpJsonOptions): Promise<HashMap>;
+export function del(url: string, options?: HttpTextOptions): Promise<string>;
+export function del(url: string, options?: HttpVoidOptions): Promise<void>;
 export function del(
     url: string,
     options?: HttpOptions,
@@ -188,8 +181,8 @@ export function del(
         m: HttpVerb,
         url: string,
         opts: HttpOptions,
-    ) => Observable<HttpResponse> = request,
-): Observable<HttpResponse> {
+    ) => Promise<HttpResponse> = request,
+): Promise<HttpResponse> {
     /* istanbul ignore else */
     if (!options) {
         options = { response_type: 'void' };
@@ -264,15 +257,15 @@ export function request(
         m: HttpVerb,
         url: string,
         body?: any,
-    ) => Observable<HashMap | string | void> | null = mockRequest,
+    ) => Promise<HashMap | string | void> | null = mockRequest,
     success: (
         e: Response,
         t: HttpResponseType,
     ) => Promise<HttpResponse> = transform,
-): Observable<HttpResponse> {
+): Promise<HttpResponse> {
     if (is_mock()) {
-        const request_obs = mock_handler(method, url, options?.body);
-        if (request_obs) return request_obs;
+        const mock_request = mock_handler(method, url, options?.body);
+        if (mock_request) return mock_request;
     }
     options.headers = options.headers || {};
     if (!options.headers['Content-Type'] && !options.headers['content-type']) {
@@ -299,59 +292,42 @@ export function request(
                     : JSON.stringify(options.body);
         }
 
-        return fromFetch(url, fetchOptions) as Observable<Response>;
+        return fetch(url, fetchOptions);
     };
-    const request_obs = options.skip_auth
-        ? fetchRequest()
-        : listenForToken().pipe(
-              filter((_) => _),
-              take(1),
-              switchMap((_) => {
-                  if (token() === 'x-api-key') {
-                      options.headers!['X-API-Key'] = apiKey();
-                  } else {
-                      options.headers!.Authorization = `Bearer ${token()}`;
-                  }
-                  return fetchRequest();
-              }),
-          );
-    return request_obs.pipe(
-        switchMap((resp: Response) => {
-            if (resp.ok) {
-                return success(resp, options.response_type as any);
+
+    const performRequest = async () => {
+        if (!options.skip_auth) {
+            await waitForSignal(listenForToken(), Boolean);
+            if (token() === 'x-api-key') {
+                options.headers!['X-API-Key'] = apiKey();
+            } else {
+                options.headers!.Authorization = `Bearer ${token()}`;
             }
-            return throwError(resp);
-        }),
-        retry({
-            count: 4,
-            delay: (error, retry_count) => {
-                return new Observable<number>((subscriber) => {
-                    if (options.skip_auth || options.skip_auth_flow) {
-                        subscriber.error(error || {});
-                        return;
-                    }
-                    if (error.status === 511) {
-                        sendToLogin(authority()!);
-                        subscriber.error(error);
-                        return;
-                    }
-                    if (error.status !== 401) {
-                        subscriber.error(error || {});
-                        return;
-                    }
-                    log('HTTP', 'Auth error', error);
-                    // Wait for auth refresh before retrying with exponential backoff
-                    const delay_ms = Math.pow(2, retry_count - 1) * 1000; // Exponential backoff: 1s, 2s, 4s, 8s
-                    reloadAuth()
-                        .then(() => {
-                            subscriber.next(delay_ms);
-                            subscriber.complete();
-                        })
-                        .catch(() => {
-                            subscriber.error(error);
-                        });
-                });
-            },
-        }),
-    );
+        }
+        const resp = await fetchRequest();
+        if (resp.ok) return success(resp, options.response_type as any);
+        throw resp;
+    };
+
+    const retry_count = 4;
+    const attempt = async (count: number): Promise<HttpResponse> => {
+        try {
+            return await performRequest();
+        } catch (error: any) {
+            if (count >= retry_count) throw error || {};
+            if (options.skip_auth || options.skip_auth_flow) throw error || {};
+            if (error.status === 511) {
+                sendToLogin(authority()!);
+                throw error;
+            }
+            if (error.status !== 401) throw error || {};
+            log.warn('Auth error:', error);
+            await reloadAuth().catch(() => {
+                throw error;
+            });
+            return attempt(count + 1);
+        }
+    };
+
+    return attempt(0);
 }

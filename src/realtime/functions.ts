@@ -1,6 +1,3 @@
-import { BehaviorSubject, Observable, Subject, Subscription } from 'rxjs';
-import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
-
 import {
     apiEndpoint,
     apiKey,
@@ -20,8 +17,23 @@ import {
     destroyWaitingAsync,
     timeout,
 } from '../utilities/async';
-import { isMobileSafari, log, simplifiedTime } from '../utilities/general';
+import {
+    isMobileSafari,
+    scoped_log,
+    simplifiedTime,
+} from '../utilities/general';
+import {
+    Signal,
+    Unsubscribe,
+    WritableSignal,
+    createSignal,
+} from '../utilities/signal';
 import { HashMap } from '../utilities/types';
+import {
+    MemoryWebSocket,
+    WebSocketConnection,
+    webSocket,
+} from '../utilities/websocket';
 import {
     PlaceCommandRequest,
     PlaceCommandRequestMetadata,
@@ -37,6 +49,8 @@ import { mockSystem } from './mock';
 import { MockPlaceWebsocketModule } from './mock-module';
 import { MockPlaceWebsocketSystem } from './mock-system';
 
+const log = scoped_log('WS');
+
 /**
  * @private
  * Time in seconds to ping the server to keep the websocket connection alive
@@ -51,7 +65,7 @@ let REQUEST_COUNT = 0;
  * @private
  * Websocket for connecting to engine
  */
-let _websocket: WebSocketSubject<any> | Subject<any> | undefined;
+let _websocket: WebSocketConnection<any> | undefined;
 let _websocket_id = 0;
 /**
  * @private
@@ -60,31 +74,24 @@ let _websocket_id = 0;
 const _requests: { [id: string]: PlaceCommandRequestMetadata } = {};
 /**
  * @private
- * Subjects for listening to values of bindings
+ * Signals for listening to values of bindings
  */
-const _binding: { [id: string]: BehaviorSubject<any> } = {};
+const _binding: { [id: string]: WritableSignal<any> } = {};
 /**
  * @private
- * Observers for the binding subjects
+ * Unsubscribe callbacks for active mock listeners
  */
-const _observers: { [id: string]: Observable<any> } = {};
+const _listeners: { [id: string]: Unsubscribe } = {};
 /**
  * @private
- * Observers for the binding subjects
+ * Signal holding the connection status of the websocket
  */
-const _listeners: { [id: string]: Subscription } = {};
+const _status = createSignal<boolean>(false);
 /**
  * @private
- * BehaviorSubject holding the connection status of the websocket
+ * Signal holding the connection past websocket
  */
-const _status = new BehaviorSubject<boolean>(false);
-_observers._place_os_status = _status.asObservable();
-/**
- * @private
- * BehaviorSubject holding the connection past websocket
- */
-const _sync = new BehaviorSubject<[number, number]>([0, 0]);
-_observers._place_os_sync = _sync.asObservable();
+const _sync = createSignal<[number, number]>([0, 0]);
 let _connect_time = Date.now();
 /**
  * @private
@@ -114,8 +121,7 @@ let _last_pong = 0;
 export const REQUEST_TIMEOUT = 10 * 1000;
 
 /** Listener for debugging events */
-export const debug_events = new Subject<PlaceDebugEvent>();
-_observers._place_os_debug_events = debug_events.asObservable();
+export const debug_events = createSignal<PlaceDebugEvent | null>(null);
 
 /* istanbul ignore next */
 /**
@@ -131,14 +137,9 @@ export function cleanupRealtime() {
             delete _binding[key];
         }
     }
-    for (const key in _observers) {
-        if (_observers[key]) {
-            delete _observers[key];
-        }
-    }
-    _observers._place_os_status = _status.asObservable();
     for (const key in _listeners) {
         if (_listeners[key]) {
+            _listeners[key]();
             delete _listeners[key];
         }
     }
@@ -147,7 +148,7 @@ export function cleanupRealtime() {
             delete _requests[key];
         }
     }
-    _status.next(false);
+    _status.set(false);
     clearInterval(_keep_alive);
     clearTimeout(_health_check);
     destroyWaitingAsync();
@@ -161,14 +162,14 @@ export function websocketRoute() {
 
 /** Whether the websocket is connected */
 export function isConnected(): boolean {
-    return _status.getValue();
+    return _status.value;
 }
 
 /**
  * Listen to websocket status changes
  */
-export function status(): Observable<boolean> {
-    return _observers._place_os_status;
+export function status(): Signal<boolean> {
+    return _status.asReadonly();
 }
 
 /**
@@ -177,8 +178,8 @@ export function status(): Observable<boolean> {
  * Second value is the time the successful websocket connection was alive.
  * @returns
  */
-export function connectionState(): Observable<[number, number]> {
-    return _observers._place_os_sync;
+export function connectionState(): Signal<[number, number]> {
+    return _sync.asReadonly();
 }
 
 /**
@@ -187,19 +188,17 @@ export function connectionState(): Observable<[number, number]> {
  */
 export function listen<T = any>(
     binding_details: PlaceRequestOptions,
-): Observable<T>;
+): Signal<T>;
 export function listen<T = any>(
     binding_details: PlaceRequestOptions,
-    bindings: HashMap<BehaviorSubject<T>> = _binding,
-    observers: HashMap<Observable<T>> = _observers,
-): Observable<T> {
+    bindings: HashMap<WritableSignal<T>> = _binding,
+): Signal<T> {
     const key = `${binding_details.sys}|${binding_details.mod}_${binding_details.index}|${binding_details.name}`;
     /* istanbul ignore else */
     if (!bindings[key]) {
-        bindings[key] = new BehaviorSubject<T>(undefined as any);
-        observers[key] = bindings[key].asObservable();
+        bindings[key] = createSignal<T>(undefined as any);
     }
-    return observers[key];
+    return bindings[key].asReadonly();
 }
 
 /**
@@ -209,11 +208,11 @@ export function listen<T = any>(
 export function value<T = any>(options: PlaceRequestOptions): T | undefined;
 export function value<T = any>(
     options: PlaceRequestOptions,
-    bindings: HashMap<BehaviorSubject<T>> = _binding,
+    bindings: HashMap<WritableSignal<T>> = _binding,
 ): T | void {
     const key = `${options.sys}|${options.mod}_${options.index}|${options.name}`;
     if (bindings[key]) {
-        return bindings[key].getValue() as T;
+        return bindings[key].value as T;
     }
     return;
 }
@@ -350,7 +349,6 @@ export function send<T = any>(
                 req.reject = reject;
                 const binding = `${request.sys}, ${request.mod}_${request.index}, ${request.name}`;
                 log(
-                    'WS',
                     `[${request.cmd.toUpperCase()}](${request.id}) ${binding}`,
                     request.args,
                 );
@@ -374,7 +372,7 @@ export function send<T = any>(
         });
         _requests[key] = req;
     } else {
-        log('WS', `Request already in progress. Waiting...`, request);
+        log(`Request already in progress. Waiting...`, request);
     }
     return _requests[key].promise as Promise<any>;
 }
@@ -391,13 +389,9 @@ export function onMessage(message: PlaceResponse | 'pong'): void {
         } else if (message.type === 'success') {
             handleSuccess(message);
         } else if (message.type === 'debug') {
-            log(
-                'WS',
-                `[DEBUG] ${message.mod}${message.klass || ''} →`,
-                message.msg,
-            );
+            log(`[DEBUG] ${message.mod}${message.klass || ''} →`, message.msg);
             const meta = message.meta || { mod: '', index: '' };
-            debug_events.next({
+            debug_events.set({
                 mod_id: message.mod || '<empty>',
                 module: `${meta.mod}_${meta.index}`,
                 class_name: message.klass || '<empty>',
@@ -409,12 +403,12 @@ export function onMessage(message: PlaceResponse | 'pong'): void {
             handleError(message);
         } else if (!(message as any).cmd) {
             // Not mock message
-            log('WS', 'Invalid websocket message', message, 'error');
+            log.error('Invalid websocket message', message);
         }
         clearAsyncTimeout(`${message.id}`);
     } else if (message === 'pong') {
         _last_pong = Date.now();
-        log('WS', `Pong!`);
+        log(`Pong!`);
     }
 }
 
@@ -427,7 +421,7 @@ export function handleSuccess(message: PlaceResponse) {
     const request = Object.keys(_requests)
         .map((i) => _requests[i])
         .find((item) => item?.id === message.id);
-    log('WS', `[SUCCESS](${message.id})`);
+    log(`[SUCCESS](${message.id})`);
     /* istanbul ignore else */
     if (request && request.resolve) {
         request.resolve(message.value);
@@ -465,12 +459,7 @@ export function handleError(message: PlaceResponse) {
             type = 'UNKNOWN COMMAND';
             break;
     }
-    log(
-        'WS',
-        `[ERROR] ${type}(${message.id}): ${message.msg}`,
-        undefined,
-        'error',
-    );
+    log.error(`[ERROR] ${type}(${message.id}): ${message.msg}`);
     const request = Object.keys(_requests)
         .map((key) => _requests[key])
         .filter((_) => _)
@@ -491,21 +480,19 @@ export function handleError(message: PlaceResponse) {
 export function handleNotify<T = any>(
     options: PlaceRequestOptions,
     updated_value: T,
-    bindings: HashMap<BehaviorSubject<T>> = _binding,
-    observers: HashMap<Observable<T>> = _observers,
+    bindings: HashMap<WritableSignal<T>> = _binding,
 ): void {
     const key = `${options.sys}|${options.mod}_${options.index}|${options.name}`;
     if (!bindings[key]) {
-        bindings[key] = new BehaviorSubject<T>(null as any);
-        observers[key] = bindings[key].asObservable();
+        bindings[key] = createSignal<T>(null as any);
     }
     const binding = `${options.sys}, ${options.mod}_${options.index}, ${options.name}`;
-    log('WS', `[NOTIFY] ${binding} changed`, [
-        bindings[key].getValue(),
+    log(`[NOTIFY] ${binding} changed`, [
+        bindings[key].value,
         '→',
         updated_value,
     ]);
-    bindings[key].next(updated_value);
+    bindings[key].set(updated_value);
 }
 
 /**
@@ -524,15 +511,15 @@ export function connect(tries: number = 0): Promise<void> {
                 isMock() ? createMockWebSocket() : createWebsocket()
             ) as any;
             if (_websocket) {
-                log('WS(Debug)', `Authority:`, [authority()]);
-                log('WS', `Connecting to websocket...`);
+                log.debug(`Authority:`, authority());
+                log(`Connecting to websocket...`);
                 _websocket.subscribe(
                     (resp: PlaceResponse) => {
-                        if (!_status.getValue()) {
-                            log('WS', `Connection established.`);
+                        if (!_status.value) {
+                            log(`Connection established.`);
                             resolve();
                         }
-                        _status.next(true);
+                        _status.set(true);
                         _connection_attempts = 0;
                         clearHealthCheck();
                         onMessage(resp);
@@ -548,8 +535,8 @@ export function connect(tries: number = 0): Promise<void> {
                         _websocket = undefined;
                         _connection_promise = null;
                         _clearRequests();
-                        log('WS', `Connection closed by browser.`);
-                        _status.next(false);
+                        log(`Connection closed by browser.`);
+                        _status.set(false);
                         // Try reconnecting after 1 second
                         reconnect();
                     },
@@ -564,25 +551,21 @@ export function connect(tries: number = 0): Promise<void> {
                 clearHealthCheck();
                 _websocket_id += 1;
                 _health_check = setTimeout(() => {
-                    log('WS', 'Unhealthy connection. Reconnecting...');
-                    _status.next(false);
+                    log('Unhealthy connection. Reconnecting...');
+                    _status.set(false);
                     _connection_promise = null;
                     reconnect();
                 }, 30 * 1000) as any;
             } else {
                 /* istanbul ignore else */
                 if (!_websocket) {
-                    log(
-                        'WS',
+                    log.error(
                         `Failed to create websocket(${tries}). Retrying in ${
                             1000 * Math.min(10, tries + 1)
                         }ms...`,
-                        undefined,
-                        'error',
                     );
                 } else {
                     log(
-                        'WS',
                         `Waiting on auth(${tries}). Retrying in ${
                             1000 * Math.min(10, tries + 1)
                         }ms...`,
@@ -618,17 +601,16 @@ export function createWebsocket() {
     let query =
         tkn === 'x-api-key' ? `api-key=${apiKey()}` : `bearer_token=${tkn}`;
     if (!needsTokenHeader() && !isMobileSafari()) {
-        log('WS', `Authenticating through cookie...`);
+        log(`Authenticating through cookie...`);
         query += `;max-age=120;path=${websocketRoute()};`;
         query += `${secure ? 'secure;' : ''}samesite=strict`;
         document.cookie = query;
-        log('WS', `Cookies:`, [document.cookie, query]);
+        log(`Cookies:`, [document.cookie, query]);
     } else {
-        log('WS', `Authenticating through URL query parameter...`);
+        log(`Authenticating through URL query parameter...`);
         url += `${url.indexOf('?') >= 0 ? '&' : '?'}${query}`;
     }
     log(
-        'WS',
         `Creating websocket connection to ws${
             secure ? 's' : ''
         }://${host()}${websocketRoute()}`,
@@ -655,7 +637,7 @@ export function createWebsocket() {
  * Close old websocket connect and open a new one
  */
 export function reconnect() {
-    _sync.next([_websocket_id, Date.now() - _connect_time]);
+    _sync.set([_websocket_id, Date.now() - _connect_time]);
     /* istanbul ignore else */
     if (_websocket && isConnected()) {
         _websocket.complete();
@@ -666,7 +648,6 @@ export function reconnect() {
         }
     }
     log(
-        'WS',
         `Reconnecting in ${Math.min(
             5000,
             _connection_attempts * 300 || 1000,
@@ -696,8 +677,8 @@ export function ping() {
  * @param err Network error response
  */
 export function onWebSocketError(err: SimpleNetworkError) {
-    _status.next(false);
-    log('WS', 'Websocket error:', err, undefined, 'error');
+    _status.set(false);
+    log.error('Websocket error:', err);
     /* istanbul ignore else */
     if (err.status === 401) {
         invalidateToken();
@@ -723,7 +704,9 @@ export function clearHealthCheck() {
  * Connect to engine websocket
  */
 export function createMockWebSocket() {
-    const websocket = new Subject<PlaceResponse | PlaceCommandRequest>();
+    const websocket = new MemoryWebSocket<
+        PlaceResponse | PlaceCommandRequest
+    >();
     websocket.subscribe((resp: PlaceResponse | PlaceCommandRequest) =>
         onMessage(resp as PlaceResponse),
     );
@@ -753,8 +736,8 @@ function mockRealtimeError(
  */
 export function handleMockSend(
     request: PlaceCommandRequest,
-    websocket: Subject<any>,
-    listeners: HashMap<Subscription>,
+    websocket: WebSocketConnection<any>,
+    listeners: HashMap<Unsubscribe>,
 ) {
     const key = `${request.sys}|${request.mod}_${request.index}|${request.name}`;
     const system: MockPlaceWebsocketSystem = mockSystem(request.sys);
@@ -766,8 +749,9 @@ export function handleMockSend(
         try {
             switch (request.cmd) {
                 case 'bind':
-                    listeners[key] = module.listen(request.name).subscribe({
-                        next: (new_value) => {
+                    listeners[key] = module
+                        .listen(request.name)
+                        .subscribe((new_value) => {
                             setTimeout(
                                 () => {
                                     websocket.next({
@@ -778,29 +762,19 @@ export function handleMockSend(
                                 },
                                 Math.floor(Math.random() * 100 + 50), // Add natural delay before response
                             );
-                        },
-                        error: (error) => {
-                            log(
-                                'WS',
-                                `[MOCK ERROR](${request.id}) listener failed`,
-                                error,
-                                'error',
-                            );
-                            websocket.next(mockRealtimeError(request, error));
-                        },
-                    });
+                        });
                     break;
                 case 'unbind':
                     /* istanbul ignore else */
                     if (listeners[key]) {
-                        listeners[key].unsubscribe();
+                        listeners[key]();
                         delete listeners[key];
                         clearAsyncTimeout(`${key}`);
                     }
                     break;
             }
         } catch (error) {
-            log('WS', `[MOCK ERROR](${request.id}) request failed`, error, 'error');
+            log.error(`[MOCK ERROR](${request.id}) request failed`, error);
             timeout(
                 `${request.id}-error`,
                 () => websocket.next(mockRealtimeError(request, error)),
@@ -822,11 +796,9 @@ export function handleMockSend(
                     } as PlaceResponse;
                     websocket.next(resp);
                 } catch (error) {
-                    log(
-                        'WS',
+                    log.error(
                         `[MOCK ERROR](${request.id}) execute failed`,
                         error,
-                        'error',
                     );
                     websocket.next(mockRealtimeError(request, error));
                 }

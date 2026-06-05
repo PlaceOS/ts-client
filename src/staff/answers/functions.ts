@@ -1,4 +1,3 @@
-import { map } from 'rxjs/operators';
 import { get, post } from '../../api';
 import { toQueryString } from '../../utilities/api';
 import { AnswerQueryOptions } from './interfaces';
@@ -15,8 +14,8 @@ const PATH = '/api/staff/v1/surveys/answers';
  */
 export function queryAnswers(query_params: AnswerQueryOptions = {}) {
     const query = toQueryString(query_params);
-    return get(`${PATH}${query ? '?' + query : ''}`).pipe(
-        map((l: any) => l.map((_: any) => new SurveyAnswer(_))),
+    return get(`${PATH}${query ? '?' + query : ''}`).then((l: any) =>
+        l.map((_: any) => new SurveyAnswer(_)),
     );
 }
 
@@ -26,7 +25,7 @@ export function queryAnswers(query_params: AnswerQueryOptions = {}) {
  * @param query_params Query parameters to add the to request URL
  */
 export function addAnswer(form_data: Partial<SurveyAnswer>[]) {
-    return post(`${PATH}`, form_data).pipe(
-        map((l: any) => l.map((_: any) => new SurveyAnswer(_))),
+    return post(`${PATH}`, form_data).then((l: any) =>
+        l.map((_: any) => new SurveyAnswer(_)),
     );
 }

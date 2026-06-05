@@ -1,4 +1,3 @@
-import { of } from 'rxjs';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import * as API from '../../../src/api';
 import * as Http from '../../../src/http/functions';
@@ -21,16 +20,20 @@ describe('Staff Survey Answers API', () => {
     });
 
     test('should allow querying answers', async () => {
-        (API.get as any) = vi.fn().mockImplementation((_) => of([{}]));
-        let list = await ANSWERS.queryAnswers().toPromise();
+        (API.get as any) = vi
+            .fn()
+            .mockImplementation((_) => Promise.resolve([{}]));
+        let list = await ANSWERS.queryAnswers();
         expect(list).toBeTruthy();
         expect(list.length).toBe(1);
         expect(list[0]).toBeInstanceOf(SurveyAnswer);
     });
 
     test('should allow adding new answers', async () => {
-        (API.post as any) = vi.fn().mockImplementation((_) => of([{}]));
-        let item = await ANSWERS.addAnswer([{}]).toPromise();
+        (API.post as any) = vi
+            .fn()
+            .mockImplementation((_) => Promise.resolve([{}]));
+        let item = await ANSWERS.addAnswer([{}]);
         expect(item.length).toBe(1);
         expect(item[0]).toBeInstanceOf(SurveyAnswer);
     });

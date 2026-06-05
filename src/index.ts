@@ -6,6 +6,7 @@ export * from './realtime';
 export * from './staff';
 
 export * from './utilities/general';
+export * from './utilities/signal';
 // export * from './utilities/nodejs';
 
 import './utilities/abort-controller';

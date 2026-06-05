@@ -1,5 +1,3 @@
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { apiEndpoint } from '../auth/functions';
 import { get } from '../http/functions';
 import { PlaceTrigger } from '../triggers/trigger';
@@ -13,8 +11,8 @@ const PATH = 'webhook';
 export function showWebhook(
     id: string,
     query_params: WebhookShowOptions = {},
-): Observable<PlaceTrigger> {
+): Promise<PlaceTrigger> {
     const q = toQueryString(query_params);
     const url = `${apiEndpoint()}/${PATH}/${encodeURIComponent(id)}${q ? '?' + q : ''}`;
-    return get(url).pipe(map((resp: HashMap) => new PlaceTrigger(resp)));
+    return get(url).then((resp: HashMap) => new PlaceTrigger(resp));
 }

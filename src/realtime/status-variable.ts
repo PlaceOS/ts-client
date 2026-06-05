@@ -1,7 +1,6 @@
-import { Observable, Subscription } from 'rxjs';
-import { distinctUntilChanged } from 'rxjs/operators';
 import { clearAsyncTimeout, timeout } from '../utilities/async';
 import { log } from '../utilities/general';
+import { Signal, Unsubscribe } from '../utilities/signal';
 
 import { bind, listen, status, unbind, value } from './functions';
 import { PlaceRequestOptions } from './interfaces';
@@ -29,29 +28,26 @@ export class PlaceVariableBinding<T = any> {
     ) {
         this.name = _name;
         // Listen for state changes in the websocket connection
-        status()
-            .pipe(distinctUntilChanged())
-            .subscribe((connected: boolean) => {
-                if (
-                    connected &&
-                    (this._stale_bindings || this._pending === PENDING.BIND)
-                ) {
-                    log('VAR', 'Re-binding to status variable', this.binding());
-                    this.rebind();
-                } else if (!connected) {
-                    clearAsyncTimeout(
-                        `rebind:${JSON.stringify(this.binding())}`,
-                    );
-                    log(
-                        'VAR',
-                        'Binding dropped due to disconnection, re-binding when possible.',
-                        this.binding(),
-                    );
-                    this._stale_bindings =
-                        this._binding_count || this._stale_bindings;
-                    this._binding_count = 0;
-                }
-            });
+        status().subscribe((connected: boolean, previous: boolean) => {
+            if (connected === previous) return;
+            if (
+                connected &&
+                (this._stale_bindings || this._pending === PENDING.BIND)
+            ) {
+                log('VAR', 'Re-binding to status variable', this.binding());
+                this.rebind();
+            } else if (!connected) {
+                clearAsyncTimeout(`rebind:${JSON.stringify(this.binding())}`);
+                log(
+                    'VAR',
+                    'Binding dropped due to disconnection, re-binding when possible.',
+                    this.binding(),
+                );
+                this._stale_bindings =
+                    this._binding_count || this._stale_bindings;
+                this._binding_count = 0;
+            }
+        });
     }
 
     /** Number of bindings to this status variable */
@@ -65,9 +61,9 @@ export class PlaceVariableBinding<T = any> {
     }
 
     /**
-     * Get an observable that emits the current value of the binding
+     * Get a signal that emits the current value of the binding
      */
-    public listen(): Observable<T> {
+    public listen(): Signal<T> {
         return listen(this.binding());
     }
 
@@ -76,23 +72,30 @@ export class PlaceVariableBinding<T = any> {
      * Note: Initial value emitted may be `undefined`
      * @param next Callback for changes to the bindings value
      */
-    public subscribe(next: (value: T) => void): Subscription {
+    public subscribe(next: (value: T) => void): Unsubscribe {
         return this.listen().subscribe(next);
     }
 
-    public bindThenSubscribe(next: (value: T) => void): Subscription {
+    public bindThenSubscribe(next: (value: T) => void): Unsubscribe {
         const unbind = this.bind();
-        return this.listen().subscribe({
-            next: (v) => {
-                try {
-                    next(v);
-                } catch (e) {
-                    console.error(e);
-                }
-            },
-            complete: () => unbind(),
-            error: () => unbind(),
+        const unsubscribe = this.listen().subscribe((v) => {
+            try {
+                next(v);
+            } catch (e) {
+                console.error(e);
+            }
         });
+        return () => {
+            try {
+                unsubscribe();
+            } finally {
+                try {
+                    unbind();
+                } catch {
+                    // Ignore unbind errors during cleanup.
+                }
+            }
+        };
     }
 
     /**

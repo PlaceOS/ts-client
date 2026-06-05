@@ -1,7 +1,5 @@
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { apiEndpoint } from '../auth/functions';
 import { PlaceAuthSourceQueryOptions } from '../auth-sources/interfaces';
+import { apiEndpoint } from '../auth/functions';
 import { get, post } from '../http/functions';
 import {
     create,
@@ -118,7 +116,7 @@ export function edgeControlUrl(): string {
 /** Get recent errors for all edges */
 export function edgeErrors(
     query_params: PlaceEdgeErrorQueryOptions = {},
-): Observable<Record<string, PlaceEdgeError[]>> {
+): Promise<Record<string, PlaceEdgeError[]>> {
     const q = toQueryString(query_params);
     return get(`${apiEndpoint()}/${PATH}/errors${q ? '?' + q : ''}`) as any;
 }
@@ -127,30 +125,34 @@ export function edgeErrors(
 export function edgeErrorsFor(
     id: string,
     query_params: PlaceEdgeErrorQueryOptions = {},
-): Observable<PlaceEdgeError[]> {
+): Promise<PlaceEdgeError[]> {
     const q = toQueryString(query_params);
-    return get(`${apiEndpoint()}/${PATH}/${encodeURIComponent(id)}/errors${q ? '?' + q : ''}`) as any;
+    return get(
+        `${apiEndpoint()}/${PATH}/${encodeURIComponent(id)}/errors${q ? '?' + q : ''}`,
+    ) as any;
 }
 
 /** Get module status for a specific edge */
-export function edgeModuleStatus(id: string): Observable<PlaceEdgeModuleStatus> {
+export function edgeModuleStatus(id: string): Promise<PlaceEdgeModuleStatus> {
     return get(
         `${apiEndpoint()}/${PATH}/${encodeURIComponent(id)}/modules/status`,
     ) as any;
 }
 
 /** Get health status for all edges */
-export function edgeHealth(): Observable<Record<string, PlaceEdgeHealth>> {
+export function edgeHealth(): Promise<Record<string, PlaceEdgeHealth>> {
     return get(`${apiEndpoint()}/${PATH}/health`) as any;
 }
 
 /** Get health status for a specific edge */
-export function edgeHealthFor(id: string): Observable<PlaceEdgeHealth | null> {
-    return get(`${apiEndpoint()}/${PATH}/${encodeURIComponent(id)}/health`) as any;
+export function edgeHealthFor(id: string): Promise<PlaceEdgeHealth | null> {
+    return get(
+        `${apiEndpoint()}/${PATH}/${encodeURIComponent(id)}/health`,
+    ) as any;
 }
 
 /** Get connection metrics for all edges */
-export function edgeConnections(): Observable<
+export function edgeConnections(): Promise<
     Record<string, PlaceEdgeConnectionMetrics>
 > {
     return get(`${apiEndpoint()}/${PATH}/connections`) as any;
@@ -159,34 +161,35 @@ export function edgeConnections(): Observable<
 /** Get connection metrics for a specific edge */
 export function edgeConnectionsFor(
     id: string,
-): Observable<PlaceEdgeConnectionMetrics | null> {
+): Promise<PlaceEdgeConnectionMetrics | null> {
     return get(
         `${apiEndpoint()}/${PATH}/${encodeURIComponent(id)}/connections`,
     ) as any;
 }
 
 /** Get failed modules grouped by edge */
-export function edgeModuleFailures(): Observable<Record<string, HashMap[]>> {
+export function edgeModuleFailures(): Promise<Record<string, HashMap[]>> {
     return get(`${apiEndpoint()}/${PATH}/modules/failures`) as any;
 }
 
 /** Get overall edge statistics */
-export function edgeStatistics(): Observable<PlaceEdgeStatistics> {
+export function edgeStatistics(): Promise<PlaceEdgeStatistics> {
     return get(`${apiEndpoint()}/${PATH}/statistics`) as any;
 }
 
 /** Trigger manual edge monitoring cleanup */
 export function cleanupEdgeMonitoring(
     query_params: PlaceEdgeMonitoringCleanupOptions = {},
-): Observable<void> {
+): Promise<void> {
     const q = toQueryString(query_params);
-    return post(`${apiEndpoint()}/${PATH}/monitoring/cleanup${q ? '?' + q : ''}`, {}).pipe(
-        map(() => undefined),
-    );
+    return post(
+        `${apiEndpoint()}/${PATH}/monitoring/cleanup${q ? '?' + q : ''}`,
+        {},
+    ).then(() => undefined);
 }
 
 /** Get edge monitoring summary */
-export function edgeMonitoringSummary(): Observable<HashMap> {
+export function edgeMonitoringSummary(): Promise<HashMap> {
     return get(`${apiEndpoint()}/${PATH}/monitoring/summary`) as any;
 }
 

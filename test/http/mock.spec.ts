@@ -1,4 +1,3 @@
-import { firstValueFrom, throwError } from 'rxjs';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { MockHttpRequestHandlerOptions } from '../../src/http/interfaces';
 
@@ -30,9 +29,11 @@ describe('MockHttp', () => {
     afterEach(() => {
         MockHttp.clearMockEndpoints();
         MockHttp.setMockNotFoundHandler((method, url) => {
-            const error = new Error(`Mock endpoint not found: ${method} ${url}`);
+            const error = new Error(
+                `Mock endpoint not found: ${method} ${url}`,
+            );
             (error as any).status = 404;
-            return throwError(error);
+            return Promise.reject(error);
         });
         vi.useRealTimers();
     });
@@ -64,73 +65,73 @@ describe('MockHttp', () => {
         expect(handler).toBeTruthy();
     });
 
-    test('should handle route parameters', () =>
-        new Promise<void>((resolve) => {
-            expect.assertions(3);
-            MockHttp.registerMockEndpoint({
-                path: 'please/:get/me',
-                method: 'GET',
-            });
-            const handler = MockHttp.findRequestHandler(
-                'GET',
-                'please/join/me',
-            );
-            expect(handler).toBeTruthy();
-            expect((handler || ({} as any)).path_structure).toEqual([
-                '',
-                'get',
-                '',
-            ]);
-            MockHttp.registerMockEndpoint({
-                path: 'please/:get/me',
-                metadata: null,
-                method: 'GET',
-                callback: (request) => {
-                    expect(request.route_params).toEqual({ get: 'help' });
-                    resolve();
-                },
-            });
-            MockHttp.mockRequest('GET', 'please/help/me?query=true')!.subscribe(
-                (_) => null,
-            );
-            vi.runOnlyPendingTimers();
-        }));
+    test('should handle route parameters', async () => {
+        expect.assertions(3);
+        MockHttp.registerMockEndpoint({
+            path: 'please/:get/me',
+            method: 'GET',
+        });
+        const handler = MockHttp.findRequestHandler('GET', 'please/join/me');
+        expect(handler).toBeTruthy();
+        expect((handler || ({} as any)).path_structure).toEqual([
+            '',
+            'get',
+            '',
+        ]);
+        MockHttp.registerMockEndpoint({
+            path: 'please/:get/me',
+            metadata: null,
+            method: 'GET',
+            callback: (request) => {
+                expect(request.route_params).toEqual({ get: 'help' });
+            },
+        });
+        const promise = MockHttp.mockRequest(
+            'GET',
+            'please/help/me?query=true',
+        );
+        vi.runOnlyPendingTimers();
+        await promise;
+    });
 
-    test('should handle query parameters', () =>
-        new Promise<void>((resolve) => {
-            expect.assertions(1);
-            MockHttp.registerMockEndpoint({
-                path: 'please/:get/me',
-                method: 'GET',
-                callback: (request) => {
-                    expect(request.query_params).toEqual({ query: 'true' });
-                    resolve();
-                },
-            });
-            MockHttp.mockRequest('GET', 'please/help/me?query=true')!.subscribe(
-                (_) => null,
-            );
-            vi.runOnlyPendingTimers();
-        }));
+    test('should handle query parameters', async () => {
+        expect.assertions(1);
+        MockHttp.registerMockEndpoint({
+            path: 'please/:get/me',
+            method: 'GET',
+            callback: (request) => {
+                expect(request.query_params).toEqual({ query: 'true' });
+            },
+        });
+        const promise = MockHttp.mockRequest(
+            'GET',
+            'please/help/me?query=true',
+        );
+        vi.runOnlyPendingTimers();
+        await promise;
+    });
 
-    test('should handle request body', () =>
-        new Promise<void>((resolve) => {
-            expect.assertions(1);
-            MockHttp.registerMockEndpoint({
-                path: 'please/:get/me',
-                method: 'POST',
-                callback: (request) => {
-                    expect(request.body).toEqual({ help: false });
-                    resolve();
-                },
-            });
-            MockHttp.mockRequest('POST', 'please/help/me?query=true', {
+    test('should handle request body', async () => {
+        expect.assertions(1);
+        MockHttp.registerMockEndpoint({
+            path: 'please/:get/me',
+            method: 'POST',
+            callback: (request) => {
+                expect(request.body).toEqual({ help: false });
+            },
+        });
+        const promise = MockHttp.mockRequest(
+            'POST',
+            'please/help/me?query=true',
+            {
                 help: false,
-            })!.subscribe((_) => null);
-            vi.runOnlyPendingTimers();
-        }));
+            },
+        );
+        vi.runOnlyPendingTimers();
+        await promise;
+    });
 
-    test('should return observable errors from handler callbacks', async () => {
+    test('should return promise errors from handler callbacks', async () => {
         const error = new Error('Callback failure');
         MockHttp.registerMockEndpoint({
             path: 'please/:get/me',
@@ -140,17 +141,17 @@ describe('MockHttp', () => {
             },
         });
         await expect(
-            firstValueFrom(MockHttp.mockRequest('GET', 'please/help/me')!),
+            MockHttp.mockRequest('GET', 'please/help/me'),
         ).rejects.toBe(error);
     });
 
-    test('should return observable errors from not found handlers', async () => {
+    test('should return promise errors from not found handlers', async () => {
         const error = new Error('Not found handler failure');
         MockHttp.setMockNotFoundHandler(() => {
             throw error;
         });
         await expect(
-            firstValueFrom(MockHttp.mockRequest('GET', 'missing/endpoint')!),
+            MockHttp.mockRequest('GET', 'missing/endpoint'),
         ).rejects.toBe(error);
     });
 });

@@ -1,4 +1,3 @@
-import { Observable } from 'rxjs';
 import { Md5 } from 'ts-md5';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import * as Auth from '../../src/auth/functions';
@@ -103,7 +102,8 @@ describe('Auth', () => {
         expect(Auth.isOnline()).toBe(true);
         expect(Auth.hasToken()).toBe(!!Auth.token());
         expect(Auth.authority()).toBeTruthy();
-        expect(Auth.onlineState()).toBeInstanceOf(Observable);
+        expect(Auth.onlineState()).toBeInstanceOf(Function);
+        expect(Auth.onlineState().value).toBe(true);
     });
 
     test('should expose the API token', async () => {

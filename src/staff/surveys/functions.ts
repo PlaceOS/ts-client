@@ -1,4 +1,3 @@
-import { map } from 'rxjs/operators';
 import { del, get, patch, post, put } from '../../api';
 import { toQueryString } from '../../utilities/api';
 import { SurveyQueryOptions, SurveyShowOptions } from './interfaces';
@@ -15,8 +14,8 @@ const PATH = '/api/staff/v1/surveys';
  */
 export function querySurveys(query_params: SurveyQueryOptions = {}) {
     const query = toQueryString(query_params);
-    return get(`${PATH}${query ? '?' + query : ''}`).pipe(
-        map((l: any) => l.map((_: any) => new Survey(_))),
+    return get(`${PATH}${query ? '?' + query : ''}`).then((l: any) =>
+        l.map((_: any) => new Survey(_)),
     );
 }
 
@@ -27,8 +26,8 @@ export function querySurveys(query_params: SurveyQueryOptions = {}) {
  */
 export function showSurvey(id: string, query_params: SurveyShowOptions = {}) {
     const query = toQueryString(query_params);
-    return get(`${PATH}/${id}${query ? '?' + query : ''}`).pipe(
-        map((l: any) => new Survey(l)),
+    return get(`${PATH}/${id}${query ? '?' + query : ''}`).then(
+        (l: any) => new Survey(l),
     );
 }
 
@@ -44,8 +43,8 @@ export function updateSurvey(
     form_data: Partial<Survey>,
     method: 'put' | 'patch' = 'patch',
 ) {
-    return (method === 'put' ? put : patch)(`${PATH}/${id}`, form_data).pipe(
-        map((l: any) => new Survey(l)),
+    return (method === 'put' ? put : patch)(`${PATH}/${id}`, form_data).then(
+        (l: any) => new Survey(l),
     );
 }
 
@@ -55,7 +54,7 @@ export function updateSurvey(
  * @param query_params Query parameters to add the to request URL
  */
 export function addSurvey(form_data: Partial<Survey>) {
-    return post(`${PATH}`, form_data).pipe(map((l: any) => new Survey(l)));
+    return post(`${PATH}`, form_data).then((l: any) => new Survey(l));
 }
 
 /**

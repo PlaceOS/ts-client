@@ -1,5 +1,3 @@
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { apiEndpoint } from '../auth/functions';
 import { PlaceGroupUser } from '../group-users/group-user';
 import { del, get, patch, post, put } from '../http/functions';
@@ -45,33 +43,29 @@ export function queryGroups(query_params: PlaceGroupQueryOptions = {}) {
 }
 
 /** Get the data for a group */
-export function showGroup(id: string): Observable<PlaceGroup> {
+export function showGroup(id: string): Promise<PlaceGroup> {
     const url = `${apiEndpoint()}/${PATH}/${encodeURIComponent(id)}`;
-    return get(url).pipe(map((resp: HashMap) => process(resp)));
+    return get(url).then((resp: HashMap) => process(resp));
 }
 
 /** Get the current user's groups with effective permissions */
 export function currentGroups(
     query_params: PlaceCurrentGroupQueryOptions = {},
-): Observable<PlaceCurrentGroup[]> {
+): Promise<PlaceCurrentGroup[]> {
     const q = toQueryString(query_params);
     const url = `${apiEndpoint()}/${PATH}/current${q ? '?' + q : ''}`;
-    return get(url).pipe(
-        map((resp: HashMap) =>
-            ((resp || []) as HashMap[]).map((item) => ({
-                group: process(item.group || {}),
-                permissions: item.permissions || 0,
-            })),
-        ),
+    return get(url).then((resp: HashMap) =>
+        ((resp || []) as HashMap[]).map((item) => ({
+            group: process(item.group || {}),
+            permissions: item.permissions || 0,
+        })),
     );
 }
 
 /** Add a new group */
-export function addGroup(
-    form_data: Partial<PlaceGroup>,
-): Observable<PlaceGroup> {
+export function addGroup(form_data: Partial<PlaceGroup>): Promise<PlaceGroup> {
     const url = `${apiEndpoint()}/${PATH}`;
-    return post(url, form_data).pipe(map((resp: HashMap) => process(resp)));
+    return post(url, form_data).then((resp: HashMap) => process(resp));
 }
 
 /** Update a group */
@@ -79,15 +73,15 @@ export function updateGroup(
     id: string,
     form_data: Partial<PlaceGroup>,
     method: 'put' | 'patch' = 'patch',
-): Observable<PlaceGroup> {
+): Promise<PlaceGroup> {
     const url = `${apiEndpoint()}/${PATH}/${encodeURIComponent(id)}`;
-    return (method === 'put' ? put : patch)(url, form_data).pipe(
-        map((resp: HashMap) => process(resp)),
+    return (method === 'put' ? put : patch)(url, form_data).then(
+        (resp: HashMap) => process(resp),
     );
 }
 
 /** Remove a group */
-export function removeGroup(id: string): Observable<void> {
+export function removeGroup(id: string): Promise<void> {
     const url = `${apiEndpoint()}/${PATH}/${encodeURIComponent(id)}`;
     return del(url, { response_type: 'void' });
 }
@@ -100,9 +94,9 @@ export function queryGroupHistory(
 }
 
 /** Get a group audit history entry */
-export function showGroupHistory(id: string): Observable<PlaceGroupHistory> {
+export function showGroupHistory(id: string): Promise<PlaceGroupHistory> {
     const url = `${apiEndpoint()}/${HISTORY_PATH}/${encodeURIComponent(id)}`;
-    return get(url).pipe(map((resp: HashMap) => processHistory(resp)));
+    return get(url).then((resp: HashMap) => processHistory(resp));
 }
 
 /** Query group invitations */
@@ -117,34 +111,30 @@ export function queryGroupInvitations(
 }
 
 /** Get a group invitation */
-export function showGroupInvitation(
-    id: string,
-): Observable<PlaceGroupInvitation> {
+export function showGroupInvitation(id: string): Promise<PlaceGroupInvitation> {
     const url = `${apiEndpoint()}/${INVITATION_PATH}/${encodeURIComponent(id)}`;
-    return get(url).pipe(map((resp: HashMap) => processInvitation(resp)));
+    return get(url).then((resp: HashMap) => processInvitation(resp));
 }
 
 /** Create a group invitation */
 export function addGroupInvitation(
     form_data: PlaceGroupInvitationCreatePayload,
-): Observable<PlaceGroupInvitationCreatedResponse> {
+): Promise<PlaceGroupInvitationCreatedResponse> {
     const url = `${apiEndpoint()}/${INVITATION_PATH}`;
-    return post(url, form_data).pipe(
-        map((resp: HashMap) => ({
-            invitation: processInvitation(resp.invitation || {}),
-            plaintext_secret: resp.plaintext_secret || '',
-        })),
-    );
+    return post(url, form_data).then((resp: HashMap) => ({
+        invitation: processInvitation(resp.invitation || {}),
+        plaintext_secret: resp.plaintext_secret || '',
+    }));
 }
 
 /** Remove a group invitation */
-export function removeGroupInvitation(id: string): Observable<void> {
+export function removeGroupInvitation(id: string): Promise<void> {
     const url = `${apiEndpoint()}/${INVITATION_PATH}/${encodeURIComponent(id)}`;
     return del(url, { response_type: 'void' });
 }
 
 /** Accept a group invitation for the current user */
-export function acceptGroupInvitation(id: string): Observable<PlaceGroupUser> {
+export function acceptGroupInvitation(id: string): Promise<PlaceGroupUser> {
     const url = `${apiEndpoint()}/${INVITATION_PATH}/${encodeURIComponent(id)}/accept`;
-    return post(url, {}).pipe(map((resp: HashMap) => new PlaceGroupUser(resp)));
+    return post(url, {}).then((resp: HashMap) => new PlaceGroupUser(resp));
 }

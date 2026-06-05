@@ -1,5 +1,3 @@
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { apiEndpoint } from '../auth/functions';
 import { del, get, patch, post, put } from '../http/functions';
 import { query } from '../resources/functions';
@@ -27,17 +25,17 @@ export function queryGroupUsers(query_params: PlaceGroupUserQueryOptions = {}) {
 export function showGroupUser(
     user_id: string,
     group_id: string,
-): Observable<PlaceGroupUser> {
+): Promise<PlaceGroupUser> {
     const url = `${apiEndpoint()}/${pathFor(user_id, group_id)}`;
-    return get(url).pipe(map((resp: HashMap) => process(resp)));
+    return get(url).then((resp: HashMap) => process(resp));
 }
 
 /** Add a user to a group */
 export function addGroupUser(
     form_data: Partial<PlaceGroupUser>,
-): Observable<PlaceGroupUser> {
+): Promise<PlaceGroupUser> {
     const url = `${apiEndpoint()}/${PATH}`;
-    return post(url, form_data).pipe(map((resp: HashMap) => process(resp)));
+    return post(url, form_data).then((resp: HashMap) => process(resp));
 }
 
 /** Update a user's group membership */
@@ -46,10 +44,10 @@ export function updateGroupUser(
     group_id: string,
     form_data: Partial<PlaceGroupUser>,
     method: 'put' | 'patch' = 'patch',
-): Observable<PlaceGroupUser> {
+): Promise<PlaceGroupUser> {
     const url = `${apiEndpoint()}/${pathFor(user_id, group_id)}`;
-    return (method === 'put' ? put : patch)(url, form_data).pipe(
-        map((resp: HashMap) => process(resp)),
+    return (method === 'put' ? put : patch)(url, form_data).then(
+        (resp: HashMap) => process(resp),
     );
 }
 
@@ -57,7 +55,7 @@ export function updateGroupUser(
 export function removeGroupUser(
     user_id: string,
     group_id: string,
-): Observable<void> {
+): Promise<void> {
     const url = `${apiEndpoint()}/${pathFor(user_id, group_id)}`;
     return del(url, { response_type: 'void' });
 }

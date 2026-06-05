@@ -1,4 +1,3 @@
-import { of } from 'rxjs';
 import { describe, expect, test, vi } from 'vitest';
 
 import * as API from '../../../src/api';
@@ -10,41 +9,51 @@ vi.mock('../../../src/api');
 
 describe('Staff Survey Questions API', () => {
     test('should allow querying questions', async () => {
-        (API.get as any) = vi.fn().mockImplementation((_) => of([{}]));
-        let list = await QUESTIONS.queryQuestions().toPromise();
+        (API.get as any) = vi
+            .fn()
+            .mockImplementation((_) => Promise.resolve([{}]));
+        let list = await QUESTIONS.queryQuestions();
         expect(list).toBeTruthy();
         expect(list.length).toBe(1);
         expect(list[0]).toBeInstanceOf(SurveyQuestion);
     });
 
     test('should allow showing question', async () => {
-        (API.get as any) = vi.fn().mockImplementation((_) => of({ id: '1' }));
-        let list = await QUESTIONS.showQuestion('1').toPromise();
+        (API.get as any) = vi
+            .fn()
+            .mockImplementation((_) => Promise.resolve({ id: '1' }));
+        let list = await QUESTIONS.showQuestion('1');
         expect(list).toBeTruthy();
         expect(list).toBeInstanceOf(SurveyQuestion);
         expect(list?.id).toBe('1');
     });
 
     test('should allow adding question', async () => {
-        (API.post as any) = vi.fn().mockImplementation((_) => of({ id: '1' }));
-        let item = await QUESTIONS.addQuestion({}).toPromise();
+        (API.post as any) = vi
+            .fn()
+            .mockImplementation((_) => Promise.resolve({ id: '1' }));
+        let item = await QUESTIONS.addQuestion({});
         expect(item).toBeTruthy();
         expect(item).toBeInstanceOf(SurveyQuestion);
         expect(item?.id).toBe('1');
     });
 
     test('should allow updating question', async () => {
-        (API.put as any) = vi.fn().mockImplementation((_) => of({ id: '1' }));
-        (API.patch as any) = vi.fn().mockImplementation((_) => of({ id: '1' }));
-        let item = await QUESTIONS.updateQuestion('1', {}).toPromise();
+        (API.put as any) = vi
+            .fn()
+            .mockImplementation((_) => Promise.resolve({ id: '1' }));
+        (API.patch as any) = vi
+            .fn()
+            .mockImplementation((_) => Promise.resolve({ id: '1' }));
+        let item = await QUESTIONS.updateQuestion('1', {});
         expect(item).toBeTruthy();
         expect(item).toBeInstanceOf(SurveyQuestion);
         expect(item?.id).toBe('1');
     });
 
     test('should allow removing question', async () => {
-        (API.del as any) = vi.fn().mockImplementation((_) => of());
-        let item = await QUESTIONS.removeQuestion('1').toPromise();
+        (API.del as any) = vi.fn().mockImplementation((_) => Promise.resolve());
+        let item = await QUESTIONS.removeQuestion('1');
         expect(item).toBeFalsy();
     });
 });

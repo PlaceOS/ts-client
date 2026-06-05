@@ -1,4 +1,3 @@
-import { Observable, of, throwError } from 'rxjs';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import * as Http from '../../src/http/functions';
 import * as Resource from '../../src/resources/functions';
@@ -10,21 +9,21 @@ describe('Resource API', () => {
 
     async function testRequest<T>(
         method: 'get' | 'post' | 'patch' | 'put' | 'del',
-        func: (...args: any[]) => Observable<T>,
+        func: (...args: any[]) => Promise<T>,
         result: any,
         test1: any[],
         test2: any[],
     ) {
         const item = result.hasOwnProperty('results') ? result.results : result;
         (Http[method] as any)
-            .mockReturnValueOnce(of(result))
-            .mockReturnValueOnce(of(result))
-            .mockImplementationOnce(() => throwError('An Error Value'));
+            .mockReturnValueOnce(Promise.resolve(result))
+            .mockReturnValueOnce(Promise.resolve(result))
+            .mockImplementationOnce(() => Promise.reject('An Error Value'));
         const value: any = await func({
             fn: (_: any) => _,
             path: 'resource',
             ...test1[0],
-        }).toPromise();
+        });
         vi.runOnlyPendingTimers();
         expect(value.data ? value.data : value).toEqual(item || []);
         // Test request with parameters
@@ -32,7 +31,7 @@ describe('Resource API', () => {
             fn: (_: any) => _,
             path: 'resource',
             ...test2[0],
-        }).toPromise();
+        });
         vi.runOnlyPendingTimers();
         // Test error handling
         try {
@@ -40,7 +39,7 @@ describe('Resource API', () => {
                 fn: (_: any) => _,
                 path: 'resource',
                 ...test1[0],
-            }).toPromise();
+            });
             throw new Error('Failed to error');
         } catch (e) {
             expect(e).toBe('An Error Value');

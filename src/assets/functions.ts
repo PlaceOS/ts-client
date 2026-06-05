@@ -1,4 +1,3 @@
-import { map } from 'rxjs';
 import {
     create,
     del,
@@ -123,7 +122,7 @@ export function addAssets(form_data: Partial<PlaceAsset>[]) {
         `${apiEndpoint()}${ASSET_PATH}/bulk`,
         JSON.stringify(form_data),
         {},
-    ).pipe(map((l: any) => l.map((_: any) => processAsset(_))));
+    ).then((l: any) => l.map((_: any) => processAsset(_)));
 }
 
 /**
@@ -142,7 +141,7 @@ export function updateAssets(
         `${apiEndpoint()}${ASSET_PATH}/bulk`,
         JSON.stringify(form_data),
         {},
-    ).pipe(map((l: any) => l.map((_: any) => processAsset(_))));
+    ).then((l: any) => l.map((_: any) => processAsset(_)));
 }
 
 /**
@@ -157,7 +156,7 @@ export function removeAssets(
     const q = toQueryString(query_params);
     return del(`${apiEndpoint()}${ASSET_PATH}/bulk${q ? '?' + q : ''}`, {
         body: JSON.stringify(id_list),
-    }).pipe(map((l: any) => l.map((_: any) => processAsset(_))));
+    }).then((l: any) => l.map((_: any) => processAsset(_)));
 }
 
 ///////////////////////////////////////////////////////////////

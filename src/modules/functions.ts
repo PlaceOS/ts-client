@@ -1,4 +1,3 @@
-import { Observable } from 'rxjs';
 import {
     create,
     query,
@@ -39,7 +38,10 @@ export function queryModules(query_params: PlaceModuleQueryOptions = {}) {
  * @param id ID of the module to retrieve
  * @param query_params Query parameters to add the to request URL
  */
-export function showModule(id: string, query_params: PlaceModuleShowOptions = {}) {
+export function showModule(
+    id: string,
+    query_params: PlaceModuleShowOptions = {},
+) {
     return show({ id, query_params, fn: process, path: PATH });
 }
 
@@ -102,7 +104,7 @@ export function stopModule(id: string) {
  * Pings the IP address of the module with the given ID
  * @param id Module ID
  */
-export function pingModule(id: string): Observable<PlaceModulePingOptions> {
+export function pingModule(id: string): Promise<PlaceModulePingOptions> {
     return task({ id, task_name: 'ping', method: 'post', path: PATH });
 }
 
@@ -111,7 +113,7 @@ export function pingModule(id: string): Observable<PlaceModulePingOptions> {
  * @param id Module ID
  * @param lookup Status variable of interest. If set it will return only the state of this variable
  */
-export function moduleState(id: string): Observable<HashMap> {
+export function moduleState(id: string): Promise<HashMap> {
     return task({ id, task_name: 'state', method: 'get', path: PATH });
 }
 
@@ -120,10 +122,7 @@ export function moduleState(id: string): Observable<HashMap> {
  * @param id Module ID
  * @param key Status variable of interest. If set it will return only the state of this variable
  */
-export function lookupModuleState(
-    id: string,
-    key: string,
-): Observable<HashMap> {
+export function lookupModuleState(id: string, key: string): Promise<HashMap> {
     return task({ id, task_name: `state/${key}`, method: 'get', path: PATH });
 }
 
@@ -131,7 +130,7 @@ export function lookupModuleState(
  * Manually load module into PlaceOS core. Only use if module should be loaded but isn't present.
  * @param id Module ID
  */
-export function loadModule(id: string): Observable<HashMap> {
+export function loadModule(id: string): Promise<HashMap> {
     return task({ id, task_name: 'load', method: 'post', path: PATH });
 }
 
@@ -173,7 +172,7 @@ export function executeOnModule(
     id: string,
     method: string,
     args: any[] = [],
-): Observable<HashMap> {
+): Promise<HashMap> {
     return task({
         id,
         task_name: `exec/${encodeURIComponent(method)}`,

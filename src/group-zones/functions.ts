@@ -1,5 +1,3 @@
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { apiEndpoint } from '../auth/functions';
 import { del, get, patch, post, put } from '../http/functions';
 import { query } from '../resources/functions';
@@ -27,17 +25,17 @@ export function queryGroupZones(query_params: PlaceGroupZoneQueryOptions = {}) {
 export function showGroupZone(
     group_id: string,
     zone_id: string,
-): Observable<PlaceGroupZone> {
+): Promise<PlaceGroupZone> {
     const url = `${apiEndpoint()}/${pathFor(group_id, zone_id)}`;
-    return get(url).pipe(map((resp: HashMap) => process(resp)));
+    return get(url).then((resp: HashMap) => process(resp));
 }
 
 /** Add group access to a zone */
 export function addGroupZone(
     form_data: Partial<PlaceGroupZone>,
-): Observable<PlaceGroupZone> {
+): Promise<PlaceGroupZone> {
     const url = `${apiEndpoint()}/${PATH}`;
-    return post(url, form_data).pipe(map((resp: HashMap) => process(resp)));
+    return post(url, form_data).then((resp: HashMap) => process(resp));
 }
 
 /** Update group access to a zone */
@@ -46,10 +44,10 @@ export function updateGroupZone(
     zone_id: string,
     form_data: Partial<PlaceGroupZone>,
     method: 'put' | 'patch' = 'patch',
-): Observable<PlaceGroupZone> {
+): Promise<PlaceGroupZone> {
     const url = `${apiEndpoint()}/${pathFor(group_id, zone_id)}`;
-    return (method === 'put' ? put : patch)(url, form_data).pipe(
-        map((resp: HashMap) => process(resp)),
+    return (method === 'put' ? put : patch)(url, form_data).then(
+        (resp: HashMap) => process(resp),
     );
 }
 
@@ -57,7 +55,7 @@ export function updateGroupZone(
 export function removeGroupZone(
     group_id: string,
     zone_id: string,
-): Observable<void> {
+): Promise<void> {
     const url = `${apiEndpoint()}/${pathFor(group_id, zone_id)}`;
     return del(url, { response_type: 'void' });
 }

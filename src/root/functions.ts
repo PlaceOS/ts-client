@@ -1,51 +1,54 @@
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { apiEndpoint } from '../auth/functions';
 import { get, post } from '../http/functions';
 import { toQueryString } from '../utilities/api';
 import { HashMap } from '../utilities/types';
-import { PlacePlatformInfo, PlaceVersion, ReindexOptions, SignalOptions } from './interfaces';
+import {
+    PlacePlatformInfo,
+    PlaceVersion,
+    ReindexOptions,
+    SignalOptions,
+} from './interfaces';
 
 /** Check API health */
-export function healthCheck(): Observable<void> {
-    return get(apiEndpoint()).pipe(map(() => undefined));
+export function healthCheck(): Promise<void> {
+    return get(apiEndpoint()).then(() => undefined);
 }
 
 /** Get platform release details */
-export function platformInfo(): Observable<PlacePlatformInfo> {
+export function platformInfo(): Promise<PlacePlatformInfo> {
     return get(`${apiEndpoint()}/platform`) as any;
 }
 
 /** Get this service version */
-export function serviceVersion(): Observable<PlaceVersion> {
+export function serviceVersion(): Promise<PlaceVersion> {
     return get(`${apiEndpoint()}/version`) as any;
 }
 
 /** Get core node versions */
-export function coreVersions(): Observable<PlaceVersion[]> {
+export function coreVersions(): Promise<PlaceVersion[]> {
     return get(`${apiEndpoint()}/cluster/versions`) as any;
 }
 
 /** List available API scopes */
-export function apiScopes(): Observable<string[]> {
+export function apiScopes(): Promise<string[]> {
     return get(`${apiEndpoint()}/scopes`) as any;
 }
 
 /** Signal a channel in a similar manner to a webhook for drivers */
-export function signal(channel: string, body: HashMap = {}): Observable<void> {
+export function signal(channel: string, body: HashMap = {}): Promise<void> {
     const q = toQueryString({ channel } as SignalOptions);
-    return post(`${apiEndpoint()}/signal?${q}`, body).pipe(map(() => undefined));
+    return post(`${apiEndpoint()}/signal?${q}`, body).then(() => undefined);
 }
 
 /** Recreate Elasticsearch indexes */
-export function reindex(query_params: ReindexOptions = {}): Observable<void> {
+export function reindex(query_params: ReindexOptions = {}): Promise<void> {
     const q = toQueryString(query_params);
-    return post(`${apiEndpoint()}/reindex${q ? '?' + q : ''}`, {}).pipe(
-        map(() => undefined),
+    return post(`${apiEndpoint()}/reindex${q ? '?' + q : ''}`, {}).then(
+        () => undefined,
     );
 }
 
 /** Push all database data into Elasticsearch */
-export function backfill(): Observable<void> {
-    return post(`${apiEndpoint()}/backfill`, {}).pipe(map(() => undefined));
+export function backfill(): Promise<void> {
+    return post(`${apiEndpoint()}/backfill`, {}).then(() => undefined);
 }

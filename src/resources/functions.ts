@@ -1,5 +1,3 @@
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { apiEndpoint } from '../auth/functions';
 import { del, get, patch, post, put, responseHeaders } from '../http/functions';
 import { toQueryString } from '../utilities/api';
@@ -30,11 +28,6 @@ export function next(): string {
 }
 /**
  * @private
- * Map of promises for Service
- */
-const _observables: HashMap<Observable<any>> = {};
-/**
- * @private
  * Total number of items returned by the last basic index query
  */
 let _total: HashMap<number> = {};
@@ -55,17 +48,12 @@ const pass_fn = (_: any) => _;
  * @private
  */
 export function cleanupAPI() {
-    for (const key in _observables) {
-        if (_observables[key]) {
-            delete _observables[key];
-        }
-    }
     _total = {};
     _last_total = {};
     _next = '';
 }
 
-export type QueryResponse<T> = Observable<{
+export type QueryResponse<T> = Promise<{
     total: number;
     next: () => QueryResponse<T> | null;
     data: T[];
@@ -82,29 +70,27 @@ export function query<T>(q: QueryParameters<T>): QueryResponse<T> {
     const url = `${endpoint || apiEndpoint()}${path ? '/' + path : ''}${
         query_str ? '?' + query_str : ''
     }`;
-    return get(url).pipe(
-        map((resp: HashMap) => {
-            const details = handleHeaders(url, query_str, path);
-            return {
-                total: details.total || 0,
-                next: details.next
-                    ? () =>
-                          query({
-                              query_params: details.next as HashMap,
-                              fn,
-                              endpoint,
-                              path,
-                          })
-                    : null,
-                data:
-                    resp && resp instanceof Array
-                        ? resp.map((i) => (fn || pass_fn)(i))
-                        : resp && !(resp instanceof Array) && resp.results
-                          ? (resp.results as HashMap[]).map((i) => process(i))
-                          : [],
-            } as any;
-        }),
-    );
+    return get(url).then((resp: HashMap) => {
+        const details = handleHeaders(url, query_str, path);
+        return {
+            total: details.total || 0,
+            next: details.next
+                ? () =>
+                      query({
+                          query_params: details.next as HashMap,
+                          fn,
+                          endpoint,
+                          path,
+                      })
+                : null,
+            data:
+                resp && resp instanceof Array
+                    ? resp.map((i) => (fn || pass_fn)(i))
+                    : resp && !(resp instanceof Array) && resp.results
+                      ? (resp.results as HashMap[]).map((i) => process(i))
+                      : [],
+        } as any;
+    });
 }
 
 /**
@@ -113,13 +99,13 @@ export function query<T>(q: QueryParameters<T>): QueryResponse<T> {
  * @param id ID of the item
  * @param query_params Map of query paramaters to add to the request URL
  */
-export function show<T>(details: ShowParameters<T>): Observable<T> {
+export function show<T>(details: ShowParameters<T>): Promise<T> {
     const { query_params, id, path, fn, options } = details;
     const query_str = toQueryString(query_params);
     const url = `${apiEndpoint()}/${path}/${id}${
         query_str ? '?' + query_str : ''
     }`;
-    return get(url, options).pipe(map((resp: any) => (fn || pass_fn)(resp)));
+    return get(url, options).then((resp: any) => (fn || pass_fn)(resp));
 }
 
 /**
@@ -128,14 +114,11 @@ export function show<T>(details: ShowParameters<T>): Observable<T> {
  * @param form_data Data to post to the server
  * @param query_params Map of query paramaters to add to the request URL
  */
-export function create<T>(details: CreateParameters<T>): Observable<T> {
+export function create<T>(details: CreateParameters<T>): Promise<T> {
     const { query_params, form_data, path, fn } = details;
     const query_str = toQueryString(query_params);
     const url = `${apiEndpoint()}/${path}${query_str ? '?' + query_str : ''}`;
-    const observable = post(url, form_data).pipe(
-        map((resp: any) => (fn || pass_fn)(resp)),
-    );
-    return observable;
+    return post(url, form_data).then((resp: any) => (fn || pass_fn)(resp));
 }
 
 /**
@@ -146,7 +129,7 @@ export function create<T>(details: CreateParameters<T>): Observable<T> {
  * @param form_data Map of data to pass to the API
  * @param method Verb to use for request
  */
-export function task<T = any>(details: TaskParameters<T>): Observable<T> {
+export function task<T = any>(details: TaskParameters<T>): Promise<T> {
     const { id, task_name, form_data, method, path, callback } = details;
     const query_str = toQueryString(form_data);
     const url = `${apiEndpoint()}/${path}/${id}/${task_name}`;
@@ -159,9 +142,7 @@ export function task<T = any>(details: TaskParameters<T>): Observable<T> {
                       response_type: 'json',
                   },
               );
-    return request.pipe(
-        map((resp: HashMap) => (callback || ((_: any) => _))(resp)),
-    );
+    return request.then((resp: HashMap) => (callback || ((_: any) => _))(resp));
 }
 
 /**
@@ -171,7 +152,7 @@ export function task<T = any>(details: TaskParameters<T>): Observable<T> {
  * @param form_data New values for the item
  * @param query_params Map of query paramaters to add to the request URL
  */
-export function update<T>(details: UpdateParameters<T>): Observable<T> {
+export function update<T>(details: UpdateParameters<T>): Promise<T> {
     const { id, query_params, form_data, method, path, fn } = details;
     const query_str = toQueryString({
         ...query_params,
@@ -180,8 +161,8 @@ export function update<T>(details: UpdateParameters<T>): Observable<T> {
     const url = `${apiEndpoint()}/${path}/${id}${
         query_str ? '?' + query_str : ''
     }`;
-    return (method === 'put' ? put : patch)(url, form_data).pipe(
-        map((resp: any) => (fn || pass_fn)(resp)),
+    return (method === 'put' ? put : patch)(url, form_data).then((resp: any) =>
+        (fn || pass_fn)(resp),
     );
 }
 
@@ -190,7 +171,7 @@ export function update<T>(details: UpdateParameters<T>): Observable<T> {
  * Make delete request for the given item
  * @param id ID of item
  */
-export function remove(details: RemoveParameters): Observable<HashMap> {
+export function remove(details: RemoveParameters): Promise<HashMap> {
     const { id, query_params, path } = details;
     const query_str = toQueryString(query_params);
     const url = `${apiEndpoint()}/${path}/${id}${

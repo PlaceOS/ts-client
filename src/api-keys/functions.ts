@@ -1,6 +1,6 @@
-import { create, query, remove, show, update } from '../resources/functions';
-import { get } from '../http/functions';
 import { apiEndpoint } from '../auth/functions';
+import { get } from '../http/functions';
+import { create, query, remove, show, update } from '../resources/functions';
 import { PlaceApiKey } from './api-key';
 import { PlaceApiKeyJwt, PlaceApiKeyQueryOptions } from './interfaces';
 
@@ -31,7 +31,14 @@ export function updateApiKey(
     form_data: Partial<PlaceApiKey>,
     method: 'put' | 'patch' = 'patch',
 ) {
-    return update({ id, form_data, query_params: {}, method, fn: process, path: PATH });
+    return update({
+        id,
+        form_data,
+        query_params: {},
+        method,
+        fn: process,
+        path: PATH,
+    });
 }
 
 /** Remove an API key */
@@ -40,6 +47,6 @@ export function removeApiKey(id: string) {
 }
 
 /** Inspect the current API key permissions as a JWT payload */
-export function inspectApiKey() {
-    return get(`${apiEndpoint()}/${PATH}/inspect`) as any as import('rxjs').Observable<PlaceApiKeyJwt>;
+export function inspectApiKey(): Promise<PlaceApiKeyJwt> {
+    return get(`${apiEndpoint()}/${PATH}/inspect`) as Promise<PlaceApiKeyJwt>;
 }

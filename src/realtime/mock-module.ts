@@ -1,5 +1,4 @@
-import { BehaviorSubject, Observable } from 'rxjs';
-
+import { Signal, WritableSignal, createSignal } from '../utilities/signal';
 import { HashMap } from '../utilities/types';
 import { MockPlaceWebsocketSystem } from './mock-system';
 
@@ -50,16 +49,12 @@ export class MockPlaceWebsocketModule {
      * @param prop_name Name of the property
      * @param next Callback for changes to the property
      */
-    public listen<T = any>(prop_name: string): Observable<T> {
-        if (
-            !this[`_${prop_name}`] &&
-            !(this[`_${prop_name}_obs`] instanceof Observable) &&
-            !this[prop_name]
-        ) {
+    public listen<T = any>(prop_name: string): Signal<T> {
+        if (!this[`_${prop_name}`] && !this[prop_name]) {
             this.addProperty<T>(prop_name, null);
         }
-        const observer = this[`_${prop_name}_obs`] as Observable<T>;
-        return observer;
+        const observer = this[`_${prop_name}`] as WritableSignal<T>;
+        return observer.asReadonly();
     }
 
     /**
@@ -75,7 +70,7 @@ export class MockPlaceWebsocketModule {
     }
 
     /**
-     * Add observable property to module
+     * Add signal property to module
      * @param prop_name Name of the property
      * @param value Initial value of the property
      */
@@ -83,11 +78,10 @@ export class MockPlaceWebsocketModule {
         if (prop_name[0] === '$') {
             prop_name = prop_name.replace('$', '');
         }
-        this[`_${prop_name}`] = new BehaviorSubject<T>(value);
-        this[`_${prop_name}_obs`] = this[`_${prop_name}`].asObservable();
+        this[`_${prop_name}`] = createSignal<T>(value);
         Object.defineProperty(this, prop_name, {
-            get: () => this[`_${prop_name}`].getValue(),
-            set: (v) => this[`_${prop_name}`].next(v),
+            get: () => this[`_${prop_name}`].value,
+            set: (v) => this[`_${prop_name}`].set(v),
         });
     }
 }

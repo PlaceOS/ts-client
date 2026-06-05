@@ -1,4 +1,3 @@
-import { Observable } from 'rxjs';
 import { PlaceDriverDetails } from '../drivers/interfaces';
 import {
     create,
@@ -91,7 +90,7 @@ export function removeRepository(id: string) {
 /**
  * Get a list of all the interfaces
  */
-export function listInterfaceRepositories(): Observable<string[]> {
+export function listInterfaceRepositories(): Promise<string[]> {
     return show({
         id: 'interfaces',
         query_params: {},
@@ -105,7 +104,7 @@ export function listInterfaceRepositories(): Observable<string[]> {
  */
 export function listRemoteRepositoryDefaultBranch(
     query_params: PlaceRemoteRepositoryQuery,
-): Observable<string> {
+): Promise<string> {
     return show({
         id: 'remote_default_branch',
         query_params,
@@ -119,7 +118,7 @@ export function listRemoteRepositoryDefaultBranch(
  */
 export function listRemoteRepositoryBranches(
     query_params: PlaceRemoteRepositoryQuery,
-): Observable<string[]> {
+): Promise<string[]> {
     return show({
         id: 'remote_branches',
         query_params,
@@ -133,7 +132,7 @@ export function listRemoteRepositoryBranches(
  */
 export function listRemoteRepositoryCommits(
     query_params: PlaceRemoteRepositoryCommitsQuery,
-): Observable<GitCommitDetails[]> {
+): Promise<GitCommitDetails[]> {
     return show({
         id: 'remote_commits',
         query_params,
@@ -147,7 +146,7 @@ export function listRemoteRepositoryCommits(
  */
 export function listRemoteRepositoryTags(
     query_params: PlaceRemoteRepositoryQuery,
-): Observable<string[]> {
+): Promise<string[]> {
     return show({
         id: 'remote_tags',
         query_params,
@@ -163,7 +162,7 @@ export function listRemoteRepositoryTags(
 export function listRepositoryDrivers(
     id: string,
     query_params?: HashMap,
-): Observable<string[]> {
+): Promise<string[]> {
     return task({
         id,
         task_name: 'drivers',
@@ -181,7 +180,7 @@ export function listRepositoryDrivers(
 export function listRepositoryReleases(
     id: string,
     query_params?: HashMap,
-): Observable<string[]> {
+): Promise<string[]> {
     return task({
         id,
         task_name: 'releases',
@@ -199,7 +198,7 @@ export function listRepositoryReleases(
 export function listRepositoryCommits(
     id: string,
     query_params?: PlaceRepositoryCommitQuery,
-): Observable<GitCommitDetails[]> {
+): Promise<GitCommitDetails[]> {
     return task({
         id,
         task_name: 'commits',
@@ -213,7 +212,7 @@ export function listRepositoryCommits(
  * Get a list of all the branches for a repository
  * @param id ID of the repository
  */
-export function listRepositoryBranches(id: string): Observable<string[]> {
+export function listRepositoryBranches(id: string): Promise<string[]> {
     return task({
         id,
         task_name: 'branches',
@@ -226,7 +225,7 @@ export function listRepositoryBranches(id: string): Observable<string[]> {
  * Get a list of all the branches for a repository
  * @param id ID of the repository
  */
-export function listRepositoryDefaultBranch(id: string): Observable<string> {
+export function listRepositoryDefaultBranch(id: string): Promise<string> {
     return task({
         id,
         task_name: 'default_branch',
@@ -239,7 +238,7 @@ export function listRepositoryDefaultBranch(id: string): Observable<string> {
  * Get a list of all the tags for a repository
  * @param id ID of the repository
  */
-export function listRepositoryTags(id: string): Observable<string[]> {
+export function listRepositoryTags(id: string): Promise<string[]> {
     return task({
         id,
         task_name: 'tags',
@@ -256,7 +255,7 @@ export function listRepositoryTags(id: string): Observable<string[]> {
 export function listRepositoryDriverDetails(
     id: string,
     query_params: PlaceRepositoryDetailsQuery,
-): Observable<PlaceDriverDetails> {
+): Promise<PlaceDriverDetails> {
     return task({
         id,
         task_name: 'details',
@@ -274,7 +273,7 @@ export function listRepositoryDriverDetails(
 export function pullRepositoryChanges(
     id: string,
     query_params?: PlaceRepositoryPullQuery,
-): Observable<GitCommitDetails> {
+): Promise<GitCommitDetails> {
     return task({
         id,
         task_name: 'pull',
@@ -292,7 +291,7 @@ export function pullRepositoryChanges(
 export function listRepositoryFolders(
     id: string,
     query_params?: PlaceRepositoryFoldersQuery,
-): Observable<string[]> {
+): Promise<string[]> {
     return task({
         id,
         task_name: 'folders',

@@ -1,4 +1,4 @@
-import { Subscription } from 'rxjs';
+import { Unsubscribe } from './signal';
 
 /* istanbul ignore file */
 
@@ -16,7 +16,9 @@ const _intervals: { [name: string]: number } = {};
  * @private
  * Store for named subscription unsub callbacks
  */
-const _subscriptions: { [name: string]: Subscription | (() => void) } = {};
+type SubscriptionLike = { unsubscribe: () => void } | Unsubscribe;
+
+const _subscriptions: { [name: string]: SubscriptionLike } = {};
 
 /**
  * @private
@@ -114,9 +116,9 @@ export function clearAsyncInterval(name: string) {
  * @private
  * Store named subscription
  * @param name Name of the subscription
- * @param fn Unsubscribe callback or Subscription object
+ * @param fn Unsubscribe callback or Subscription-like object
  */
-export function subscription(name: string, fn: Subscription | (() => void)) {
+export function subscription(name: string, fn: SubscriptionLike) {
     unsub(name);
     _subscriptions[name] = fn;
 }
@@ -128,9 +130,11 @@ export function subscription(name: string, fn: Subscription | (() => void)) {
  */
 export function unsub(name: string) {
     if (_subscriptions && _subscriptions[name]) {
-        _subscriptions[name] instanceof Subscription
-            ? (_subscriptions[name] as Subscription).unsubscribe()
-            : (_subscriptions[name] as any)();
+        typeof _subscriptions[name] === 'function'
+            ? (_subscriptions[name] as Unsubscribe)()
+            : (
+                  _subscriptions[name] as { unsubscribe: () => void }
+              ).unsubscribe();
         delete _subscriptions[name];
     }
 }

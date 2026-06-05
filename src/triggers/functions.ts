@@ -1,4 +1,3 @@
-import { Observable } from 'rxjs';
 import {
     create,
     query,
@@ -86,7 +85,7 @@ export function removeTrigger(id: string) {
  * List systems that contain instances of a trigger
  * @param id ID of the trigger to grab system instances for
  */
-export function listTriggerInstances(id: string): Observable<PlaceTrigger[]> {
+export function listTriggerInstances(id: string): Promise<PlaceTrigger[]> {
     return task({
         id,
         task_name: `instances`,

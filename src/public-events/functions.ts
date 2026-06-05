@@ -1,5 +1,3 @@
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { apiEndpoint } from '../auth/functions';
 import { get, post } from '../http/functions';
 import { toQueryString } from '../utilities/api';
@@ -16,7 +14,7 @@ const PATH = 'public_events';
 export function publicEventGuestToken(
     system_id: string,
     body: PublicEventTokenRequest,
-): Observable<string> {
+): Promise<string> {
     const url = `${apiEndpoint()}/${PATH}/guest_token/${encodeURIComponent(system_id)}`;
     return post(url, body, { skip_auth: true }) as any;
 }
@@ -25,11 +23,11 @@ export function publicEventGuestToken(
 export function listPublicEvents(
     system_id: string,
     query_params: PublicEventQueryOptions = {},
-): Observable<HashMap[]> {
+): Promise<HashMap[]> {
     const q = toQueryString(query_params);
     const url = `${apiEndpoint()}/${PATH}/${encodeURIComponent(system_id)}/events${q ? '?' + q : ''}`;
-    return get(url, { skip_auth_flow: true }).pipe(
-        map((resp: HashMap) => (resp || []) as HashMap[]),
+    return get(url, { skip_auth_flow: true }).then(
+        (resp: HashMap) => (resp || []) as HashMap[],
     );
 }
 
@@ -37,7 +35,7 @@ export function listPublicEvents(
 export function registerPublicEvent(
     system_id: string,
     body: PublicEventRegistrationRequest,
-): Observable<HashMap> {
+): Promise<HashMap> {
     const url = `${apiEndpoint()}/${PATH}/${encodeURIComponent(system_id)}/register`;
     return post(url, body, { skip_auth_flow: true }) as any;
 }

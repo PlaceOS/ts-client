@@ -1,8 +1,8 @@
-import { of } from 'rxjs';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { PlaceModuleBinding } from '../../src/realtime/module';
 import { PlaceVariableBinding } from '../../src/realtime/status-variable';
+import { createSignal } from '../../src/utilities/signal';
 
 import * as ws from '../../src/realtime/functions';
 
@@ -14,7 +14,9 @@ describe('PlaceSystemBinding', () => {
 
     beforeEach(() => {
         vi.useFakeTimers();
-        (ws as any).status.mockImplementation(() => of(true));
+        (ws as any).status.mockImplementation(() =>
+            createSignal(true).asReadonly(),
+        );
         (ws as any).execute.mockImplementation(() => Promise.resolve());
         fake_system = { id: 'sys-A0' };
         module = new PlaceModuleBinding(fake_system, 'Test_1');

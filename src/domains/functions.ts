@@ -1,5 +1,3 @@
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { apiEndpoint } from '../auth/functions';
 import { get } from '../http/functions';
 import { create, query, remove, show, update } from '../resources/functions';
@@ -75,7 +73,7 @@ export function removeDomain(id: string) {
  * Find the domain associated with a user's email address
  * @param email Email address to lookup
  */
-export function lookupDomainByEmail(email: string): Observable<string> {
+export function lookupDomainByEmail(email: string): Promise<string> {
     const url = `${apiEndpoint()}${PATH}/lookup/${encodeURIComponent(email)}`;
-    return get(url).pipe(map((resp) => `${resp}`));
+    return get(url).then((resp) => `${resp}`);
 }

@@ -1,7 +1,4 @@
-import { from, Observable, throwError } from 'rxjs';
-import { delay } from 'rxjs/operators';
-
-import { convertPairStringToMap, log } from '../utilities/general';
+import { convertPairStringToMap, scoped_log } from '../utilities/general';
 import { HashMap } from '../utilities/types';
 import {
     HttpVerb,
@@ -10,19 +7,21 @@ import {
     MockHttpRequestHandlerOptions,
 } from './interfaces';
 
+const log = scoped_log('HTTP(M)');
+
 /**
  * @private
  */
 const _handlers: HashMap<MockHttpRequestHandler> = {};
 
-let _error_handler: (
+let _error_handler: (method: HttpVerb, url: string) => Promise<never> | null = (
     method: HttpVerb,
     url: string,
-) => Observable<never> | null = (method: HttpVerb, url: string) => {
+) => {
     const error = new Error(`Mock endpoint not found: ${method} ${url}`);
     (error as any).status = 404;
-    log('HTTP(M)', `404 ${method}:`, url);
-    return throwError(error);
+    log(`404 ${method}:`, url);
+    return Promise.reject(error);
 };
 
 /**
@@ -31,7 +30,7 @@ let _error_handler: (
  * @param handler_fn Function to handle not found mocked endpoints
  */
 export function setMockNotFoundHandler(
-    handler_fn: (method: HttpVerb, url: string) => Observable<never> | null,
+    handler_fn: (method: HttpVerb, url: string) => Promise<never> | null,
 ) {
     _error_handler = handler_fn;
 }
@@ -62,7 +61,7 @@ export function registerMockEndpoint<T>(
         ),
     };
     handler_map[key] = handler;
-    log('HTTP(M)', `+ ${handler_ops.method} ${handler_ops.path}`);
+    log(`+ ${handler_ops.method} ${handler_ops.path}`);
 }
 
 /**
@@ -79,7 +78,7 @@ export function deregisterMockEndpoint(
     const key = `${method}|${url}`;
     if (handler_map[key]) {
         delete handler_map[key];
-        log('HTTP(M)', `- ${method} ${url}`);
+        log(`- ${method} ${url}`);
     }
 }
 
@@ -112,7 +111,7 @@ export function mockRequest(
     url: string,
     body?: any,
     handler_map: HashMap<MockHttpRequestHandler> = _handlers,
-): Observable<HashMap | string | void> | null {
+): Promise<HashMap | string | void> | null {
     const handler = findRequestHandler(method, url, handler_map);
     if (handler) {
         const request = processRequest(url, handler, body);
@@ -122,8 +121,8 @@ export function mockRequest(
     try {
         return _error_handler(method, url);
     } catch (error) {
-        log('HTTP(M)', `ERROR ${method}:`, [url, error]);
-        return throwError(error);
+        log.error(`ERROR ${method}:`, [url, error]);
+        return Promise.reject(error);
     }
 }
 
@@ -209,13 +208,13 @@ export function processRequest<T = any>(
         query_params,
         body,
     };
-    log('HTTP(M)', `MATCHED ${request.method}:`, request);
+    log(`MATCHED ${request.method}:`, request);
     return request;
 }
 
 /**
  * @private
- * Perform request and return an observable for the generated response
+ * Perform request and return a promise for the generated response
  * @param handler Request handler
  * @param request Request contents
  */
@@ -229,15 +228,17 @@ export function onMockRequest(
             ? handler.callback(request)
             : handler.metadata;
     } catch (error) {
-        log('HTTP(M)', `ERROR ${request.method}:`, [request.url, error]);
-        return throwError(error);
+        log.error(`ERROR ${request.method}:`, request.url, error);
+        return Promise.reject(error);
     }
     const variance = handler.delay_variance || 100;
     const delay_value = handler.delay || 300;
     const delay_time =
         Math.floor(Math.random() * variance - variance / 2) + delay_value;
-    log('HTTP(M)', `RESP ${request.method}:`, [request.url, result]);
-    return from([result]).pipe(delay(Math.max(200, delay_time)));
+    log(`RESP ${request.method}:`, request.url, result);
+    return new Promise<HashMap | string | void>((resolve) => {
+        setTimeout(() => resolve(result), Math.max(200, delay_time));
+    });
 }
 
 /**

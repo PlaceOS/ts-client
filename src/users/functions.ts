@@ -1,5 +1,3 @@
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { apiEndpoint } from '../auth/functions';
 import { del, get, post } from '../http/functions';
 import {
@@ -108,12 +106,10 @@ export function removeUser(
  */
 export function queryUserGroups(
     query_params: PlaceUserGroupsOptions,
-): Observable<PlaceUserGroupResponse[]> {
+): Promise<PlaceUserGroupResponse[]> {
     const q = toQueryString(query_params);
     const url = `${apiEndpoint()}${PATH}/groups${q ? '?' + q : ''}`;
-    return get(url).pipe(
-        map((resp: HashMap) => resp as PlaceUserGroupResponse[]),
-    );
+    return get(url).then((resp: HashMap) => resp as PlaceUserGroupResponse[]);
 }
 
 /**
@@ -122,23 +118,21 @@ export function queryUserGroups(
  */
 export function searchUserMetadata(
     query_params: PlaceUserMetadataSearchOptions,
-): Observable<PlaceUser[]> {
+): Promise<PlaceUser[]> {
     const q = toQueryString(query_params);
     const url = `${apiEndpoint()}${PATH}/metadata/search${q ? '?' + q : ''}`;
-    return get(url).pipe(
-        map((resp: HashMap) =>
-            ((resp || []) as HashMap[]).map((item) => process(item)),
-        ),
+    return get(url).then((resp: HashMap) =>
+        ((resp || []) as HashMap[]).map((item) => process(item)),
     );
 }
 
 /**
  * Obtain a token to the current user's SSO resources
  */
-export function currentUserResourceToken(): Observable<PlaceUserResourceToken> {
+export function currentUserResourceToken(): Promise<PlaceUserResourceToken> {
     const url = `${apiEndpoint()}${PATH}/resource_token`;
-    return post(url, {}).pipe(
-        map((resp: HashMap) => resp as PlaceUserResourceToken),
+    return post(url, {}).then(
+        (resp: HashMap) => resp as PlaceUserResourceToken,
     );
 }
 
@@ -150,7 +144,7 @@ export function currentUserResourceToken(): Observable<PlaceUserResourceToken> {
 export function userMetadata(
     id: string,
     query_params: PlaceUserMetadataOptions = {},
-): Observable<HashMap> {
+): Promise<HashMap> {
     return task({
         id,
         task_name: 'metadata',
@@ -164,7 +158,7 @@ export function userMetadata(
  * Remove the saved resource token of a user
  * @param id User ID
  */
-export function removeUserResourceToken(id: string): Observable<void> {
+export function removeUserResourceToken(id: string): Promise<void> {
     const url = `${apiEndpoint()}${PATH}/${encodeURIComponent(id)}/resource_token`;
     return del(url, { response_type: 'void' });
 }
@@ -173,12 +167,10 @@ export function removeUserResourceToken(id: string): Observable<void> {
  * Obtain a token to the specified user's SSO resources
  * @param id User ID
  */
-export function userResourceToken(
-    id: string,
-): Observable<PlaceUserResourceToken> {
+export function userResourceToken(id: string): Promise<PlaceUserResourceToken> {
     const url = `${apiEndpoint()}${PATH}/${encodeURIComponent(id)}/resource_token`;
-    return post(url, {}).pipe(
-        map((resp: HashMap) => resp as PlaceUserResourceToken),
+    return post(url, {}).then(
+        (resp: HashMap) => resp as PlaceUserResourceToken,
     );
 }
 
@@ -186,7 +178,7 @@ export function userResourceToken(
  * Undelete a user
  * @param id User ID
  */
-export function reviveUser(id: string): Observable<PlaceUser> {
+export function reviveUser(id: string): Promise<PlaceUser> {
     return task({
         id,
         task_name: 'revive',

@@ -1,4 +1,3 @@
-import { map } from 'rxjs/operators';
 import { del, get, patch, post, put } from '../../api';
 import { toQueryString } from '../../utilities/api';
 import { QuestionQueryOptions, QuestionShowOptions } from './interfaces';
@@ -15,8 +14,8 @@ const PATH = '/api/staff/v1/surveys/questions';
  */
 export function queryQuestions(query_params: QuestionQueryOptions = {}) {
     const query = toQueryString(query_params);
-    return get(`${PATH}${query ? '?' + query : ''}`).pipe(
-        map((l: any) => l.map((_: any) => new SurveyQuestion(_))),
+    return get(`${PATH}${query ? '?' + query : ''}`).then((l: any) =>
+        l.map((_: any) => new SurveyQuestion(_)),
     );
 }
 
@@ -30,8 +29,8 @@ export function showQuestion(
     query_params: QuestionShowOptions = {},
 ) {
     const query = toQueryString(query_params);
-    return get(`${PATH}/${id}${query ? '?' + query : ''}`).pipe(
-        map((l: any) => new SurveyQuestion(l)),
+    return get(`${PATH}/${id}${query ? '?' + query : ''}`).then(
+        (l: any) => new SurveyQuestion(l),
     );
 }
 
@@ -41,9 +40,7 @@ export function showQuestion(
  * @param query_params Query parameters to add the to request URL
  */
 export function addQuestion(form_data: Partial<SurveyQuestion>) {
-    return post(`${PATH}`, form_data).pipe(
-        map((l: any) => new SurveyQuestion(l)),
-    );
+    return post(`${PATH}`, form_data).then((l: any) => new SurveyQuestion(l));
 }
 
 /**
@@ -58,8 +55,8 @@ export function updateQuestion(
     form_data: Partial<SurveyQuestion>,
     method: 'put' | 'patch' = 'patch',
 ) {
-    return (method === 'put' ? put : patch)(`${PATH}/${id}`, form_data).pipe(
-        map((l: any) => new SurveyQuestion(l)),
+    return (method === 'put' ? put : patch)(`${PATH}/${id}`, form_data).then(
+        (l: any) => new SurveyQuestion(l),
     );
 }
 

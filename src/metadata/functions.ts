@@ -1,5 +1,3 @@
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { apiEndpoint } from '../auth/functions';
 import { get } from '../http/functions';
 import { create, remove, show, task, update } from '../resources/functions';
@@ -33,7 +31,7 @@ function process(item: Partial<PlaceMetadata>) {
 export function listMetadata(
     id: string,
     query_params: PlaceMetadataOptions = {},
-): Observable<PlaceMetadata[]> {
+): Promise<PlaceMetadata[]> {
     return show({
         id,
         query_params,
@@ -68,7 +66,7 @@ function flatten<T = any>(an_array: T[]): T {
 export function listMetadataHistory(
     id: string,
     query_params: PlaceMetadataHistoryOptions = {},
-): Observable<PlaceMetadata[]> {
+): Promise<PlaceMetadata[]> {
     return task({
         id,
         task_name: `history`,
@@ -89,10 +87,7 @@ export function listMetadataHistory(
  * @param id ID of the item to retrieve metadata
  * @param name Name of the metadata field to retrieve
  */
-export function showMetadata(
-    id: string,
-    name: string,
-): Observable<PlaceMetadata> {
+export function showMetadata(id: string, name: string): Promise<PlaceMetadata> {
     return show({
         id,
         query_params: { name },
@@ -169,15 +164,13 @@ export function listChildMetadata(
 export function bulkMetadata(
     name: string,
     query_params: PlaceMetadataBulkOptions,
-): Observable<Record<string, PlaceMetadata>> {
+): Promise<Record<string, PlaceMetadata>> {
     const q = toQueryString(query_params);
     const url = `${apiEndpoint()}/${PATH}/${encodeURIComponent(name)}/bulk${q ? '?' + q : ''}`;
-    return get(url).pipe(
-        map((resp: HashMap) =>
-            Object.keys(resp || {}).reduce(
-                (map, key) => ({ ...map, [key]: process(resp[key]) }),
-                {} as Record<string, PlaceMetadata>,
-            ),
+    return get(url).then((resp: HashMap) =>
+        Object.keys(resp || {}).reduce(
+            (map, key) => ({ ...map, [key]: process(resp[key]) }),
+            {} as Record<string, PlaceMetadata>,
         ),
     );
 }

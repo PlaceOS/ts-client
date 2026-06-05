@@ -6,7 +6,6 @@ import {
     registerSystem,
 } from '../../src/realtime/mock';
 
-import { first } from 'rxjs/operators';
 import * as Auth from '../../src/auth/functions';
 import * as ws from '../../src/realtime/functions';
 
@@ -81,17 +80,17 @@ describe('MockEngineWebsocket', () => {
 
     test('should exec mock system module methods', (done) => {
         const binding = { sys: 'sys-A0', mod: 'Test', index: 1, name: 'test' };
-        ws.listen(binding)
-            .pipe(first((_) => _))
-            .subscribe((_) => {
-                ws.execute({ ...binding, name: 'testCall' }).then((value) => {
-                    expect(value).toBe(10);
-                    setTimeout(() => {
-                        expect(ws.value(binding)).toBe(11);
-                        done();
-                    }, 200);
-                });
+        const unsubscribe = ws.listen(binding).subscribe((value) => {
+            if (!value) return;
+            unsubscribe();
+            ws.execute({ ...binding, name: 'testCall' }).then((value) => {
+                expect(value).toBe(10);
+                setTimeout(() => {
+                    expect(ws.value(binding)).toBe(11);
+                    done();
+                }, 200);
             });
+        });
         ws.bind(binding);
     });
 
