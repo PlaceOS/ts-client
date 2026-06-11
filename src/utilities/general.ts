@@ -151,6 +151,21 @@ const NONCE_CHARS =
  */
 export function generateNonce(length: number = 40): string {
     let nonce = '';
+    const crypto = window?.crypto;
+    if (crypto?.getRandomValues) {
+        // Rejection sampling to avoid modulo bias
+        const limit = 256 - (256 % NONCE_CHARS.length);
+        const buffer = new Uint8Array(length * 2);
+        while (nonce.length < length) {
+            crypto.getRandomValues(buffer);
+            for (const byte of buffer) {
+                if (byte < limit && nonce.length < length) {
+                    nonce += NONCE_CHARS.charAt(byte % NONCE_CHARS.length);
+                }
+            }
+        }
+        return nonce;
+    }
     for (let i = 0; i < length; i++) {
         nonce += NONCE_CHARS.charAt(
             Math.floor(Math.random() * NONCE_CHARS.length),

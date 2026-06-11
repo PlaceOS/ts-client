@@ -338,6 +338,124 @@ describe('Auth', () => {
             })();
         }));
 
+    test('should reload authority on focus when there is no session', async () => {
+        window.fetch = vi.fn().mockImplementation(async () => ({
+            ok: true,
+            json: async () =>
+                ({
+                    version: '2.0.0',
+                    login_url: '/login?continue={{url}}',
+                    session: false,
+                }) as PlaceAuthority,
+        }));
+        await Auth.setup({
+            auth_uri: '',
+            token_uri: '',
+            redirect_uri: '',
+            scope: 'public',
+            handle_login: false,
+        });
+        expect(Auth.authority()?.session).toBe(false);
+        expect(window.fetch).toHaveBeenCalledTimes(1);
+        (window.fetch as any).mockImplementation(async () => ({
+            ok: true,
+            json: async () =>
+                ({
+                    version: '2.0.0',
+                    login_url: '/login?continue={{url}}',
+                    session: true,
+                }) as PlaceAuthority,
+        }));
+        document.dispatchEvent(new Event('visibilitychange'));
+        await new Promise<void>((resolve) => setTimeout(resolve, 50));
+        expect(window.fetch).toHaveBeenCalledTimes(2);
+        expect(Auth.authority()?.session).toBe(true);
+    });
+
+    test('should not reload authority on focus with a current session', async () => {
+        await Auth.setup({
+            auth_uri: '',
+            token_uri: '',
+            redirect_uri: '',
+            scope: 'public',
+            handle_login: false,
+        });
+        expect(Auth.authority()?.session).toBe(true);
+        expect(window.fetch).toHaveBeenCalledTimes(1);
+        document.dispatchEvent(new Event('visibilitychange'));
+        await new Promise<void>((resolve) => setTimeout(resolve, 50));
+        expect(window.fetch).toHaveBeenCalledTimes(1);
+    });
+
+    test('should handle auth redirects from native wrappers', async () => {
+        (window.fetch as any)
+            .mockImplementationOnce(async () => ({
+                ok: true,
+                json: async () =>
+                    ({
+                        version: '2.0.0',
+                        login_url: '/login?continue={{url}}',
+                        session: false,
+                    }) as PlaceAuthority,
+            }))
+            .mockImplementationOnce(async () => ({
+                ok: true,
+                json: async () => ({
+                    access_token: 'today',
+                    refresh_token: 'tomorrow',
+                    expires_in: 3600,
+                }),
+            }));
+        await Auth.setup({
+            auth_uri: '',
+            token_uri: 'token',
+            redirect_uri: '',
+            scope: 'public',
+            handle_login: false,
+        });
+        const token = await Auth.handleAuthRedirect(
+            'myapp://oauth/callback?code=abc123',
+        );
+        expect(token).toBe('today');
+        expect(sessionStorage.getItem('ENGINE.auth.params')).toBeNull();
+    });
+
+    test('should complete auth on focus with params stored while backgrounded', async () => {
+        (window.fetch as any)
+            .mockImplementationOnce(async () => ({
+                ok: true,
+                json: async () =>
+                    ({
+                        version: '2.0.0',
+                        login_url: '/login?continue={{url}}',
+                        session: false,
+                    }) as PlaceAuthority,
+            }))
+            .mockImplementationOnce(async () => ({
+                ok: true,
+                json: async () => ({
+                    access_token: 'today',
+                    refresh_token: 'tomorrow',
+                    expires_in: 3600,
+                }),
+            }));
+        await Auth.setup({
+            auth_uri: '',
+            token_uri: 'token',
+            redirect_uri: '',
+            scope: 'public',
+            handle_login: false,
+        });
+        expect(Auth.hasToken()).toBe(false);
+        sessionStorage.setItem(
+            'ENGINE.auth.params',
+            JSON.stringify({ code: 'abc123' }),
+        );
+        document.dispatchEvent(new Event('visibilitychange'));
+        await new Promise<void>((resolve) => setTimeout(resolve, 100));
+        expect(Auth.token()).toBe('today');
+    });
+
     test('should allow generating challenge pairs', () => {
         (window as any).TextEncoder = vi.fn(() => ({
             encode: vi.fn((_: any) => _),

@@ -7,6 +7,7 @@ export {
     authority,
     cleanupAuth,
     clientId,
+    handleAuthRedirect,
     hasToken,
     host,
     httpRoute,

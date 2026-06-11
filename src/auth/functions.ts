@@ -11,6 +11,7 @@ import {
     timeout,
 } from '../utilities/async';
 import {
+    convertPairStringToMap,
     generateNonce,
     getFragments,
     isNestedFrame,
@@ -303,10 +304,101 @@ export async function setup(options: PlaceAuthOptions): Promise<void> {
     // Intialise storage
     _storage = _options.storage === 'session' ? sessionStorage : localStorage;
     _client_id = Md5.hashStr(_options.redirect_uri, false);
+    listenForAppFocus();
     if (_options.delay && _options.delay > 0) {
         await sleep(_options.delay!);
     }
     return loadAuthority();
+}
+
+/**
+ * @private
+ */
+let _listening_for_focus = false;
+
+/**
+ * @private
+ * Watch for the application returning to the foreground. The user may have
+ * logged in from another tab, browser or application while this one was in
+ * the background, leaving the cached authority's `session` state stale.
+ */
+function listenForAppFocus(): void {
+    if (_listening_for_focus) return;
+    _listening_for_focus = true;
+    window.addEventListener('focus', onAppFocus);
+    document.addEventListener('visibilitychange', onAppFocus);
+}
+
+/**
+ * @private
+ */
+function stopListeningForAppFocus(): void {
+    if (!_listening_for_focus) return;
+    _listening_for_focus = false;
+    window.removeEventListener('focus', onAppFocus);
+    document.removeEventListener('visibilitychange', onAppFocus);
+}
+
+/**
+ * @private
+ * Handle the application returning to the foreground. The user may have
+ * authenticated from another context while this one was in the background.
+ * Credentials delivered while backgrounded (e.g. a native wrapper storing
+ * deep link parameters) are used to complete the auth flow, otherwise the
+ * authority is reloaded in case a session now exists for this context.
+ */
+async function onAppFocus(): Promise<void> {
+    if (document.visibilityState === 'hidden') return;
+    if (_options.mock || !_authority) return;
+    if (_authority.session || hasCurrentToken()) return;
+    // Force a fresh check, ignoring any cached result from before backgrounding
+    delete _promises.check_params;
+    const found = await checkForAuthParameters().catch(() => false);
+    if (found || _code || refreshToken()) {
+        log('Application focused with new credentials. Authorising...');
+        _redirecting = false;
+        delete _promises.authorise;
+        await authorise().catch((e) =>
+            log.error('Failed to authorise on focus:', e),
+        );
+        return;
+    }
+    log('Application focused without a session. Reloading authority...');
+    _redirecting = false;
+    refreshAuthority().catch((e) =>
+        log.error('Failed to refresh authority:', e),
+    );
+}
+
+/**
+ * Complete authentication with a redirect URL received outside the normal
+ * browser navigation flow. Use this from native wrapper applications that
+ * perform login in an external browser and receive the OAuth redirect as a
+ * deep link, where this context's location never changes.
+ * @param url Redirect/deep link URL containing the auth parameters
+ * @returns Promise resolving to the new access token
+ */
+export async function handleAuthRedirect(url: string): Promise<string> {
+    const params: HashMap<string> = {};
+    const match = url.match(/[?#](.*)/);
+    if (match) {
+        for (const part of match[1].split(/[?#]/)) {
+            Object.assign(params, convertPairStringToMap(part));
+        }
+    }
+    if (!params.code && !params.access_token && !params.refresh_token) {
+        throw new Error('No auth parameters found in redirect URL');
+    }
+    log('Received auth redirect. Storing parameters...');
+    sessionStorage.setItem('ENGINE.auth.params', JSON.stringify(params));
+    // Wait for any in-flight authority load before authorising
+    if (!_authority && _promises.load_authority) {
+        await _promises.load_authority;
+    }
+    _redirecting = false;
+    delete _promises.check_params;
+    delete _promises.authorise;
+    return authorise();
 }
 
 export function setStorage(type: 'session' | 'local'): void {
@@ -326,6 +418,8 @@ export function cleanupAuth() {
     _client_id = '';
     _code = '';
     _route = `/api/engine/v2`;
+    _redirecting = false;
+    stopListeningForAppFocus();
     // Clear local subscriptions
     for (const key in _promises) {
         /* istanbul ignore else */
@@ -414,9 +508,15 @@ export function authorise(
                             sendToAuthorize(state).then(...token_handlers);
                         } else {
                             log('No user session');
-                            sendToLogin(api_authority);
+                            // Settle the promise before redirecting as
+                            // `sendToLogin` throws when it redirects
                             reject('No user session');
                             setTimeout(() => delete _promises.authorise, 200);
+                            try {
+                                sendToLogin(api_authority);
+                            } catch {
+                                /* redirecting to login */
+                            }
                         }
                     }
                 }
@@ -440,17 +540,36 @@ export function logout(): void {
         headers: {
             Authorization: 'Bearer ' + token(),
         },
-    }).then((response) => {
-        const location = response.headers.get('Location') || url;
-        // Remove user credentials
-        for (let i = 0; i < _storage.length; i++) {
-            const key = _storage.key(i);
-            if (key && key.indexOf(_client_id) >= 0) {
-                _storage.removeItem(key);
-            }
-        }
-        window.location?.assign(location);
-    });
+    }).then(
+        (response) => {
+            const location = response.headers.get('Location') || url;
+            clearCredentials();
+            window.location?.assign(location);
+        },
+        (err) => {
+            log.error('Error logging out:', err);
+            clearCredentials();
+            window.location?.assign(url);
+        },
+    );
+}
+
+/**
+ * @private
+ * Remove stored credentials for the application
+ */
+function clearCredentials(): void {
+    const keys: string[] = [];
+    for (let i = 0; i < _storage.length; i++) {
+        const key = _storage.key(i);
+        if (key && key.indexOf(_client_id) >= 0) keys.push(key);
+    }
+    for (const key of keys) {
+        _storage.removeItem(key);
+    }
+    _access_token.set('');
+    _refresh_token.set('');
+    updateTokenState();
 }
 
 /**
@@ -583,10 +702,16 @@ export function authorizeWithIFrame(url: string): Promise<void> {
                     );
                 }
             };
+            const cleanup = () => {
+                window.removeEventListener('message', callback);
+                if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
+                delete _promises.iframe_auth;
+            };
             timeout(
                 'iframe_auth',
                 () => {
                     log.error('Unable to resolve iFrame after 15 seconds...');
+                    cleanup();
                     reject();
                 },
                 15 * 1000,
@@ -594,7 +719,8 @@ export function authorizeWithIFrame(url: string): Promise<void> {
             window.addEventListener('message', callback);
             iframe.onerror = (_) => {
                 log.error('iFrame error.', _);
-                delete _promises.iframe_auth;
+                clearAsyncTimeout('iframe_auth');
+                cleanup();
                 reject();
             };
             document.body.appendChild(iframe);
@@ -668,6 +794,8 @@ export function checkForAuthParameters(): Promise<boolean> {
                 fragments = JSON.parse(
                     sessionStorage.getItem('ENGINE.auth.params') || '{}',
                 );
+                // Consume stored parameters so stale credentials aren't retried
+                sessionStorage.removeItem('ENGINE.auth.params');
             }
             if (
                 fragments &&
@@ -675,19 +803,6 @@ export function checkForAuthParameters(): Promise<boolean> {
                     fragments.access_token ||
                     fragments.refresh_token)
             ) {
-                // Store authorisation code
-                if (fragments.code) {
-                    _code = fragments.code;
-                    removeFragment('code');
-                }
-                // Store refresh token
-                if (fragments.refresh_token) {
-                    _storage.setItem(
-                        `${_client_id}_refresh_token`,
-                        fragments.refresh_token,
-                    );
-                    removeFragment('refresh_token');
-                }
                 const saved_nonce =
                     _storage.getItem(`${_client_id}_nonce`) || '';
                 const state_parts = (fragments.state || '').split(';');
@@ -696,9 +811,24 @@ export function checkForAuthParameters(): Promise<boolean> {
                 const nonce = state_parts[0];
                 /* istanbul ignore else */
                 if (saved_nonce === nonce) {
+                    // Only accept credentials once the state nonce is validated
+                    if (fragments.code) {
+                        _code = fragments.code;
+                        removeFragment('code');
+                    }
+                    if (fragments.refresh_token) {
+                        _storage.setItem(
+                            `${_client_id}_refresh_token`,
+                            fragments.refresh_token,
+                        );
+                        removeFragment('refresh_token');
+                    }
                     _storeTokenDetails(fragments as any);
                     resolve(!!fragments.access_token);
                 } else {
+                    removeFragment('code');
+                    removeFragment('access_token');
+                    removeFragment('refresh_token');
                     resolve(false);
                 }
             } else {
@@ -747,23 +877,10 @@ export function createLoginURL(state?: string): string {
 
 /**
  * @private
- */
-const AVAILABLE_CHARS =
-    'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('');
-/**
- * @private
  * @param length Length of the challenge string
  */
 export function generateChallenge(length: number = 43) {
-    const challenge = new Array(length)
-        .fill(0)
-        .map(
-            () =>
-                AVAILABLE_CHARS[
-                    Math.floor(Math.random() * AVAILABLE_CHARS.length)
-                ],
-        )
-        .join('');
+    const challenge = generateNonce(length);
     const uint8array = base64.base64ToBytes(base64.base64encode(challenge));
     const verify = base64
         .bytesToBase64(sha256.hash(uint8array))
@@ -785,9 +902,9 @@ export function createRefreshURL(): [string, string] {
     if (refreshToken()) {
         url += `&refresh_token=${encodeURIComponent(refreshToken())}`;
         url += `&grant_type=refresh_token`;
-        const parts = url.split('?');
-        url = parts[0];
-        body = parts[1];
+        const query_index = url.indexOf('?');
+        body = url.slice(query_index + 1);
+        url = url.slice(0, query_index);
     } else {
         url += `&code=${encodeURIComponent(_code)}`;
         url += `&grant_type=authorization_code`;
@@ -884,8 +1001,12 @@ export function generateTokenWithUrl(
             log('Generating new token...');
             const on_error = (err: any) => {
                 log.error('Error generating new tokens:', err);
-                _storage.removeItem(`${_client_id}_refresh_token`);
-                _refresh_token.set('');
+                // Only discard the refresh token when the server explicitly
+                // rejects it, not on network or server errors
+                if (err && err.status >= 400 && err.status < 500) {
+                    _storage.removeItem(`${_client_id}_refresh_token`);
+                    _refresh_token.set('');
+                }
                 updateTokenState();
                 reject();
                 delete _promises.generate_tokens;
