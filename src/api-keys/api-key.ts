@@ -19,6 +19,8 @@ export class PlaceApiKey extends PlaceResource {
     public readonly x_api_key: string;
     public readonly user?: PlaceUser;
     public readonly authority?: PlaceAuthority;
+    public readonly expires_at?: number;
+    public readonly ttl?: number;
 
     constructor(raw_data: Partial<PlaceApiKey> = {}) {
         super(raw_data);
@@ -31,5 +33,7 @@ export class PlaceApiKey extends PlaceResource {
         this.x_api_key = raw_data.x_api_key || '';
         this.user = raw_data.user ? new PlaceUser(raw_data.user) : undefined;
         this.authority = raw_data.authority;
+        this.expires_at = raw_data.expires_at;
+        this.ttl = raw_data.ttl;
     }
 }
