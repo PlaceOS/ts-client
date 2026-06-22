@@ -43,6 +43,11 @@ let _last_total: HashMap<number> = {};
 let _next: string = '';
 
 const pass_fn = (_: any) => _;
+const query_cache_delay = 300;
+const _query_cache: HashMap<{
+    promise: QueryResponse<any>;
+    timeout: ReturnType<typeof setTimeout>;
+}> = {};
 
 /**
  * @private
@@ -51,6 +56,10 @@ export function cleanupAPI() {
     _total = {};
     _last_total = {};
     _next = '';
+    for (const key in _query_cache) {
+        clearTimeout(_query_cache[key].timeout);
+        delete _query_cache[key];
+    }
 }
 
 export type QueryResponse<T> = Promise<{
@@ -70,7 +79,8 @@ export function query<T>(q: QueryParameters<T>): QueryResponse<T> {
     const url = `${endpoint || apiEndpoint()}${path ? '/' + path : ''}${
         query_str ? '?' + query_str : ''
     }`;
-    return get(url).then((resp: HashMap) => {
+    if (_query_cache[url]) return _query_cache[url].promise;
+    const promise = get(url).then((resp: HashMap) => {
         const details = handleHeaders(url, query_str, path);
         return {
             total: details.total || 0,
@@ -91,6 +101,15 @@ export function query<T>(q: QueryParameters<T>): QueryResponse<T> {
                       : [],
         } as any;
     });
+    _query_cache[url] = {
+        promise,
+        timeout: setTimeout(() => delete _query_cache[url], query_cache_delay),
+    };
+    promise.catch(() => {
+        clearTimeout(_query_cache[url]?.timeout);
+        delete _query_cache[url];
+    });
+    return promise;
 }
 
 /**

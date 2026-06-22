@@ -130,6 +130,41 @@ describe('Resource API', () => {
         expect(Resource.lastRequestTotal('resource')).toBe(25);
     });
 
+    test('should reuse identical query requests for 300ms', async () => {
+        const item = { id: 'test', name: 'Test' };
+        (Http.get as any).mockResolvedValue({ results: [item] });
+
+        const first = Resource.query({
+            fn: (_: any) => _,
+            path: 'resource',
+            query_params: { test: true },
+        });
+        const second = Resource.query({
+            fn: (_: any) => _,
+            path: 'resource',
+            query_params: { test: true },
+        });
+
+        expect(first).toBe(second);
+        expect(Http.get).toHaveBeenCalledTimes(1);
+        expect((await first).data).toEqual([item]);
+
+        Resource.query({
+            fn: (_: any) => _,
+            path: 'resource',
+            query_params: { other: true },
+        });
+        expect(Http.get).toHaveBeenCalledTimes(2);
+
+        vi.advanceTimersByTime(300);
+        Resource.query({
+            fn: (_: any) => _,
+            path: 'resource',
+            query_params: { test: true },
+        });
+        expect(Http.get).toHaveBeenCalledTimes(3);
+    });
+
     test('should allow for grabbing the show endpoint for an item', async () => {
         const item = { id: 'test', name: 'Test' };
         await testRequest(
