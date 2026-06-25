@@ -514,6 +514,7 @@ export {
     addSignagePlaylist,
     addSignagePlugin,
     approveSignagePlaylist,
+    listSignageMediaTags,
     listSignagePlaylistApprovers,
     listSignagePlaylistMedia,
     listSignagePlaylistMediaRevisions,
@@ -539,6 +540,7 @@ export {
 } from './signage/functions';
 export type {
     SignageMediaQueryOptions,
+    SignageMediaTagsOptions,
     SignageMetrics,
     SignagePlaylistApprover,
     SignagePlaylistQueryOptions,

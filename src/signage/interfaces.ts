@@ -28,6 +28,12 @@ export interface SignageMediaQueryOptions extends PlaceResourceQueryOptions {
     item_id?: string;
 }
 
+/** Allowable query parameters for signage media tags endpoint */
+export interface SignageMediaTagsOptions {
+    /** ID of the group to scope media tags to */
+    group_id?: string;
+}
+
 /** Allowable query parameters for signage playlists index endpoint */
 export interface SignagePlaylistQueryOptions
     extends PlaceResourceQueryOptions {}

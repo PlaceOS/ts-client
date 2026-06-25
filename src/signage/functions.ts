@@ -6,6 +6,7 @@ import { task } from '../resources/functions';
 import { toQueryString } from '../utilities/api';
 import {
     SignageMediaQueryOptions,
+    SignageMediaTagsOptions,
     SignageMetrics,
     SignagePlaylistApprover,
     SignagePluginQueryOptions,
@@ -65,6 +66,18 @@ function processMedia(item: Partial<SignageMedia>) {
  */
 export function querySignageMedia(query_params: SignageMediaQueryOptions = {}) {
     return query({ query_params, fn: processMedia, path: MEDIA_PATH });
+}
+
+/** List the distinct tags in use by signage media */
+export function listSignageMediaTags(
+    query_params: SignageMediaTagsOptions = {},
+) {
+    return show<string[]>({
+        id: 'tags',
+        query_params,
+        fn: (i) => i as string[],
+        path: MEDIA_PATH,
+    });
 }
 
 /**
