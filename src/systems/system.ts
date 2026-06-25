@@ -1,3 +1,4 @@
+import { getUnixTime } from 'date-fns';
 import { PlaceModule } from '../modules/module';
 import { PlaceResource } from '../resources/resource';
 import { EncryptionLevel } from '../settings/interfaces';
@@ -69,6 +70,8 @@ export class PlaceSystem extends PlaceResource {
     public readonly playlists: readonly string[];
     /** List of security groups with access to the system */
     public readonly security_groups: readonly string[];
+    /** Unix timestamp of the last ping from the signage player UI */
+    public readonly signage_last_seen: number;
     public readonly approval: boolean;
     /** Orientation of the signage system */
     public readonly orientation:
@@ -105,6 +108,8 @@ export class PlaceSystem extends PlaceResource {
         this.security_groups = raw_data.security_groups || [];
         this.orientation = raw_data.orientation || 'unspecified';
         this.approval = raw_data.approval || false;
+        this.signage_last_seen =
+            raw_data.signage_last_seen || getUnixTime(Date.now());
         if (typeof this.settings !== 'object') {
             (this as any).settings = [null, null, null, null];
         }
