@@ -6,6 +6,7 @@ export class SignagePlaylistMedia {
     public readonly playlist_id: string;
     public readonly items: string[];
     public readonly media: SignageMedia[];
+    public readonly schedules: SignagePlaylistItemSchedule[];
     public readonly created_at: number;
     public readonly updated_at: number;
 
@@ -27,6 +28,7 @@ export class SignagePlaylistMedia {
 
         this.items = data.items || [];
         this.media = data.media || [];
+        this.schedules = data.schedules || [];
 
         this.approved = !!data.approved;
         this.approval_requested = !!data.approval_requested;
@@ -47,6 +49,7 @@ export class SignagePlaylistItemSchedule {
     public readonly schedules: SignagePlaylistSchedule[];
     public readonly created_at: number;
     public readonly updated_at: number;
+    public readonly media: SignageMedia;
 
     constructor(data: Partial<SignagePlaylistItemSchedule> = {}) {
         this.id = data.id || '';
@@ -55,6 +58,7 @@ export class SignagePlaylistItemSchedule {
         this.schedules = data.schedules || [];
         this.created_at = data.created_at || 0;
         this.updated_at = data.updated_at || 0;
+        this.media = data.media || new SignageMedia({});
     }
 }
 
