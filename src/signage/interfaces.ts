@@ -22,6 +22,10 @@ export interface SignagePlaylistApprover {
 export interface SignageMediaQueryOptions extends PlaceResourceQueryOptions {
     /** ID of the authority to filter the returned values on */
     authority_id?: string;
+    /** ID of the group to scope media to */
+    group_id?: string;
+    /** Tags to filter media by */
+    tags?: string[] | string;
     /** Ignore state changes to the display media is requested for */
     preview?: boolean;
     /** ID of the currently playing item */

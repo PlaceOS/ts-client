@@ -12,13 +12,13 @@ export type MediaType =
     | 'external_image';
 
 export enum MediaAnimation {
-    Default = 0,
-    Cut,
-    CrossFade,
-    SlideTop,
-    SlideLeft,
-    SlideRight,
-    SlideBottom,
+    Default = 'default',
+    Cut = 'cut',
+    CrossFade = 'cross_fade',
+    SlideTop = 'slide_top',
+    SlideLeft = 'slide_left',
+    SlideRight = 'slide_right',
+    SlideBottom = 'slide_bottom',
 }
 
 export type MediaOrientation =

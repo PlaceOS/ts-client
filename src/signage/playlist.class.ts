@@ -40,6 +40,24 @@ export class SignagePlaylistMedia {
     }
 }
 
+export class SignagePlaylistItemSchedule {
+    public readonly id: string;
+    public readonly playlist_id: string;
+    public readonly item_id: string;
+    public readonly schedules: SignagePlaylistSchedule[];
+    public readonly created_at: number;
+    public readonly updated_at: number;
+
+    constructor(data: Partial<SignagePlaylistItemSchedule> = {}) {
+        this.id = data.id || '';
+        this.playlist_id = data.playlist_id || '';
+        this.item_id = data.item_id || '';
+        this.schedules = data.schedules || [];
+        this.created_at = data.created_at || 0;
+        this.updated_at = data.updated_at || 0;
+    }
+}
+
 export class SignagePlaylist {
     public readonly id: string;
     public readonly created_at: number;
@@ -53,6 +71,7 @@ export class SignagePlaylist {
     public readonly default_animation: MediaAnimation;
     public readonly random: boolean;
     public readonly enabled: boolean;
+    public readonly distribution: boolean;
     public readonly default_duration: number;
     public readonly schedules: SignagePlaylistSchedule[];
     public readonly valid_from?: number;
@@ -71,6 +90,7 @@ export class SignagePlaylist {
         this.default_animation = data.default_animation || MediaAnimation.Cut;
         this.random = data.random || false;
         this.enabled = data.enabled ?? true;
+        this.distribution = data.distribution || false;
         this.default_duration = data.default_duration ?? 15 * 1000;
         this.valid_from = data.valid_from;
         this.valid_until = data.valid_until;

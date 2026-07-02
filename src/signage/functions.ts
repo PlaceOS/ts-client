@@ -1,6 +1,6 @@
 import { create, query, remove, show, update } from '../api';
 import { apiEndpoint } from '../auth';
-import { post } from '../http/functions';
+import { patch, post } from '../http/functions';
 import { HttpJsonOptions } from '../http/interfaces';
 import { task } from '../resources/functions';
 import { toQueryString } from '../utilities/api';
@@ -13,7 +13,11 @@ import {
     SignageShareOptions,
 } from './interfaces';
 import { SignageMedia } from './media.class';
-import { SignagePlaylist, SignagePlaylistMedia } from './playlist.class';
+import {
+    SignagePlaylist,
+    SignagePlaylistItemSchedule,
+    SignagePlaylistMedia,
+} from './playlist.class';
 import { SignagePlugin } from './plugin.class';
 
 /**
@@ -164,6 +168,14 @@ function processPlaylist(item: Partial<SignagePlaylist>) {
     return new SignagePlaylist(item);
 }
 
+function processPlaylistMedia(item: Partial<SignagePlaylistMedia>) {
+    return new SignagePlaylistMedia(item);
+}
+
+function processPlaylistItemSchedule(item: Partial<SignagePlaylistItemSchedule>) {
+    return new SignagePlaylistItemSchedule(item);
+}
+
 /**
  * Query the available playlists
  * @param query_params Query parameters to add the to request URL
@@ -253,8 +265,7 @@ export function listSignagePlaylistMedia(
         task_name: 'media',
         form_data: query_params,
         method: 'get',
-        callback: (value: SignagePlaylistMedia) =>
-            new SignagePlaylistMedia(value),
+        callback: processPlaylistMedia,
         path: PLAYLISTS_PATH,
     });
 }
@@ -274,9 +285,7 @@ export function listSignagePlaylistMediaRevisions(
         form_data: query_params,
         method: 'get',
         callback: (list: SignagePlaylistMedia[]) =>
-            list.map(
-                (item: SignagePlaylistMedia) => new SignagePlaylistMedia(item),
-            ),
+            list.map(processPlaylistMedia),
         path: PLAYLISTS_PATH,
     });
 }
@@ -343,9 +352,35 @@ export function updateSignagePlaylistMedia(id: string, form_data: string[]) {
         form_data,
         method: 'post',
         path: PLAYLISTS_PATH,
-        callback: (value: SignagePlaylistMedia) =>
-            new SignagePlaylistMedia(value),
+        callback: processPlaylistMedia,
     });
+}
+
+/** Add scheduled media to a distribution playlist */
+export function scheduleSignagePlaylistMedia(
+    id: string,
+    form_data: Partial<SignagePlaylistItemSchedule>,
+) {
+    return task({
+        id,
+        task_name: 'media/schedule',
+        form_data,
+        method: 'post',
+        path: PLAYLISTS_PATH,
+        callback: processPlaylistMedia,
+    });
+}
+
+/** Update scheduled media on a playlist */
+export function updateSignagePlaylistMediaSchedule(
+    id: string,
+    item_id: string,
+    form_data: Partial<SignagePlaylistItemSchedule>,
+) {
+    return patch(
+        `${apiEndpoint()}/${PLAYLISTS_PATH}/${id}/media/schedule/${item_id}`,
+        form_data,
+    ).then(processPlaylistItemSchedule);
 }
 
 /** Share one or more playlists into another signage group */

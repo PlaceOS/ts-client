@@ -526,6 +526,7 @@ export {
     removeSignagePlaylist,
     removeSignagePlugin,
     requestApprovalSignagePlaylist,
+    scheduleSignagePlaylistMedia,
     shareSignageMedia,
     shareSignagePlaylists,
     showSignage,
@@ -536,6 +537,7 @@ export {
     updateSignageMedia,
     updateSignagePlaylist,
     updateSignagePlaylistMedia,
+    updateSignagePlaylistMediaSchedule,
     updateSignagePlugin,
 } from './signage/functions';
 export type {
@@ -557,6 +559,7 @@ export {
 } from './signage/media.class';
 export {
     SignagePlaylist,
+    SignagePlaylistItemSchedule,
     SignagePlaylistMedia,
 } from './signage/playlist.class';
 export {
