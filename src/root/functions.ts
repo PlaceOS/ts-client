@@ -40,7 +40,7 @@ export function signal(channel: string, body: HashMap = {}): Promise<void> {
     return post(`${apiEndpoint()}/signal?${q}`, body).then(() => undefined);
 }
 
-/** Recreate Elasticsearch indexes */
+/** @deprecated No-op since PlaceOS moved search to PostgreSQL (PPT-2644); will be removed */
 export function reindex(query_params: ReindexOptions = {}): Promise<void> {
     const q = toQueryString(query_params);
     return post(`${apiEndpoint()}/reindex${q ? '?' + q : ''}`, {}).then(
@@ -48,7 +48,7 @@ export function reindex(query_params: ReindexOptions = {}): Promise<void> {
     );
 }
 
-/** Push all database data into Elasticsearch */
+/** @deprecated No-op since PlaceOS moved search to PostgreSQL (PPT-2644); will be removed */
 export function backfill(): Promise<void> {
     return post(`${apiEndpoint()}/backfill`, {}).then(() => undefined);
 }
