@@ -11,6 +11,13 @@ import {
     SignagePlaylistApprover,
     SignagePluginQueryOptions,
     SignageShareOptions,
+    SignageTemplateApprover,
+    SignageTemplateCreateOptions,
+    SignageTemplateMappingQueryOptions,
+    SignageTemplateQueryOptions,
+    SignageTemplateShareOptions,
+    SignageTemplateShareResult,
+    SignageTemplateShowOptions,
 } from './interfaces';
 import { SignageMedia } from './media.class';
 import {
@@ -19,6 +26,7 @@ import {
     SignagePlaylistMedia,
 } from './playlist.class';
 import { SignagePlugin } from './plugin.class';
+import { SignageTemplate, SignageTemplateMapping } from './template.class';
 
 /**
  * @private
@@ -172,7 +180,9 @@ function processPlaylistMedia(item: Partial<SignagePlaylistMedia>) {
     return new SignagePlaylistMedia(item);
 }
 
-function processPlaylistItemSchedule(item: Partial<SignagePlaylistItemSchedule>) {
+function processPlaylistItemSchedule(
+    item: Partial<SignagePlaylistItemSchedule>,
+) {
     return new SignagePlaylistItemSchedule(item);
 }
 
@@ -473,4 +483,191 @@ export function removeSignagePlugin(
     query_params: Record<string, any> = {},
 ) {
     return remove({ id, query_params, path: PLUGINS_PATH });
+}
+
+/**
+ * @private
+ */
+const TEMPLATES_PATH = 'signage/templates';
+
+/** Convert raw server data to a signage template object */
+function processTemplate(item: Partial<SignageTemplate>) {
+    return new SignageTemplate(item);
+}
+
+/** Query the approved signage templates available to the current authority */
+export function querySignageTemplates(
+    query_params: SignageTemplateQueryOptions = {},
+) {
+    return query({ query_params, fn: processTemplate, path: TEMPLATES_PATH });
+}
+
+/** Get a signage template, resolving a pending draft by default */
+export function showSignageTemplate(
+    id: string,
+    query_params: SignageTemplateShowOptions = {},
+) {
+    return show({
+        id,
+        query_params,
+        fn: processTemplate,
+        path: TEMPLATES_PATH,
+    });
+}
+
+/** Add a new signage template */
+export function addSignageTemplate(
+    form_data: Partial<SignageTemplate>,
+    query_params: SignageTemplateCreateOptions = {},
+) {
+    return create({
+        form_data,
+        query_params,
+        fn: processTemplate,
+        path: TEMPLATES_PATH,
+    });
+}
+
+/** Update a signage template */
+export function updateSignageTemplate(
+    id: string,
+    form_data: Partial<SignageTemplate>,
+    method: 'put' | 'patch' = 'patch',
+) {
+    return update({
+        id,
+        form_data,
+        query_params: {},
+        method,
+        fn: processTemplate,
+        path: TEMPLATES_PATH,
+    });
+}
+
+/** Remove a signage template */
+export function removeSignageTemplate(id: string) {
+    return remove({ id, query_params: {}, path: TEMPLATES_PATH });
+}
+
+/** Discard the pending draft for a signage template */
+export function removeSignageTemplateDraft(id: string) {
+    return task({
+        id,
+        task_name: 'draft',
+        method: 'del',
+        path: TEMPLATES_PATH,
+    });
+}
+
+/** Share one or more templates into another signage group */
+export function shareSignageTemplates(
+    query_params: SignageTemplateShareOptions,
+) {
+    const q = toQueryString(query_params);
+    return post(
+        `${apiEndpoint()}/${TEMPLATES_PATH}/share${q ? '?' + q : ''}`,
+        {},
+    ).then((response) => response as unknown as SignageTemplateShareResult);
+}
+
+/** Approve the pending changes for a signage template */
+export function approveSignageTemplate(id: string) {
+    return task({
+        id,
+        task_name: 'approve',
+        method: 'post',
+        path: TEMPLATES_PATH,
+        callback: processTemplate,
+    });
+}
+
+/** List users who can approve signage templates for a group */
+export function listSignageTemplateApprovers(group_id: string) {
+    return show<SignageTemplateApprover[]>({
+        id: 'approvers',
+        query_params: { group_id },
+        fn: (response) => response as SignageTemplateApprover[],
+        path: TEMPLATES_PATH,
+    });
+}
+
+/** Request approval for a signage template's pending changes */
+export function requestApprovalSignageTemplate(
+    id: string,
+    group_id: string,
+    message: string = '',
+    approver_id?: string,
+) {
+    const q = toQueryString({ group_id, approver_id });
+    return task({
+        id,
+        task_name: `request_approval${q ? '?' + q : ''}`,
+        method: 'post',
+        path: TEMPLATES_PATH,
+        form_data: { message },
+    });
+}
+
+/**
+ * @private
+ */
+const TEMPLATE_MAPPINGS_PATH = 'signage/template_mappings';
+
+/** Convert raw server data to a signage template mapping object */
+function processTemplateMapping(item: Partial<SignageTemplateMapping>) {
+    return new SignageTemplateMapping(item);
+}
+
+/** Query signage template mappings in the current authority */
+export function querySignageTemplateMappings(
+    query_params: SignageTemplateMappingQueryOptions = {},
+) {
+    return query({
+        query_params,
+        fn: processTemplateMapping,
+        path: TEMPLATE_MAPPINGS_PATH,
+    });
+}
+
+/** Get the details of a signage template mapping */
+export function showSignageTemplateMapping(id: string) {
+    return show({
+        id,
+        query_params: {},
+        fn: processTemplateMapping,
+        path: TEMPLATE_MAPPINGS_PATH,
+    });
+}
+
+/** Apply a signage template to a display or zone */
+export function addSignageTemplateMapping(
+    form_data: Partial<SignageTemplateMapping>,
+) {
+    return create({
+        form_data,
+        query_params: {},
+        fn: processTemplateMapping,
+        path: TEMPLATE_MAPPINGS_PATH,
+    });
+}
+
+/** Update the schedule of a signage template mapping */
+export function updateSignageTemplateMapping(
+    id: string,
+    form_data: Partial<SignageTemplateMapping>,
+    method: 'put' | 'patch' = 'patch',
+) {
+    return update({
+        id,
+        form_data,
+        query_params: {},
+        method,
+        fn: processTemplateMapping,
+        path: TEMPLATE_MAPPINGS_PATH,
+    });
+}
+
+/** Remove a signage template mapping */
+export function removeSignageTemplateMapping(id: string) {
+    return remove({ id, query_params: {}, path: TEMPLATE_MAPPINGS_PATH });
 }

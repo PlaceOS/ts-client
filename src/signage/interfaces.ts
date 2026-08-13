@@ -51,6 +51,52 @@ export interface SignagePlaylistRevisionsOptions {
 /** Allowable query parameters for signage plugins index endpoint */
 export interface SignagePluginQueryOptions extends PlaceResourceQueryOptions {}
 
+/** Allowable query parameters for signage templates index endpoint */
+export interface SignageTemplateQueryOptions extends PlaceResourceQueryOptions {
+    /** ID of the group to scope templates to */
+    group_id?: string;
+}
+
+/** Allowable query parameters when creating a signage template */
+export interface SignageTemplateCreateOptions {
+    /** ID of the group to link the new template to */
+    group_id?: string;
+}
+
+/** Allowable query parameters for signage template show endpoint */
+export interface SignageTemplateShowOptions {
+    /** Return the approved template even when a pending draft exists */
+    approved?: boolean;
+}
+
+/** Allowable query parameters for signage template mappings index endpoint */
+export interface SignageTemplateMappingQueryOptions
+    extends PlaceResourceQueryOptions {
+    /** ID of the display to filter mappings by */
+    control_system_id?: string;
+    /** ID of the zone to filter mappings by */
+    zone_id?: string;
+    /** ID of the template to filter mappings by */
+    template_id?: string;
+}
+
+export interface SignageTemplateApprover {
+    id: string;
+    name: string;
+}
+
+export interface SignageTemplateShareOptions {
+    /** Template IDs to share into the target group */
+    items: string[] | string;
+    /** Destination signage group ID */
+    to: string;
+}
+
+export interface SignageTemplateShareResult {
+    linked: string[];
+    already_present: string[];
+}
+
 export interface SignageShareOptions {
     /** Comma separated list of media or playlist IDs */
     items: string;
