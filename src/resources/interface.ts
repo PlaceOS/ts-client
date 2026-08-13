@@ -6,20 +6,17 @@ import { HashMap } from '../utilities/types';
 /** Allowable query parameters for basic index endpoints */
 export interface PlaceResourceQueryOptions {
     /**
-     * Search filter supporting the following syntax
-     * https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-simple-query-string-query.html
+     * Free-text search filter. Words match as prefixes against the resource's
+     * searchable fields (PostgreSQL full-text search); all words must match.
      */
     q?: string;
-    /**
-     * Comma separated list of fields to search.
-     * Accepts wildcard expressions and boost relevance scores using caret ^ operator.
-     */
+    /** @deprecated Ignored by the server since PlaceOS moved search to PostgreSQL (PPT-2644) */
     fields?: string;
-    /** Number of results to return. Defaults to `20`. Max `500` */
+    /** Number of results to return. Defaults to `20`. Max `10000` */
     limit?: number;
-    /** @deprecated Use `ref` for pagination. Offset of the results to return. Max `10000` */
+    /** Offset of the results to return. Max `1000000` */
     offset?: number;
-    /** Token for accessing the next page of results, provided in the `Link` header */
+    /** @deprecated Ignored by the server; pagination follows the `Link` header's offset */
     ref?: string;
     /** Number of milliseconds to cache the query response */
     cache?: number;
