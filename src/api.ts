@@ -517,6 +517,7 @@ export {
     addSignageTemplateMapping,
     approveSignagePlaylist,
     approveSignageTemplate,
+    listSignageMediaTagCounts,
     listSignageMediaTags,
     listSignagePlaylistApprovers,
     listSignagePlaylistMedia,
@@ -542,12 +543,12 @@ export {
     shareSignageTemplates,
     showSignage,
     showSignageMedia,
-    showSignageMetrics,
     showSignagePlaylist,
     showSignagePlugin,
     showSignageTemplate,
     showSignageTemplateMapping,
     updateSignageMedia,
+    updateSignageMetrics,
     updateSignagePlaylist,
     updateSignagePlaylistMedia,
     updateSignagePlaylistMediaSchedule,
@@ -556,6 +557,7 @@ export {
     updateSignageTemplateMapping,
 } from './signage/functions';
 export type {
+    SignageDisplayOptions,
     SignageMediaQueryOptions,
     SignageMediaTagsOptions,
     SignageMetrics,
@@ -564,7 +566,9 @@ export type {
     SignagePlaylistRevisionsOptions,
     SignagePlaylistSchedule,
     SignagePluginQueryOptions,
+    SignageRemoveOptions,
     SignageShareOptions,
+    SignageShareResult,
     SignageTemplateApprover,
     SignageTemplateCreateOptions,
     SignageTemplateMappingQueryOptions,
@@ -587,6 +591,7 @@ export {
 export {
     SignagePlugin,
     type SignagePlaybackType,
+    type SignagePluginType,
 } from './signage/plugin.class';
 export {
     SignageTemplate,

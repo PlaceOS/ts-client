@@ -16,6 +16,7 @@ export class SignagePlaylistMedia {
 
     public readonly approved: boolean;
     public readonly approval_requested: boolean;
+    public readonly requested_by_id: string;
     public readonly approved_by_id: string;
     public readonly approved_by_email: string;
     public readonly approved_by_name: string;
@@ -32,6 +33,7 @@ export class SignagePlaylistMedia {
 
         this.approved = !!data.approved;
         this.approval_requested = !!data.approval_requested;
+        this.requested_by_id = data.requested_by_id || '';
         this.approved_by_id = data.approved_by_id || '';
         this.approved_by_email = data.approved_by_email || '';
         this.approved_by_name = data.approved_by_name || '';

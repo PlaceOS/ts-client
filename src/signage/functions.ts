@@ -5,18 +5,21 @@ import { HttpJsonOptions } from '../http/interfaces';
 import { task } from '../resources/functions';
 import { toQueryString } from '../utilities/api';
 import {
+    SignageDisplayOptions,
     SignageMediaQueryOptions,
     SignageMediaTagsOptions,
     SignageMetrics,
     SignagePlaylistApprover,
+    SignagePlaylistQueryOptions,
+    SignagePlaylistRevisionsOptions,
     SignagePluginQueryOptions,
+    SignageRemoveOptions,
     SignageShareOptions,
+    SignageShareResult,
     SignageTemplateApprover,
     SignageTemplateCreateOptions,
     SignageTemplateMappingQueryOptions,
     SignageTemplateQueryOptions,
-    SignageTemplateShareOptions,
-    SignageTemplateShareResult,
     SignageTemplateShowOptions,
 } from './interfaces';
 import { SignageMedia } from './media.class';
@@ -34,30 +37,29 @@ import { SignageTemplate, SignageTemplateMapping } from './template.class';
 const PATH = 'signage';
 
 /**
- * Get the data for a signage item
- * @param id ID of the signage item to retrieve
+ * Get all the details needed to display signage on a system
+ * @param id ID of the system to display signage for
  * @param query_params Query parameters to add the to request URL
  */
 export function showSignage(
     id: string,
-    query_params: SignageMediaQueryOptions = {},
+    query_params: SignageDisplayOptions = {},
     options?: HttpJsonOptions,
 ) {
     return show({ id, query_params, fn: (r) => r, path: `${PATH}`, options });
 }
 
 /**
- * Get the data for a signage item
- * @param id ID of the signage item to retrieve
- * @param query_params Query parameters to add the to request URL
+ * Post the playback metrics collected by a production player
+ * @param id ID of the system the player is running on
+ * @param metrics Playback counts collected since the last update
  */
-export function showSignageMetrics(id: string) {
+export function updateSignageMetrics(id: string, metrics: SignageMetrics) {
     return task({
         id,
         task_name: `metrics`,
-        form_data: {},
+        form_data: metrics,
         method: 'post',
-        callback: (d) => d as SignageMetrics,
         path: PATH,
     });
 }
@@ -88,6 +90,18 @@ export function listSignageMediaTags(
         id: 'tags',
         query_params,
         fn: (i) => i as string[],
+        path: MEDIA_PATH,
+    });
+}
+
+/** List the distinct tags in use by signage media, with the count of media using each */
+export function listSignageMediaTagCounts(
+    query_params: SignageMediaTagsOptions = {},
+) {
+    return show<Record<string, number>>({
+        id: 'tag_counts',
+        query_params,
+        fn: (i) => i as Record<string, number>,
         path: MEDIA_PATH,
     });
 }
@@ -141,13 +155,14 @@ export function addSignageMedia(form_data: Partial<SignageMedia>) {
 }
 
 /**
- * Remove an media item from the database
+ * Remove a media item from the library, or unlink it from a single group
+ * when `group_id` is set
  * @param id ID of the media item
  * @param query_params Query parameters to add the to request URL
  */
 export function removeSignageMedia(
     id: string,
-    query_params: Record<string, any> = {},
+    query_params: SignageRemoveOptions = {},
 ) {
     return remove({ id, query_params, path: MEDIA_PATH });
 }
@@ -163,7 +178,10 @@ export function mediaThumbnail(id: string): string {
 /** Share one or more media items into another signage group */
 export function shareSignageMedia(query_params: SignageShareOptions) {
     const q = toQueryString(query_params);
-    return post(`${apiEndpoint()}/${MEDIA_PATH}/share${q ? '?' + q : ''}`, {});
+    return post(
+        `${apiEndpoint()}/${MEDIA_PATH}/share${q ? '?' + q : ''}`,
+        {},
+    ).then((response) => response as unknown as SignageShareResult);
 }
 
 /**
@@ -191,7 +209,7 @@ function processPlaylistItemSchedule(
  * @param query_params Query parameters to add the to request URL
  */
 export function querySignagePlaylists(
-    query_params: SignageMediaQueryOptions = {},
+    query_params: SignagePlaylistQueryOptions = {},
 ) {
     return query({ query_params, fn: processPlaylist, path: PLAYLISTS_PATH });
 }
@@ -203,7 +221,7 @@ export function querySignagePlaylists(
  */
 export function showSignagePlaylist(
     id: string,
-    query_params: SignageMediaQueryOptions = {},
+    query_params: SignagePlaylistQueryOptions = {},
 ) {
     return show({
         id,
@@ -262,18 +280,14 @@ export function removeSignagePlaylist(
 }
 
 /**
- * Get media for a playlist
+ * Get the current revision of the media list for a playlist
  * @param id ID of the playlist
- * @param query_params Query parameters to add the to request URL
  */
-export function listSignagePlaylistMedia(
-    id: string,
-    query_params: SignageMediaQueryOptions = {},
-) {
+export function listSignagePlaylistMedia(id: string) {
     return task({
         id,
         task_name: 'media',
-        form_data: query_params,
+        form_data: {},
         method: 'get',
         callback: processPlaylistMedia,
         path: PLAYLISTS_PATH,
@@ -287,7 +301,7 @@ export function listSignagePlaylistMedia(
  */
 export function listSignagePlaylistMediaRevisions(
     id: string,
-    query_params: SignageMediaQueryOptions = {},
+    query_params: SignagePlaylistRevisionsOptions = {},
 ) {
     return task({
         id,
@@ -399,7 +413,7 @@ export function shareSignagePlaylists(query_params: SignageShareOptions) {
     return post(
         `${apiEndpoint()}/${PLAYLISTS_PATH}/share${q ? '?' + q : ''}`,
         {},
-    );
+    ).then((response) => response as unknown as SignageShareResult);
 }
 
 /**
@@ -544,9 +558,15 @@ export function updateSignageTemplate(
     });
 }
 
-/** Remove a signage template */
-export function removeSignageTemplate(id: string) {
-    return remove({ id, query_params: {}, path: TEMPLATES_PATH });
+/**
+ * Remove a signage template, or unlink it from a single group when
+ * `group_id` is set. Pending drafts and group links cascade
+ */
+export function removeSignageTemplate(
+    id: string,
+    query_params: SignageRemoveOptions = {},
+) {
+    return remove({ id, query_params, path: TEMPLATES_PATH });
 }
 
 /** Discard the pending draft for a signage template */
@@ -560,14 +580,12 @@ export function removeSignageTemplateDraft(id: string) {
 }
 
 /** Share one or more templates into another signage group */
-export function shareSignageTemplates(
-    query_params: SignageTemplateShareOptions,
-) {
+export function shareSignageTemplates(query_params: SignageShareOptions) {
     const q = toQueryString(query_params);
     return post(
         `${apiEndpoint()}/${TEMPLATES_PATH}/share${q ? '?' + q : ''}`,
         {},
-    ).then((response) => response as unknown as SignageTemplateShareResult);
+    ).then((response) => response as unknown as SignageShareResult);
 }
 
 /** Approve the pending changes for a signage template */

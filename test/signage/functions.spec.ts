@@ -30,6 +30,75 @@ describe('Signage API', () => {
         });
     });
 
+    test('should allow listing media tag counts', async () => {
+        const spy = vi.spyOn(Resources, 'show');
+        spy.mockImplementation((_) =>
+            Promise.resolve(_.fn!({ promo: 3 }) as any),
+        );
+
+        const counts = await SERVICE.listSignageMediaTagCounts({
+            group_id: 'group-123',
+        });
+
+        expect(counts).toEqual({ promo: 3 });
+        expect(spy).toHaveBeenCalledWith({
+            id: 'tag_counts',
+            query_params: { group_id: 'group-123' },
+            fn: expect.any(Function),
+            path: 'signage/media',
+        });
+    });
+
+    test('should allow unlinking media from a group', async () => {
+        const spy = vi.spyOn(Resources, 'remove');
+        spy.mockResolvedValue({});
+
+        await SERVICE.removeSignageMedia('media-123', {
+            group_id: 'group-123',
+        });
+
+        expect(spy).toHaveBeenCalledWith({
+            id: 'media-123',
+            query_params: { group_id: 'group-123' },
+            path: 'signage/media',
+        });
+    });
+
+    test('should allow unlinking templates from a group', async () => {
+        const spy = vi.spyOn(Resources, 'remove');
+        spy.mockResolvedValue({});
+
+        await SERVICE.removeSignageTemplate('template-123', {
+            group_id: 'group-123',
+        });
+
+        expect(spy).toHaveBeenCalledWith({
+            id: 'template-123',
+            query_params: { group_id: 'group-123' },
+            path: 'signage/templates',
+        });
+    });
+
+    test('should allow posting player metrics', async () => {
+        const spy = vi.spyOn(Resources, 'task');
+        spy.mockResolvedValue({} as any);
+
+        const metrics = {
+            play_through_counts: { 'playlist-123': 2 },
+            playlist_counts: { 'playlist-123': 5 },
+            media_counts: { 'media-123': 7 },
+        };
+        await SERVICE.updateSignageMetrics('sys-123', metrics);
+
+        expect(spy).toHaveBeenCalledWith({
+            id: 'sys-123',
+            task_name: 'metrics',
+            form_data: metrics,
+            method: 'post',
+            path: 'signage',
+        });
+    });
+
     test('should allow scheduling playlist media', async () => {
         const spy = vi.spyOn(Resources, 'task');
         spy.mockImplementation((_) => Promise.resolve(_.callback!({}) as any));

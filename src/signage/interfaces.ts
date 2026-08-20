@@ -1,4 +1,5 @@
 import { PlaceResourceQueryOptions } from '../resources/interface';
+import { SignagePluginType } from './plugin.class';
 
 export interface SignageMetrics {
     play_through_counts: Record<string, number>;
@@ -18,29 +19,42 @@ export interface SignagePlaylistApprover {
     name: string;
 }
 
-/** Allowable query parameters for signage media index endpoint */
-export interface SignageMediaQueryOptions extends PlaceResourceQueryOptions {
-    /** ID of the authority to filter the returned values on */
-    authority_id?: string;
-    /** ID of the group to scope media to */
-    group_id?: string;
-    /** Tags to filter media by */
-    tags?: string[] | string;
-    /** Ignore state changes to the display media is requested for */
-    preview?: boolean;
-    /** ID of the currently playing item */
+/** Allowable query parameters for the signage display endpoint */
+export interface SignageDisplayOptions {
+    /** ID of the currently playing item, if the player is playing content */
     item_id?: string;
+    /** Ignore state changes to the display. Used by the preview player */
+    preview?: boolean;
 }
 
-/** Allowable query parameters for signage media tags endpoint */
+/** Allowable query parameters for signage media index endpoint */
+export interface SignageMediaQueryOptions extends PlaceResourceQueryOptions {
+    /** ID of the group to scope media to */
+    group_id?: string;
+    /** Return media carrying any of these tags */
+    tags?: string[] | string;
+}
+
+/** Allowable query parameters for the signage media tag endpoints */
 export interface SignageMediaTagsOptions {
     /** ID of the group to scope media tags to */
     group_id?: string;
 }
 
+/** Allowable query parameters when removing a media item or template */
+export interface SignageRemoveOptions {
+    /**
+     * Unlink the item from this group instead of deleting it outright.
+     * Requires `Delete` or `Manage` permission on the group
+     */
+    group_id?: string;
+}
+
 /** Allowable query parameters for signage playlists index endpoint */
-export interface SignagePlaylistQueryOptions
-    extends PlaceResourceQueryOptions {}
+export interface SignagePlaylistQueryOptions extends PlaceResourceQueryOptions {
+    /** ID of the group to scope playlists to */
+    group_id?: string;
+}
 
 /** Allowable query parameters for signage playlist media revisions endpoint */
 export interface SignagePlaylistRevisionsOptions {
@@ -49,7 +63,12 @@ export interface SignagePlaylistRevisionsOptions {
 }
 
 /** Allowable query parameters for signage plugins index endpoint */
-export interface SignagePluginQueryOptions extends PlaceResourceQueryOptions {}
+export interface SignagePluginQueryOptions extends PlaceResourceQueryOptions {
+    /** Only return plugins that are enabled */
+    enabled?: boolean;
+    /** Only return plugins of this type */
+    plugin_type?: SignagePluginType;
+}
 
 /** Allowable query parameters for signage templates index endpoint */
 export interface SignageTemplateQueryOptions extends PlaceResourceQueryOptions {
@@ -85,21 +104,24 @@ export interface SignageTemplateApprover {
     name: string;
 }
 
-export interface SignageTemplateShareOptions {
-    /** Template IDs to share into the target group */
+/** Query parameters for the media, playlist and template share endpoints */
+export interface SignageShareOptions {
+    /** IDs of the items to share into the target group */
     items: string[] | string;
     /** Destination signage group ID */
     to: string;
 }
 
-export interface SignageTemplateShareResult {
+/** Result of sharing media, playlists or templates into a group */
+export interface SignageShareResult {
+    /** IDs newly linked to the target group */
     linked: string[];
+    /** IDs already linked to the target group */
     already_present: string[];
 }
 
-export interface SignageShareOptions {
-    /** Comma separated list of media or playlist IDs */
-    items: string;
-    /** Destination signage group ID */
-    to: string;
-}
+/** @deprecated Use {@link SignageShareOptions} */
+export type SignageTemplateShareOptions = SignageShareOptions;
+
+/** @deprecated Use {@link SignageShareResult} */
+export type SignageTemplateShareResult = SignageShareResult;
