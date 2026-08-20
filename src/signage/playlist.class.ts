@@ -84,6 +84,7 @@ export class SignagePlaylist {
     public readonly schedules: SignagePlaylistSchedule[];
     public readonly valid_from?: number;
     public readonly valid_until?: number;
+    public readonly shared_with: { id: string, name: string }[];
 
     constructor(data: Partial<SignagePlaylist>) {
         this.id = data.id || '';
@@ -103,5 +104,6 @@ export class SignagePlaylist {
         this.valid_from = data.valid_from;
         this.valid_until = data.valid_until;
         this.schedules = data.schedules || [];
+        this.shared_with = data.shared_with || [];
     }
 }
