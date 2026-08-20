@@ -49,6 +49,7 @@ export class SignageMedia {
     public readonly valid_from?: number;
     public readonly valid_until?: number;
     public readonly tags: string[];
+    public readonly shared_with: { id: string, name: string }[];
 
     public get media_url() {
         return this.media_id
@@ -82,5 +83,6 @@ export class SignageMedia {
         this.valid_from = data.valid_from;
         this.valid_until = data.valid_until;
         this.tags = data.tags || [];
+        this.shared_with = data.shared_with || [];
     }
 }

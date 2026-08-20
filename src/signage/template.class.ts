@@ -33,6 +33,7 @@ export class SignageTemplate {
     public readonly approved_by_name: string;
     public readonly approved_by_email: string;
     public readonly live_template_id: string;
+    public readonly shared_with: { id: string, name: string }[];
 
     constructor(data: Partial<SignageTemplate> = {}) {
         this.created_at = data.created_at || '';
@@ -52,6 +53,7 @@ export class SignageTemplate {
         this.approved_by_name = data.approved_by_name || '';
         this.approved_by_email = data.approved_by_email || '';
         this.live_template_id = data.live_template_id || '';
+        this.shared_with = data.shared_with || [];
     }
 }
 

@@ -20,6 +20,7 @@ export class SignagePlaylistMedia {
     public readonly approved_by_id: string;
     public readonly approved_by_email: string;
     public readonly approved_by_name: string;
+    public readonly shared_with: { id: string, name: string }[];
 
     constructor(data: Partial<SignagePlaylistMedia> = {}) {
         this.id = data.id || '';
@@ -41,6 +42,7 @@ export class SignagePlaylistMedia {
         this.user_id = data.user_id || '';
         this.user_name = data.user_name || '';
         this.user_email = data.user_email || '';
+        this.shared_with = data.shared_with || [];
     }
 }
 
