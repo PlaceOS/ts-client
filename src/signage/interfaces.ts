@@ -12,6 +12,8 @@ export interface SignagePlaylistSchedule {
     readonly play_period: number;
     readonly play_at?: number;
     readonly play_takeover: boolean;
+    /** Ignore when not truthy */
+    readonly valid_until?: number;
 }
 
 export interface SignagePlaylistApprover {

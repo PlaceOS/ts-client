@@ -1,5 +1,6 @@
 import { getUnixTime } from 'date-fns';
 import { HashMap } from '../utilities/types';
+import { SignagePlaylist } from './playlist.class';
 
 export type MediaType =
     | 'unknown'
@@ -49,7 +50,10 @@ export class SignageMedia {
     public readonly valid_from?: number;
     public readonly valid_until?: number;
     public readonly tags: string[];
+    /** User groups that the media item is shared with. Only set on the show requests result not the query */
     public readonly shared_with: { id: string, name: string }[];
+    /** Playlists that the media item is included within. Only set on the show requests result not the query */
+    public readonly playlists: SignagePlaylist[];
 
     public get media_url() {
         return this.media_id
@@ -84,5 +88,6 @@ export class SignageMedia {
         this.valid_until = data.valid_until;
         this.tags = data.tags || [];
         this.shared_with = data.shared_with || [];
+        this.playlists = data.playlists || [];
     }
 }
