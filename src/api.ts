@@ -512,6 +512,45 @@ export type {
 export { PlaceZone } from './zones/zone';
 
 export {
+    addSignageAIProvider,
+    cancelSignageAIJob,
+    claimSignageAIImage,
+    editSignageImage,
+    generateSignageImage,
+    querySignageAIJobs,
+    querySignageAIProviders,
+    removeSignageAIProvider,
+    showSignageAIJob,
+    showSignageAIProvider,
+    signageAICapabilities,
+    signageAIUsage,
+    testSignageAIProvider,
+    updateSignageAIProvider,
+} from './signage/ai/functions';
+export type {
+    SignageAICapabilities,
+    SignageAIClaimRequest,
+    SignageAIEditRequest,
+    SignageAIGenerateRequest,
+    SignageAIImage,
+    SignageAIJob,
+    SignageAIJobKind,
+    SignageAIJobQueryOptions,
+    SignageAIJobShowOptions,
+    SignageAIJobState,
+    SignageAIModelCapabilities,
+    SignageAIProvider,
+    SignageAIProviderCapabilities,
+    SignageAIProviderQueryOptions,
+    SignageAIProviderRequest,
+    SignageAIProviderTestResult,
+    SignageAIProviderType,
+    SignageAIQuota,
+    SignageAIUsageOptions,
+    SignageAIUsageRow,
+} from './signage/ai/interfaces';
+
+export {
     addSignageMedia,
     addSignagePlaylist,
     addSignagePlugin,
