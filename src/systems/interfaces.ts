@@ -28,6 +28,10 @@ export interface PlaceSystemsQueryOptions extends PlaceResourceQueryOptions {
     trigger_id?: string;
     /** Zone ID to filter the returned values on */
     zone_id?: string;
+    /** Group ID to filter systems by */
+    group_id?: string;
+    /** Only return systems linked to this subsystem */
+    subsystem?: string;
     /** Return systems which are public */
     public?: boolean;
     /** Only return systems that have signage capabilities */

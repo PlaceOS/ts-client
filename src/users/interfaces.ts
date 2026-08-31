@@ -32,6 +32,8 @@ export interface PlaceUserGroupsOptions {
 export interface PlaceUserGroupResponse {
     /** ID of the user */
     id?: string;
+    /** Email address of the user */
+    email?: string;
     /** Groups associated with the user */
     groups: string[];
 }

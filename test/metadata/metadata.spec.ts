@@ -10,6 +10,7 @@ describe('PlaceMetadata', () => {
             name: 'catering',
             description: 'In a galaxy far far away...',
             details: [],
+            schema_id: 'schema-1',
         });
     });
 
@@ -20,8 +21,11 @@ describe('PlaceMetadata', () => {
 
     test('should expose properties', () => {
         expect(metadata.id).toBe('dep-test');
+        expect(metadata.parent_id).toBe('dep-test');
         expect(metadata.name).toBe('catering');
         expect(metadata.description).toBe('In a galaxy far far away...');
         expect(metadata.details).toEqual([]);
+        expect(metadata.schema_id).toBe('schema-1');
+        expect(metadata.schema).toBe('schema-1');
     });
 });

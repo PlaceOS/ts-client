@@ -31,3 +31,11 @@ export interface PlaceMetadataBulkOptions {
     /** Comma separated list of parent/resource IDs */
     parent_ids: string;
 }
+
+/** Payload for renaming a metadata key */
+export interface PlaceMetadataRenamePayload {
+    /** Existing metadata key name */
+    current_name: string;
+    /** New metadata key name */
+    new_name: string;
+}

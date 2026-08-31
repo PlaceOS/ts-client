@@ -2,6 +2,8 @@ import { describe, expect, test, vi } from 'vitest';
 import * as SERVICE from '../../src/metadata/functions';
 import { PlaceMetadata } from '../../src/metadata/metadata';
 import { PlaceZoneMetadata } from '../../src/metadata/zone-metadata';
+import * as Auth from '../../src/auth/functions';
+import * as Http from '../../src/http/functions';
 import * as Resources from '../../src/resources/functions';
 
 describe('Applications API', () => {
@@ -51,5 +53,24 @@ describe('Applications API', () => {
         );
         const item = await SERVICE.listChildMetadata('1', {});
         expect(item[0]).toBeInstanceOf(PlaceZoneMetadata);
+    });
+
+    test('should allow renaming metadata', async () => {
+        vi.spyOn(Auth, 'apiEndpoint').mockReturnValue('/api/engine/v2/');
+        const spy = vi.spyOn(Http, 'patch');
+        spy.mockImplementation(() =>
+            Promise.resolve({ parent_id: '1', name: 'new-name', details: {} }) as any,
+        );
+
+        const item = await SERVICE.renameMetadata('1', {
+            current_name: 'old-name',
+            new_name: 'new-name',
+        });
+
+        expect(item).toBeInstanceOf(PlaceMetadata);
+        expect(spy).toHaveBeenCalledWith('/api/engine/v2/metadata/1/name', {
+            current_name: 'old-name',
+            new_name: 'new-name',
+        });
     });
 });

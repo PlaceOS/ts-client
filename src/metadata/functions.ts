@@ -1,5 +1,5 @@
 import { apiEndpoint } from '../auth/functions';
-import { get } from '../http/functions';
+import { get, patch } from '../http/functions';
 import { create, remove, show, task, update } from '../resources/functions';
 import { toQueryString } from '../utilities/api';
 import { HashMap } from '../utilities/types';
@@ -8,6 +8,7 @@ import {
     PlaceMetadataDeleteOptions,
     PlaceMetadataHistoryOptions,
     PlaceMetadataOptions,
+    PlaceMetadataRenamePayload,
     PlaceZoneMetadataOptions,
 } from './interfaces';
 import { PlaceMetadata } from './metadata';
@@ -132,6 +133,19 @@ export function removeMetadata(
     query_params: PlaceMetadataDeleteOptions,
 ) {
     return remove({ id, query_params, path: PATH });
+}
+
+/**
+ * Rename a metadata key on the given parent resource
+ * @param id ID of the item associated with the metadata
+ * @param form_data Current and new metadata key names
+ */
+export function renameMetadata(
+    id: string,
+    form_data: PlaceMetadataRenamePayload,
+): Promise<PlaceMetadata> {
+    const url = `${apiEndpoint()}${PATH}/${encodeURIComponent(id)}/name`;
+    return patch(url, form_data).then((resp: HashMap) => process(resp));
 }
 
 /**

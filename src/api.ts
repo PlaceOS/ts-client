@@ -230,6 +230,7 @@ export {
     listChildMetadata,
     listMetadata,
     listMetadataHistory,
+    renameMetadata,
     removeMetadata,
     showMetadata,
     updateMetadata,
@@ -239,6 +240,7 @@ export type {
     PlaceMetadataDeleteOptions,
     PlaceMetadataHistoryOptions,
     PlaceMetadataOptions,
+    PlaceMetadataRenamePayload,
     PlaceZoneMetadataOptions,
 } from './metadata/interfaces';
 export { PlaceMetadata } from './metadata/metadata';

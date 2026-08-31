@@ -6,7 +6,7 @@ export interface PlaceModuleQueryOptions extends PlaceResourceQueryOptions {
     as_of?: number;
     /** Only return modules running in this system (query params are ignored if this is provided) */
     control_system_id?: string;
-    /** Return results that connected state matches this value */
+    /** @deprecated Not present in the current API spec */
     connected?: boolean;
     /** Only return instances of this driver */
     driver_id?: string;

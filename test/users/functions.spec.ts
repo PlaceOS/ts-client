@@ -66,16 +66,18 @@ describe('Users API', () => {
         const httpSpy = vi.spyOn(Http, 'get');
         httpSpy.mockImplementation(
             () =>
-                Promise.resolve({
-                    'user@example.com': ['group1', 'group2'],
-                }) as any,
+                Promise.resolve([
+                    { id: 'user-1', email: 'user@example.com', groups: ['group1', 'group2'] },
+                ]) as any,
         );
 
         const result = await SERVICE.queryUserGroups({
             emails: 'user@example.com',
         });
         expect(result).toBeTruthy();
-        expect(result!['user@example.com']).toEqual(['group1', 'group2']);
+        expect(result).toEqual([
+            { id: 'user-1', email: 'user@example.com', groups: ['group1', 'group2'] },
+        ]);
         expect(httpSpy).toHaveBeenCalledWith(
             expect.stringContaining('emails=user%40example.com'),
         );

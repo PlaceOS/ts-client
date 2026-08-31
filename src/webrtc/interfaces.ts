@@ -1,3 +1,4 @@
+import type { PlaceSystem } from '../systems/system';
 import { PlaceResourceQueryOptions } from '../resources/interface';
 
 /** Mapping of available query parameters for the webrtc rooms index endpoint */
@@ -32,36 +33,7 @@ export interface PlaceKickReason {
 /** Details of a WebRTC public chat room */
 export interface PlaceWebrtcRoomDetails {
     /** System information for the room */
-    system?: {
-        created_at?: number;
-        updated_at?: number;
-        name?: string;
-        description?: string;
-        features?: string[];
-        email?: string;
-        bookable?: boolean;
-        public?: boolean;
-        display_name?: string;
-        code?: string;
-        type?: string;
-        capacity?: number;
-        map_id?: string;
-        approval?: boolean;
-        images?: string[];
-        timezone?: Record<string, unknown>;
-        support_url?: string;
-        timetable_url?: string;
-        camera_snapshot_url?: string;
-        camera_url?: string;
-        room_booking_url?: string;
-        version?: number;
-        installed_ui_devices?: number;
-        zones?: string[];
-        modules?: string[];
-        orientation?: 'unspecified' | 'landscape' | 'portrait' | 'square';
-        playlists?: string[];
-        signage?: boolean;
-    };
+    system?: Partial<PlaceSystem>;
 }
 
 /** Member details in a WebRTC chat session */
