@@ -243,7 +243,7 @@ export interface SignageAIProvider {
     name: string;
     /** Vendor the provider talks to */
     provider: SignageAIProviderType;
-    /** Domain the row belongs to. `null` on the shared fallback row */
+    /** Domain the row belongs to, set by the server. `null` on the shared row */
     authority_id: string | null;
     /** Vendor endpoint, for deployments that have their own */
     endpoint: string | null;
@@ -274,8 +274,6 @@ export interface SignageAIProviderRequest {
     name?: string;
     /** Vendor the provider talks to */
     provider?: SignageAIProviderType;
-    /** Domain the row belongs to. Leave unset for the shared fallback row */
-    authority_id?: string;
     /** Vendor credentials, in the shape that vendor expects */
     credentials?: Record<string, any>;
     /** Vendor endpoint, for deployments that have their own */
@@ -294,10 +292,13 @@ export interface SignageAIProviderRequest {
     quotas?: Record<string, number>;
 }
 
-/** Allowable query parameters for the AI providers index endpoint */
+/**
+ * Allowable query parameters for the AI providers index endpoint.
+ *
+ * There is no domain parameter: the endpoint answers for the domain the request
+ * is made against, and another domain's rows are not reachable.
+ */
 export interface SignageAIProviderQueryOptions {
-    /** Return the rows belonging to this domain */
-    authority_id?: string;
     /** Include the shared fallback row. Defaults to `true` */
     include_shared?: boolean;
 }
