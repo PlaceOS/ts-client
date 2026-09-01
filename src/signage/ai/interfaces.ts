@@ -294,9 +294,6 @@ export interface SignageAIProviderRequest {
 
 /**
  * Allowable query parameters for the AI providers index endpoint.
- *
- * There is no domain parameter: the endpoint answers for the domain the request
- * is made against, and another domain's rows are not reachable.
  */
 export interface SignageAIProviderQueryOptions {
     /** Include the shared fallback row. Defaults to `true` */

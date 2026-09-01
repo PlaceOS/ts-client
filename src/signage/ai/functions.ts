@@ -74,11 +74,8 @@ export function editSignageImage(request: SignageAIEditRequest) {
  * Get an image generation job, optionally holding the request open until the
  * job changes.
  *
- * Uses `show` rather than `query` on purpose: a `wait` of up to 25 seconds must
- * not be served from the query dedupe cache, or two pollers share one response
- * and one of them waits twice as long as it asked to. Pass
- * `{ skip_auth_flow: true }` as `options` to stop a failed poll being retried
- * four times before it rejects
+ * Pass `{ skip_auth_flow: true }` as `options` to stop a failed poll being
+ * retried four times before it rejects
  * @param id ID of the job
  * @param query_params Query parameters to add the to request URL
  * @param options Options to add to the request
@@ -99,10 +96,6 @@ export function showSignageAIJob(
 
 /**
  * List recent image generation jobs, for the recent generations list.
- *
- * The endpoint answers with a plain array rather than a paged index, and the
- * list is polled alongside the jobs themselves, so this uses `show` to stay out
- * of the query dedupe cache
  * @param query_params Query parameters to add the to request URL
  */
 export function querySignageAIJobs(
@@ -209,9 +202,6 @@ export function addSignageAIProvider(form_data: SignageAIProviderRequest) {
 
 /**
  * Update an AI provider. Leaving `credentials` out keeps the stored value.
- *
- * Bypasses the `update` helper because that appends `version` to the query
- * string and provider rows are not versioned
  * @param id ID of the provider
  * @param form_data New values for the provider
  * @param method HTTP verb to use on request. Defaults to `patch`
