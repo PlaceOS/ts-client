@@ -49,6 +49,7 @@ describe('Signage AI API', () => {
             prompt: 'A quiet foyer at dawn',
             aspect_ratio: '16:9',
             candidates: 2,
+            use_branding: false,
             group_id: 'group-123',
             idempotency_key: 'key-123',
         };
@@ -192,15 +193,17 @@ describe('Signage AI API', () => {
         );
 
         const result = await SERVICE.querySignageAIProviders({
-            authority_id: 'authority-123',
             include_shared: false,
+            q: 'OpenAI',
+            limit: 10,
         });
 
         expect(result.data[0].id).toBe('provider-123');
         expect(spy).toHaveBeenCalledWith({
             query_params: {
-                authority_id: 'authority-123',
                 include_shared: false,
+                q: 'OpenAI',
+                limit: 10,
             },
             fn: expect.any(Function),
             path: 'signage/ai/providers',

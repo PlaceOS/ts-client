@@ -49,6 +49,33 @@ describe('Signage API', () => {
         });
     });
 
+    test('should allow linking new media and playlists to a group', async () => {
+        const spy = vi.spyOn(Resources, 'create');
+        spy.mockResolvedValue({} as any);
+
+        await SERVICE.addSignageMedia(
+            { name: 'Welcome' },
+            { group_id: 'group-123' },
+        );
+        await SERVICE.addSignagePlaylist(
+            { name: 'Lobby' },
+            { group_id: 'group-123' },
+        );
+
+        expect(spy).toHaveBeenNthCalledWith(1, {
+            form_data: { name: 'Welcome' },
+            query_params: { group_id: 'group-123' },
+            fn: expect.any(Function),
+            path: 'signage/media',
+        });
+        expect(spy).toHaveBeenNthCalledWith(2, {
+            form_data: { name: 'Lobby' },
+            query_params: { group_id: 'group-123' },
+            fn: expect.any(Function),
+            path: 'signage/playlists',
+        });
+    });
+
     test('should allow renaming media tags', async () => {
         vi.spyOn(Auth, 'apiEndpoint').mockReturnValue('/api/engine/v2');
         const spy = vi.spyOn(Http, 'patch');
@@ -103,6 +130,21 @@ describe('Signage API', () => {
             id: 'media-123',
             query_params: { group_id: 'group-123' },
             path: 'signage/media',
+        });
+    });
+
+    test('should allow unlinking playlists from a group', async () => {
+        const spy = vi.spyOn(Resources, 'remove');
+        spy.mockResolvedValue({});
+
+        await SERVICE.removeSignagePlaylist('playlist-123', {
+            group_id: 'group-123',
+        });
+
+        expect(spy).toHaveBeenCalledWith({
+            id: 'playlist-123',
+            query_params: { group_id: 'group-123' },
+            path: 'signage/playlists',
         });
     });
 
@@ -227,11 +269,12 @@ describe('Signage API', () => {
 
         const result = await SERVICE.querySignageTemplates({
             group_id: 'group-123',
+            approved: true,
         });
 
         expect(result.data[0]).toBeInstanceOf(SignageTemplate);
         expect(spy).toHaveBeenCalledWith({
-            query_params: { group_id: 'group-123' },
+            query_params: { group_id: 'group-123', approved: true },
             fn: expect.any(Function),
             path: 'signage/templates',
         });

@@ -5,6 +5,7 @@ import { HttpJsonOptions } from '../http/interfaces';
 import { task } from '../resources/functions';
 import { toQueryString } from '../utilities/api';
 import {
+    SignageCreateOptions,
     SignageDisplayOptions,
     SignageMediaQueryOptions,
     SignageMediaTagRemoveOptions,
@@ -19,7 +20,6 @@ import {
     SignageShareOptions,
     SignageShareResult,
     SignageTemplateApprover,
-    SignageTemplateCreateOptions,
     SignageTemplateMappingQueryOptions,
     SignageTemplateQueryOptions,
     SignageTemplateShowOptions,
@@ -113,9 +113,13 @@ export function renameSignageMediaTag(
     query_params: SignageMediaTagRenameOptions,
 ): Promise<void> {
     const q = toQueryString(query_params);
-    return patch(`${apiEndpoint()}/${MEDIA_PATH}/tags?${q}`, {}, {
-        response_type: 'void',
-    });
+    return patch(
+        `${apiEndpoint()}/${MEDIA_PATH}/tags?${q}`,
+        {},
+        {
+            response_type: 'void',
+        },
+    );
 }
 
 /** Remove a tag, or remove tagged media, in the selected scope */
@@ -167,10 +171,13 @@ export function updateSignageMedia(
  * @param form_data Media item data
  * @param query_params Query parameters to add the to request URL
  */
-export function addSignageMedia(form_data: Partial<SignageMedia>) {
+export function addSignageMedia(
+    form_data: Partial<SignageMedia>,
+    query_params: SignageCreateOptions = {},
+) {
     return create({
         form_data,
-        query_params: {},
+        query_params,
         fn: processMedia,
         path: MEDIA_PATH,
     });
@@ -280,10 +287,13 @@ export function updateSignagePlaylist(
  * @param form_data Playlist data
  * @param query_params Query parameters to add the to request URL
  */
-export function addSignagePlaylist(form_data: Partial<SignagePlaylist>) {
+export function addSignagePlaylist(
+    form_data: Partial<SignagePlaylist>,
+    query_params: SignageCreateOptions = {},
+) {
     return create({
         form_data,
-        query_params: {},
+        query_params,
         fn: processPlaylist,
         path: PLAYLISTS_PATH,
     });
@@ -296,7 +306,7 @@ export function addSignagePlaylist(form_data: Partial<SignagePlaylist>) {
  */
 export function removeSignagePlaylist(
     id: string,
-    query_params: Record<string, any> = {},
+    query_params: SignageRemoveOptions = {},
 ) {
     return remove({ id, query_params, path: PLAYLISTS_PATH });
 }
@@ -554,7 +564,7 @@ export function showSignageTemplate(
 /** Add a new signage template */
 export function addSignageTemplate(
     form_data: Partial<SignageTemplate>,
-    query_params: SignageTemplateCreateOptions = {},
+    query_params: SignageCreateOptions = {},
 ) {
     return create({
         form_data,

@@ -141,6 +141,20 @@ describe('Http', () => {
         expect(data).toBe('MSG Received!!!');
     });
 
+    test('should allow returning blob data for GET', async () => {
+        const blob = new Blob(['image-data'], { type: 'image/png' });
+        window.fetch = vi.fn().mockImplementation(async () => ({
+            status: 200,
+            ok: true,
+            blob: async () => blob,
+            headers: {},
+        }));
+
+        const data = await Http.get('test_url', { response_type: 'blob' });
+
+        expect(data).toBe(blob);
+    });
+
     test('should allow custom headers for GET', async () => {
         expect.assertions(1);
         await Http.get('test_url', {

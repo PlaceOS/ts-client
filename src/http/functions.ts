@@ -12,6 +12,7 @@ import { scoped_log } from '../utilities/general';
 import { waitForSignal } from '../utilities/signal';
 import { HashMap } from '../utilities/types';
 import {
+    HttpBlobOptions,
     HttpJsonOptions,
     HttpOptions,
     HttpResponse,
@@ -50,6 +51,7 @@ export function responseHeaders(
  * @param options Options to add to the request
  */
 export function get(url: string, options?: HttpJsonOptions): Promise<HashMap>;
+export function get(url: string, options: HttpBlobOptions): Promise<Blob>;
 export function get(url: string, options?: HttpTextOptions): Promise<string>;
 export function get(
     url: string,
@@ -219,6 +221,8 @@ export async function transform(
         headers[resp.url || ''] = map;
     }
     switch (type) {
+        case 'blob':
+            return await resp.blob();
         case 'json':
             return await resp.json().catch(() => ({}));
         case 'text':

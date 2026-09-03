@@ -2,6 +2,7 @@
 
 export { del, get, patch, post, put, responseHeaders } from './http/functions';
 export type {
+    HttpBlobOptions,
     HttpError,
     HttpJsonOptions,
     HttpOptions,
@@ -230,8 +231,8 @@ export {
     listChildMetadata,
     listMetadata,
     listMetadataHistory,
-    renameMetadata,
     removeMetadata,
+    renameMetadata,
     showMetadata,
     updateMetadata,
 } from './metadata/functions';
@@ -511,6 +512,9 @@ export type {
 } from './zones/interfaces';
 export { PlaceZone } from './zones/zone';
 
+export { proxyUrl } from './url-proxy/functions';
+export type { UrlProxyOptions } from './url-proxy/functions';
+
 export {
     addSignageAIProvider,
     cancelSignageAIJob,
@@ -577,9 +581,9 @@ export {
     removeSignageTemplate,
     removeSignageTemplateDraft,
     removeSignageTemplateMapping,
+    renameSignageMediaTag,
     requestApprovalSignagePlaylist,
     requestApprovalSignageTemplate,
-    renameSignageMediaTag,
     scheduleSignagePlaylistMedia,
     shareSignageMedia,
     shareSignagePlaylists,
@@ -600,6 +604,7 @@ export {
     updateSignageTemplateMapping,
 } from './signage/functions';
 export type {
+    SignageCreateOptions,
     SignageDisplayOptions,
     SignageMediaQueryOptions,
     SignageMediaTagRemoveOptions,

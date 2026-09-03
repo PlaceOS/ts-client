@@ -3,9 +3,9 @@ import { HashMap } from '../utilities/types';
 /** HTTP request verb. Can be one of either `GET`, `POST`, `PUT`, `PATCH`, or `DELETE` */
 export type HttpVerb = `GET` | `POST` | `PUT` | `PATCH` | `DELETE`;
 
-export type HttpResponseType = 'json' | 'text' | 'void';
+export type HttpResponseType = 'blob' | 'json' | 'text' | 'void';
 
-export type HttpResponse = HashMap | string | void;
+export type HttpResponse = Blob | HashMap | string | void;
 
 export interface HttpOptions {
     headers?: HashMap<string>;
@@ -19,6 +19,10 @@ export interface HttpOptions {
 
 export interface HttpJsonOptions extends HttpOptions {
     response_type?: 'json';
+}
+
+export interface HttpBlobOptions extends HttpOptions {
+    response_type: 'blob';
 }
 
 export interface HttpTextOptions extends HttpOptions {

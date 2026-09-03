@@ -1,3 +1,5 @@
+import { PlaceResourceQueryOptions } from '../../resources/interface';
+
 /** Vendors an AI provider row can be pointed at */
 export type SignageAIProviderType = 'OPENAI' | 'AZURE_OPENAI' | 'GOOGLE_VERTEX';
 
@@ -162,6 +164,8 @@ export interface SignageAIGenerateRequest {
     include_logo?: boolean;
     /** Keep wording out of the image so it can be laid over. Defaults to `true` */
     add_text_with_layer?: boolean;
+    /** Apply the organisation's colours, face and tone. Defaults to `true` */
+    use_branding?: boolean;
     /** Wording the image is being made for, used to leave room for it */
     words?: string;
     /** Provider to use. Defaults to the domain's default provider */
@@ -274,8 +278,10 @@ export interface SignageAIProviderRequest {
     name?: string;
     /** Vendor the provider talks to */
     provider?: SignageAIProviderType;
+    /** Domain for the provider. The server uses the current authority on create */
+    authority_id?: string;
     /** Vendor credentials, in the shape that vendor expects */
-    credentials?: Record<string, any>;
+    credentials?: Record<string, unknown>;
     /** Vendor endpoint, for deployments that have their own */
     endpoint?: string;
     /** Vendor region, for deployments that have one */
@@ -295,7 +301,8 @@ export interface SignageAIProviderRequest {
 /**
  * Allowable query parameters for the AI providers index endpoint.
  */
-export interface SignageAIProviderQueryOptions {
+export interface SignageAIProviderQueryOptions
+    extends PlaceResourceQueryOptions {
     /** Include the shared fallback row. Defaults to `true` */
     include_shared?: boolean;
 }

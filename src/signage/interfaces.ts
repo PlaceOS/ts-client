@@ -43,9 +43,14 @@ export interface SignageMediaTagsOptions {
     group_id?: string;
 }
 
+/** Allowable query parameters when creating signage content */
+export interface SignageCreateOptions {
+    /** Group to link the new item to */
+    group_id?: string;
+}
+
 /** Query parameters for renaming a signage media tag */
-export interface SignageMediaTagRenameOptions
-    extends SignageMediaTagsOptions {
+export interface SignageMediaTagRenameOptions extends SignageMediaTagsOptions {
     /** Existing tag name */
     current_tag: string;
     /** Replacement tag name */
@@ -53,8 +58,7 @@ export interface SignageMediaTagRenameOptions
 }
 
 /** Query parameters for removing a signage media tag */
-export interface SignageMediaTagRemoveOptions
-    extends SignageMediaTagsOptions {
+export interface SignageMediaTagRemoveOptions extends SignageMediaTagsOptions {
     /** Tag name to remove */
     tag: string;
     /** Remove tagged media instead of removing the tag from each item */
@@ -94,13 +98,12 @@ export interface SignagePluginQueryOptions extends PlaceResourceQueryOptions {
 export interface SignageTemplateQueryOptions extends PlaceResourceQueryOptions {
     /** ID of the group to scope templates to */
     group_id?: string;
+    /** Return approved versions instead of pending drafts */
+    approved?: boolean;
 }
 
 /** Allowable query parameters when creating a signage template */
-export interface SignageTemplateCreateOptions {
-    /** ID of the group to link the new template to */
-    group_id?: string;
-}
+export type SignageTemplateCreateOptions = SignageCreateOptions;
 
 /** Allowable query parameters for signage template show endpoint */
 export interface SignageTemplateShowOptions {
