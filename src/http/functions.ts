@@ -152,6 +152,11 @@ export function patch(
 export function patch(
     url: string,
     body: any,
+    options?: HttpVoidOptions,
+): Promise<void>;
+export function patch(
+    url: string,
+    body: any,
     options?: HttpOptions,
     handler: (
         m: HttpVerb,

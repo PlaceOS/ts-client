@@ -49,6 +49,48 @@ describe('Signage API', () => {
         });
     });
 
+    test('should allow renaming media tags', async () => {
+        vi.spyOn(Auth, 'apiEndpoint').mockReturnValue('/api/engine/v2');
+        const spy = vi.spyOn(Http, 'patch');
+        spy.mockResolvedValue();
+
+        await SERVICE.renameSignageMediaTag({
+            current_tag: 'old & tired',
+            new_tag: 'new/tag',
+            group_id: 'group-123',
+        });
+
+        expect(spy).toHaveBeenCalledWith(
+            '/api/engine/v2/signage/media/tags?current_tag=old%20%26%20tired&new_tag=new%2Ftag&group_id=group-123',
+            {},
+            { response_type: 'void' },
+        );
+    });
+
+    test('should allow removing media tags and tagged media', async () => {
+        vi.spyOn(Auth, 'apiEndpoint').mockReturnValue('/api/engine/v2');
+        const spy = vi.spyOn(Http, 'del');
+        spy.mockResolvedValue();
+
+        await SERVICE.removeSignageMediaTag({ tag: 'promo' });
+        await SERVICE.removeSignageMediaTag({
+            tag: 'expired',
+            remove_media: true,
+            group_id: 'group-123',
+        });
+
+        expect(spy).toHaveBeenNthCalledWith(
+            1,
+            '/api/engine/v2/signage/media/tags?tag=promo',
+            { response_type: 'void' },
+        );
+        expect(spy).toHaveBeenNthCalledWith(
+            2,
+            '/api/engine/v2/signage/media/tags?tag=expired&remove_media=true&group_id=group-123',
+            { response_type: 'void' },
+        );
+    });
+
     test('should allow unlinking media from a group', async () => {
         const spy = vi.spyOn(Resources, 'remove');
         spy.mockResolvedValue({});

@@ -1,12 +1,14 @@
 import { create, query, remove, show, update } from '../api';
 import { apiEndpoint } from '../auth';
-import { patch, post } from '../http/functions';
+import { del, patch, post } from '../http/functions';
 import { HttpJsonOptions } from '../http/interfaces';
 import { task } from '../resources/functions';
 import { toQueryString } from '../utilities/api';
 import {
     SignageDisplayOptions,
     SignageMediaQueryOptions,
+    SignageMediaTagRemoveOptions,
+    SignageMediaTagRenameOptions,
     SignageMediaTagsOptions,
     SignageMetrics,
     SignagePlaylistApprover,
@@ -103,6 +105,26 @@ export function listSignageMediaTagCounts(
         query_params,
         fn: (i) => i as Record<string, number>,
         path: MEDIA_PATH,
+    });
+}
+
+/** Rename a tag on all signage media in the selected scope */
+export function renameSignageMediaTag(
+    query_params: SignageMediaTagRenameOptions,
+): Promise<void> {
+    const q = toQueryString(query_params);
+    return patch(`${apiEndpoint()}/${MEDIA_PATH}/tags?${q}`, {}, {
+        response_type: 'void',
+    });
+}
+
+/** Remove a tag, or remove tagged media, in the selected scope */
+export function removeSignageMediaTag(
+    query_params: SignageMediaTagRemoveOptions,
+): Promise<void> {
+    const q = toQueryString(query_params);
+    return del(`${apiEndpoint()}/${MEDIA_PATH}/tags?${q}`, {
+        response_type: 'void',
     });
 }
 

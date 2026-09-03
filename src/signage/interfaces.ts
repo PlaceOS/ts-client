@@ -43,6 +43,24 @@ export interface SignageMediaTagsOptions {
     group_id?: string;
 }
 
+/** Query parameters for renaming a signage media tag */
+export interface SignageMediaTagRenameOptions
+    extends SignageMediaTagsOptions {
+    /** Existing tag name */
+    current_tag: string;
+    /** Replacement tag name */
+    new_tag: string;
+}
+
+/** Query parameters for removing a signage media tag */
+export interface SignageMediaTagRemoveOptions
+    extends SignageMediaTagsOptions {
+    /** Tag name to remove */
+    tag: string;
+    /** Remove tagged media instead of removing the tag from each item */
+    remove_media?: boolean;
+}
+
 /** Allowable query parameters when removing a media item or template */
 export interface SignageRemoveOptions {
     /**
