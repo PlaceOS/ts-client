@@ -74,6 +74,8 @@ export class PlaceUser extends PlaceResource {
     /** Password */
     protected confirm_password = '';
 
+    public readonly deleted?: boolean;
+
     constructor(raw_data: Partial<PlaceUser> = {}) {
         super(raw_data);
         this.authority_id = raw_data.authority_id || '';
@@ -101,5 +103,6 @@ export class PlaceUser extends PlaceResource {
         this.work_preferences = raw_data.work_preferences || [];
         this.work_overrides = raw_data.work_overrides || ({} as any);
         this.locatable = raw_data.locatable ?? true;
+        this.deleted = raw_data.deleted ?? false;
     }
 }
