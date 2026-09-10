@@ -9,7 +9,6 @@ import {
     token,
 } from '../auth/functions';
 import { scoped_log } from '../utilities/general';
-import { waitForSignal } from '../utilities/signal';
 import { HashMap } from '../utilities/types';
 import {
     HttpBlobOptions,
@@ -24,6 +23,29 @@ import {
 import { mockRequest } from './mock';
 
 const log = scoped_log('HTTP');
+const AUTH_WAIT_TIMEOUT = 30_000;
+
+/** Start token renewal before waiting, and release the listener on timeout. */
+async function waitForRequestToken(): Promise<void> {
+    token(false);
+    const token_state = listenForToken();
+    if (token_state.value) return;
+    await new Promise<void>((resolve, reject) => {
+        const timer = setTimeout(() => {
+            unsubscribe();
+            reject(new Error('Timed out waiting for authentication.'));
+        }, AUTH_WAIT_TIMEOUT);
+        const unsubscribe = token_state.subscribe(
+            (ready) => {
+                if (!ready) return;
+                clearTimeout(timer);
+                unsubscribe();
+                resolve();
+            },
+            { emitCurrent: false },
+        );
+    });
+}
 
 /**
  * Method store to allow attaching spies for testing
@@ -306,7 +328,7 @@ export function request(
 
     const performRequest = async () => {
         if (!options.skip_auth) {
-            await waitForSignal(listenForToken(), Boolean);
+            await waitForRequestToken();
             if (token() === 'x-api-key') {
                 options.headers!['X-API-Key'] = apiKey();
             } else {
