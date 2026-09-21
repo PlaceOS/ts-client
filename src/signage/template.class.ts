@@ -26,6 +26,7 @@ export class SignageTemplate {
     public readonly background_item_id: string;
     public readonly layouts: SignageTemplateLayout[];
     public readonly full_screen_takeover: boolean;
+    public readonly merge: boolean;
     public readonly approval_requested: boolean;
     public readonly requested_by_id: string;
     public readonly approved: boolean;
@@ -46,6 +47,7 @@ export class SignageTemplate {
         this.background_item_id = data.background_item_id || '';
         this.layouts = data.layouts || [];
         this.full_screen_takeover = data.full_screen_takeover || false;
+        this.merge = data.merge ?? false;
         this.approval_requested = data.approval_requested || false;
         this.requested_by_id = data.requested_by_id || '';
         this.approved = data.approved || false;

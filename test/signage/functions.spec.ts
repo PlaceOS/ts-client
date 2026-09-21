@@ -273,6 +273,7 @@ describe('Signage API', () => {
         });
 
         expect(result.data[0]).toBeInstanceOf(SignageTemplate);
+        expect(result.data[0].merge).toBe(false);
         expect(spy).toHaveBeenCalledWith({
             query_params: { group_id: 'group-123', approved: true },
             fn: expect.any(Function),
@@ -280,25 +281,29 @@ describe('Signage API', () => {
         });
     });
 
-    test('should allow creating signage templates in a group', async () => {
-        const spy = vi.spyOn(Resources, 'create');
-        spy.mockImplementation((_) =>
-            Promise.resolve(_.fn!({ id: 'template-123', ..._.form_data })),
-        );
+    test.each([false, true])(
+        'should allow creating signage templates in a group with merge=%s',
+        async (merge) => {
+            const spy = vi.spyOn(Resources, 'create');
+            spy.mockImplementation((_) =>
+                Promise.resolve(_.fn!({ id: 'template-123', ..._.form_data })),
+            );
 
-        const template = await SERVICE.addSignageTemplate(
-            { name: 'Welcome' },
-            { group_id: 'group-123' },
-        );
+            const template = await SERVICE.addSignageTemplate(
+                { name: 'Welcome', merge },
+                { group_id: 'group-123' },
+            );
 
-        expect(template).toBeInstanceOf(SignageTemplate);
-        expect(spy).toHaveBeenCalledWith({
-            form_data: { name: 'Welcome' },
-            query_params: { group_id: 'group-123' },
-            fn: expect.any(Function),
-            path: 'signage/templates',
-        });
-    });
+            expect(template).toBeInstanceOf(SignageTemplate);
+            expect(template.merge).toBe(merge);
+            expect(spy).toHaveBeenCalledWith({
+                form_data: { name: 'Welcome', merge },
+                query_params: { group_id: 'group-123' },
+                fn: expect.any(Function),
+                path: 'signage/templates',
+            });
+        },
+    );
 
     test('should allow managing signage template approval', async () => {
         const spy = vi.spyOn(Resources, 'task');
