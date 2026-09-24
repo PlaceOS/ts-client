@@ -14,6 +14,12 @@ export interface PlaceCurrentGroupQueryOptions {
     subsystem?: string;
 }
 
+/** Mapping of available query parameters for the group features endpoint */
+export interface PlaceGroupFeaturesQueryOptions {
+    /** Only return features for this subsystem */
+    subsystem?: string;
+}
+
 /** Mapping of available query parameters for the group history index endpoint */
 export interface PlaceGroupHistoryQueryOptions
     extends PlaceResourceQueryOptions {

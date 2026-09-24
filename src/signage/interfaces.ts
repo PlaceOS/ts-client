@@ -12,8 +12,15 @@ export interface SignagePlaylistSchedule {
     readonly play_period: number;
     readonly play_at?: number;
     readonly play_takeover: boolean;
+    /** Unix epoch seconds this schedule becomes valid. Required when `mask` is set */
+    readonly valid_from?: number;
     /** Ignore when not truthy */
     readonly valid_until?: number;
+    /**
+     * Bitmask of `0`s and `1`s (max 128 chars). Active when not empty.
+     * Requires `valid_from`
+     */
+    readonly mask?: string;
 }
 
 export interface SignagePlaylistApprover {

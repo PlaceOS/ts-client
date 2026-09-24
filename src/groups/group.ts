@@ -16,6 +16,11 @@ export class PlaceGroup {
     public readonly authority_id: string;
     /** ID of the parent group */
     public readonly parent_id: string;
+    /**
+     * Feature flags per subsystem, i.e. `{ signage: { templates: true } }`.
+     * Child groups inherit and can override ancestor keys
+     */
+    public readonly features: PlaceGroupFeatures;
     /** Count of child groups for this group */
     public readonly children_count?: number;
 
@@ -28,11 +33,15 @@ export class PlaceGroup {
         this.subsystems = raw_data.subsystems || [];
         this.authority_id = raw_data.authority_id || '';
         this.parent_id = raw_data.parent_id || '';
+        this.features = raw_data.features || {};
         if (isFinite(Number(raw_data.children_count))) {
             this.children_count = raw_data.children_count;
         }
     }
 }
+
+/** Feature flags keyed by subsystem, then by feature key */
+export type PlaceGroupFeatures = Record<string, Record<string, unknown>>;
 
 /** Groups the current user is a member of with effective permissions. */
 export interface PlaceCurrentGroup {

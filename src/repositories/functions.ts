@@ -14,6 +14,7 @@ import {
     PlaceRemoteRepositoryQuery,
     PlaceRepositoryCommitQuery,
     PlaceRepositoryDetailsQuery,
+    PlaceRepositoryFilesQuery,
     PlaceRepositoryFoldersQuery,
     PlaceRepositoryPullQuery,
     PlaceRepositoryQueryOptions,
@@ -295,6 +296,25 @@ export function listRepositoryFolders(
     return task({
         id,
         task_name: 'folders',
+        form_data: query_params,
+        method: 'get',
+        path: PATH,
+    });
+}
+
+/**
+ * List the files in an interface repository that match a glob pattern.
+ * Paths are relative to where they are served, i.e. `/<folder_name>/path/to/file.html`
+ * @param id ID of the repository
+ * @param query_params Glob pattern to match files against
+ */
+export function listRepositoryFiles(
+    id: string,
+    query_params: PlaceRepositoryFilesQuery,
+): Promise<string[]> {
+    return task({
+        id,
+        task_name: 'files',
         form_data: query_params,
         method: 'get',
         path: PATH,

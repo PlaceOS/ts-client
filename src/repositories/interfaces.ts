@@ -9,7 +9,8 @@ export enum PlaceRepositoryType {
 }
 
 /** Mapping of available query parameters for the repositories index endpoint */
-export interface PlaceRepositoryQueryOptions extends PlaceResourceQueryOptions {}
+export interface PlaceRepositoryQueryOptions
+    extends PlaceResourceQueryOptions {}
 
 /** Query parameters for repository commit listing */
 export interface PlaceRepositoryCommitQuery {
@@ -57,7 +58,8 @@ export interface PlaceRemoteRepositoryQuery {
 }
 
 /** Query parameters for remote repository commits */
-export interface PlaceRemoteRepositoryCommitsQuery extends PlaceRemoteRepositoryQuery {
+export interface PlaceRemoteRepositoryCommitsQuery
+    extends PlaceRemoteRepositoryQuery {
     /** The branch to grab commits from */
     branch?: string;
     /** The number of commits to return */
@@ -68,6 +70,15 @@ export interface PlaceRemoteRepositoryCommitsQuery extends PlaceRemoteRepository
 export interface PlaceRepositoryFoldersQuery {
     /** Include dot files and folders */
     include_dots?: boolean;
+}
+
+/** Query parameters for repository files listing */
+export interface PlaceRepositoryFilesQuery {
+    /**
+     * Glob pattern. Without a `/` it matches file names at any depth,
+     * otherwise the full path (use `**` to recurse)
+     */
+    pattern: string;
 }
 
 /** Metadata for a repository commit */

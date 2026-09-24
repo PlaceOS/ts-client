@@ -4,7 +4,7 @@ import { del, get, patch, post, put } from '../http/functions';
 import { query } from '../resources/functions';
 import { toQueryString } from '../utilities/api';
 import { HashMap } from '../utilities/types';
-import { PlaceCurrentGroup, PlaceGroup } from './group';
+import { PlaceCurrentGroup, PlaceGroup, PlaceGroupFeatures } from './group';
 import { PlaceGroupHistory } from './group-history';
 import {
     PlaceGroupInvitation,
@@ -13,6 +13,7 @@ import {
 } from './group-invitation';
 import {
     PlaceCurrentGroupQueryOptions,
+    PlaceGroupFeaturesQueryOptions,
     PlaceGroupHistoryQueryOptions,
     PlaceGroupInvitationQueryOptions,
     PlaceGroupQueryOptions,
@@ -60,6 +61,19 @@ export function currentGroups(
             permissions: item.permissions || 0,
         })),
     );
+}
+
+/**
+ * Get the effective feature flags for a group.
+ * The group's own features are merged over its ancestors', deepest group wins
+ */
+export function showGroupFeatures(
+    id: string,
+    query_params: PlaceGroupFeaturesQueryOptions = {},
+): Promise<PlaceGroupFeatures> {
+    const q = toQueryString(query_params);
+    const url = `${apiEndpoint()}/${PATH}/${encodeURIComponent(id)}/features${q ? '?' + q : ''}`;
+    return get(url).then((resp: HashMap) => (resp || {}) as PlaceGroupFeatures);
 }
 
 /** Add a new group */

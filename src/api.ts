@@ -176,12 +176,13 @@ export {
     removeGroup,
     removeGroupInvitation,
     showGroup,
+    showGroupFeatures,
     showGroupHistory,
     showGroupInvitation,
     updateGroup,
 } from './groups/functions';
 export { PlaceGroup } from './groups/group';
-export type { PlaceCurrentGroup } from './groups/group';
+export type { PlaceCurrentGroup, PlaceGroupFeatures } from './groups/group';
 export { PlaceGroupHistory } from './groups/group-history';
 export { PlaceGroupInvitation } from './groups/group-invitation';
 export type {
@@ -190,6 +191,7 @@ export type {
 } from './groups/group-invitation';
 export type {
     PlaceCurrentGroupQueryOptions,
+    PlaceGroupFeaturesQueryOptions,
     PlaceGroupHistoryQueryOptions,
     PlaceGroupInvitationQueryOptions,
     PlaceGroupQueryOptions,
@@ -313,6 +315,7 @@ export {
     listRepositoryDefaultBranch,
     listRepositoryDriverDetails,
     listRepositoryDrivers,
+    listRepositoryFiles,
     listRepositoryFolders,
     pullRepositoryChanges,
     queryRepositories,
@@ -328,6 +331,7 @@ export type {
     PlaceRepositoryCommit,
     PlaceRepositoryCommitQuery,
     PlaceRepositoryDetailsQuery,
+    PlaceRepositoryFilesQuery,
     PlaceRepositoryFoldersQuery,
     PlaceRepositoryPullQuery,
     PlaceRepositoryQueryOptions,

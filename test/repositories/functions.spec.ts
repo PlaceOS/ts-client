@@ -160,4 +160,20 @@ describe('Repositories API', () => {
             include_dots: true,
         });
     });
+
+    test('should allow listing repository files by pattern', async () => {
+        const spy = vi.spyOn(Resources, 'task');
+        spy.mockImplementation(() => Promise.resolve(['/plugins/index.html']));
+        const files = await SERVICE.listRepositoryFiles('1', {
+            pattern: '*.html',
+        });
+        expect(files).toEqual(['/plugins/index.html']);
+        expect(spy).toHaveBeenCalledWith({
+            id: '1',
+            task_name: 'files',
+            form_data: { pattern: '*.html' },
+            method: 'get',
+            path: 'repositories',
+        });
+    });
 });
