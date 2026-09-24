@@ -460,13 +460,13 @@ export function authorise(
     state?: string,
     api_authority: PlaceAuthority = _authority as PlaceAuthority,
 ): Promise<string> {
+    // Reject without caching. A cached rejection blocks every later authorise.
+    if (!_promises.authorise && !api_authority) {
+        return Promise.reject('Authority is not loaded');
+    }
     /* istanbul ignore else */
     if (!_promises.authorise) {
         _promises.authorise = new Promise<string>((resolve, reject) => {
-            if (!api_authority) {
-                delete _promises.authorise;
-                return reject('Authority is not loaded');
-            }
             log('Authorising user...');
             const after_check = () => {
                 if (token(false)) {
@@ -652,6 +652,11 @@ export function loadAuthority(tries: number = 0): Promise<void> {
  * @param state
  */
 export async function sendToAuthorize(state?: string): Promise<void> {
+    // Join the in-flight iFrame. A new login URL replaces the stored PKCE
+    // verifier and the pending code exchange then fails.
+    if (_options.use_iframe && _promises.iframe_auth) {
+        return _promises.iframe_auth;
+    }
     const auth_url = createLoginURL(state);
     if (_options.use_iframe) {
         return authorizeWithIFrame(auth_url);

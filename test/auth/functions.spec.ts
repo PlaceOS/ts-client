@@ -229,6 +229,43 @@ describe('Auth', () => {
         });
     });
 
+    test('should authorise after failing before authority loaded', async () => {
+        await Auth.authorise().catch(() => null);
+        await Auth.setup({
+            auth_uri: '/auth/oauth/authorize',
+            token_uri: '',
+            redirect_uri: '',
+            scope: 'public',
+        });
+        expect(window.location.assign).toHaveBeenCalledWith(
+            expect.stringContaining('/auth/oauth/authorize'),
+        );
+    });
+
+    test('should keep the PKCE verifier while an iFrame auth is in flight', async () => {
+        window.fetch = vi.fn().mockImplementation(async () => ({
+            ok: true,
+            json: async () => ({ version: '1.0.0', session: false }),
+        }));
+        await Auth.setup({
+            auth_uri: '/auth/oauth/authorize',
+            token_uri: '',
+            redirect_uri: '',
+            scope: 'public',
+            auth_type: 'auth_code',
+            use_iframe: true,
+            handle_login: false,
+        });
+        Auth.sendToAuthorize().catch(() => null);
+        const key = `${Auth.clientId()}_challenge`;
+        const verifier = sessionStorage.getItem(key);
+        expect(verifier).toBeTruthy();
+        Auth.sendToAuthorize().catch(() => null);
+        expect(sessionStorage.getItem(key)).toBe(verifier);
+        expect(document.querySelectorAll('#place-authorize')).toHaveLength(1);
+        document.getElementById('place-authorize')?.remove();
+    });
+
     // test('should redirect to login when user has no session', async (done) => {
     //     window.fetch = vi.fn().mockImplementation(async () => ({
     //         ok: true,
