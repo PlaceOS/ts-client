@@ -10,7 +10,13 @@ export interface SignageMetrics {
 export interface SignagePlaylistSchedule {
     readonly play_cron: string;
     readonly play_period: number;
+    /** One-off play time as unix epoch seconds. Do not set with `play_at_local` */
     readonly play_at?: number;
+    /**
+     * One-off play time in the local timezone of the display.
+     * ISO 8601 with no offset, e.g. `2027-01-01T00:00:00`. Do not set with `play_at`
+     */
+    readonly play_at_local?: string;
     readonly play_takeover: boolean;
     /** Unix epoch seconds this schedule becomes valid. Required when `mask` is set */
     readonly valid_from?: number;
