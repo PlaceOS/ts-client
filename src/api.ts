@@ -182,7 +182,11 @@ export {
     updateGroup,
 } from './groups/functions';
 export { PlaceGroup } from './groups/group';
-export type { PlaceCurrentGroup, PlaceGroupFeatures } from './groups/group';
+export type {
+    PlaceCurrentGroup,
+    PlaceGroupAdMappings,
+    PlaceGroupFeatures,
+} from './groups/group';
 export { PlaceGroupHistory } from './groups/group-history';
 export { PlaceGroupInvitation } from './groups/group-invitation';
 export type {

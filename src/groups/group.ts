@@ -21,6 +21,10 @@ export class PlaceGroup {
      * Child groups inherit and can override ancestor keys
      */
     public readonly features: PlaceGroupFeatures;
+    /** Permission bitmask given to users added without explicit permissions */
+    public readonly default_permissions: number;
+    /** AD group ID mapped to its display name and permission bitmask */
+    public readonly ad_group_mappings: PlaceGroupAdMappings;
     /** Count of child groups for this group */
     public readonly children_count?: number;
 
@@ -34,6 +38,8 @@ export class PlaceGroup {
         this.authority_id = raw_data.authority_id || '';
         this.parent_id = raw_data.parent_id || '';
         this.features = raw_data.features || {};
+        this.default_permissions = raw_data.default_permissions || 0;
+        this.ad_group_mappings = raw_data.ad_group_mappings || {};
         if (isFinite(Number(raw_data.children_count))) {
             this.children_count = raw_data.children_count;
         }
@@ -42,6 +48,12 @@ export class PlaceGroup {
 
 /** Feature flags keyed by subsystem, then by feature key */
 export type PlaceGroupFeatures = Record<string, Record<string, unknown>>;
+
+/**
+ * AD group ID mapped to `[display name, permission bitmask]`.
+ * Users in a mapped AD group are added to the group automatically
+ */
+export type PlaceGroupAdMappings = Record<string, [string, number]>;
 
 /** Groups the current user is a member of with effective permissions. */
 export interface PlaceCurrentGroup {

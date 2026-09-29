@@ -15,6 +15,8 @@ export class PlaceGroupUser {
     public readonly group_id: string;
     /** Permission bitmask granted by this association */
     public readonly permissions: number;
+    /** AD group ID that added this membership. Empty when added manually */
+    public readonly auto_assigned: string;
     /** Group details included by the API when available */
     public readonly group?: PlaceGroup;
     /** User details included by the API when available */
@@ -26,6 +28,7 @@ export class PlaceGroupUser {
         this.user_id = raw_data.user_id || '';
         this.group_id = raw_data.group_id || '';
         this.permissions = raw_data.permissions || 0;
+        this.auto_assigned = raw_data.auto_assigned || '';
         this.group = raw_data.group
             ? new PlaceGroup(raw_data.group)
             : undefined;
