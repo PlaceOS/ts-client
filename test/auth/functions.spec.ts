@@ -457,6 +457,50 @@ describe('Auth', () => {
         expect(sessionStorage.getItem('ENGINE.auth.params')).toBeNull();
     });
 
+    test('should exchange an Entra token when no other credentials exist', async () => {
+        (window.fetch as any)
+            .mockImplementationOnce(async () => ({
+                ok: true,
+                json: async () =>
+                    ({
+                        version: '2.0.0',
+                        login_url: '/login?continue={{url}}',
+                        session: false,
+                    }) as PlaceAuthority,
+            }))
+            .mockImplementationOnce(async () => ({
+                ok: true,
+                json: async () => ({
+                    access_token: 'placeos',
+                    refresh_token: 'refresh',
+                    expires_in: 3600,
+                    issued_token_type:
+                        'urn:ietf:params:oauth:token-type:access_token',
+                }),
+            }));
+        await Auth.setup({
+            auth_uri: '',
+            token_uri: '/auth/oauth/token',
+            redirect_uri: '/addin',
+            scope: 'public',
+            entra_token: async () => 'entra-jwt',
+        });
+        expect(Auth.token()).toBe('placeos');
+        expect(window.location.assign).not.toHaveBeenCalled();
+        const [url, init] = (window.fetch as any).mock.calls[1];
+        const body = new URLSearchParams(init.body);
+        expect(url).toBe('/auth/oauth/token');
+        expect(body.get('grant_type')).toBe(
+            'urn:ietf:params:oauth:grant-type:token-exchange',
+        );
+        expect(body.get('client_id')).toBe(Md5.hashStr('/addin'));
+        expect(body.get('subject_token')).toBe('entra-jwt');
+        expect(body.get('subject_token_type')).toBe(
+            'urn:ietf:params:oauth:token-type:access_token',
+        );
+        expect(body.get('scope')).toBe('public');
+    });
+
     test('should complete auth on focus with params stored while backgrounded', async () => {
         (window.fetch as any)
             .mockImplementationOnce(async () => ({

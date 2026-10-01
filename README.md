@@ -44,6 +44,29 @@ The setup method takes a `config` object with the following properties
 | `username`       | Username to use for basic authentication                | Yes      | `string`                   | `"user@place.os"`          |
 | `password`       | Password to use for basic authentication                | Yes      | `string`                   | `"hard-to-guest-password"` |
 | `auth_type`      | Type of authentication to perform                       | Yes      | `"implicit" \| "password"` | `"implicit"`               |
+| `entra_token`    | Get a Microsoft Entra access token to exchange          | Yes      | `() => Promise<string>`    | `getAccessToken`           |
+
+#### Microsoft Entra token exchange
+
+Apps that are signed in to Microsoft (for example, an Outlook add-in) can exchange the Entra access token for PlaceOS tokens. The user does not have to sign in again.
+
+Set `entra_token` to a function that gets the Entra access token. When no other credentials are available, `authorise` sends the token to `token_uri` with the RFC 8693 token exchange grant.
+
+```typescript
+import { setup } from '@placeos/ts-client';
+
+await setup({
+    auth_uri: '/auth/oauth/authorize',
+    token_uri: '/auth/oauth/token',
+    redirect_uri: `${location.origin}/addin/oauth-resp.html`,
+    scope: 'public',
+    entra_token: () => Office.auth.getAccessToken({ allowSignInPrompt: true }),
+});
+```
+
+You can also call `exchangeEntraToken(token)` directly.
+
+The PlaceOS domain must have an Entra OAuth source for a single tenant. Refer to the [auth.cr documentation](https://github.com/PlaceOS/auth.cr/blob/master/README.md#microsoft-entra-token-exchange) for the server requirements.
 
 #### Local Development with live environments
 

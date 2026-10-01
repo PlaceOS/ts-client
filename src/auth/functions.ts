@@ -500,6 +500,13 @@ export function authorise(
                         );
                         generateToken().then(...token_handlers);
                         _failed_count = 0;
+                    } else if (_options.entra_token) {
+                        log('Exchanging Entra token...');
+                        _options
+                            .entra_token()
+                            .then(exchangeEntraToken)
+                            .then(...token_handlers);
+                        _failed_count = 0;
                     } else {
                         if (api_authority!.session) {
                             log(
@@ -990,6 +997,23 @@ export function generateToken() {
  */
 export function generateTokenWithCredentials(options: PlaceAuthOptions) {
     return generateTokenWithUrl(createCredentialsURL(options));
+}
+
+/**
+ * Exchange a Microsoft Entra access token for PlaceOS tokens (RFC 8693).
+ * Use in apps already signed in to Microsoft, e.g. Outlook add-ins.
+ * @param subject_token Entra access token for the user
+ */
+export function exchangeEntraToken(subject_token: string): Promise<void> {
+    const body = toQueryString({
+        grant_type: 'urn:ietf:params:oauth:grant-type:token-exchange',
+        client_id: _client_id,
+        client_secret: _options.client_secret,
+        subject_token,
+        subject_token_type: 'urn:ietf:params:oauth:token-type:access_token',
+        scope: _options.scope,
+    });
+    return generateTokenWithUrl(_options.token_uri || '/auth/token', body);
 }
 
 /**

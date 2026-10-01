@@ -7,6 +7,7 @@ export {
     authority,
     cleanupAuth,
     clientId,
+    exchangeEntraToken,
     handleAuthRedirect,
     hasToken,
     host,

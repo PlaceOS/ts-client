@@ -87,6 +87,12 @@ export interface PlaceAuthOptions {
     ignore_api_key?: boolean;
     /** Delay authentication by X milliseconds */
     delay?: number;
+    /**
+     * Get a Microsoft Entra access token for the user, e.g. `Office.auth.getAccessToken`.
+     * When set, `authorise` exchanges this token for PlaceOS tokens
+     * (RFC 8693) when no other credentials are available.
+     */
+    entra_token?: () => Promise<string>;
 }
 
 export interface PlaceTokenResponse {
@@ -96,4 +102,6 @@ export interface PlaceTokenResponse {
     refresh_token: string;
     /** Time in seconds with which the token expires */
     expires_in: string;
+    /** Type of the issued token. Only set for token exchange responses */
+    issued_token_type?: string;
 }
