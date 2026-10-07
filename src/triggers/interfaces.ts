@@ -2,7 +2,10 @@ import { PlaceResourceQueryOptions } from '../resources/interface';
 import { HashMap } from '../utilities/types';
 
 /** Mapping of available query parameters for the triggers index endpoint */
-export interface PlaceTriggerQueryOptions extends PlaceResourceQueryOptions {}
+export interface PlaceTriggerQueryOptions extends PlaceResourceQueryOptions {
+    /** Only triggers bound to systems owned by this organisation; templates are always included */
+    organisation_id?: string;
+}
 
 /** Mapping of available query parameters for the triggers show endpoint */
 export interface PlaceTriggerShowOptions {

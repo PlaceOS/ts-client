@@ -2,6 +2,8 @@ import { PlaceResourceQueryOptions } from '../resources/interface';
 
 /** Mapping of available query parameters for the zones index endpoint */
 export interface PlaceZoneQueryOptions extends PlaceResourceQueryOptions {
+    /** Only zones owned by this organisation (must be within reach) */
+    organisation_id?: string;
     /** ID of the parent zone to filter the results (supports comma-separated list) */
     parent_id?: string;
     /** List of space separated tags to filter the results */
