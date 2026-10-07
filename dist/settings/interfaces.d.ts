@@ -1,0 +1,24 @@
+import { PlaceResourceQueryOptions } from '../resources/interface';
+/** Access level for the settings string */
+export declare enum EncryptionLevel {
+    /** Full access to the settings string */
+    None = 0,
+    /** Only support users are allowed to view the settings contents */
+    Support = 1,
+    /** Only admin users are allowed to view the settings contents */
+    Admin = 2,
+    /** Never show the settings contents */
+    NeverDisplay = 3
+}
+/** Allowable query parameters for settings index endpoint */
+export interface PlaceSettingsQueryOptions extends PlaceResourceQueryOptions {
+    /** ID of the parent zone, system, module or driver to grab settings for */
+    parent_id?: string;
+}
+/** Allowable query parameters for settings history endpoint */
+export interface PlaceSettingsHistoryOptions {
+    /** Maximum number of results to return */
+    limit?: number;
+    /** Starting offset of the result set for pagination */
+    offset?: number;
+}
