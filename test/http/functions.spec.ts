@@ -122,6 +122,23 @@ describe('Http', () => {
         expect(Auth.refreshAuthority).not.toBeCalled();
     });
 
+    test('should add app headers to every request', async () => {
+        (Auth as any).appHeaders = vi.fn(() => ({
+            'X-App-Id': 'client',
+            'X-App-Build': 'abcd1234',
+        }));
+        await Http.get('test_url', { headers: { 'X-App-Build': 'override' } });
+        expect(window.fetch).toHaveBeenCalledWith(
+            'test_url',
+            expect.objectContaining({
+                headers: expect.objectContaining({
+                    'X-App-Id': 'client',
+                    'X-App-Build': 'override',
+                }),
+            }),
+        );
+    });
+
     test('should expose response headers', () => {
         expect(Http.responseHeaders('/test')).toEqual({});
     });

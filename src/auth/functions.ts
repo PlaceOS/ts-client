@@ -56,6 +56,11 @@ const _promises: HashMap<Promise<any> | undefined> = {};
 let _client_id: string = '';
 /**
  * @private
+ * App identity headers set with `setAppHeaders`
+ */
+let _app_headers: Readonly<HashMap<string>> = {};
+/**
+ * @private
  * OAuth 2 token generation code
  */
 let _code: string = '';
@@ -147,6 +152,31 @@ export function needsTokenHeader(): boolean {
 /** OAuth 2 client ID for the application */
 export function clientId(): string {
     return _client_id;
+}
+
+/**
+ * Set app identity headers to send with every HTTP request
+ * @param name Application name. Sent as `X-App-Name`
+ * @param date Application release date. Sent as `X-App-Date`
+ * @param build Application build ID. Sent as `X-App-Build`
+ */
+export function setAppHeaders(name: string, date: string, build: string) {
+    _app_headers = {
+        'X-App-Name': name,
+        'X-App-Date': date,
+        'X-App-Build': build,
+    };
+}
+
+/**
+ * Get the app identity headers for a request.
+ * Adds the client ID as `X-App-Id` after `setup` sets it.
+ */
+export function appHeaders(): HashMap<string> {
+    return {
+        ...(_client_id ? { 'X-App-Id': _client_id } : {}),
+        ..._app_headers,
+    };
 }
 
 /** Redirect URI for the OAuth flow */
@@ -416,6 +446,7 @@ export function cleanupAuth() {
     _token_state.set(false);
     _online.set(false);
     _client_id = '';
+    _app_headers = {};
     _code = '';
     _route = `/api/engine/v2`;
     _redirecting = false;
@@ -545,6 +576,7 @@ export function logout(): void {
         method: 'GET',
         redirect: 'manual',
         headers: {
+            ...appHeaders(),
             Authorization: 'Bearer ' + token(),
         },
     }).then(
@@ -615,6 +647,7 @@ export function loadAuthority(tries: number = 0): Promise<void> {
             };
             fetch(`${secure ? 'https:' : 'http:'}//${host()}/auth/authority`, {
                 credentials: 'same-origin',
+                headers: appHeaders(),
             }).then(async (resp) => {
                 if (!resp.ok) {
                     return on_error(await resp.text().catch((_) => _));
@@ -967,6 +1000,7 @@ export function revokeToken(): Promise<void> {
             };
             fetch(`${token_uri}?token=${token()}`, {
                 method: 'POST',
+                headers: appHeaders(),
             }).then((r: Response) => {
                 if (!r.ok) return on_error(r);
                 log('Successfully revoked token.');
@@ -1044,6 +1078,7 @@ export function generateTokenWithUrl(
                 method: 'POST',
                 body,
                 headers: {
+                    ...appHeaders(),
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
             }).then(async (r: Response) => {

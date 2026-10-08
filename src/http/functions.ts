@@ -1,5 +1,6 @@
 import {
     apiKey,
+    appHeaders,
     authority,
     invalidateToken,
     isMock,
@@ -298,7 +299,7 @@ export function request(
         const mock_request = mock_handler(method, url, options?.body);
         if (mock_request) return mock_request;
     }
-    options.headers = options.headers || {};
+    options.headers = { ...appHeaders(), ...options.headers };
     if (!options.headers['Content-Type'] && !options.headers['content-type']) {
         options.headers['Content-Type'] = `application/json`;
     }

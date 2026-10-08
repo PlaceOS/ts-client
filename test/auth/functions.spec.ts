@@ -45,6 +45,23 @@ describe('Auth', () => {
         expect(client_id).toBe(Auth.clientId());
     });
 
+    test('should send client ID and app details in app headers', async () => {
+        expect(Auth.appHeaders()).toEqual({});
+        Auth.setAppHeaders('workplace', '2026-10-08', 'abcd1234');
+        await Auth.setup({
+            auth_uri: '',
+            token_uri: '',
+            redirect_uri: '1',
+            scope: 'public',
+        });
+        expect(Auth.appHeaders()).toEqual({
+            'X-App-Id': Auth.clientId(),
+            'X-App-Name': 'workplace',
+            'X-App-Date': '2026-10-08',
+            'X-App-Build': 'abcd1234',
+        });
+    });
+
     test('should allow setting up auth with username and password', async () => {
         await Auth.setup({
             auth_uri: '',

@@ -3,6 +3,7 @@
 export {
     apiEndpoint,
     apiKey,
+    appHeaders,
     authorise,
     authority,
     cleanupAuth,
@@ -25,6 +26,7 @@ export {
     refreshAuthority,
     refreshToken,
     setAPI_Key,
+    setAppHeaders,
     setStorage,
     setToken,
     setup,

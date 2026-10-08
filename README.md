@@ -190,6 +190,16 @@ const created = await post('/api/engine/v2/zones', zone_data);
 await del(`/api/engine/v2/zones/${zone_id}`);
 ```
 
+Every HTTP request sends the OAuth client ID as `X-App-Id` after `setup` runs.
+To identify your application, set app headers. Every HTTP request then also sends `X-App-Name`, `X-App-Date` and `X-App-Build`.
+Headers given in the request options override them.
+
+```typescript
+import { setAppHeaders } from '@placeos/ts-client';
+
+setAppHeaders('workplace', '2026-10-08', 'abcd1234');
+```
+
 The modules also provide methods for the various item action endpoints
 
 ```typescript
