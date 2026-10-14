@@ -14,7 +14,3 @@ export interface PlaceVersion {
 export interface SignalOptions {
     channel: string;
 }
-
-export interface ReindexOptions {
-    backfill?: boolean;
-}

@@ -2,12 +2,7 @@ import { apiEndpoint } from '../auth/functions';
 import { get, post } from '../http/functions';
 import { toQueryString } from '../utilities/api';
 import { HashMap } from '../utilities/types';
-import {
-    PlacePlatformInfo,
-    PlaceVersion,
-    ReindexOptions,
-    SignalOptions,
-} from './interfaces';
+import { PlacePlatformInfo, PlaceVersion, SignalOptions } from './interfaces';
 
 /** Check API health */
 export function healthCheck(): Promise<void> {
@@ -38,17 +33,4 @@ export function apiScopes(): Promise<string[]> {
 export function signal(channel: string, body: HashMap = {}): Promise<void> {
     const q = toQueryString({ channel } as SignalOptions);
     return post(`${apiEndpoint()}/signal?${q}`, body).then(() => undefined);
-}
-
-/** @deprecated No-op since PlaceOS moved search to PostgreSQL (PPT-2644); will be removed */
-export function reindex(query_params: ReindexOptions = {}): Promise<void> {
-    const q = toQueryString(query_params);
-    return post(`${apiEndpoint()}/reindex${q ? '?' + q : ''}`, {}).then(
-        () => undefined,
-    );
-}
-
-/** @deprecated No-op since PlaceOS moved search to PostgreSQL (PPT-2644); will be removed */
-export function backfill(): Promise<void> {
-    return post(`${apiEndpoint()}/backfill`, {}).then(() => undefined);
 }
