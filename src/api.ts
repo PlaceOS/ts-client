@@ -344,18 +344,15 @@ export { PlaceRepository } from './repositories/repository';
 
 export {
     apiScopes,
-    backfill,
     coreVersions,
     healthCheck,
     platformInfo,
-    reindex,
     serviceVersion,
     signal,
 } from './root/functions';
 export type {
     PlacePlatformInfo,
     PlaceVersion,
-    ReindexOptions,
     SignalOptions,
 } from './root/interfaces';
 
