@@ -349,9 +349,12 @@ export {
     platformInfo,
     serviceVersion,
     signal,
+    sourceResync,
+    sourceResyncStatus,
 } from './root/functions';
 export type {
     PlacePlatformInfo,
+    PlaceSourceResyncStatus,
     PlaceVersion,
     SignalOptions,
 } from './root/interfaces';
