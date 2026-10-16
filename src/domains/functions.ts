@@ -1,6 +1,7 @@
 import { apiEndpoint } from '../auth/functions';
 import { get } from '../http/functions';
 import { create, query, remove, show, update } from '../resources/functions';
+import { PlaceOrganisationOwnerOptions } from '../organisations/interfaces';
 import { PlaceResourceQueryOptions } from '../resources/interface';
 import { PlaceDomain } from './domain';
 
@@ -18,7 +19,9 @@ function process(item: Partial<PlaceDomain>) {
  * Query the available domains
  * @param query_params Query parameters to add the to request URL
  */
-export function queryDomains(query_params: PlaceResourceQueryOptions = {}) {
+export function queryDomains(
+    query_params: PlaceResourceQueryOptions & PlaceOrganisationOwnerOptions = {},
+) {
     return query({ query_params, fn: process, path: PATH });
 }
 
@@ -36,16 +39,18 @@ export function showDomain(id: string) {
  * @param form_data New values for the domain
  * @param query_params Query parameters to add the to request URL
  * @param method HTTP verb to use on request. Defaults to `patch`
+ * @param options Organisation to move the domain to (cluster admins only)
  */
 export function updateDomain(
     id: string,
     form_data: Partial<PlaceDomain>,
     method: 'put' | 'patch' = 'patch',
+    options: PlaceOrganisationOwnerOptions = {},
 ) {
     return update({
         id,
         form_data,
-        query_params: {},
+        query_params: options,
         method,
         fn: process,
         path: PATH,
@@ -55,10 +60,13 @@ export function updateDomain(
 /**
  * Add a new domain to the database
  * @param form_data Domain data
- * @param query_params Query parameters to add the to request URL
+ * @param options Organisation that owns the new domain (cluster admins only; defaults to the caller's)
  */
-export function addDomain(form_data: Partial<PlaceDomain>) {
-    return create({ form_data, query_params: {}, fn: process, path: PATH });
+export function addDomain(
+    form_data: Partial<PlaceDomain>,
+    options: PlaceOrganisationOwnerOptions = {},
+) {
+    return create({ form_data, query_params: options, fn: process, path: PATH });
 }
 
 /**

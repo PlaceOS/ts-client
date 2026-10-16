@@ -11,6 +11,8 @@ export interface PlaceZoneComplete extends Partial<PlaceZone> {
 }
 
 export class PlaceZone extends PlaceResource {
+    /** ID of the organisation that owns this row; empty when unowned */
+    public readonly organisation_id: string;
     /** Tuple of user settings of differring encryption levels for the zone */
     public readonly settings: [
         PlaceSettings | null,
@@ -56,6 +58,7 @@ export class PlaceZone extends PlaceResource {
 
     constructor(raw_data: PlaceZoneComplete = {}) {
         super(raw_data);
+        this.organisation_id = raw_data.organisation_id || '';
         this.description = raw_data.description || '';
         this.tags = raw_data.tags || [];
         this.triggers = raw_data.triggers || [];

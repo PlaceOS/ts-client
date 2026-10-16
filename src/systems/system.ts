@@ -12,6 +12,8 @@ export interface PlaceSystemComplete extends Partial<PlaceSystem> {
 }
 
 export class PlaceSystem extends PlaceResource {
+    /** ID of the organisation that owns this row; empty when unowned */
+    public readonly organisation_id: string;
     /** Tuple of user settings of differring encryption levels for the system */
     public readonly settings: [
         PlaceSettings | null,
@@ -82,6 +84,7 @@ export class PlaceSystem extends PlaceResource {
 
     constructor(raw_data: PlaceSystemComplete = {}) {
         super(raw_data);
+        this.organisation_id = raw_data.organisation_id || '';
         this.display_name = raw_data.display_name || '';
         this.description = raw_data.description || '';
         this.email = raw_data.email || '';

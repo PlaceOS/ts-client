@@ -12,6 +12,8 @@ export interface PlaceTriggerComplete extends Partial<PlaceTrigger> {
 }
 
 export class PlaceTrigger extends PlaceResource {
+    /** ID of the organisation that owns this row; empty when unowned */
+    public readonly organisation_id: string;
     /** Name of the system assocaited with the trigger */
     public readonly system_name: string;
     /** Number of times the trigger has been activated/triggered */
@@ -82,6 +84,7 @@ export class PlaceTrigger extends PlaceResource {
 
     constructor(raw_data: PlaceTriggerComplete = {}) {
         super(raw_data);
+        this.organisation_id = raw_data.organisation_id || '';
         this.description = raw_data.description || '';
         this._actions = raw_data.actions || { functions: [], mailers: [] };
         this._conditions = raw_data.conditions || {

@@ -1,3 +1,4 @@
+import { PlaceOrganisationOwnerOptions } from '../organisations/interfaces';
 import {
     create,
     query,
@@ -72,8 +73,11 @@ export function updateModule(
  * @param form_data Module data
  * @param query_params Query parameters to add the to request URL
  */
-export function addModule(form_data: Partial<PlaceModule>) {
-    return create({ form_data, query_params: {}, fn: process, path: PATH });
+export function addModule(
+    form_data: Partial<PlaceModule>,
+    options: PlaceOrganisationOwnerOptions = {},
+) {
+    return create({ form_data, query_params: options, fn: process, path: PATH });
 }
 
 /**

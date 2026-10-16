@@ -8,6 +8,8 @@ export interface PlaceUserQueryOptions extends PlaceResourceQueryOptions {
     include_metadata?: boolean;
     /** Admin users can view other domains (ignored for other users) */
     authority_id?: string;
+    /** Only users on domains owned by this organisation (must be within reach) */
+    organisation_id?: string;
 }
 
 /** Mapping of available query parameters for the users show endpoint */

@@ -93,7 +93,9 @@ export class BrowserWebSocket<T>
 
     public override next(value: T): void {
         if (this._socket.readyState === WebSocket.OPEN) {
-            this._socket.send(this._serialize(value));
+            this._socket.send(
+                this._serialize(value) as Parameters<WebSocket['send']>[0],
+            );
         } else {
             this._queue.push(value);
         }

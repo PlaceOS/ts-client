@@ -1,3 +1,4 @@
+import { PlaceOrganisationOwnerOptions } from '../organisations/interfaces';
 import {
     create,
     query,
@@ -83,8 +84,11 @@ export function updateZone(
  * @param form_data Application data
  * @param query_params Query parameters to add the to request URL
  */
-export function addZone(form_data: Partial<PlaceZone>) {
-    return create({ form_data, query_params: {}, fn: process, path: PATH });
+export function addZone(
+    form_data: Partial<PlaceZone>,
+    options: PlaceOrganisationOwnerOptions = {},
+) {
+    return create({ form_data, query_params: options, fn: process, path: PATH });
 }
 
 /**

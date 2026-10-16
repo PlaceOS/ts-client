@@ -2,6 +2,8 @@ import { PlaceResourceQueryOptions } from '../resources/interface';
 
 /** Mapping of available query parameters for the modules index endpoint */
 export interface PlaceModuleQueryOptions extends PlaceResourceQueryOptions {
+    /** Only modules owned by this organisation (must be within reach) */
+    organisation_id?: string;
     /** Only return modules updated before this time (unix epoch) */
     as_of?: number;
     /** Only return modules running in this system (query params are ignored if this is provided) */
