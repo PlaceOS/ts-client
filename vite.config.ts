@@ -22,6 +22,17 @@ export default defineConfig({
         },
         target: 'esnext', // transpile as little as possible
     },
-    test: { environment: 'jsdom' },
+    test: {
+        environment: 'jsdom',
+        // Node 25+ has its own `localStorage`, which shadows jsdom's
+        poolOptions: {
+            forks: {
+                execArgv:
+                    Number(process.versions.node.split('.')[0]) >= 25
+                        ? ['--no-experimental-webstorage']
+                        : [],
+            },
+        },
+    },
     plugins: [dts()],
 });
