@@ -166,6 +166,18 @@ export type {
 } from './edge/interfaces';
 
 export {
+    queryHistory,
+    showHistory,
+    undeleteResource,
+} from './history/functions';
+export { PlaceHistory } from './history/history';
+export type {
+    PlaceHistoryAction,
+    PlaceHistoryMetadata,
+} from './history/history';
+export type { PlaceHistoryQueryOptions } from './history/interfaces';
+
+export {
     acceptGroupInvitation,
     addGroup,
     addGroupInvitation,

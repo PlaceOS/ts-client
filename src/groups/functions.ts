@@ -1,11 +1,11 @@
 import { apiEndpoint } from '../auth/functions';
 import { PlaceGroupUser } from '../group-users/group-user';
+import { PlaceHistory } from '../history/history';
 import { del, get, patch, post, put } from '../http/functions';
 import { query } from '../resources/functions';
 import { toQueryString } from '../utilities/api';
 import { HashMap } from '../utilities/types';
 import { PlaceCurrentGroup, PlaceGroup, PlaceGroupFeatures } from './group';
-import { PlaceGroupHistory } from './group-history';
 import {
     PlaceGroupInvitation,
     PlaceGroupInvitationCreatedResponse,
@@ -28,9 +28,9 @@ function process(item: Partial<PlaceGroup>) {
     return new PlaceGroup(item);
 }
 
-/** Convert raw server data to a group history object */
-function processHistory(item: Partial<PlaceGroupHistory>) {
-    return new PlaceGroupHistory(item);
+/** Convert raw server data to a history object */
+function processHistory(item: Partial<PlaceHistory>) {
+    return new PlaceHistory(item);
 }
 
 /** Convert raw server data to a group invitation object */
@@ -100,15 +100,15 @@ export function removeGroup(id: string): Promise<void> {
     return del(url, { response_type: 'void' });
 }
 
-/** Query group audit history entries */
+/** Query changes to groups and their memberships, newest first */
 export function queryGroupHistory(
     query_params: PlaceGroupHistoryQueryOptions = {},
 ) {
     return query({ query_params, fn: processHistory, path: HISTORY_PATH });
 }
 
-/** Get a group audit history entry */
-export function showGroupHistory(id: string): Promise<PlaceGroupHistory> {
+/** Get a group change history entry */
+export function showGroupHistory(id: string): Promise<PlaceHistory> {
     const url = `${apiEndpoint()}/${HISTORY_PATH}/${encodeURIComponent(id)}`;
     return get(url).then((resp: HashMap) => processHistory(resp));
 }

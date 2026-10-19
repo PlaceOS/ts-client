@@ -21,10 +21,13 @@ export interface PlaceGroupFeaturesQueryOptions {
 }
 
 /** Mapping of available query parameters for the group history index endpoint */
-export interface PlaceGroupHistoryQueryOptions
-    extends PlaceResourceQueryOptions {
-    /** ID of the group to filter audit entries by */
+export interface PlaceGroupHistoryQueryOptions {
+    /** ID of the group to return changes of. Required unless an admin */
     group_id?: string;
+    /** Number of results to return. Defaults to `100` */
+    limit?: number;
+    /** Offset of the results to return */
+    offset?: number;
 }
 
 /** Mapping of available query parameters for the group invitations index endpoint */
