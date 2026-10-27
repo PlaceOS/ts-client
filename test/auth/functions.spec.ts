@@ -590,9 +590,6 @@ describe('Auth', () => {
     });
 
     test('should allow generating challenge pairs', () => {
-        (window as any).TextEncoder = vi.fn(() => ({
-            encode: vi.fn((_: any) => _),
-        }));
         const { challenge, verify } = Auth.generateChallenge();
         expect(challenge).toBeTruthy();
         expect(challenge).toHaveLength(43);

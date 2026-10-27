@@ -1,4 +1,4 @@
-/// <reference types="vitest" />
+/// <reference types="vitest/config" />
 import { resolve } from 'path';
 import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';
@@ -25,14 +25,10 @@ export default defineConfig({
     test: {
         environment: 'jsdom',
         // Node 25+ has its own `localStorage`, which shadows jsdom's
-        poolOptions: {
-            forks: {
-                execArgv:
-                    Number(process.versions.node.split('.')[0]) >= 25
-                        ? ['--no-experimental-webstorage']
-                        : [],
-            },
-        },
+        execArgv:
+            Number(process.versions.node.split('.')[0]) >= 25
+                ? ['--no-experimental-webstorage']
+                : [],
     },
     plugins: [dts()],
 });
