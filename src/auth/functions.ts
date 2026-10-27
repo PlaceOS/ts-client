@@ -848,15 +848,15 @@ export function checkForAuthParameters(): Promise<boolean> {
                     fragments.access_token ||
                     fragments.refresh_token)
             ) {
-                const saved_nonce =
-                    _storage.getItem(`${_client_id}_nonce`) || '';
-                const state_parts = (fragments.state || '').split(';');
+                const nonce_key = `${_client_id}_nonce`;
+                const saved_nonce = _storage.getItem(nonce_key);
+                const nonce = (fragments.state || '').split(';')[0];
                 removeFragment('state');
                 removeFragment('token_type');
-                const nonce = state_parts[0];
-                /* istanbul ignore else */
-                if (saved_nonce === nonce) {
-                    // Only accept credentials once the state nonce is validated
+                if (saved_nonce && saved_nonce === nonce) {
+                    // Only accept credentials for a login this client started.
+                    // Consume the nonce so the same state can't be replayed.
+                    _storage.removeItem(nonce_key);
                     if (fragments.code) {
                         _code = fragments.code;
                         removeFragment('code');

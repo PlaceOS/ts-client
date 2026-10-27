@@ -3,6 +3,11 @@ import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import * as Auth from '../../src/auth/functions';
 import { PlaceAuthority } from '../../src/auth/interfaces';
 
+/** Save a login nonce, as `createLoginURL` does before it redirects */
+function pendingLogin(redirect_uri = '', storage: Storage = localStorage) {
+    storage.setItem(`${Md5.hashStr(redirect_uri)}_nonce`, 'nonce');
+}
+
 describe('Auth', () => {
     beforeEach(() => {
         Object.defineProperty(window, 'location', {
@@ -134,14 +139,18 @@ describe('Auth', () => {
         };
         await Auth.setup(options);
         expect(Auth.token()).toBe('mock-token');
-        window.location.search = '?access_token=test&expires_in=3600';
+        pendingLogin();
+        window.location.search =
+            '?access_token=test&expires_in=3600&state=nonce';
         await Auth.setup({ ...options, mock: false });
         await Auth.authorise();
         expect(Auth.token()).toBe('test');
     });
 
     test('should clear expired tokens', async () => {
-        window.location.search = '?access_token=test&expires_in=3600';
+        pendingLogin();
+        window.location.search =
+            '?access_token=test&expires_in=3600&state=nonce';
         const options = {
             auth_uri: '',
             token_uri: '',
@@ -159,7 +168,8 @@ describe('Auth', () => {
     });
 
     test('should expose the refresh token', async () => {
-        window.location.search = '?code=test';
+        pendingLogin();
+        window.location.search = '?code=test&state=nonce';
         const options = {
             auth_uri: '',
             token_uri: 'token',
@@ -203,8 +213,9 @@ describe('Auth', () => {
     });
 
     test('should allow using session storage', async () => {
+        pendingLogin('', sessionStorage);
         window.location.search =
-            '?access_token=test&expires_in=3600&trust=true';
+            '?access_token=test&expires_in=3600&state=nonce&trust=true';
         await Auth.setup({
             auth_uri: '',
             token_uri: '',
@@ -222,8 +233,9 @@ describe('Auth', () => {
     });
 
     test('should handle refresh token in URL', async () => {
+        pendingLogin();
         window.location.search =
-            '?access_token=test&refresh_token=hehe&expires_in=3600&state=;^_^&&trust=true';
+            '?access_token=test&refresh_token=hehe&expires_in=3600&state=nonce;^_^&&trust=true';
         await Auth.setup({
             auth_uri: '',
             token_uri: '',
@@ -237,6 +249,25 @@ describe('Auth', () => {
         expect(localStorage.getItem(`${Auth.clientId()}_refresh_token`)).toBe(
             'hehe',
         );
+        expect(localStorage.getItem(`${Auth.clientId()}_nonce`)).toBeNull();
+    });
+
+    test('should reject URL credentials when no login is pending', async () => {
+        Auth.setStorage('local');
+        window.location.search = '?access_token=attacker&expires_in=3600';
+        expect(await Auth.checkForAuthParameters()).toBe(false);
+        expect(Auth.token()).toBe('');
+    });
+
+    test('should reject URL credentials with a mismatched state', async () => {
+        Auth.setStorage('local');
+        localStorage.setItem(`${Auth.clientId()}_nonce`, 'nonce');
+        window.location.search =
+            '?access_token=attacker&expires_in=3600&state=other';
+        expect(await Auth.checkForAuthParameters()).toBe(false);
+        expect(Auth.token()).toBe('');
+        // A crafted link must not cancel the login that is pending
+        expect(localStorage.getItem(`${Auth.clientId()}_nonce`)).toBe('nonce');
     });
 
     test('should fail to authorise before authority loaded', async () => {
@@ -376,7 +407,9 @@ describe('Auth', () => {
     test('should allow listening to changes to token', () =>
         new Promise<void>((resolve) => {
             (async () => {
-                window.location.search = '?access_token=test&expires_in=3600';
+                pendingLogin();
+                window.location.search =
+                    '?access_token=test&expires_in=3600&state=nonce';
                 Auth.listenForToken().subscribe((token) => {
                     if (token) {
                         resolve();
@@ -467,8 +500,9 @@ describe('Auth', () => {
             scope: 'public',
             handle_login: false,
         });
+        pendingLogin();
         const token = await Auth.handleAuthRedirect(
-            'myapp://oauth/callback?code=abc123',
+            'myapp://oauth/callback?code=abc123&state=nonce',
         );
         expect(token).toBe('today');
         expect(sessionStorage.getItem('ENGINE.auth.params')).toBeNull();
@@ -545,9 +579,10 @@ describe('Auth', () => {
             handle_login: false,
         });
         expect(Auth.hasToken()).toBe(false);
+        pendingLogin();
         sessionStorage.setItem(
             'ENGINE.auth.params',
-            JSON.stringify({ code: 'abc123' }),
+            JSON.stringify({ code: 'abc123', state: 'nonce' }),
         );
         document.dispatchEvent(new Event('visibilitychange'));
         await new Promise<void>((resolve) => setTimeout(resolve, 100));
