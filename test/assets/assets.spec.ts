@@ -12,6 +12,7 @@ describe('PlaceAssetCategory', () => {
     beforeEach(() => {
         category = new PlaceAssetCategory({
             id: 'cat-test',
+            authority_id: 'authority-1',
             parent_category_id: 'cat-parent',
             name: 'Test Category',
             description: 'A test category',
@@ -28,6 +29,10 @@ describe('PlaceAssetCategory', () => {
 
     test('should expose id', () => {
         expect(category.id).toBe('cat-test');
+    });
+
+    test('should expose authority_id', () => {
+        expect(category.authority_id).toBe('authority-1');
     });
 
     test('should expose parent_category_id', () => {
@@ -57,6 +62,7 @@ describe('PlaceAssetCategory', () => {
     test('should use default values for missing properties', () => {
         const emptyCategory = new PlaceAssetCategory({});
         expect(emptyCategory.id).toBe('');
+        expect(emptyCategory.authority_id).toBe('');
         expect(emptyCategory.parent_category_id).toBe('');
         expect(emptyCategory.name).toBe('');
         expect(emptyCategory.description).toBe('');
