@@ -1,5 +1,7 @@
 export class PlaceAssetCategory {
     readonly id: string;
+    /** Authority that owns the category. Empty for legacy categories. */
+    readonly authority_id: string;
     readonly parent_category_id: string;
     readonly name: string;
     readonly description: string;
@@ -9,6 +11,7 @@ export class PlaceAssetCategory {
 
     constructor(data: Partial<PlaceAssetCategory>) {
         this.id = data.id || '';
+        this.authority_id = data.authority_id || '';
         this.parent_category_id = data.parent_category_id || '';
         this.name = data.name || '';
         this.description = data.description || '';
