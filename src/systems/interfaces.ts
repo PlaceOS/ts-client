@@ -14,6 +14,8 @@ export interface PlaceModuleFunction {
 
 /** Allowable query parameters for systems index endpoint */
 export interface PlaceSystemsQueryOptions extends PlaceResourceQueryOptions {
+    /** Only systems owned by this organisation (must be within reach) */
+    organisation_id?: string;
     /** Return only bookable or non-bookable rooms (returns both when not specified) */
     bookable?: boolean;
     /** Return only rooms with capacity equal or greater than provided */

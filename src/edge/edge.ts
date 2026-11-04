@@ -2,6 +2,8 @@ import { PlaceResource } from '../resources/resource';
 import { HashMap } from '../utilities/types';
 
 export class PlaceEdge extends PlaceResource {
+    /** ID of the organisation that owns this row; empty when unowned */
+    public readonly organisation_id: string;
     public readonly description: string;
     public readonly secret: string;
     public readonly x_api_key: string;
@@ -10,6 +12,7 @@ export class PlaceEdge extends PlaceResource {
 
     constructor(raw_data: Partial<PlaceEdge> = {}) {
         super(raw_data);
+        this.organisation_id = raw_data.organisation_id || '';
         this.description = raw_data.description || '';
         this.secret = raw_data.secret || '';
         this.x_api_key = raw_data.x_api_key || '';

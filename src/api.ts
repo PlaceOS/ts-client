@@ -111,6 +111,45 @@ export {
     updateDomain,
 } from './domains/functions';
 
+export { PlaceGrant } from './grants/grant';
+export {
+    addGrant,
+    queryGrants,
+    removeGrant,
+    showGrant,
+} from './grants/functions';
+export type {
+    PlaceGrantCreatePayload,
+    PlaceGrantQueryOptions,
+} from './grants/interfaces';
+
+export { PlaceOrganisation } from './organisations/organisation';
+export {
+    addOrganisation,
+    claimZonesForOrganisation,
+    currentReach,
+    queryOrganisations,
+    removeOrganisation,
+    showOrganisation,
+    updateOrganisation,
+} from './organisations/functions';
+export type {
+    PlaceOrganisationClaimResult,
+    PlaceOrganisationOwnerOptions,
+    PlaceOrganisationQueryOptions,
+    PlaceOrganisationWriteOptions,
+    PlaceReach,
+} from './organisations/interfaces';
+
+export { PlacePartner } from './partners/partner';
+export {
+    addPartner,
+    queryPartners,
+    removePartner,
+    showPartner,
+    updatePartner,
+} from './partners/functions';
+
 export { PlaceDriver } from './drivers/driver';
 export { PlaceDriverRole } from './drivers/enums';
 export {

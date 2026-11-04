@@ -20,6 +20,8 @@ export interface PlaceModuleComplete extends Partial<PlaceModule> {
 export type EndDebugFn = () => void;
 
 export class PlaceModule extends PlaceResource {
+    /** ID of the organisation that owns this row; empty when unowned */
+    public readonly organisation_id: string;
     /** Whether the associated hardware is connected */
     public readonly connected: boolean | undefined;
     /** Whether the module driver is running */
@@ -76,6 +78,7 @@ export class PlaceModule extends PlaceResource {
 
     constructor(raw_data: PlaceModuleComplete = {}) {
         super(raw_data);
+        this.organisation_id = raw_data.organisation_id || '';
         this.driver_id = raw_data.driver_id || raw_data.dependency_id || '';
         this.control_system_id = raw_data.control_system_id || '';
         this.edge_id = raw_data.edge_id || '';
