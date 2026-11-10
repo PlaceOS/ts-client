@@ -54,14 +54,14 @@ describe('Short URL API', () => {
 describe('Short URL Redirect', () => {
     test('should generate correct redirect URL', () => {
         const spy = vi.spyOn(Auth, 'apiEndpoint');
-        spy.mockReturnValue('/api/engine/v2/');
+        spy.mockReturnValue('/api/engine/v2');
         const url = SERVICE.shortUrlRedirectUrl('test-id');
         expect(url).toBe('/api/engine/v2/short_url/test-id/redirect');
     });
 
     test('should encode special characters in ID', () => {
         const spy = vi.spyOn(Auth, 'apiEndpoint');
-        spy.mockReturnValue('/api/engine/v2/');
+        spy.mockReturnValue('/api/engine/v2');
         const url = SERVICE.shortUrlRedirectUrl('test/id with spaces');
         expect(url).toBe(
             '/api/engine/v2/short_url/test%2Fid%20with%20spaces/redirect',
@@ -72,7 +72,7 @@ describe('Short URL Redirect', () => {
 describe('Short URL QR Code SVG', () => {
     test('should fetch SVG QR code', async () => {
         const authSpy = vi.spyOn(Auth, 'apiEndpoint');
-        authSpy.mockReturnValue('/api/engine/v2/');
+        authSpy.mockReturnValue('/api/engine/v2');
         const httpSpy = vi.spyOn(Http, 'get');
         httpSpy.mockImplementation(
             () => Promise.resolve('<svg>...</svg>') as any,
@@ -90,14 +90,14 @@ describe('Short URL QR Code SVG', () => {
 describe('Short URL QR Code PNG URL', () => {
     test('should generate correct PNG QR code URL', () => {
         const spy = vi.spyOn(Auth, 'apiEndpoint');
-        spy.mockReturnValue('/api/engine/v2/');
+        spy.mockReturnValue('/api/engine/v2');
         const url = SERVICE.shortUrlQrCodePngUrl('test-id');
         expect(url).toBe('/api/engine/v2/short_url/test-id/qr_code.png');
     });
 
     test('should include size parameter', () => {
         const spy = vi.spyOn(Auth, 'apiEndpoint');
-        spy.mockReturnValue('/api/engine/v2/');
+        spy.mockReturnValue('/api/engine/v2');
         const url = SERVICE.shortUrlQrCodePngUrl('test-id', { size: 256 });
         expect(url).toBe(
             '/api/engine/v2/short_url/test-id/qr_code.png?size=256',
@@ -106,7 +106,7 @@ describe('Short URL QR Code PNG URL', () => {
 
     test('should encode special characters in ID', () => {
         const spy = vi.spyOn(Auth, 'apiEndpoint');
-        spy.mockReturnValue('/api/engine/v2/');
+        spy.mockReturnValue('/api/engine/v2');
         const url = SERVICE.shortUrlQrCodePngUrl('test/id');
         expect(url).toBe('/api/engine/v2/short_url/test%2Fid/qr_code.png');
     });
@@ -115,7 +115,7 @@ describe('Short URL QR Code PNG URL', () => {
 describe('QR Code URL Generator', () => {
     test('should generate correct QR code URL with required params', () => {
         const spy = vi.spyOn(Auth, 'apiEndpoint');
-        spy.mockReturnValue('/api/engine/v2/');
+        spy.mockReturnValue('/api/engine/v2');
         const url = SERVICE.qrCodeUrl({
             content: 'https://example.com',
             id: 'qr-123',
@@ -128,7 +128,7 @@ describe('QR Code URL Generator', () => {
 
     test('should support PNG format', () => {
         const spy = vi.spyOn(Auth, 'apiEndpoint');
-        spy.mockReturnValue('/api/engine/v2/');
+        spy.mockReturnValue('/api/engine/v2');
         const url = SERVICE.qrCodeUrl({
             content: 'test',
             id: 'qr-123',
@@ -139,7 +139,7 @@ describe('QR Code URL Generator', () => {
 
     test('should include size parameter', () => {
         const spy = vi.spyOn(Auth, 'apiEndpoint');
-        spy.mockReturnValue('/api/engine/v2/');
+        spy.mockReturnValue('/api/engine/v2');
         const url = SERVICE.qrCodeUrl({
             content: 'test',
             id: 'qr-123',
@@ -152,7 +152,7 @@ describe('QR Code URL Generator', () => {
 describe('Generate QR Code', () => {
     test('should generate SVG QR code with custom content', async () => {
         const authSpy = vi.spyOn(Auth, 'apiEndpoint');
-        authSpy.mockReturnValue('/api/engine/v2/');
+        authSpy.mockReturnValue('/api/engine/v2');
         const httpSpy = vi.spyOn(Http, 'get');
         httpSpy.mockImplementation(
             () => Promise.resolve('<svg>custom</svg>') as any,
@@ -172,7 +172,7 @@ describe('Generate QR Code', () => {
 
     test('should include size in request', async () => {
         const authSpy = vi.spyOn(Auth, 'apiEndpoint');
-        authSpy.mockReturnValue('/api/engine/v2/');
+        authSpy.mockReturnValue('/api/engine/v2');
         const httpSpy = vi.spyOn(Http, 'get');
         httpSpy.mockImplementation(() => Promise.resolve('<svg></svg>') as any);
 

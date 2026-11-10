@@ -23,7 +23,7 @@ export function queryWebrtcRooms(
     query_params: PlaceWebrtcRoomsQueryOptions = {},
 ): Promise<PlaceWebrtcRoomDetails[]> {
     const query = toQueryString(query_params);
-    const url = `${apiEndpoint()}${PATH}/rooms${query ? '?' + query : ''}`;
+    const url = `${apiEndpoint()}/${PATH}/rooms${query ? '?' + query : ''}`;
     return get(url).then((resp: HashMap) => resp as PlaceWebrtcRoomDetails[]);
 }
 
@@ -34,7 +34,7 @@ export function queryWebrtcRooms(
 export function showWebrtcRoom(
     system_id: string,
 ): Promise<PlaceWebrtcRoomDetails> {
-    const url = `${apiEndpoint()}${PATH}/room/${encodeURIComponent(system_id)}`;
+    const url = `${apiEndpoint()}/${PATH}/room/${encodeURIComponent(system_id)}`;
     return get(url).then((resp: HashMap) => resp as PlaceWebrtcRoomDetails);
 }
 
@@ -45,7 +45,7 @@ export function showWebrtcRoom(
 export function webrtcSessionMembers(
     session_id: string,
 ): Promise<PlaceWebrtcMember[]> {
-    const url = `${apiEndpoint()}${PATH}/members/${encodeURIComponent(session_id)}`;
+    const url = `${apiEndpoint()}/${PATH}/members/${encodeURIComponent(session_id)}`;
     return get(url).then((resp: HashMap) => resp as PlaceWebrtcMember[]);
 }
 
@@ -60,7 +60,7 @@ export function webrtcGuestEntry(
     system_id: string,
     participant: PlaceGuestParticipant,
 ): Promise<void> {
-    const url = `${apiEndpoint()}${PATH}/guest_entry/${encodeURIComponent(system_id)}`;
+    const url = `${apiEndpoint()}/${PATH}/guest_entry/${encodeURIComponent(system_id)}`;
     return post(url, participant).then(() => undefined);
 }
 
@@ -69,7 +69,7 @@ export function webrtcGuestEntry(
  * This will remove the authentication token and close any open websockets.
  */
 export function webrtcGuestExit(): Promise<void> {
-    const url = `${apiEndpoint()}${PATH}/guest/exit`;
+    const url = `${apiEndpoint()}/${PATH}/guest/exit`;
     return post(url, {}).then(() => undefined);
 }
 
@@ -86,7 +86,7 @@ export function webrtcKickUser(
     session_id: string,
     reason: PlaceKickReason,
 ): Promise<void> {
-    const url = `${apiEndpoint()}${PATH}/kick/${encodeURIComponent(user_id)}/${encodeURIComponent(session_id)}`;
+    const url = `${apiEndpoint()}/${PATH}/kick/${encodeURIComponent(user_id)}/${encodeURIComponent(session_id)}`;
     return post(url, reason).then(() => undefined);
 }
 
@@ -102,7 +102,7 @@ export function webrtcTransferUser(
     session_id: string,
     connection_details?: Record<string, unknown>,
 ): Promise<void> {
-    const url = `${apiEndpoint()}${PATH}/transfer/${encodeURIComponent(user_id)}/${encodeURIComponent(session_id)}`;
+    const url = `${apiEndpoint()}/${PATH}/transfer/${encodeURIComponent(user_id)}/${encodeURIComponent(session_id)}`;
     return post(url, connection_details || {}).then(() => undefined);
 }
 

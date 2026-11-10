@@ -144,7 +144,7 @@ export function renameMetadata(
     id: string,
     form_data: PlaceMetadataRenamePayload,
 ): Promise<PlaceMetadata> {
-    const url = `${apiEndpoint()}${PATH}/${encodeURIComponent(id)}/name`;
+    const url = `${apiEndpoint()}/${PATH}/${encodeURIComponent(id)}/name`;
     return patch(url, form_data).then((resp: HashMap) => process(resp));
 }
 

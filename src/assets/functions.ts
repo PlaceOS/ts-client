@@ -119,7 +119,7 @@ export function removeAsset(
  */
 export function addAssets(form_data: Partial<PlaceAsset>[]) {
     return post(
-        `${apiEndpoint()}${ASSET_PATH}/bulk`,
+        `${apiEndpoint()}/${ASSET_PATH}/bulk`,
         JSON.stringify(form_data),
         {},
     ).then((l: any) => l.map((_: any) => processAsset(_)));
@@ -138,7 +138,7 @@ export function updateAssets(
 ) {
     const verb = method === 'put' ? put : patch;
     return verb(
-        `${apiEndpoint()}${ASSET_PATH}/bulk`,
+        `${apiEndpoint()}/${ASSET_PATH}/bulk`,
         JSON.stringify(form_data),
         {},
     ).then((l: any) => l.map((_: any) => processAsset(_)));
@@ -154,7 +154,7 @@ export function removeAssets(
     query_params: Record<string, any> = {},
 ) {
     const q = toQueryString(query_params);
-    return del(`${apiEndpoint()}${ASSET_PATH}/bulk${q ? '?' + q : ''}`, {
+    return del(`${apiEndpoint()}/${ASSET_PATH}/bulk${q ? '?' + q : ''}`, {
         body: JSON.stringify(id_list),
     }).then((l: any) => l.map((_: any) => processAsset(_)));
 }

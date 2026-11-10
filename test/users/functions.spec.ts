@@ -62,7 +62,7 @@ describe('Users API', () => {
 
     test('should allow querying user groups', async () => {
         const authSpy = vi.spyOn(Auth, 'apiEndpoint');
-        authSpy.mockReturnValue('/api/engine/v2/');
+        authSpy.mockReturnValue('/api/engine/v2');
         const httpSpy = vi.spyOn(Http, 'get');
         httpSpy.mockImplementation(
             () =>
@@ -85,7 +85,7 @@ describe('Users API', () => {
 
     test('should allow searching user metadata', async () => {
         const authSpy = vi.spyOn(Auth, 'apiEndpoint');
-        authSpy.mockReturnValue('/api/engine/v2/');
+        authSpy.mockReturnValue('/api/engine/v2');
         const httpSpy = vi.spyOn(Http, 'get');
         httpSpy.mockImplementation(
             () => Promise.resolve([{ id: 'user-1', metadata: {} }]) as any,
@@ -103,7 +103,7 @@ describe('Users API', () => {
 
     test('should allow getting current user resource token', async () => {
         const authSpy = vi.spyOn(Auth, 'apiEndpoint');
-        authSpy.mockReturnValue('/api/engine/v2/');
+        authSpy.mockReturnValue('/api/engine/v2');
         const httpSpy = vi.spyOn(Http, 'post');
         httpSpy.mockImplementation(
             () => Promise.resolve({ token: 'abc123' }) as any,
@@ -128,7 +128,7 @@ describe('Users API', () => {
 
     test('should allow removing user resource token', async () => {
         const authSpy = vi.spyOn(Auth, 'apiEndpoint');
-        authSpy.mockReturnValue('/api/engine/v2/');
+        authSpy.mockReturnValue('/api/engine/v2');
         const httpSpy = vi.spyOn(Http, 'del');
         httpSpy.mockImplementation(() => Promise.resolve(undefined) as any);
 
@@ -141,7 +141,7 @@ describe('Users API', () => {
 
     test('should allow getting user resource token', async () => {
         const authSpy = vi.spyOn(Auth, 'apiEndpoint');
-        authSpy.mockReturnValue('/api/engine/v2/');
+        authSpy.mockReturnValue('/api/engine/v2');
         const httpSpy = vi.spyOn(Http, 'post');
         httpSpy.mockImplementation(
             () => Promise.resolve({ token: 'xyz789' }) as any,
