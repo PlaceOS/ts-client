@@ -108,7 +108,7 @@ export function queryUserGroups(
     query_params: PlaceUserGroupsOptions,
 ): Promise<PlaceUserGroupResponse[]> {
     const q = toQueryString(query_params);
-    const url = `${apiEndpoint()}${PATH}/groups${q ? '?' + q : ''}`;
+    const url = `${apiEndpoint()}/${PATH}/groups${q ? '?' + q : ''}`;
     return get(url).then((resp: HashMap) => resp as PlaceUserGroupResponse[]);
 }
 
@@ -120,7 +120,7 @@ export function searchUserMetadata(
     query_params: PlaceUserMetadataSearchOptions,
 ): Promise<PlaceUser[]> {
     const q = toQueryString(query_params);
-    const url = `${apiEndpoint()}${PATH}/metadata/search${q ? '?' + q : ''}`;
+    const url = `${apiEndpoint()}/${PATH}/metadata/search${q ? '?' + q : ''}`;
     return get(url).then((resp: HashMap) =>
         ((resp || []) as HashMap[]).map((item) => process(item)),
     );
@@ -130,7 +130,7 @@ export function searchUserMetadata(
  * Obtain a token to the current user's SSO resources
  */
 export function currentUserResourceToken(): Promise<PlaceUserResourceToken> {
-    const url = `${apiEndpoint()}${PATH}/resource_token`;
+    const url = `${apiEndpoint()}/${PATH}/resource_token`;
     return post(url, {}).then(
         (resp: HashMap) => resp as PlaceUserResourceToken,
     );
@@ -159,7 +159,7 @@ export function userMetadata(
  * @param id User ID
  */
 export function removeUserResourceToken(id: string): Promise<void> {
-    const url = `${apiEndpoint()}${PATH}/${encodeURIComponent(id)}/resource_token`;
+    const url = `${apiEndpoint()}/${PATH}/${encodeURIComponent(id)}/resource_token`;
     return del(url, { response_type: 'void' });
 }
 
@@ -168,7 +168,7 @@ export function removeUserResourceToken(id: string): Promise<void> {
  * @param id User ID
  */
 export function userResourceToken(id: string): Promise<PlaceUserResourceToken> {
-    const url = `${apiEndpoint()}${PATH}/${encodeURIComponent(id)}/resource_token`;
+    const url = `${apiEndpoint()}/${PATH}/${encodeURIComponent(id)}/resource_token`;
     return post(url, {}).then(
         (resp: HashMap) => resp as PlaceUserResourceToken,
     );

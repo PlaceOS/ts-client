@@ -74,6 +74,6 @@ export function removeDomain(id: string) {
  * @param email Email address to lookup
  */
 export function lookupDomainByEmail(email: string): Promise<string> {
-    const url = `${apiEndpoint()}${PATH}/lookup/${encodeURIComponent(email)}`;
+    const url = `${apiEndpoint()}/${PATH}/lookup/${encodeURIComponent(email)}`;
     return get(url).then((resp) => `${resp}`);
 }

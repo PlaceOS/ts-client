@@ -6,7 +6,7 @@ import * as SERVICE from '../../src/webrtc/functions';
 describe('WebRTC Rooms API', () => {
     test('should query public chat rooms', async () => {
         const authSpy = vi.spyOn(Auth, 'apiEndpoint');
-        authSpy.mockReturnValue('/api/engine/v2/');
+        authSpy.mockReturnValue('/api/engine/v2');
         const httpSpy = vi.spyOn(Http, 'get');
         httpSpy.mockImplementation(
             () => Promise.resolve([{ system: { name: 'Room 1' } }]) as any,
@@ -20,7 +20,7 @@ describe('WebRTC Rooms API', () => {
 
     test('should query public chat rooms with query params', async () => {
         const authSpy = vi.spyOn(Auth, 'apiEndpoint');
-        authSpy.mockReturnValue('/api/engine/v2/');
+        authSpy.mockReturnValue('/api/engine/v2');
         const httpSpy = vi.spyOn(Http, 'get');
         httpSpy.mockImplementation(() => Promise.resolve([]) as any);
 
@@ -33,7 +33,7 @@ describe('WebRTC Rooms API', () => {
 
     test('should show room details', async () => {
         const authSpy = vi.spyOn(Auth, 'apiEndpoint');
-        authSpy.mockReturnValue('/api/engine/v2/');
+        authSpy.mockReturnValue('/api/engine/v2');
         const httpSpy = vi.spyOn(Http, 'get');
         httpSpy.mockImplementation(
             () => Promise.resolve({ system: { name: 'Test Room' } }) as any,
@@ -49,7 +49,7 @@ describe('WebRTC Rooms API', () => {
 
     test('should encode special characters in system ID', async () => {
         const authSpy = vi.spyOn(Auth, 'apiEndpoint');
-        authSpy.mockReturnValue('/api/engine/v2/');
+        authSpy.mockReturnValue('/api/engine/v2');
         const httpSpy = vi.spyOn(Http, 'get');
         httpSpy.mockImplementation(() => Promise.resolve({}) as any);
 
@@ -63,7 +63,7 @@ describe('WebRTC Rooms API', () => {
 describe('WebRTC Session Members', () => {
     test('should get session members', async () => {
         const authSpy = vi.spyOn(Auth, 'apiEndpoint');
-        authSpy.mockReturnValue('/api/engine/v2/');
+        authSpy.mockReturnValue('/api/engine/v2');
         const httpSpy = vi.spyOn(Http, 'get');
         httpSpy.mockImplementation(
             () =>
@@ -87,7 +87,7 @@ describe('WebRTC Session Members', () => {
 describe('WebRTC Guest Entry', () => {
     test('should request guest entry', async () => {
         const authSpy = vi.spyOn(Auth, 'apiEndpoint');
-        authSpy.mockReturnValue('/api/engine/v2/');
+        authSpy.mockReturnValue('/api/engine/v2');
         const httpSpy = vi.spyOn(Http, 'post');
         httpSpy.mockImplementation(() => Promise.resolve({}) as any);
 
@@ -108,7 +108,7 @@ describe('WebRTC Guest Entry', () => {
 
     test('should encode special characters in system ID for guest entry', async () => {
         const authSpy = vi.spyOn(Auth, 'apiEndpoint');
-        authSpy.mockReturnValue('/api/engine/v2/');
+        authSpy.mockReturnValue('/api/engine/v2');
         const httpSpy = vi.spyOn(Http, 'post');
         httpSpy.mockImplementation(() => Promise.resolve({}) as any);
 
@@ -130,7 +130,7 @@ describe('WebRTC Guest Entry', () => {
 describe('WebRTC Guest Exit', () => {
     test('should call guest exit', async () => {
         const authSpy = vi.spyOn(Auth, 'apiEndpoint');
-        authSpy.mockReturnValue('/api/engine/v2/');
+        authSpy.mockReturnValue('/api/engine/v2');
         const httpSpy = vi.spyOn(Http, 'post');
         httpSpy.mockImplementation(() => Promise.resolve({}) as any);
 
@@ -145,7 +145,7 @@ describe('WebRTC Guest Exit', () => {
 describe('WebRTC Kick User', () => {
     test('should kick a user from a session', async () => {
         const authSpy = vi.spyOn(Auth, 'apiEndpoint');
-        authSpy.mockReturnValue('/api/engine/v2/');
+        authSpy.mockReturnValue('/api/engine/v2');
         const httpSpy = vi.spyOn(Http, 'post');
         httpSpy.mockImplementation(() => Promise.resolve({}) as any);
 
@@ -160,7 +160,7 @@ describe('WebRTC Kick User', () => {
 
     test('should encode special characters in user ID and session ID', async () => {
         const authSpy = vi.spyOn(Auth, 'apiEndpoint');
-        authSpy.mockReturnValue('/api/engine/v2/');
+        authSpy.mockReturnValue('/api/engine/v2');
         const httpSpy = vi.spyOn(Http, 'post');
         httpSpy.mockImplementation(() => Promise.resolve({}) as any);
 
@@ -177,7 +177,7 @@ describe('WebRTC Kick User', () => {
 describe('WebRTC Transfer User', () => {
     test('should transfer a user to another session', async () => {
         const authSpy = vi.spyOn(Auth, 'apiEndpoint');
-        authSpy.mockReturnValue('/api/engine/v2/');
+        authSpy.mockReturnValue('/api/engine/v2');
         const httpSpy = vi.spyOn(Http, 'post');
         httpSpy.mockImplementation(() => Promise.resolve({}) as any);
 
@@ -196,7 +196,7 @@ describe('WebRTC Transfer User', () => {
 
     test('should transfer a user without connection details', async () => {
         const authSpy = vi.spyOn(Auth, 'apiEndpoint');
-        authSpy.mockReturnValue('/api/engine/v2/');
+        authSpy.mockReturnValue('/api/engine/v2');
         const httpSpy = vi.spyOn(Http, 'post');
         httpSpy.mockImplementation(() => Promise.resolve({}) as any);
 

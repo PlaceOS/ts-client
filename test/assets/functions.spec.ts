@@ -1,5 +1,6 @@
 import { describe, expect, test, vi } from 'vitest';
 import * as Api from '../../src/api';
+import * as Auth from '../../src/auth/functions';
 import {
     PlaceAsset,
     PlaceAssetCategory,
@@ -54,9 +55,11 @@ describe('Assets API', () => {
     });
 
     test('should allow bulk creating assets', async () => {
+        vi.spyOn(Auth, 'apiEndpoint').mockReturnValue('/api/engine/v2');
         const spy = vi.spyOn(Api, 'post');
         spy.mockImplementation(() => Promise.resolve([{}, {}] as any));
         const items = await SERVICE.addAssets([{}, {}]);
+        expect(spy.mock.calls[0][0]).toBe('/api/engine/v2/assets/bulk');
         expect(items).toBeTruthy();
         expect(items.length).toBe(2);
         expect(items[0]).toBeInstanceOf(PlaceAsset);
@@ -64,9 +67,11 @@ describe('Assets API', () => {
     });
 
     test('should allow bulk updating assets', async () => {
+        vi.spyOn(Auth, 'apiEndpoint').mockReturnValue('/api/engine/v2');
         const patchSpy = vi.spyOn(Api, 'patch');
         patchSpy.mockImplementation(() => Promise.resolve([{}, {}] as any));
         let items = await SERVICE.updateAssets([{}, {}]);
+        expect(patchSpy.mock.calls[0][0]).toBe('/api/engine/v2/assets/bulk');
         expect(items).toBeTruthy();
         expect(items.length).toBe(2);
         expect(items[0]).toBeInstanceOf(PlaceAsset);
@@ -78,9 +83,11 @@ describe('Assets API', () => {
     });
 
     test('should allow bulk removing assets', async () => {
+        vi.spyOn(Auth, 'apiEndpoint').mockReturnValue('/api/engine/v2');
         const spy = vi.spyOn(Api, 'del');
         spy.mockImplementation(() => Promise.resolve([{}, {}] as any));
         const items = await SERVICE.removeAssets(['1', '2']);
+        expect(spy.mock.calls[0][0]).toBe('/api/engine/v2/assets/bulk');
         expect(items).toBeTruthy();
         expect(items.length).toBe(2);
     });

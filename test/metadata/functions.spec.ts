@@ -56,7 +56,7 @@ describe('Applications API', () => {
     });
 
     test('should allow renaming metadata', async () => {
-        vi.spyOn(Auth, 'apiEndpoint').mockReturnValue('/api/engine/v2/');
+        vi.spyOn(Auth, 'apiEndpoint').mockReturnValue('/api/engine/v2');
         const spy = vi.spyOn(Http, 'patch');
         spy.mockImplementation(() =>
             Promise.resolve({ parent_id: '1', name: 'new-name', details: {} }) as any,

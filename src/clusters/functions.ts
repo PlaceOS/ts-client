@@ -77,7 +77,7 @@ export function terminateProcess(
  * Force the core nodes to perform a cluster rebalance
  */
 export function clusterRebalance(): Promise<void> {
-    const url = `${apiEndpoint()}${PATH}/rebalance`;
+    const url = `${apiEndpoint()}/${PATH}/rebalance`;
     return post(url, {}).then(() => undefined);
 }
 
@@ -85,6 +85,6 @@ export function clusterRebalance(): Promise<void> {
  * Get the core node versions
  */
 export function clusterVersions(): Promise<PlaceClusterVersions> {
-    const url = `${apiEndpoint()}${PATH}/versions`;
+    const url = `${apiEndpoint()}/${PATH}/versions`;
     return get(url).then((resp: HashMap) => resp as PlaceClusterVersions);
 }

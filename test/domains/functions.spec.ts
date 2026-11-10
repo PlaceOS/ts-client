@@ -50,7 +50,7 @@ describe('Domains API', () => {
 
     test('should allow looking up domain by email', async () => {
         const authSpy = vi.spyOn(Auth, 'apiEndpoint');
-        authSpy.mockReturnValue('/api/engine/v2/');
+        authSpy.mockReturnValue('/api/engine/v2');
         const httpSpy = vi.spyOn(Http, 'get');
         httpSpy.mockImplementation(() => Promise.resolve('example.com') as any);
 

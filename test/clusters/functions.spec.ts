@@ -38,7 +38,7 @@ describe('Cluster API', () => {
 
     test('should allow triggering cluster rebalance', async () => {
         const authSpy = vi.spyOn(Auth, 'apiEndpoint');
-        authSpy.mockReturnValue('/api/engine/v2/');
+        authSpy.mockReturnValue('/api/engine/v2');
         const httpSpy = vi.spyOn(Http, 'post');
         httpSpy.mockImplementation(() => Promise.resolve({}) as any);
 
@@ -51,7 +51,7 @@ describe('Cluster API', () => {
 
     test('should allow getting cluster versions', async () => {
         const authSpy = vi.spyOn(Auth, 'apiEndpoint');
-        authSpy.mockReturnValue('/api/engine/v2/');
+        authSpy.mockReturnValue('/api/engine/v2');
         const httpSpy = vi.spyOn(Http, 'get');
         httpSpy.mockImplementation(
             () =>

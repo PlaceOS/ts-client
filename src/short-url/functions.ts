@@ -102,7 +102,7 @@ export function removeShortUrl(
 export function shortUrlRedirectUrl(
     id: string,
 ): string {
-    return `${apiEndpoint()}${PATH}/${encodeURIComponent(id)}/redirect`;
+    return `${apiEndpoint()}/${PATH}/${encodeURIComponent(id)}/redirect`;
 }
 
 /**
@@ -111,7 +111,7 @@ export function shortUrlRedirectUrl(
  */
 export function getShortUrlQrCodeSvg(id: string) {
     return get(
-        `${apiEndpoint()}${PATH}/${encodeURIComponent(id)}/qr_code.svg`,
+        `${apiEndpoint()}/${PATH}/${encodeURIComponent(id)}/qr_code.svg`,
         { response_type: 'text' },
     );
 }
@@ -127,7 +127,7 @@ export function shortUrlQrCodePngUrl(
     options: PlaceShortUrlPngQrOptions = {},
 ): string {
     const q = toQueryString(options);
-    return `${apiEndpoint()}${PATH}/${encodeURIComponent(id)}/qr_code.png${q ? '?' + q : ''}`;
+    return `${apiEndpoint()}/${PATH}/${encodeURIComponent(id)}/qr_code.png${q ? '?' + q : ''}`;
 }
 
 /**
@@ -138,7 +138,7 @@ export function qrCodeUrl(options: PlaceQrCodeOptions): string {
     const { format = 'svg', ...params } = options;
     const query_params = { ...params, format };
     const q = toQueryString(query_params);
-    return `${apiEndpoint()}${PATH}/qr_code${q ? '?' + q : ''}`;
+    return `${apiEndpoint()}/${PATH}/qr_code${q ? '?' + q : ''}`;
 }
 
 /**
@@ -149,7 +149,7 @@ export function qrCodeUrl(options: PlaceQrCodeOptions): string {
 export function generateQrCode(options: Omit<PlaceQrCodeOptions, 'format'>) {
     const query_params = { ...options, format: 'svg' };
     const q = toQueryString(query_params);
-    return get(`${apiEndpoint()}${PATH}/qr_code${q ? '?' + q : ''}`, {
+    return get(`${apiEndpoint()}/${PATH}/qr_code${q ? '?' + q : ''}`, {
         response_type: 'text',
     });
 }
