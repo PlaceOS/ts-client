@@ -62,6 +62,12 @@ export interface MockHttpRequestHandlerOptions<T = any> {
     delay?: number;
     /** Number of milliseconds the delay value can vary */
     delay_variance?: number;
+    /**
+     * Response headers for the request, e.g. `link` and `x-total-count` for paginated results.
+     * Use a function to make headers that change with the request.
+     * The values are available from `responseHeaders(url)` after the request resolves
+     */
+    headers?: HashMap<string> | ((request: MockHttpRequest) => HashMap<string>);
 }
 
 /** Interface for data needed to handle Mock HTTP requests */
@@ -88,4 +94,12 @@ export interface MockHttpRequest {
     query_params: HashMap<string>;
     /** Request body */
     body: any;
+}
+
+/** Result of a mock HTTP request */
+export interface MockHttpResponse {
+    /** Response body */
+    body: HashMap | string | void;
+    /** Response headers. Keys are lowercase */
+    headers: HashMap<string>;
 }

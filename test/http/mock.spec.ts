@@ -131,6 +131,27 @@ describe('MockHttp', () => {
         await promise;
     });
 
+    test('should return response headers', async () => {
+        MockHttp.registerMockEndpoint({
+            path: 'items',
+            method: 'GET',
+            callback: () => [1, 2],
+            headers: (request) => ({
+                Link: `<items?offset=${+request.query_params.offset + 2}>; rel="next"`,
+                'X-Total-Count': '10',
+            }),
+        });
+        const promise = MockHttp.mockRequest('GET', 'items?offset=2');
+        vi.runOnlyPendingTimers();
+        await expect(promise).resolves.toEqual({
+            body: [1, 2],
+            headers: {
+                link: '<items?offset=4>; rel="next"',
+                'x-total-count': '10',
+            },
+        });
+    });
+
     test('should return promise errors from handler callbacks', async () => {
         const error = new Error('Callback failure');
         MockHttp.registerMockEndpoint({

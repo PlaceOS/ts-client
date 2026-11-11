@@ -5,6 +5,7 @@ import {
     MockHttpRequest,
     MockHttpRequestHandler,
     MockHttpRequestHandlerOptions,
+    MockHttpResponse,
 } from './interfaces';
 
 const log = scoped_log('HTTP(M)');
@@ -111,7 +112,7 @@ export function mockRequest(
     url: string,
     body?: any,
     handler_map: HashMap<MockHttpRequestHandler> = _handlers,
-): Promise<HashMap | string | void> | null {
+): Promise<MockHttpResponse> | null {
     const handler = findRequestHandler(method, url, handler_map);
     if (handler) {
         const request = processRequest(url, handler, body);
@@ -223,10 +224,18 @@ export function onMockRequest(
     request: MockHttpRequest,
 ) {
     let result;
+    const headers: HashMap<string> = {};
     try {
         result = handler.callback
             ? handler.callback(request)
             : handler.metadata;
+        const raw_headers =
+            typeof handler.headers === 'function'
+                ? handler.headers(request)
+                : handler.headers || {};
+        for (const key in raw_headers) {
+            headers[key.toLowerCase()] = raw_headers[key];
+        }
     } catch (error) {
         log.error(`ERROR ${request.method}:`, request.url, error);
         return Promise.reject(error);
@@ -236,8 +245,11 @@ export function onMockRequest(
     const delay_time =
         Math.floor(Math.random() * variance - variance / 2) + delay_value;
     log(`RESP ${request.method}:`, request.url, result);
-    return new Promise<HashMap | string | void>((resolve) => {
-        setTimeout(() => resolve(result), Math.max(200, delay_time));
+    return new Promise<MockHttpResponse>((resolve) => {
+        setTimeout(
+            () => resolve({ body: result, headers }),
+            Math.max(200, delay_time),
+        );
     });
 }
 

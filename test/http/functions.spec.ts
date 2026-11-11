@@ -143,6 +143,25 @@ describe('Http', () => {
         expect(Http.responseHeaders('/test')).toEqual({});
     });
 
+    test('should store response headers from mock requests', async () => {
+        const mock_handler = vi.fn(async () => ({
+            body: [1],
+            headers: { link: '</items?offset=1>; rel="next"' },
+        }));
+        const data = await Http.request(
+            'GET',
+            '/items',
+            {},
+            () => true,
+            mock_handler,
+        );
+        expect(data).toEqual([1]);
+        expect(window.fetch).not.toHaveBeenCalled();
+        expect(Http.responseHeaders(`${location.origin}/items`)).toEqual({
+            link: '</items?offset=1>; rel="next"',
+        });
+    });
+
     test('should allow GET requests', async () => {
         expect.assertions(2);
         const data = await Http.get('test_url');

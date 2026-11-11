@@ -11,6 +11,7 @@ export type {
     MockHttpRequest,
     MockHttpRequestHandler,
     MockHttpRequestHandlerOptions,
+    MockHttpResponse,
 } from './http/interfaces';
 export {
     deregisterMockEndpoint,

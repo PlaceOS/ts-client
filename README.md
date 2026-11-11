@@ -446,6 +446,32 @@ registerMockEndpoint({
 
 Query parameters are also available on the callback input.
 
+Handlers can return response headers, e.g. `Link` and `X-Total-Count` for paginated results.
+Use a static map, or a function to make headers from the request.
+Header keys are lowercase in `responseHeaders(url)`, the same as live requests.
+
+```typescript
+registerMockEndpoint({
+    path: '/api/engine/v2/systems',
+    method: 'GET',
+    callback: (request) => {
+        const offset = +(request.query_params.offset || 0);
+        return my_mock_systems.slice(offset, offset + 20);
+    },
+    headers: (request) => {
+        const next = +(request.query_params.offset || 0) + 20;
+        return {
+            'X-Total-Count': `${my_mock_systems.length}`,
+            ...(next < my_mock_systems.length
+                ? {
+                      Link: `</api/engine/v2/systems?offset=${next}>; rel="next"`,
+                  }
+                : {}),
+        };
+    },
+});
+```
+
 `GET`, `POST`, `PUT`, `PATCH` and `DELETE` requests can be mocked out.
 
 Mock HTTP handlers return promises. If a request is made and there are no handlers it will attempt to make the live request.

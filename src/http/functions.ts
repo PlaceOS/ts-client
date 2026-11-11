@@ -20,6 +20,7 @@ import {
     HttpTextOptions,
     HttpVerb,
     HttpVoidOptions,
+    MockHttpResponse,
 } from './interfaces';
 import { mockRequest } from './mock';
 
@@ -289,7 +290,7 @@ export function request(
         m: HttpVerb,
         url: string,
         body?: any,
-    ) => Promise<HashMap | string | void> | null = mockRequest,
+    ) => Promise<MockHttpResponse> | null = mockRequest,
     success: (
         e: Response,
         t: HttpResponseType,
@@ -297,7 +298,14 @@ export function request(
 ): Promise<HttpResponse> {
     if (is_mock()) {
         const mock_request = mock_handler(method, url, options?.body);
-        if (mock_request) return mock_request;
+        if (mock_request) {
+            return mock_request.then(({ body, headers }) => {
+                // Key like `fetch` does with `resp.url`, which is always absolute
+                const key = url[0] === '/' ? `${location.origin}${url}` : url;
+                _response_headers[key] = headers;
+                return body;
+            });
+        }
     }
     options.headers = { ...appHeaders(), ...options.headers };
     if (!options.headers['Content-Type'] && !options.headers['content-type']) {
