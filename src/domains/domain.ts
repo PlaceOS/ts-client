@@ -2,6 +2,8 @@ import { PlaceResource } from '../resources/resource';
 import { HashMap } from '../utilities/types';
 
 export class PlaceDomain extends PlaceResource {
+    /** ID of the organisation that owns this row; empty when unowned */
+    public readonly organisation_id: string;
     /** Domain name */
     public readonly domain: string;
     /** Login URL for the domain */
@@ -19,6 +21,7 @@ export class PlaceDomain extends PlaceResource {
 
     constructor(raw_data: Partial<PlaceDomain> = {}) {
         super(raw_data);
+        this.organisation_id = raw_data.organisation_id || '';
         this.description = raw_data.description || '';
         this.domain = raw_data.domain || '';
         this.login_url = raw_data.login_url || '';
