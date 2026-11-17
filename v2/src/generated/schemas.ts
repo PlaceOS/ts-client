@@ -453,17 +453,13 @@ export interface AssetType extends Output<typeof AssetTypeSchema> {}
 export interface AssetTypeInput extends Input<typeof AssetTypeSchema> {}
 export const AssetType: Schema<AssetType, AssetTypeInput> = AssetTypeSchema;
 
-const BrokerAuthTypeSchema = literal(['certificate', 'no_auth', 'user_password']);
-export type BrokerAuthType = Output<typeof BrokerAuthTypeSchema>;
-export type BrokerAuthTypeInput = Input<typeof BrokerAuthTypeSchema>;
-export const BrokerAuthType: Schema<BrokerAuthType, BrokerAuthTypeInput> = BrokerAuthTypeSchema;
-
 const BrokerSchema = object({
     /** Unix time in seconds. */
     created_at: nullable(integer()),
     /** Unix time in seconds. */
     updated_at: nullable(integer()),
-    auth_type: nullable(BrokerAuthType),
+    /** The number of the enum: 0 certificate, 1 no_auth, 2 user_password. */
+    auth_type: nullable(literal([0, 1, 2])),
     name: nullable(string()),
     description: nullable(string()),
     host: nullable(string()),
@@ -765,11 +761,6 @@ export interface ConnectionMetricsInput extends Input<typeof ConnectionMetricsSc
 export const ConnectionMetrics: Schema<ConnectionMetrics, ConnectionMetricsInput> =
     ConnectionMetricsSchema;
 
-const DriverRoleSchema = literal(['ssh', 'device', 'service', 'websocket', 'logic']);
-export type DriverRole = Output<typeof DriverRoleSchema>;
-export type DriverRoleInput = Input<typeof DriverRoleSchema>;
-export const DriverRole: Schema<DriverRole, DriverRoleInput> = DriverRoleSchema;
-
 const TriggerActionsEmailSchema = object({
     emails: nullable(array(string())),
     content: nullable(string()),
@@ -939,7 +930,8 @@ const ModuleSchema = object({
     uri: nullable(string()),
     name: nullable(string()),
     custom_name: nullable(string()),
-    role: nullable(DriverRole),
+    /** The number of the enum: 0 ssh, 1 device, 2 service, 3 websocket, 99 logic. */
+    role: nullable(literal([0, 1, 2, 3, 99])),
     /** the alert level for stagehand issues */
     alert_level: nullable(AlertSeverity),
     connected: nullable(boolean()),
@@ -962,20 +954,6 @@ const ModuleSchema = object({
 export interface Module extends Output<typeof ModuleSchema> {}
 export interface ModuleInput extends Input<typeof ModuleSchema> {}
 export const Module: Schema<Module, ModuleInput> = ModuleSchema;
-
-const PlaylistAnimationSchema = literal([
-    'default',
-    'cut',
-    'cross_fade',
-    'slide_top',
-    'slide_left',
-    'slide_right',
-    'slide_bottom',
-]);
-export type PlaylistAnimation = Output<typeof PlaylistAnimationSchema>;
-export type PlaylistAnimationInput = Input<typeof PlaylistAnimationSchema>;
-export const PlaylistAnimation: Schema<PlaylistAnimation, PlaylistAnimationInput> =
-    PlaylistAnimationSchema;
 
 const PlaylistOrientationSchema = literal(['unspecified', 'landscape', 'portrait', 'square']);
 export type PlaylistOrientation = Output<typeof PlaylistOrientationSchema>;
@@ -1012,7 +990,11 @@ const PlaylistSchema = object({
     orientation: nullable(PlaylistOrientation),
     play_count: nullable(integer()),
     play_through_count: nullable(integer()),
-    default_animation: nullable(PlaylistAnimation),
+    /**
+     * The number of the enum: 0 default, 1 cut, 2 cross_fade, 3 slide_top, 4 slide_left, 5
+     * slide_right, 6 slide_bottom.
+     */
+    default_animation: nullable(literal([0, 1, 2, 3, 4, 5, 6])),
     random: nullable(boolean()),
     enabled: nullable(boolean()),
     distribution: nullable(boolean()),
@@ -1050,7 +1032,11 @@ const PlaylistItemSchema = object({
     video_length: nullable(integer('Int32')),
     start_time: nullable(integer('Int32')),
     play_time: nullable(integer('Int32')),
-    animation: nullable(PlaylistAnimation),
+    /**
+     * The number of the enum: 0 default, 1 cut, 2 cross_fade, 3 slide_top, 4 slide_left, 5
+     * slide_right, 6 slide_bottom.
+     */
+    animation: nullable(literal([0, 1, 2, 3, 4, 5, 6])),
     media_type: nullable(PlaylistItemMediaType),
     orientation: nullable(PlaylistOrientation),
     media_uri: nullable(string()),
@@ -1225,7 +1211,8 @@ const DriverSchema = object({
     json_schema: nullable(json()),
     default_uri: nullable(string()),
     default_port: nullable(integer('Int32')),
-    role: nullable(DriverRole),
+    /** The number of the enum: 0 ssh, 1 device, 2 service, 3 websocket, 99 logic. */
+    role: nullable(literal([0, 1, 2, 3, 99])),
     /** the default alert level for stagehand issues */
     alert_level: nullable(AlertSeverity),
     file_name: nullable(string()),
@@ -1242,6 +1229,11 @@ const DriverSchema = object({
 export interface Driver extends Output<typeof DriverSchema> {}
 export interface DriverInput extends Input<typeof DriverSchema> {}
 export const Driver: Schema<Driver, DriverInput> = DriverSchema;
+
+const DriverRoleSchema = literal(['ssh', 'device', 'service', 'websocket', 'logic']);
+export type DriverRole = Output<typeof DriverRoleSchema>;
+export type DriverRoleInput = Input<typeof DriverRoleSchema>;
+export const DriverRole: Schema<DriverRole, DriverRoleInput> = DriverRoleSchema;
 
 const EdgeSchema = object({
     /** Unix time in seconds. */
@@ -1370,11 +1362,6 @@ const EdgeStatisticsSchema = object(
 export interface EdgeStatistics extends Output<typeof EdgeStatisticsSchema> {}
 export interface EdgeStatisticsInput extends Input<typeof EdgeStatisticsSchema> {}
 export const EdgeStatistics: Schema<EdgeStatistics, EdgeStatisticsInput> = EdgeStatisticsSchema;
-
-const EncryptionLevelSchema = literal(['none', 'support', 'admin', 'never_display']);
-export type EncryptionLevel = Output<typeof EncryptionLevelSchema>;
-export type EncryptionLevelInput = Input<typeof EncryptionLevelSchema>;
-export const EncryptionLevel: Schema<EncryptionLevel, EncryptionLevelInput> = EncryptionLevelSchema;
 
 const GitRepositoryCommitSchema = object(
     {
@@ -2285,7 +2272,8 @@ const SettingsSchema = object({
     updated_at: nullable(integer()),
     modified_by_id: nullable(string()),
     settings_id: nullable(string()),
-    encryption_level: nullable(EncryptionLevel),
+    /** The number of the enum: 0 none, 1 support, 2 admin, 3 never_display. */
+    encryption_level: nullable(literal([0, 1, 2, 3])),
     settings_string: nullable(string()),
     keys: nullable(array(string())),
     parent_type: nullable(SettingsParentType),

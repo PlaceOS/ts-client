@@ -6,8 +6,9 @@
  *     bun scripts/generate.ts --check   Fails if a generated file is not up to date.
  *
  * The output is one schema file and one operation file for each API controller. The schema file
- * has a schema value and a type of the same name for each named schema of the document. Each
- * operation file has one function for each endpoint of the controller.
+ * has a schema value and a type of the same name for each named schema that an operation uses,
+ * directly or through other schemas. Each operation file has one function for each endpoint of
+ * the controller.
  *
  * The generator stops with an assertion on a part of the document that it does not support. Then
  * a change to the document cannot make the output wrong without a message.
@@ -102,6 +103,66 @@ const STRING_TIME_FIELDS: ReadonlyMap<string, readonly string[]> = new Map([
     ['PlaceOS.Model.Upload', ['cache_modified']],
 ]);
 
+/**
+ * Enum fields that the server sends as the number of the enum. A PgORM `attribute` with
+ * `Enum::ValueConverter` writes `value`, but the document gives the names of the enum. The values
+ * come from PlaceOS/models, and the live server sends these numbers. `ApiKey.permissions` has the
+ * same converter in the models source, but the server sends its name, so it is not here.
+ */
+const DRIVER_ROLES = { ssh: 0, device: 1, service: 2, websocket: 3, logic: 99 };
+const ANIMATIONS = {
+    default: 0,
+    cut: 1,
+    cross_fade: 2,
+    slide_top: 3,
+    slide_left: 4,
+    slide_right: 5,
+    slide_bottom: 6,
+};
+const VALUE_ENUM_FIELDS: ReadonlyMap<string, Readonly<Record<string, ValueEnum>>> = new Map([
+    [
+        'PlaceOS.Model.Broker',
+        {
+            auth_type: valueEnum('PlaceOS.Model.Broker.AuthType', {
+                certificate: 0,
+                no_auth: 1,
+                user_password: 2,
+            }),
+        },
+    ],
+    ['PlaceOS.Model.Driver', { role: valueEnum('PlaceOS.Model.Driver.Role', DRIVER_ROLES) }],
+    ['PlaceOS.Model.Module', { role: valueEnum('PlaceOS.Model.Driver.Role', DRIVER_ROLES) }],
+    [
+        'PlaceOS.Model.Playlist',
+        { default_animation: valueEnum('PlaceOS.Model.Playlist.Animation', ANIMATIONS) },
+    ],
+    [
+        'PlaceOS.Model.Playlist.Item',
+        { animation: valueEnum('PlaceOS.Model.Playlist.Animation', ANIMATIONS) },
+    ],
+    [
+        'PlaceOS.Model.Settings',
+        {
+            encryption_level: valueEnum('PlaceOS.Encryption.Level', {
+                none: 0,
+                support: 1,
+                admin: 2,
+                never_display: 3,
+            }),
+        },
+    ],
+]);
+
+interface ValueEnum {
+    /** The enum schema of the document that the field refers to now. */
+    readonly specName: string;
+    readonly values: Readonly<Record<string, number>>;
+}
+
+function valueEnum(specName: string, values: Readonly<Record<string, number>>): ValueEnum {
+    return { specName, values };
+}
+
 /** Operations that send JSON, but have no response schema in the document. */
 const JSON_RESPONSE_OPERATIONS: ReadonlySet<string> = new Set([
     'PlaceOS::Api::Modules_execute',
@@ -119,7 +180,10 @@ const CORE_NAMES: ReadonlySet<string> = new Set([
     'AuthSession',
     'AuthSessionConfig',
     'AuthStatus',
+    'BindingState',
     'Credential',
+    'DebugMessage',
+    'DebugTarget',
     'DomainAuthority',
     'DomainAuthorityInput',
     'FrameError',
@@ -141,12 +205,21 @@ const CORE_NAMES: ReadonlySet<string> = new Set([
     'OperationInput',
     'Output',
     'PageInfo',
+    'Realtime',
+    'RealtimeConfig',
+    'RealtimeEnvironment',
+    'RealtimeError',
+    'RealtimeSocket',
+    'RealtimeStatus',
+    'RealtimeTarget',
     'Reply',
     'Result',
     'Schema',
     'SchemaError',
     'SchemaNode',
+    'SocketHandlers',
     'Simplify',
+    'TokenTransport',
 ]);
 
 const RESERVED_WORDS: ReadonlySet<string> = new Set(
@@ -176,6 +249,8 @@ const SCHEMA_KEYS: ReadonlySet<string> = new Set([
     'type',
 ]);
 const METHODS = ['get', 'post', 'put', 'patch', 'delete'] as const;
+/** The keys of a path item that are not a method. They change nothing in the output. */
+const PATH_ITEM_KEYS: ReadonlySet<string> = new Set(['summary', 'description']);
 const INTEGER_FORMATS: ReadonlySet<string> = new Set(['Int32', 'UInt32', 'Int64']);
 const NUMBER_FORMATS: ReadonlySet<string> = new Set(['Float32', 'Float64']);
 const STRING_FORMATS: ReadonlySet<string> = new Set(['date-time', 'email', 'uuid']);
@@ -224,6 +299,10 @@ async function main(): Promise<void> {
     const skipped: string[] = [];
     for (const [path, itemValue] of Object.entries(paths)) {
         const item = asNode(itemValue, `paths.${path}`);
+        for (const key of Object.keys(item)) {
+            const known = PATH_ITEM_KEYS.has(key) || METHODS.some((method) => method === key);
+            assert(known, `the key "${key}" of the path ${path} is supported`);
+        }
         for (const method of METHODS) {
             const operationValue = field(item, method);
             if (operationValue === undefined) continue;
@@ -512,10 +591,7 @@ interface TimeFields {
 /** Returns the code of a schema expression, such as `nullable(string())`. */
 function emitSchema(schemas: SpecNode, node: SpecNode, imports: Imports, depth: number): string {
     assert(depth < EMIT_DEPTH_MAX, 'the schema depth is less than EMIT_DEPTH_MAX');
-    for (const key of Object.keys(node)) {
-        const supported = IGNORED_SCHEMA_KEYS.has(key) || SCHEMA_KEYS.has(key);
-        assert(supported, `the schema key "${key}" is supported`);
-    }
+    assertSupportedKeys(node);
 
     const ref = field(node, '$ref');
     if (ref !== undefined) {
@@ -646,6 +722,12 @@ function emitObject(
     depth: number,
     timeFields: TimeFields | null,
 ): string {
+    // A named schema comes here without `emitSchema`, so check its keys here too. An object
+    // with properties cannot also be one of these: the output would ignore them.
+    assertSupportedKeys(node);
+    for (const key of ['$ref', 'anyOf', 'enum', 'additionalProperties', 'items']) {
+        assert(field(node, key) === undefined, `an object with properties has no "${key}"`);
+    }
     const properties = asNode(field(node, 'properties'), 'properties');
     const required = asArray(field(node, 'required') ?? [], 'required').map((key) =>
         asString(key, 'required key'),
@@ -658,10 +740,40 @@ function emitObject(
         let description = optionalString(field(property, 'description'), key) ?? '';
         let expression: string;
         const isTime = isDateTime(property);
+        const valueEnumField =
+            timeFields === null ? undefined : VALUE_ENUM_FIELDS.get(timeFields.specName)?.[key];
         if (timeFields === null) {
             expression = emitSchema(schemas, property, imports, depth + 1);
+        } else if (valueEnumField !== undefined) {
+            const target = `#/components/schemas/${valueEnumField.specName}`;
+            const subject = `${timeFields.specName}.${key}`;
+            assertPatchedShape(property, (node) => isOnly(node, { $ref: target }), subject);
+            // A new member of the enum needs its number in the patch.
+            const enumNode = asNode(field(schemas, valueEnumField.specName), 'the patched enum');
+            assertSupportedKeys(enumNode);
+            assert(
+                isOnly(enumNode, { type: 'string', enum: field(enumNode, 'enum') }),
+                `${valueEnumField.specName} is a string enum and nothing else`,
+            );
+            const members = asArray(field(enumNode, 'enum'), 'the patched enum values').map(String);
+            const mapped = Object.keys(valueEnumField.values);
+            assert(
+                [...members].sort().join() === [...mapped].sort().join(),
+                `the numbers of ${valueEnumField.specName} cover each member of the enum`,
+            );
+            imports.combinators.add('literal');
+            expression = `literal(${JSON.stringify(Object.values(valueEnumField.values))})`;
+            if (isNullable(property)) {
+                imports.combinators.add('nullable');
+                expression = `nullable(${expression})`;
+            }
+            const names = Object.entries(valueEnumField.values).map(([n, v]) => `${v} ${n}`);
+            const separator = description.length > 0 ? '\n\n' : '';
+            description = `${description}${separator}The number of the enum: ${names.join(', ')}.`;
         } else if (timeFields.epochFields.has(key)) {
-            assert(isTime, `${timeFields.specName}.${key} is a date-time to patch`);
+            const subject = `${timeFields.specName}.${key}`;
+            const dateTime = { type: 'string', format: 'date-time' };
+            assertPatchedShape(property, (node) => isOnly(node, dateTime), subject);
             imports.combinators.add('integer');
             expression = 'integer()';
             if (isNullable(property)) {
@@ -679,11 +791,52 @@ function emitObject(
     }
     if (timeFields !== null) {
         const keys = [...timeFields.epochFields, ...timeFields.stringFields];
+        keys.push(...Object.keys(VALUE_ENUM_FIELDS.get(timeFields.specName) ?? {}));
         for (const key of keys) assert(Object.hasOwn(properties, key), `${key} is a property`);
     }
     imports.combinators.add('object');
     const requiredList = required.length > 0 ? `, ${JSON.stringify(required)}` : '';
     return `object({\n${fields.join('\n')}\n}${requiredList})`;
+}
+
+function assertSupportedKeys(node: SpecNode): void {
+    for (const key of Object.keys(node)) {
+        const supported = IGNORED_SCHEMA_KEYS.has(key) || SCHEMA_KEYS.has(key);
+        assert(supported, `the schema key "${key}" is supported`);
+    }
+}
+
+/**
+ * A patched field must be the schema that the patch replaces, or an `anyOf` of it and `null`.
+ * Any other shape is a change of the document that the patch would hide.
+ */
+function assertPatchedShape(
+    property: SpecNode,
+    isReplaced: (node: SpecNode) => boolean,
+    subject: string,
+): void {
+    assertSupportedKeys(property);
+    const anyOf = field(property, 'anyOf');
+    if (anyOf === undefined) {
+        assert(isReplaced(property), `${subject} has the shape that the patch replaces`);
+        return;
+    }
+    assert(isOnly(property, { anyOf }), `${subject} is only an anyOf`);
+    const variants = asArray(anyOf, `${subject} anyOf`).map((variant) => asNode(variant, subject));
+    assert(variants.length === 2, `${subject} is the replaced schema or null`);
+    for (const variant of variants) {
+        assertSupportedKeys(variant);
+        const known = isReplaced(variant) || isOnly(variant, { type: 'null' });
+        assert(known, `${subject} has only the replaced schema and null`);
+    }
+    assert(variants.some(isReplaced), `${subject} has the schema that the patch replaces`);
+}
+
+/** True if `node` has exactly the fields of `expected`, ignoring the keys that change nothing. */
+function isOnly(node: SpecNode, expected: Readonly<Record<string, unknown>>): boolean {
+    const keys = Object.keys(node).filter((key) => !IGNORED_SCHEMA_KEYS.has(key));
+    if (keys.length !== Object.keys(expected).length) return false;
+    return keys.every((key) => Object.hasOwn(expected, key) && expected[key] === field(node, key));
 }
 
 function isDateTime(node: SpecNode): boolean {

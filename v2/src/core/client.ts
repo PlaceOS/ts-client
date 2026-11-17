@@ -260,32 +260,44 @@ async function send(
         bodyText = JSON.stringify(bodyChecked.value);
     }
 
-    const limits = {
-        timeoutMs: options.timeoutMs ?? client.timeoutMs,
-        bytesMax: client.responseBytesMax,
-        ...(options.signal === undefined ? {} : { signal: options.signal }),
-    };
-    // Each attempt gets the credential again, because a `rejected` auth can renew it. The time
-    // limit is for each attempt.
+    const timeoutMs = options.timeoutMs ?? client.timeoutMs;
+    assertPositiveInteger(timeoutMs, 'timeoutMs');
+    // One deadline for the call. The credential, a renewal and each fetch share it, so a slow
+    // login cannot make the call take longer than `timeoutMs`.
+    const deadlineMs = Date.now() + timeoutMs;
+    const signal = options.signal;
+    // Each attempt gets the credential again, because a `rejected` auth can renew it.
     let response: Fetched | null = null;
     for (let attempt = 0; attempt < AUTH_ATTEMPTS_MAX; attempt += 1) {
-        const credential = await resolveCredential(client.auth);
-        if (credential === null) return { ok: false, error: { kind: 'auth_missing' } };
+        const auth = client.auth;
+        const credential = await waitWithin(() => resolveCredential(auth), deadlineMs, signal);
+        if (!credential.ok) return limitError(credential.error, timeoutMs);
+        if (credential.value === null) return { ok: false, error: { kind: 'auth_missing' } };
         const headers = new Headers(client.headers);
         headers.set('Accept', 'application/json');
         if (bodyText !== null) headers.set('Content-Type', 'application/json');
-        setCredentialHeader(headers, credential);
+        setCredentialHeader(headers, credential.value);
         const init = { method: operation.method, headers, body: bodyText };
+        const remainingMs = deadlineMs - Date.now();
+        if (remainingMs <= 0) return { ok: false, error: { kind: 'timeout', timeoutMs } };
+        const limits = {
+            timeoutMs: remainingMs,
+            bytesMax: client.responseBytesMax,
+            ...(signal === undefined ? {} : { signal }),
+        };
         const fetched = await fetchBody(client.fetch, url, init, limits);
-        if (!fetched.ok) return fetched;
+        if (!fetched.ok) return limitError(fetched.error, timeoutMs);
         response = fetched.value;
 
         const status = response.status;
         if (client.auth.kind !== 'credential') break;
         if (status !== 401 && status !== 511) break;
         if (attempt + 1 >= AUTH_ATTEMPTS_MAX) break;
-        const renewed = await client.auth.rejected(status, credential);
-        if (!renewed) break;
+        const rejected = client.auth.rejected;
+        const used = credential.value;
+        const renewed = await waitWithin(() => rejected(status, used), deadlineMs, signal);
+        if (!renewed.ok) return limitError(renewed.error, timeoutMs);
+        if (!renewed.value) break;
     }
     assert(response !== null, 'the request was sent');
 
@@ -441,6 +453,52 @@ export async function fetchBody(
 }
 
 /**
+ * Starts `work`, and waits for it until `deadlineMs` or until `signal` cancels. The work itself
+ * goes on, because it can be shared, such as one renewal of the auth for many calls.
+ *
+ * It starts the work only after the checks, so a cancelled call starts no work, and no promise is
+ * left without a handler.
+ */
+async function waitWithin<T>(
+    work: () => Promise<T>,
+    deadlineMs: number,
+    signal: AbortSignal | undefined,
+): Promise<Result<T, 'aborted' | 'timeout'>> {
+    if (isAborted(signal)) return { ok: false, error: 'aborted' };
+    const remainingMs = deadlineMs - Date.now();
+    if (remainingMs <= 0) return { ok: false, error: 'timeout' };
+    const promise = work();
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    let onAbort: (() => void) | undefined;
+    const stopped = new Promise<Result<T, 'aborted' | 'timeout'>>((resolve) => {
+        timer = setTimeout(() => resolve({ ok: false, error: 'timeout' }), remainingMs);
+        onAbort = () => resolve({ ok: false, error: 'aborted' });
+        signal?.addEventListener('abort', onAbort, { once: true });
+    });
+    const settled = promise.then((value): Result<T, 'aborted' | 'timeout'> => ({
+        ok: true,
+        value,
+    }));
+    try {
+        return await Promise.race([settled, stopped]);
+    } finally {
+        clearTimeout(timer);
+        if (onAbort !== undefined) signal?.removeEventListener('abort', onAbort);
+    }
+}
+
+/** A limit of the whole call. The error gives the time limit of the call, not of one step. */
+function limitError(
+    error: FetchError | 'aborted' | 'timeout',
+    timeoutMs: number,
+): { readonly ok: false; readonly error: FetchError } {
+    if (error === 'aborted') return { ok: false, error: { kind: 'aborted' } };
+    if (error === 'timeout') return { ok: false, error: { kind: 'timeout', timeoutMs } };
+    if (error.kind === 'timeout') return { ok: false, error: { kind: 'timeout', timeoutMs } };
+    return { ok: false, error };
+}
+
+/**
  * Reads the state of the signal now. The compiler keeps a narrowed `signal.aborted` across an
  * `await`, but the value can change while the code waits.
  */
@@ -448,7 +506,8 @@ function isAborted(signal: AbortSignal | undefined): boolean {
     return signal?.aborted === true;
 }
 
-async function resolveCredential(auth: Auth): Promise<Credential | null> {
+/** The credential that `auth` gives now, or `null`. The client and the realtime client use it. */
+export async function resolveCredential(auth: Auth): Promise<Credential | null> {
     switch (auth.kind) {
         case 'none':
             return { kind: 'none' };

@@ -31,6 +31,25 @@ export {
 } from './auth/session.ts';
 export { assert, unreachable } from './core/assert.ts';
 export {
+    browserRealtimeEnvironment,
+    type RealtimeEnvironment,
+    type RealtimeSocket,
+    type SocketHandlers,
+    type TokenTransport,
+} from './realtime/environment.ts';
+export {
+    createRealtime,
+    splitModuleId,
+    type BindingState,
+    type DebugMessage,
+    type DebugTarget,
+    type Realtime,
+    type RealtimeConfig,
+    type RealtimeError,
+    type RealtimeStatus,
+    type RealtimeTarget,
+} from './realtime/realtime.ts';
+export {
     call,
     configure,
     createClient,

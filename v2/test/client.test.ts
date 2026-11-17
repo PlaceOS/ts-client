@@ -223,6 +223,40 @@ describe('call errors', () => {
         expect(await pending).toEqual({ ok: false, error: { kind: 'aborted' } });
     });
 
+    test('the time limit and the cancel also cover the wait for the credential', async () => {
+        const { fetch, sent } = fakeFetch(() => new Response(''));
+        // A credential that is slow, such as a login that renews the token.
+        const slow = new Promise<string>((resolve) => setTimeout(() => resolve('abc'), 200));
+        const client = clientWith(fetch, { auth: { kind: 'bearer', token: () => slow } });
+        expect(await call(DOWNLOAD, {}, { client, timeoutMs: 20 })).toEqual({
+            ok: false,
+            error: { kind: 'timeout', timeoutMs: 20 },
+        });
+        const controller = new AbortController();
+        const pending = call(DOWNLOAD, {}, { client, signal: controller.signal, timeoutMs: 5_000 });
+        controller.abort();
+        expect(await pending).toEqual({ ok: false, error: { kind: 'aborted' } });
+        expect(sent).toHaveLength(0);
+    });
+
+    test('a cancelled call does not start the credential, so a rejection has no orphan', async () => {
+        let started = false;
+        const token = () => {
+            started = true;
+            return Promise.reject(new Error('the token store failed'));
+        };
+        const client = clientWith(fakeFetch(() => new Response('')).fetch, {
+            auth: { kind: 'bearer', token },
+        });
+        const controller = new AbortController();
+        controller.abort();
+        expect(await call(DOWNLOAD, {}, { client, signal: controller.signal })).toEqual({
+            ok: false,
+            error: { kind: 'aborted' },
+        });
+        expect(started).toBe(false);
+    });
+
     test('stops at responseBytesMax, with or without a content-length', async () => {
         const tooLarge = { ok: false, error: { kind: 'response_too_large', bytesMax: 8 } } as const;
         const declared = fakeFetch(() => new Response('0123456789'));

@@ -58,10 +58,10 @@ export const FRAME_MESSAGE_TYPE = 'place-os';
  */
 export function browserEnvironment(storage: 'local' | 'session' = 'local'): AuthEnvironment {
     assert(typeof window !== 'undefined', 'browserEnvironment runs in a browser');
-    const sessionStore = browserStore(() => window.sessionStorage);
+    const sessionStore = webStorageStore(() => window.sessionStorage);
     return {
         fetch: (url, init) => globalThis.fetch(url, init),
-        storage: storage === 'session' ? sessionStore : browserStore(() => window.localStorage),
+        storage: storage === 'session' ? sessionStore : webStorageStore(() => window.localStorage),
         sessionStorage: sessionStore,
         currentUrl: () => window.location.href,
         replaceUrl: (url) => window.history.replaceState(window.history.state, '', url),
@@ -101,9 +101,15 @@ export function memoryStore(): KeyValueStore {
     };
 }
 
-/** Wraps a Web Storage. Each access can throw, so each one falls back to a store in memory. */
-function browserStore(getStorage: () => Storage): KeyValueStore {
-    const fallback = memoryStore();
+/**
+ * Wraps a Web Storage, such as `localStorage`. The storage is the one source of truth, so a change
+ * in a different tab, such as a logout, is seen here. Each access can throw, for example in a
+ * sandboxed frame or with a full quota. Then the value stays in memory, so the login works but is
+ * not kept after a reload.
+ */
+export function webStorageStore(getStorage: () => Storage): KeyValueStore {
+    /** Only the values that the storage refused. */
+    const refused = memoryStore();
     const storageOrNull = (): Storage | null => {
         try {
             return getStorage();
@@ -113,25 +119,26 @@ function browserStore(getStorage: () => Storage): KeyValueStore {
     };
     return {
         get: (key) => {
+            const kept = refused.get(key);
+            if (kept !== null) return kept;
             const store = storageOrNull();
-            if (store === null) return fallback.get(key);
+            if (store === null) return null;
             try {
-                return store.getItem(key) ?? fallback.get(key);
+                return store.getItem(key);
             } catch {
-                return fallback.get(key);
+                return null;
             }
         },
         set: (key, value) => {
             const store = storageOrNull();
-            try {
-                store?.setItem(key, value);
-            } catch {
-                // The quota is full or the storage is off. The value stays in memory below.
+            if (store !== null && trySetItem(store, key, value)) {
+                refused.remove(key);
+                return;
             }
-            fallback.set(key, value);
+            refused.set(key, value);
         },
         remove: (key) => {
-            fallback.remove(key);
+            refused.remove(key);
             try {
                 storageOrNull()?.removeItem(key);
             } catch {
@@ -139,7 +146,7 @@ function browserStore(getStorage: () => Storage): KeyValueStore {
             }
         },
         keys: () => {
-            const keys = new Set(fallback.keys());
+            const keys = new Set(refused.keys());
             const store = storageOrNull();
             if (store === null) return [...keys];
             try {
@@ -148,11 +155,20 @@ function browserStore(getStorage: () => Storage): KeyValueStore {
                     if (key !== null) keys.add(key);
                 }
             } catch {
-                // The storage is off. The keys in memory are all the keys.
+                // The storage is off. The refused keys are all the keys.
             }
             return [...keys];
         },
     };
+}
+
+function trySetItem(store: Storage, key: string, value: string): boolean {
+    try {
+        store.setItem(key, value);
+        return true;
+    } catch {
+        return false;
+    }
 }
 
 /**

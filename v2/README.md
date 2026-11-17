@@ -144,8 +144,9 @@ client ID is the MD5 of `redirectUri`, as in v1.
 6. Else the login page of the authority. With `handleLogin: false`, the result is a
    `login_required` error, and the application shows its own login.
 
-The grants are `code` (with PKCE), `implicit`, `password` and `entra`. A trusted application
-(`?trust=true`) keeps its tokens in the storage. Other applications keep them in memory only.
+The grants are `code` (with PKCE), `implicit`, `password` and `entra`. PlaceOS auth.cr refuses
+the `password` grant; only older auth services accept it. A trusted application (`?trust=true`)
+keeps its tokens in the storage. Other applications keep them in memory only.
 
 After a 401, the client asks the session for a new token and sends the request again, one time.
 Parallel requests share one renewal. After a 511, the session sends the user to the login page.
@@ -164,16 +165,69 @@ Other parts of the session:
 ### Changes from v1
 
 - The session keeps the storage keys of v1, so a user stays logged in after the change.
+- The default token path is `/auth/oauth/token`. PlaceOS auth.cr and the older Ruby auth service
+  both serve it. The Ruby auth service does not serve `/auth/token`.
+- A relative login or logout URL of the authority is on `baseUrl`. v1 used the `domain` of the
+  authority, which has no port.
+- A refused code stops the login with `token_rejected`. A new redirect could loop.
 - The token requests send their parameters in the body, not in the URL. A password is not in the
   URL.
 - A trusted application with the `implicit` grant uses the code with PKCE.
 - The frame login checks the `state`. It needs the `oauth-resp.html` of v2.
 - The session removes `x-api-key` from the URL after it reads it.
 - After a refused refresh token, the login continues immediately.
+- A refusal on the consent page (`error=access_denied` with the state of this client) stops the
+  login with `authorization_denied`. v1 sent the user to the authorize page again.
 - `/auth/authority` gets `AUTHORITY_ATTEMPTS_MAX` attempts, not an unlimited number. Then
   `start` gives `authority_unavailable`. Call `start` again to try again.
 - Not ported: `revokeToken`, the mock mode (give a `fetch` to the client), the state of the
   application in `authorise(state)`, and the ACA Engine API path.
+
+## Realtime
+
+`createRealtime` opens one WebSocket to `systems/control`. It binds to the status variables of
+modules, calls their functions and gets their logs:
+
+```ts
+import { createRealtime } from '@placeos/ts-client';
+
+const realtime = createRealtime({ baseUrl: '', auth: session.clientAuth });
+
+const power = { sys: 'sys-1234', mod: 'Display', index: 1, name: 'power' };
+const release = realtime.bind(power, (state) => {
+    if (state.kind === 'value') console.log('power', state.value);
+});
+const result = await realtime.exec(power, [true]);
+release();
+```
+
+- The client connects when the first binding or call needs it. `start` connects now.
+- A binding has a count. The first `bind` sends `bind`. The last release sends `unbind`.
+- After a new connection, the client binds each variable again.
+- The client handles the messages of the server in batches. In one batch, many notifications for
+  one variable give one call to its listeners, with the last value.
+- `exec` gives a `Result` with the return value of the function, or a `RealtimeError`:
+  `timeout`, `disconnected` (the socket closed after the server got the call), `stopped`,
+  `unavailable`, `too_many_requests` or `server` (with the error code and the status).
+- The client sends `ping` each 15 seconds. A socket without a message for 60 seconds closes, and
+  the client connects again. It waits longer after each failure, to 5 seconds. After 40 attempts,
+  the status is `failed`. Call `start` to try again.
+- `realtime.debug({ sys, moduleId }, listener)` gets the logs of a module.
+- `splitModuleId('Display_2')` gives `{ mod: 'Display', index: 2 }`.
+- In a browser, the token goes in a cookie on the socket path. In a frame and on mobile Safari it
+  goes in the query, as in v1. `createRealtime({ ..., environment })` replaces the socket, the
+  timers and the cookie, for tests.
+
+### Changes from v1
+
+- A call that the server got fails with `disconnected` when the socket closes. v1 did not settle
+  these calls.
+- Two calls with the same arguments are two calls. v1 merged them for one minute.
+- Server errors have the correct code name. v1 read the HTTP style status as the error code.
+- `iface: true` addresses an interface, such as `Interface::Sensor`.
+- After 40 failed attempts, the status is `failed`. v1 reloaded the page.
+- Not ported: the mock systems (give an `environment` with a fake socket), the
+  `connectionState` signal, and the `/control/websocket` path of ACA Engine.
 
 ## Types
 
@@ -196,6 +250,8 @@ The generator changes some parts of the document. Each change has a comment in
   in seconds, for example `created_at` on most models. The generator changes these fields to
   integers. The list comes from the source of PlaceOS/models. The generator stops if it finds a
   `date-time` field that is not in a list, so each new field gets a decision.
+- **Enum numbers.** The server sends some enums as numbers, for example `Driver.role` (`99` is
+  `logic`). The document gives their names. The generator changes these fields to the numbers.
 - **Required fields in a request.** The document marks a field as required when the server always
   sends it. The server can have a default for the same field in a request. Thus each field of a
   request body is optional, and the server checks the body. Path and query parameters keep the
@@ -238,7 +294,6 @@ bun run build   # Writes dist/.
 
 ## What v1 has that v2 does not have
 
-- The realtime WebSocket bindings.
 - The mock systems. Give `createClient` a `fetch` function.
 - Classes with methods for each model. v2 has plain data and functions.
 

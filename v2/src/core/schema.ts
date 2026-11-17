@@ -14,6 +14,9 @@ import type { Result } from './result.ts';
 
 /** The schema tree is generated, so its depth is small. This catches a cycle by mistake. */
 export const SCHEMA_DEPTH_MAX = 64;
+/** The limits of a value for `json()`. They also stop the check on a value with a cycle. */
+export const JSON_DEPTH_MAX = 256;
+export const JSON_NODES_MAX = 1_000_000;
 
 /** Any value that `JSON.parse` can return. */
 export type JsonValue =
@@ -111,7 +114,10 @@ export function boolean(): Schema<boolean> {
     return { node: { kind: 'boolean' } };
 }
 
-/** Any JSON value. The parser does not look inside it. */
+/**
+ * Any JSON value: `null`, a boolean, a finite number, a string, an array or a plain object. The
+ * parser checks the value, but does not copy it.
+ */
 export function json(): Schema<JsonValue> {
     return { node: { kind: 'json' } };
 }
@@ -293,7 +299,8 @@ function walk(
             if (typeof value === 'boolean') return value;
             return fail(failure, 'boolean');
         case 'json':
-            if (value === undefined) return fail(failure, 'JSON value');
+            // `JSON.stringify` changes other values without an error, such as `NaN` to `null`.
+            if (!isJsonValue(value)) return fail(failure, 'JSON value');
             return value;
         case 'nullable':
             if (value === null) return null;
@@ -396,6 +403,39 @@ function walk(
         default:
             return unreachable(node);
     }
+}
+
+/** True if `JSON.stringify` writes `value` as it is. The walk has its own bounded stack. */
+function isJsonValue(value: unknown): boolean {
+    const stack: { readonly value: unknown; readonly depth: number }[] = [{ value, depth: 0 }];
+    for (let visited = 0; visited < JSON_NODES_MAX; visited += 1) {
+        const top = stack.pop();
+        if (top === undefined) return true;
+        const current = top.value;
+        if (current === null || typeof current === 'string' || typeof current === 'boolean') {
+            continue;
+        }
+        if (typeof current === 'number') {
+            if (Number.isFinite(current)) continue;
+            return false;
+        }
+        if (top.depth >= JSON_DEPTH_MAX) return false;
+        if (Array.isArray(current)) {
+            const items: readonly unknown[] = current;
+            // Check the budget before the push, so a huge array does not fill the memory first.
+            if (visited + stack.length + items.length >= JSON_NODES_MAX) return false;
+            for (const item of items) stack.push({ value: item, depth: top.depth + 1 });
+            continue;
+        }
+        // A function, `undefined`, a symbol, a bigint, or an instance such as a `Date`.
+        if (!isRecord(current)) return false;
+        const prototype: unknown = Object.getPrototypeOf(current);
+        if (prototype !== Object.prototype && prototype !== null) return false;
+        const keys = Object.keys(current);
+        if (visited + stack.length + keys.length >= JSON_NODES_MAX) return false;
+        for (const key of keys) stack.push({ value: current[key], depth: top.depth + 1 });
+    }
+    return false;
 }
 
 function fail(failure: Failure, expected: string): typeof FAIL {

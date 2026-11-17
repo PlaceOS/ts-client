@@ -10,6 +10,7 @@ import {
     checkRequest,
     integer,
     json,
+    JSON_NODES_MAX,
     literal,
     nullable,
     number,
@@ -108,6 +109,23 @@ describe('parseResponse', () => {
     test('accepts any JSON value for json, but not a missing value', () => {
         expect(parseResponse(json(), { a: [1, 'b', null] }).ok).toBe(true);
         expect(parseResponse(object({ details: json() }, ['details']), {}).ok).toBe(false);
+    });
+
+    test('refuses values that JSON.stringify would change, such as NaN', () => {
+        // `JSON.stringify([NaN])` is `[null]`: the server would get a different argument.
+        expect(checkRequest(array(json()), [Number.NaN]).ok).toBe(false);
+        expect(parseResponse(json(), () => 1).ok).toBe(false);
+        expect(parseResponse(json(), { when: new Date(0) }).ok).toBe(false);
+        expect(parseResponse(json(), [1, undefined]).ok).toBe(false);
+        // A cycle stops at the depth limit, not with a stack overflow.
+        const cycle: Record<string, unknown> = {};
+        cycle['self'] = cycle;
+        expect(parseResponse(json(), cycle).ok).toBe(false);
+    });
+
+    test('refuses a JSON value with more than JSON_NODES_MAX values before it walks them', () => {
+        expect(parseResponse(json(), new Array(JSON_NODES_MAX).fill(0)).ok).toBe(false);
+        expect(parseResponse(json(), new Array(1_000).fill(0)).ok).toBe(true);
     });
 });
 
