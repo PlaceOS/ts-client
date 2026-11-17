@@ -209,7 +209,8 @@ export function operation<
 >(definition: Operation<P, B, R>): Operation<P, B, R> {
     assert(definition.path.startsWith('/'), 'the path starts with a slash');
     assert(definition.params.node.kind === 'object', 'the params schema is an object');
-    const templateKeys = [...definition.path.matchAll(/\{([^}]+)\}/g)].map((match) => match[1]);
+    // `[^{}]` cannot match a brace, so the match is linear also for a path with many braces.
+    const templateKeys = [...definition.path.matchAll(/\{([^{}]+)\}/g)].map((match) => match[1]);
     assert(
         templateKeys.join() === definition.pathKeys.join(),
         `the path keys of ${definition.path} are in pathKeys`,

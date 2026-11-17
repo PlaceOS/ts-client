@@ -173,11 +173,13 @@ export interface Realtime {
 
 /** `Display_2` is the module `Display` with index 2. A name without an index has index 1. */
 export function splitModuleId(moduleId: string): { readonly mod: string; readonly index: number } {
-    const match = /^(.+)_(\d+)$/.exec(moduleId);
-    if (match === null) return { mod: moduleId, index: 1 };
-    const index = Number(match[2]);
+    // `lastIndexOf` is linear. A regular expression such as `^(.+)_(\d+)$` backtracks.
+    const separator = moduleId.lastIndexOf('_');
+    const digits = moduleId.slice(separator + 1);
+    if (separator <= 0 || !/^\d+$/.test(digits)) return { mod: moduleId, index: 1 };
+    const index = Number(digits);
     assert(Number.isSafeInteger(index), 'the module index is an integer');
-    return { mod: match[1] ?? moduleId, index: Math.max(1, index) };
+    return { mod: moduleId.slice(0, separator), index: Math.max(1, index) };
 }
 
 const Meta = object({ sys: string(), mod: string(), index: integer('Int32'), name: string() }, [
