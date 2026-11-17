@@ -394,7 +394,14 @@ bun run generate:check   # Fails if the generated files do not match the current
 
 The generated files are in the repository, so a change to the API shows as a diff. Examine the
 diff before you commit it. `generate:check` can fail because the API changed, not because of your
-change, so it is not part of `bun test`.
+change, so it is not part of `bun test` or of the checks of a PR.
+
+Each day, the `v2 regenerate` workflow regenerates the client from the API documents on master
+(`scripts/regenerate-pr.sh`). When the output changes, it opens a PR with the diff and the results
+of the checks. It also closes the older regeneration PRs, because the new one has their changes.
+When master matches the documents again, it closes all of them. Each run deletes the
+regeneration branches that have no open PR, such as the branch of a merged PR. `DRY_RUN=1
+scripts/regenerate-pr.sh` (from the root of the repository) shows what it would do.
 
 The generator stops with an assertion on a part of the document that it does not support. Add the
 support to `scripts/generate.ts` and `src/core/schema.ts`.
