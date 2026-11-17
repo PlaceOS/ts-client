@@ -1,6 +1,7 @@
 /// <reference types="vitest/config" />
 import { resolve } from 'path';
 import { defineConfig } from 'vite';
+import { configDefaults } from 'vitest/config';
 import dts from 'vite-plugin-dts';
 // import pkg from './package.json';
 
@@ -24,6 +25,8 @@ export default defineConfig({
     },
     test: {
         environment: 'jsdom',
+        // v2 is a separate package with its own tests, which run on Bun.
+        exclude: [...configDefaults.exclude, 'v2/**'],
         // Node 25+ has its own `localStorage`, which shadows jsdom's
         execArgv:
             Number(process.versions.node.split('.')[0]) >= 25

@@ -1,0 +1,39 @@
+{
+    "name": "@placeos/ts-client",
+    "version": "2.0.0-alpha.0",
+    "description": "Typed PlaceOS REST API client, generated from the PlaceOS OpenAPI document",
+    "license": "MIT",
+    "type": "module",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/PlaceOS/ts-client.git",
+        "directory": "v2"
+    },
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "default": "./dist/index.js"
+        }
+    },
+    "files": [
+        "dist",
+        "src"
+    ],
+    "sideEffects": false,
+    "engines": {
+        "node": ">=20.3"
+    },
+    "scripts": {
+        "generate": "bun scripts/generate.ts",
+        "generate:check": "bun scripts/generate.ts --check",
+        "check": "tsc --noEmit && tsc --noEmit -p tsconfig.build.json",
+        "test": "bun test",
+        "build": "rm -rf dist && tsc -p tsconfig.build.json",
+        "format": "prettier --write ."
+    },
+    "devDependencies": {
+        "@types/bun": "1.4.3",
+        "prettier": "3.9.10",
+        "typescript": "7.0.2"
+    }
+}
