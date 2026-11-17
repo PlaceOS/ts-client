@@ -412,19 +412,46 @@ function walk(
             }
             return output;
         }
-        case 'union':
+        case 'union': {
+            if (direction !== 'response_zero') {
+                for (const variant of node.variants) {
+                    const parsed = walk(variant, value, direction, failure, depth + 1);
+                    if (parsed !== FAIL) return parsed;
+                    failure.segments.length = 0;
+                }
+                return fail(failure, 'a match for one variant of the union');
+            }
+            // Zero-fill can make each variant match. The variant that knows the most of the given
+            // fields wins, so that the fill does not drop them. In a tie, a variant that matches
+            // without the fill wins, then the first.
+            let best: unknown = FAIL;
+            let bestScore = -1;
             for (const variant of node.variants) {
                 const parsed = walk(variant, value, direction, failure, depth + 1);
-                if (parsed !== FAIL) return parsed;
                 failure.segments.length = 0;
+                if (parsed === FAIL) continue;
+                const strict = walk(variant, value, 'response', failure, depth + 1) !== FAIL;
+                failure.segments.length = 0;
+                const score = knownKeys(variant, value) * 2 + (strict ? 1 : 0);
+                if (score > bestScore) {
+                    best = parsed;
+                    bestScore = score;
+                }
             }
+            if (best !== FAIL) return best;
             return fail(failure, 'a match for one variant of the union');
+        }
         default:
             return unreachable(node);
     }
 }
 
-/** True if `JSON.stringify` writes `value` as it is. The walk has its own bounded stack. */
+/** The number of keys of `value` that an object schema has. Other schemas know none. */
+function knownKeys(node: SchemaNode, value: unknown): number {
+    if (node.kind !== 'object' || !isRecord(value)) return 0;
+    return Object.keys(value).filter((key) => node.keys.has(key)).length;
+}
+
 /** The empty value of a schema, for a missing required field of mock data. */
 function zeroValue(node: SchemaNode, depth: number): unknown {
     assert(depth < SCHEMA_DEPTH_MAX, 'the schema depth is less than SCHEMA_DEPTH_MAX');
@@ -464,6 +491,7 @@ function zeroValue(node: SchemaNode, depth: number): unknown {
     }
 }
 
+/** True if `JSON.stringify` writes `value` as it is. The walk has its own bounded stack. */
 function isJsonValue(value: unknown): boolean {
     const stack: { readonly value: unknown; readonly depth: number }[] = [{ value, depth: 0 }];
     for (let visited = 0; visited < JSON_NODES_MAX; visited += 1) {

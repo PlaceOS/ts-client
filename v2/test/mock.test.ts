@@ -104,3 +104,66 @@ test('a staff API endpoint has a typed mock too', async () => {
     // @ts-expect-error the staff endpoints start with `staff.`
     mockEndpoint('bookings.show', () => ({}));
 });
+
+test('a mock answer has the deadline, the signal and the size limit of a response', async () => {
+    mockEndpoint('zones.show', () => new Promise<never>(() => {}));
+    const late = await zones.show({ id: 'zone-1' }, { client, timeoutMs: 5 });
+    expect(late.ok === false && late.error.kind).toBe('timeout');
+    const controller = new AbortController();
+    const pending = zones.show({ id: 'zone-1' }, { client, signal: controller.signal });
+    controller.abort();
+    const aborted = await pending;
+    expect(aborted.ok === false && aborted.error.kind).toBe('aborted');
+    const small = createClient({
+        baseUrl: 'http://mock.invalid',
+        auth: { kind: 'none' },
+        mock: endpointMocks,
+        responseBytesMax: 16,
+    });
+    mockEndpoint('zones.show', () => ({ id: 'zone-1', name: 'a name longer than the limit' }));
+    const large = await zones.show({ id: 'zone-1' }, { client: small });
+    expect(large.ok === false && large.error.kind).toBe('response_too_large');
+});
+
+test('zero-fill keeps the union variant that knows the given fields', async () => {
+    const { events } = await import('../src/staff.ts');
+    const input = { id: 'event-1', body: { email: 'a@example.com' } } as never;
+    // `PlaceCalendarEventAttendee` is first, and has no `id`.
+    mockEndpoint('staff.events.addAttendee', () => ({ id: 7 }) as never);
+    const byId = await events.addAttendee(input, options);
+    expect(byId.ok && Reflect.get(Object(byId.value.data), 'id')).toBe(7);
+    // `Attendee` matches without the fill, and has no `resource`.
+    mockEndpoint('staff.events.addAttendee', () => ({ resource: true }) as never);
+    const byResource = await events.addAttendee(input, options);
+    expect(byResource.ok && Reflect.get(Object(byResource.value.data), 'resource')).toBe(true);
+});
+
+test('an aborted call does not leave the promise of a mock without a handler', async () => {
+    const rejections: unknown[] = [];
+    const onRejection = (reason: unknown) => rejections.push(reason);
+    process.on('unhandledRejection', onRejection);
+    try {
+        mockEndpoint('zones.show', () => Promise.reject(new Error('a bug in the test')));
+        const controller = new AbortController();
+        controller.abort();
+        const result = await zones.show({ id: 'zone-1' }, { client, signal: controller.signal });
+        await new Promise((resolve) => setTimeout(resolve, 10));
+        expect(result.ok === false && result.error.kind).toBe('aborted');
+        expect(rejections).toEqual([]);
+    } finally {
+        process.off('unhandledRejection', onRejection);
+    }
+});
+
+test('a mock that aborts its own call gives aborted, not timeout', async () => {
+    const controller = new AbortController();
+    mockEndpoint('zones.show', () => {
+        controller.abort();
+        return new Promise<never>(() => {});
+    });
+    const result = await zones.show(
+        { id: 'zone-1' },
+        { client, signal: controller.signal, timeoutMs: 50 },
+    );
+    expect(result.ok === false && result.error.kind).toBe('aborted');
+});

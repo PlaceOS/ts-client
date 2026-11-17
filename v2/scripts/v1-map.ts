@@ -53,6 +53,8 @@ interface V1Function {
         kind: ParameterKind;
     }[];
     readonly page: boolean;
+    /** `true` when v1 gives an array (not a page). */
+    readonly list: boolean;
     /** The v1 class of the data, such as `PlaceZone`, or `null`. */
     readonly model: string | null;
 }
@@ -66,6 +68,8 @@ interface V2Operation {
     readonly segments: readonly string[];
     readonly params: ReadonlySet<string>;
     readonly hasBody: boolean;
+    /** `true` when the response is an array. */
+    readonly list: boolean;
     /** The named schema of the response data, or of its items, such as `Zone`. */
     readonly model: string | null;
 }
@@ -283,7 +287,8 @@ function readV1Functions(): V1Function[] {
             modelSymbol !== undefined && modelSymbol.flags & ts.SymbolFlags.Class
                 ? modelSymbol.getName()
                 : null;
-        functions.push({ name, file, parameters, page, model });
+        const list = !page && data !== undefined && data !== null && checker.isArrayType(data);
+        functions.push({ name, file, parameters, page, list, model });
     }
     return functions;
 }
@@ -380,6 +385,8 @@ async function readV2Operations(dir: string, module: 'staff' | null): Promise<V2
                 segments: path.split('/').filter(Boolean),
                 params,
                 hasBody,
+                // `array(` can be on its own line, before the items.
+                list: /\n {4}response: (?:\/\* @__PURE__ \*\/ )?array\(/.test(block),
                 model,
             });
         }
@@ -484,7 +491,12 @@ function objectKey(index: number): string {
 }
 
 /** The marker argument for a parameter, or `undefined` for a parameter that has no marker. */
-function marker(kind: ParameterKind, index: number, flag: boolean): unknown {
+function marker(
+    kind: ParameterKind,
+    index: number,
+    flag: boolean,
+    options: { readonly members: boolean } = { members: true },
+): unknown {
     switch (kind) {
         case 'string':
             return stringMarker(index);
@@ -495,7 +507,7 @@ function marker(kind: ParameterKind, index: number, flag: boolean): unknown {
         case 'array':
             return [arrayMarker(index)];
         case 'object':
-            return objectMarker(index);
+            return options.members ? objectMarker(index) : { [objectKey(index)]: `o${index}zv` };
         case 'choice':
         case 'function':
             return undefined;
@@ -519,6 +531,29 @@ function objectMarker(index: number): object {
     });
 }
 
+/**
+ * A member with the value that v1 sends when the data does not have it, such as the `0` of
+ * `form_data.version || 0`. A second request, with objects that have no members, shows it.
+ */
+async function withFallback(
+    template: Template,
+    key: string,
+    fn: V1Function,
+    record: Recorder,
+): Promise<Template> {
+    if (template.kind !== 'member') return template;
+    const plain = await record(
+        fn,
+        fn.parameters.map((p, i) => marker(p.kind, i, true, { members: false })),
+    );
+    const request = plain.requests[0];
+    const value = request === undefined ? null : new URL(request.url, HOST).searchParams.get(key);
+    if (value === null) return template;
+    const fallback = literalQuery(stringTemplate(value));
+    if (fallback.kind !== 'literal') return template;
+    return { ...template, fallback: fallback.value };
+}
+
 async function mapFunction(
     fn: V1Function,
     operations: readonly V2Operation[],
@@ -539,6 +574,10 @@ async function mapFunction(
     const segments = url.pathname.split('/').filter(Boolean).map(decodeURIComponent);
     const operation = findOperation(operations, request.method, segments);
     if (operation === null) return `no v2 operation for ${request.method} ${url.pathname}`;
+    // v1 can make the data into a list, such as the metadata of a zone, which v2 gives by name.
+    if (fn.list && !operation.list) {
+        return `v1 gives a list, and ${operation.namespace}.${operation.name} gives another shape`;
+    }
 
     const notes: string[] = [];
     const entries: ObjectEntry[] = [];
@@ -556,7 +595,7 @@ async function mapFunction(
             spreads.add(index);
             continue;
         }
-        const template = stringTemplate(value);
+        const template = await withFallback(stringTemplate(value), key, fn, record);
         // v1 updates send the `version` of the data. Only some v2 updates have it.
         if (template.kind === 'member' && !operation.params.has(key)) continue;
         if (template.kind === 'literal' && !operation.params.has(key)) {

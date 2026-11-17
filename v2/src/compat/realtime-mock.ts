@@ -24,6 +24,10 @@ import { ERROR_CODE_NAMES } from '../realtime/realtime.ts';
 
 /** More systems is a leak, such as a test that registers in a loop and never removes them. */
 export const MOCK_SYSTEMS_MAX = 10_000;
+/** More status variables on one mock module is a leak, such as a test that binds random names. */
+export const MOCK_VARIABLES_MAX = 1_000;
+/** More messages waiting in one mock socket is a test that sends without letting it answer. */
+export const MOCK_MESSAGES_MAX = 10_000;
 
 /** A mock module: its status variables and its functions. As in v1, the values have no type. */
 export type MockModule = Record<string, any>;
@@ -94,6 +98,7 @@ function mockModule(properties: object): ModuleState {
 }
 
 function addVariable(state: ModuleState, name: string, value: unknown): void {
+    assert(state.values.size < MOCK_VARIABLES_MAX, 'fewer variables on a mock module');
     state.values.set(name, value);
     Object.defineProperty(state.module, name, {
         enumerable: true,
@@ -135,11 +140,19 @@ function createSocket(_url: string, handlers: SocketHandlers): RealtimeSocket {
     let open = true;
     /** The listener of each binding, by the JSON of its target. */
     const bound = new Map<string, () => void>();
-    // The socket answers later, as a real one does.
-    const later = (work: () => void) =>
-        setTimeout(() => {
-            if (open) work();
-        }, 0);
+    // The socket answers later, as a real one does: the answers wait here, and one timer sends
+    // them. A close drops the answers that wait.
+    const outbox: (() => void)[] = [];
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    const flush = () => {
+        timer = null;
+        for (const work of outbox.splice(0, outbox.length)) if (open) work();
+    };
+    const later = (work: () => void) => {
+        assert(outbox.length < MOCK_MESSAGES_MAX, 'fewer messages wait in the mock socket');
+        outbox.push(work);
+        timer ??= setTimeout(flush, 0);
+    };
     const reply = (message: object) => later(() => handlers.message(JSON.stringify(message)));
     later(() => handlers.open());
 
@@ -172,7 +185,10 @@ function createSocket(_url: string, handlers: SocketHandlers): RealtimeSocket {
                 const listeners = state.listeners.get(request.name) ?? new Set<Listener>();
                 listeners.add(notify);
                 state.listeners.set(request.name, listeners);
-                bound.set(key, () => listeners.delete(notify));
+                bound.set(key, () => {
+                    listeners.delete(notify);
+                    if (listeners.size === 0) state.listeners.delete(request.name);
+                });
                 reply({ id: request.id, type: 'success' });
                 notify(state.values.get(request.name));
                 return;
@@ -215,6 +231,9 @@ function createSocket(_url: string, handlers: SocketHandlers): RealtimeSocket {
             for (const release of bound.values()) release();
             bound.clear();
             open = false;
+            outbox.length = 0;
+            if (timer !== null) clearTimeout(timer);
+            timer = null;
             setTimeout(() => handlers.close(), 0);
         },
     };

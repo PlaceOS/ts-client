@@ -18,6 +18,8 @@ import { V1_CALLS, V1_COMPAT, V1_TYPES, V1_UNMAPPED } from './v1-map.ts';
 
 /** A project has fewer source files. The tool stops at this count. */
 const FILES_MAX = 50_000;
+/** The walk visits at most this many files and folders, of all kinds. */
+const ENTRIES_MAX = 500_000;
 /** A larger file is not hand-written source. The tool skips it. */
 const FILE_BYTES_MAX = 5_000_000;
 const SKIPPED_FOLDERS: ReadonlySet<string> = new Set([
@@ -156,7 +158,14 @@ async function sourceFiles(paths: readonly string[]): Promise<string[]> {
         if (info.isDirectory()) {
             for (const entry of await readdir(path, { withFileTypes: true })) {
                 if (entry.isDirectory() && SKIPPED_FOLDERS.has(entry.name)) continue;
-                if (entry.isDirectory() || entry.isFile()) queue.push(join(path, entry.name));
+                if (!entry.isDirectory() && !entry.isFile()) continue;
+                if (queue.length >= ENTRIES_MAX) {
+                    console.error(
+                        `Stopped at ${ENTRIES_MAX} files and folders. Give a smaller folder.`,
+                    );
+                    return files.sort();
+                }
+                queue.push(join(path, entry.name));
             }
             continue;
         }

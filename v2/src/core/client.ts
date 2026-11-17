@@ -229,8 +229,8 @@ export function createClient(config: ClientConfig): Client {
 }
 
 /**
- * The client of `configure`. It is the one module state of the library, so that an application
- * does not give its client to each call.
+ * The client of `configure`, so that an application does not give its client to each call. It is
+ * the one module state of the core. The mock registries of `compat` and `mock` are the others.
  */
 let configuredClient: Client | null = null;
 
@@ -310,16 +310,29 @@ async function send(
         bodyText = JSON.stringify(bodyChecked.value);
     }
 
-    // A mock gets the input after the checks, so a test finds the same errors as the server.
-    const answer = client.mock?.({ name: operation.name, input }) ?? null;
-    if (answer !== null) return mockResult(operation, await answer);
-
     const timeoutMs = options.timeoutMs ?? client.timeoutMs;
     assertPositiveInteger(timeoutMs, 'timeoutMs');
     // One deadline for the call. The credential, a renewal and each fetch share it, so a slow
     // login cannot make the call take longer than `timeoutMs`.
     const deadlineMs = Date.now() + timeoutMs;
     const signal = options.signal;
+
+    // A mock gets the input after the checks, so a test finds the same errors as the server. Its
+    // answer has the same limits as a response: the deadline, the signal and the size. It starts
+    // in `waitWithin`, so that an aborted call does not leave its promise without a handler.
+    const mock = client.mock;
+    if (mock !== null) {
+        const answered = await waitWithin(
+            () => Promise.resolve(mock({ name: operation.name, input })),
+            deadlineMs,
+            signal,
+        );
+        if (!answered.ok) return limitError(answered.error, timeoutMs);
+        // `null`: the mock does not answer this call, so the request goes to the server.
+        if (answered.value !== null) {
+            return mockResult(operation, answered.value, client.responseBytesMax);
+        }
+    }
     // Each attempt gets the credential again, because a `rejected` auth can renew it.
     let response: Fetched | null = null;
     for (let attempt = 0; attempt < AUTH_ATTEMPTS_MAX; attempt += 1) {
@@ -397,6 +410,7 @@ async function send(
 function mockResult(
     operation: AnyOperation,
     answer: MockAnswer,
+    bytesMax: number,
 ): Result<Reply<unknown>, CallError> {
     const reply = { status: answer.status, headers: answer.headers };
     const bytes =
@@ -407,6 +421,9 @@ function mockResult(
                       ? answer.data
                       : (JSON.stringify(answer.data) ?? 'null'),
               );
+    if (bytes.length > bytesMax) {
+        return { ok: false, error: { kind: 'response_too_large', bytesMax } };
+    }
     if (answer.status < 200 || answer.status > 299) {
         const parsed = decodeJson(bytes);
         const body = parsed.ok ? parseResponse(json(), parsed.value) : null;
@@ -576,6 +593,8 @@ async function waitWithin<T>(
         timer = setTimeout(() => resolve({ ok: false, error: 'timeout' }), remainingMs);
         onAbort = () => resolve({ ok: false, error: 'aborted' });
         signal?.addEventListener('abort', onAbort, { once: true });
+        // `work` can abort the signal before the listener exists, such as a mock of a test.
+        if (isAborted(signal)) resolve({ ok: false, error: 'aborted' });
     });
     const settled = promise.then((value): Result<T, 'aborted' | 'timeout'> => ({
         ok: true,

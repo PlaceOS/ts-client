@@ -172,3 +172,21 @@ async function waitFor(done: () => boolean): Promise<void> {
     }
     throw new Error('the condition did not become true');
 }
+
+test('a mock endpoint that gives a string gives JSON, unless it sets another content type', async () => {
+    registerMockEndpoint({
+        path: '/api/engine/v2/domains/lookup/:email',
+        method: 'GET',
+        callback: () => 'auth-1',
+    });
+    const response = await mockFetch('http://mock.invalid/api/engine/v2/domains/lookup/a', {});
+    expect(await response.json()).toBe('auth-1');
+    registerMockEndpoint({
+        path: '/api/engine/v2/drivers/:id/readme',
+        method: 'GET',
+        headers: { 'Content-Type': 'text/markdown' },
+        callback: () => '# Readme',
+    });
+    const text = await mockFetch('http://mock.invalid/api/engine/v2/drivers/d/readme', {});
+    expect(await text.text()).toBe('# Readme');
+});

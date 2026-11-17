@@ -68,15 +68,17 @@ delete_orphan_branches() {
 }
 
 (cd v2 && bun run generate && bun run v1-map)
+# Staged, so that a new generated file, such as one of a new controller, is in the diff and the hash.
+git add -A -- v2
 
-if git diff --quiet -- v2; then
+if git diff --cached --quiet -- v2; then
     echo "The generated client matches the API documents."
     close_others '' "Closed by the scheduled regeneration: \`$BASE\` matches the API documents now."
     delete_orphan_branches ''
     exit 0
 fi
 
-hash="$(git diff --binary -- v2 | sha256sum | cut -c1-12)"
+hash="$(git diff --cached --binary -- v2 | sha256sum | cut -c1-12)"
 branch="$BRANCH_PREFIX$hash"
 prs="$(open_prs)"
 existing="$(awk -v branch="$branch" '$2 == branch { print $1 }' <<<"$prs")"
@@ -115,7 +117,7 @@ operation.
 
 ${results}
 \`\`\`
-$(git diff --stat -- v2 | tail -n 25)
+$(git diff --cached --stat -- v2 | tail -n 25)
 \`\`\`
 
 The [scheduled regeneration]($run_url) opened this PR. It closes this PR when a newer
@@ -125,7 +127,6 @@ EOF
 git config user.name 'github-actions[bot]'
 git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
 git switch -c "$branch"
-git add -- v2
 git commit -q -m 'chore(v2): regenerate the client from the API documents'
 # A branch of this name can be left from a failed run on an older base. Only this script writes to
 # the prefix, so the push replaces it.

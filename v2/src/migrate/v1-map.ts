@@ -1044,51 +1044,6 @@ export const V1_CALLS: CallMap = {
         pick: null,
         notes: [],
     },
-    listInterfaceRepositories: {
-        namespace: 'repositories',
-        operation: 'loadedInterfaces',
-        parameters: [],
-        input: { kind: 'object', entries: [] },
-        result: 'data',
-        pick: null,
-        notes: [],
-    },
-    listMetadata: {
-        namespace: 'metadata',
-        operation: 'show',
-        parameters: [
-            { name: 'id', initializer: null, use: 'mapped' },
-            { name: 'query_params', initializer: '{}', use: 'mapped' },
-        ],
-        input: {
-            kind: 'object',
-            entries: [
-                { kind: 'property', key: 'id', value: { kind: 'arg', index: 0 } },
-                { kind: 'spread', index: 1 },
-            ],
-        },
-        result: 'data',
-        pick: null,
-        notes: [],
-    },
-    listMetadataHistory: {
-        namespace: 'metadata',
-        operation: 'history',
-        parameters: [
-            { name: 'id', initializer: null, use: 'mapped' },
-            { name: 'query_params', initializer: '{}', use: 'mapped' },
-        ],
-        input: {
-            kind: 'object',
-            entries: [
-                { kind: 'property', key: 'id', value: { kind: 'arg', index: 0 } },
-                { kind: 'spread', index: 1 },
-            ],
-        },
-        result: 'data',
-        pick: null,
-        notes: [],
-    },
     listPublicEvents: {
         namespace: 'publicEvents',
         operation: 'query',
@@ -4578,7 +4533,7 @@ export const V1_CALLS: CallMap = {
                 {
                     kind: 'property',
                     key: 'version',
-                    value: { kind: 'member', index: 1, key: 'version' },
+                    value: { kind: 'member', index: 1, key: 'version', fallback: 0 },
                 },
                 { kind: 'property', key: 'body', value: { kind: 'arg', index: 1 } },
             ],
@@ -4913,6 +4868,10 @@ export const V1_UNMAPPED: Readonly<Record<string, string>> = {
     lastRequestTotal: 'a v1 request helper: use the generated operation',
     listen: 'use createRealtime (README: Realtime)',
     listenForToken: 'use createAuthSession and configure (README: Log in)',
+    listInterfaceRepositories:
+        'v1 gives a list, and repositories.loadedInterfaces gives another shape',
+    listMetadata: 'v1 gives a list, and metadata.show gives another shape',
+    listMetadataHistory: 'v1 gives a list, and metadata.history gives another shape',
     log: 'v2 has no replacement',
     logout: 'use createAuthSession and configure (README: Log in)',
     mediaThumbnail: 'it sends 0 requests',

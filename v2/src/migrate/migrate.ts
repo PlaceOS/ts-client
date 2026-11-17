@@ -57,6 +57,11 @@ const VALUE_TO_IMPLEMENTATION: Readonly<Record<string, string>> = {
 };
 /** A chain such as `vi.mocked(f).mockResolvedValueOnce(a).mockResolvedValueOnce(b)` is shorter. */
 const CHAIN_DEPTH_MAX = 32;
+/**
+ * The tool walks the syntax tree with recursion. A deeper file, such as one long chain of `+`, is
+ * left as it is, with a finding. Hand-written code is far less deep.
+ */
+const AST_DEPTH_MAX = 1_000;
 /** A name that collides gets a suffix. A file has fewer names with the same base. */
 const ALIASES_MAX = 100;
 
@@ -114,7 +119,10 @@ export function migrateSource(
         const imported = imports.named.get(name);
         return imported !== undefined && imported in tables.types;
     };
-    const taken = declaredNames(ts, source, typeOnly);
+    const names = declaredNames(ts, source, typeOnly);
+    if (names === null) return tooDeep(text);
+    // A closure does not keep the narrowing of `names`, so this name has the narrow type.
+    const taken: Set<string> = names;
     const edits: Edit[] = [];
     const findings: Finding[] = [];
     const migrated = new Set<string>();
@@ -138,6 +146,58 @@ export function migrateSource(
         compatNames.add(kind === 'type' ? `type ${name}` : name);
     }
     let changes = 0;
+    let deep = false;
+
+    // The helpers that a file already imports from the compat module, by name.
+    const compatImported = new Map<string, string>();
+    for (const statement of source.statements) {
+        if (!ts.isImportDeclaration(statement)) continue;
+        const specifier = statement.moduleSpecifier;
+        if (!ts.isStringLiteral(specifier) || specifier.text !== COMPAT_MODULE) continue;
+        // A type-only import has no value, so it cannot be a helper at run time.
+        if (statement.importClause?.isTypeOnly === true) continue;
+        const bindings = statement.importClause?.namedBindings;
+        if (bindings === undefined || !ts.isNamedImports(bindings)) continue;
+        for (const element of bindings.elements) {
+            if (element.isTypeOnly) continue;
+            compatImported.set((element.propertyName ?? element.name).text, element.name.text);
+        }
+    }
+    const helperLocals = new Map<string, string>();
+
+    /**
+     * The local name of a compat helper, such as `orThrow`: the name of an import that the file
+     * has, or a new name that the file does not use. `register` adds it to the new compat import.
+     */
+    function helperLocal(
+        name: string,
+        options: { readonly register: boolean } = { register: true },
+    ): string {
+        const imported = compatImported.get(name);
+        if (imported !== undefined) return imported;
+        let local = helperLocals.get(name);
+        if (local === undefined) {
+            local = localName(name);
+            helperLocals.set(name, local);
+        }
+        if (options.register) compatNames.add(local === name ? name : `${name} as ${local}`);
+        return local;
+    }
+
+    /** The name of `vi.hoisted` for `fromV1Mock`, when the file also imports `fromV1Mock`. */
+    let hoistedLocal: string | null = null;
+
+    /**
+     * The local name of `fromV1Mock`. A `vi.mock` factory runs before the imports, so it uses the
+     * name of `vi.hoisted`. That name is not the name of an import that the file has.
+     */
+    function fromV1MockLocal(options: { readonly inFactory: boolean }): string {
+        if (options.inFactory && compatImported.has('fromV1Mock')) {
+            hoistedLocal ??= localName('fromV1Mock');
+            return hoistedLocal;
+        }
+        return helperLocal('fromV1Mock', { register: false });
+    }
 
     function find(node: TS.Node, name: string, message: string): void {
         const at = source.getLineAndCharacterOfPosition(node.getStart(source));
@@ -236,8 +296,7 @@ export function migrateSource(
             return false;
         }
         const namespace = namespaceOf(mapping, prefix);
-        const helper = mapping.result === 'page' ? 'orThrowPage' : 'orThrow';
-        compatNames.add(helper);
+        const helper = helperLocal(mapping.result === 'page' ? 'orThrowPage' : 'orThrow');
         const pick =
             rendered.pick === null
                 ? ''
@@ -311,8 +370,7 @@ export function migrateSource(
         const [value] = call.arguments;
         const callee = call.expression;
         if (RESOLVED_VALUE_METHODS.has(method) && value !== undefined && mapping.pick === null) {
-            const helper = mapping.result === 'page' ? 'mockPage' : 'mockReply';
-            compatNames.add(helper);
+            const helper = helperLocal(mapping.result === 'page' ? 'mockPage' : 'mockReply');
             replace(value, `${helper}(${textOf(value)})`);
             return;
         }
@@ -324,13 +382,18 @@ export function migrateSource(
             ts.isPropertyAccessExpression(callee) &&
             implementation !== undefined
         ) {
+            if (!invertible(mapping)) {
+                find(call, name, NOT_INVERTIBLE);
+                return;
+            }
             const v1 = method.startsWith('mockImplementation')
                 ? textOf(value)
                 : `() => (${textOf(value)})`;
             importsFromV1Mock = true;
+            const fromV1Mock = fromV1MockLocal({ inFactory: false });
             replace(
                 call,
-                `${textOf(callee.expression)}.${implementation}(fromV1Mock(${v1}, ${fromV1MockArgs(mapping)}))`,
+                `${textOf(callee.expression)}.${implementation}(${fromV1Mock}(${v1}, ${fromV1MockArgs(mapping)}))`,
             );
             return;
         }
@@ -365,7 +428,11 @@ export function migrateSource(
                 if (name === undefined || !(ts.isIdentifier(name) || ts.isStringLiteral(name)))
                     continue;
                 const mapping = tables.calls[name.text];
-                if (mapping?.module !== 'staff') continue;
+                if (mapping === undefined) continue;
+                if (mapping.module !== 'staff') {
+                    if (!invertible(mapping)) find(property, name.text, NOT_INVERTIBLE);
+                    continue;
+                }
                 find(
                     property,
                     name.text,
@@ -395,8 +462,10 @@ export function migrateSource(
             return null;
         }
         const mapping = tables.calls[name.text] ?? null;
-        // The staff functions are in another module, which this factory does not mock.
-        return mapping?.module === 'staff' ? null : mapping;
+        // The staff functions are in another module, which this factory does not mock. A function
+        // with an argument in a template cannot get its v1 arguments. `rewriteFactory` finds both.
+        if (mapping === null || mapping.module === 'staff' || !invertible(mapping)) return null;
+        return mapping;
     }
 
     function rewriteFactoryObject(object: TS.ObjectLiteralExpression): void {
@@ -436,6 +505,7 @@ export function migrateSource(
     /** The v2 value of one v1 function of a factory. `null` is a shorthand property. */
     function mockValue(value: TS.Expression | null, name: string, mapping: CallMapping): string {
         const extra = fromV1MockArgs(mapping);
+        const fromV1Mock = fromV1MockLocal({ inFactory: true });
         if (
             value !== null &&
             ts.isCallExpression(value) &&
@@ -443,9 +513,11 @@ export function migrateSource(
         ) {
             const [implementation] = value.arguments;
             const text = implementation === undefined ? 'undefined' : textOf(implementation);
-            return `${textOf(value.expression)}(fromV1Mock(${text}, ${extra}))`;
+            return `${textOf(value.expression)}(${fromV1Mock}(${text}, ${extra}))`;
         }
-        return `fromV1Mock(${value === null ? name : textOf(value)}, ${extra})`;
+        // Another value, such as `vi.fn().mockResolvedValue(zone)` or a hoisted mock, is the v1
+        // implementation of a new mock, so the v2 function is still a mock that tests can change.
+        return `vi.fn(${fromV1Mock}(${value === null ? name : textOf(value)}, ${extra}))`;
     }
 
     /** `vi.mocked(f)`, `jest.mocked(f)` or `expect(f)`, with `f` as the first argument. */
@@ -462,9 +534,13 @@ export function migrateSource(
         return isMocked ? parent : null;
     }
 
-    function visit(node: TS.Node): void {
+    function visit(node: TS.Node, depth: number): void {
+        if (depth > AST_DEPTH_MAX) {
+            deep = true;
+            return;
+        }
         // The children first, so that a call in an argument is changed before the outer call.
-        ts.forEachChild(node, visit);
+        ts.forEachChild(node, (child) => visit(child, depth + 1));
 
         if (ts.isCallExpression(node)) {
             const callee = node.expression;
@@ -489,6 +565,8 @@ export function migrateSource(
                             method.text,
                             `spy on ${STAFF_MODULE} for ${mapping.namespace}.${mapping.operation}`,
                         );
+                    } else if (mapping !== undefined && !invertible(mapping)) {
+                        find(node, method.text, NOT_INVERTIBLE);
                     } else if (mapping !== undefined) {
                         replace(method, `'${mapping.operation}'`);
                         replace(target, `${target.text}.${mapping.namespace}`);
@@ -575,6 +653,15 @@ export function migrateSource(
             if (!isV1Name(tables, imported)) return;
             if (isCountedAtParent(ts, node, imported, tables)) return;
             const wrapper = doubleWrapper(node);
+            const doubleMapping = tables.calls[imported];
+            const isDouble =
+                wrapper !== null || (testFile && !ts.isShorthandPropertyAssignment(node.parent));
+            // A test double of a function whose v1 arguments the tool cannot rebuild stays v1.
+            if (isDouble && doubleMapping !== undefined && !invertible(doubleMapping)) {
+                countUse(node.text, false);
+                find(node, imported, NOT_INVERTIBLE);
+                return;
+            }
             if (wrapper !== null && imported in tables.calls) {
                 rewriteDouble(node, wrapper, imported, null);
                 countUse(node.text, true);
@@ -602,6 +689,15 @@ export function migrateSource(
         ) {
             const name = node.name.text;
             const wrapper = doubleWrapper(node);
+            const doubleMapping = tables.calls[name];
+            if (
+                (wrapper !== null || testFile) &&
+                doubleMapping !== undefined &&
+                !invertible(doubleMapping)
+            ) {
+                find(node, name, NOT_INVERTIBLE);
+                return;
+            }
             if (wrapper !== null && name in tables.calls) {
                 rewriteDouble(node, wrapper, name, node.expression.text);
                 return;
@@ -642,10 +738,11 @@ export function migrateSource(
             find(node, node.text, `a test double of v1: make it for the v2 call${target}`);
         }
     }
-    visit(source);
+    visit(source, 0);
+    if (deep) return tooDeep(text);
 
     // The hoisted `fromV1Mock` of a factory is also there for the tests.
-    if (importsFromV1Mock && !usesFromV1Mock) compatNames.add('fromV1Mock');
+    if (importsFromV1Mock && !usesFromV1Mock) helperLocal('fromV1Mock');
 
     // The new imports of the v2 namespaces and types, and of the helpers.
     const specifiers = (module: 'staff' | null): string[] =>
@@ -675,6 +772,12 @@ export function migrateSource(
         const names = [...compatNames].sort(compareSpecifiers).join(', ');
         lines.push(`import { ${names} } from '${COMPAT_MODULE}';`);
     }
+    if (usesFromV1Mock) {
+        // `vi.mock` runs before the imports, so its factory gets the helper from `vi.hoisted`.
+        const local = hoistedLocal ?? fromV1MockLocal({ inFactory: true });
+        const binding = local === 'fromV1Mock' ? local : `fromV1Mock: ${local}`;
+        lines.push(`const { ${binding} } = await vi.hoisted(() => import('${COMPAT_MODULE}'));`);
+    }
     const last = imports.declarations.at(-1);
     assert(last !== undefined, 'a v1 import exists');
     if (lines.length > 0 && changed.removed.has(last)) {
@@ -685,17 +788,6 @@ export function migrateSource(
             start: last.end,
             end: last.end,
             text: lines.map((line) => `\n${line}`).join(''),
-        });
-    }
-
-    if (usesFromV1Mock) {
-        // `vi.mock` runs before the imports, so its factory gets the helper from `vi.hoisted`.
-        const lastImport = source.statements.filter(ts.isImportDeclaration).at(-1);
-        assert(lastImport !== undefined, 'the file has an import');
-        edits.push({
-            start: lastImport.end,
-            end: lastImport.end,
-            text: `\nconst { fromV1Mock } = await vi.hoisted(() => import('${COMPAT_MODULE}'));`,
         });
     }
 
@@ -733,22 +825,57 @@ function readImports(ts: typeof TS, source: TS.SourceFile): V1Imports {
 }
 
 /** The names that the file declares or uses, so that a new import does not hide one. */
+/** The result for a file deeper than `AST_DEPTH_MAX`: no change, and a finding. */
+function tooDeep(text: string): MigrateResult {
+    const message = `the file nests deeper than ${AST_DEPTH_MAX} levels: change it by hand`;
+    return {
+        text,
+        changes: 0,
+        findings: [{ line: 1, column: 1, name: V1_MODULE, message }],
+        migrated: new Set(),
+    };
+}
+
+/**
+ * The names that the file declares, uses or imports from other modules, so that a new import does
+ * not hide one. `null` for a file deeper than `AST_DEPTH_MAX`.
+ */
 function declaredNames(
     ts: typeof TS,
     source: TS.SourceFile,
     replacedType: (name: string) => boolean,
-): Set<string> {
+): Set<string> | null {
     const names = new Set<string>();
-    function visit(node: TS.Node): void {
+    let deep = false;
+    function visit(node: TS.Node, depth: number): void {
+        if (depth > AST_DEPTH_MAX) {
+            deep = true;
+            return;
+        }
         if (ts.isIdentifier(node) && isReference(ts, node)) {
             const parent = node.parent;
             const typeName = ts.isTypeReferenceNode(parent) && parent.typeName === node;
             if (!typeName || !replacedType(node.text)) names.add(node.text);
         }
-        ts.forEachChild(node, visit);
+        // An import of another module, such as `import { orThrow } from './utils'`, has a name.
+        if (ts.isImportDeclaration(node)) {
+            const specifier = node.moduleSpecifier;
+            const v1 = ts.isStringLiteral(specifier) && specifier.text === V1_MODULE;
+            const clause = node.importClause;
+            if (!v1 && clause !== undefined) {
+                if (clause.name !== undefined) names.add(clause.name.text);
+                const bindings = clause.namedBindings;
+                if (bindings !== undefined && ts.isNamespaceImport(bindings))
+                    names.add(bindings.name.text);
+                if (bindings !== undefined && ts.isNamedImports(bindings)) {
+                    for (const element of bindings.elements) names.add(element.name.text);
+                }
+            }
+        }
+        ts.forEachChild(node, (child) => visit(child, depth + 1));
     }
-    visit(source);
-    return names;
+    visit(source, 0);
+    return deep ? null : names;
 }
 
 /** `vi.<method>` or `jest.<method>`, or only `<global>.<method>`. */
@@ -794,6 +921,21 @@ function factoryObjects(
         if (object !== null) objects.push(object);
     }
     return objects;
+}
+
+const NOT_INVERTIBLE =
+    'the v2 input has an argument in a template, such as `${module}_${index}`, so a v1 ' +
+    'implementation cannot get it: change the mock by hand';
+
+/** `true` when each v1 argument that the v2 input has is a key of the input, or its spread. */
+function invertible(mapping: CallMapping): boolean {
+    const keyed = mapping.parameters.every(
+        (parameter, index) => parameter.use !== 'mapped' || inputKey(mapping, index) !== null,
+    );
+    const pick = mapping.pick;
+    return (
+        keyed && (pick === null || (pick.kind === 'arg' && inputKey(mapping, pick.index) !== null))
+    );
 }
 
 /** The arguments of `fromV1Mock` after the implementation: the input keys of the v1 arguments. */
@@ -987,7 +1129,10 @@ function renderTemplate(
             if (given === null) return null;
             const base =
                 given.node === null || isSimple(ts, given.node) ? given.text : `(${given.text})`;
-            return `${base}.${template.key}`;
+            const fallback = template.fallback;
+            if (fallback === undefined) return `${base}.${template.key}`;
+            const text = typeof fallback === 'string' ? quote(fallback) : String(fallback);
+            return `${base}.${template.key} ?? ${text}`;
         }
         case 'literal':
             return typeof template.value === 'string'
@@ -1065,16 +1210,21 @@ function countArgs(template: Template, counts: Map<number, number>): void {
 
 /** A name, a property path or a literal. It has no side effects, so it can be evaluated twice. */
 function isSimple(ts: typeof TS, node: TS.Expression): boolean {
-    if (ts.isIdentifier(node) || node.kind === ts.SyntaxKind.ThisKeyword) return true;
-    if (
-        ts.isStringLiteral(node) ||
-        ts.isNumericLiteral(node) ||
-        ts.isNoSubstitutionTemplateLiteral(node)
-    ) {
-        return true;
+    let current = node;
+    for (let depth = 0; depth < AST_DEPTH_MAX; depth += 1) {
+        if (ts.isIdentifier(current) || current.kind === ts.SyntaxKind.ThisKeyword) return true;
+        if (
+            ts.isStringLiteral(current) ||
+            ts.isNumericLiteral(current) ||
+            ts.isNoSubstitutionTemplateLiteral(current)
+        ) {
+            return true;
+        }
+        if (!ts.isPropertyAccessExpression(current) && !ts.isParenthesizedExpression(current)) {
+            return false;
+        }
+        current = current.expression;
     }
-    if (ts.isPropertyAccessExpression(node)) return isSimple(ts, node.expression);
-    if (ts.isParenthesizedExpression(node)) return isSimple(ts, node.expression);
     return false;
 }
 

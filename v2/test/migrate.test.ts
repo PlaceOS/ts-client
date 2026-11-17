@@ -55,13 +55,16 @@ test('maps path templates, default values, members and picked keys', () => {
     expect(result.text.split('\n').slice(2)).toEqual([
         "zones.zoneExecute({ id, module_slug: 'Display_1', method: 'power', body: [] }).then(orThrow);",
         'metadata.show({ id: zone.id, name }).then(orThrow).then((data) => data[name]);',
-        'systems.update({ sys_id: system.id, version: system.version, body: system }).then(orThrow);',
+        // v1 sent `form_data.version || 0`.
+        'systems.update({ sys_id: system.id, version: system.version ?? 0, body: system }).then(orThrow);',
     ]);
 });
 
 test('keeps the uses that it cannot rewrite, with a finding', () => {
     const text = [
-        "import { addSystemModule, getModule, showMetadata, showZone } from '@placeos/ts-client';",
+        "import { addSystemModule, getModule, listMetadata, showMetadata, showZone } from '@placeos/ts-client';",
+        // v1 made a list of the metadata, which v2 gives by name.
+        'listMetadata(zone.id);',
         "addSystemModule('sys-1', 'mod-1', { a: 1 });",
         'showMetadata(id, names()[0]);',
         "getModule('sys-1', 'Bookings');",
@@ -70,10 +73,11 @@ test('keeps the uses that it cannot rewrite, with a finding', () => {
     const result = migrate(text);
     expect(result.text).toBe(text);
     expect(result.findings.map((finding) => `${finding.line} ${finding.name}`)).toEqual([
-        '2 addSystemModule',
-        '3 showMetadata',
-        '4 getModule',
-        '5 showZone',
+        '2 listMetadata',
+        '3 addSystemModule',
+        '4 showMetadata',
+        '5 getModule',
+        '6 showZone',
     ]);
 });
 
@@ -283,5 +287,118 @@ test('rewrites the v1 staff functions to @placeos/ts-client/staff', () => {
         // v1 `querySurveys` gave a list, not a page.
         'const list = await surveys.query({ zone_id: zone }).then(orThrow);',
         'await zones.show({ id }).then(orThrow);',
+    ]);
+});
+
+test('the hoisted helper goes with the new imports, also when the last v1 import goes', () => {
+    const result = migrate(
+        [
+            "import { showZone } from '@placeos/ts-client';",
+            "import type { PlaceZone } from '@placeos/ts-client';",
+            "vi.mock('@placeos/ts-client', () => ({ showZone: vi.fn() }));",
+            'let zone: PlaceZone;',
+        ].join('\n'),
+    );
+    // `showZone` is only a key of the factory, so the file needs no `zones` import.
+    expect(result.text.split('\n').slice(0, 3)).toEqual([
+        "import { type Zone } from '@placeos/ts-client';",
+        "const { fromV1Mock } = await vi.hoisted(() => import('@placeos/ts-client/compat'));",
+        "vi.mock('@placeos/ts-client', () => ({ zones: { show: vi.fn(fromV1Mock(undefined, ['id', '...'])) } }));",
+    ]);
+});
+
+test('a helper reuses the compat import of the file, and gets an alias when the file has its name', () => {
+    const imported = migrate(
+        [
+            "import { showZone } from '@placeos/ts-client';",
+            "import { orThrow } from '@placeos/ts-client/compat';",
+            'await showZone(id);',
+        ].join('\n'),
+    );
+    expect(imported.text.split('\n')).toEqual([
+        "import { zones } from '@placeos/ts-client';",
+        "import { orThrow } from '@placeos/ts-client/compat';",
+        'await zones.show({ id }).then(orThrow);',
+    ]);
+    // A type-only import has no value, so the call gets a value import.
+    const typeOnly = migrate(
+        [
+            "import { showZone } from '@placeos/ts-client';",
+            "import type { orThrow } from '@placeos/ts-client/compat';",
+            'await showZone(id);',
+        ].join('\n'),
+    );
+    expect(typeOnly.text).toContain('.then(orThrowV2)');
+    const local = migrate(
+        [
+            "import { showZone } from '@placeos/ts-client';",
+            'const orThrow = 1;',
+            'await showZone(id);',
+        ].join('\n'),
+    );
+    expect(local.text.split('\n').slice(1)).toEqual([
+        "import { orThrow as orThrowV2 } from '@placeos/ts-client/compat';",
+        'const orThrow = 1;',
+        'await zones.show({ id }).then(orThrowV2);',
+    ]);
+});
+
+test('a factory keeps a mock as a mock, and finds a function whose arguments it cannot rebuild', () => {
+    const result = migrate(
+        [
+            "import { executeOnZone, showZone } from '@placeos/ts-client';",
+            "vi.mock('@placeos/ts-client', () => ({",
+            '    showZone: vi.fn().mockResolvedValue(zone),',
+            '    executeOnZone: vi.fn(),',
+            '}));',
+        ].join('\n'),
+        'zone.spec.ts',
+    );
+    // `${module}_${index}` of `executeOnZone` has two v1 arguments in one input value.
+    expect(result.text).toContain(
+        "zones: { show: vi.fn(fromV1Mock(vi.fn().mockResolvedValue(zone), ['id', '...'])) }",
+    );
+    expect(result.text).toContain('executeOnZone: vi.fn()');
+    expect(result.findings.map((finding) => `${finding.line} ${finding.name}`)).toEqual([
+        '4 executeOnZone',
+    ]);
+});
+
+test('a file deeper than the limit stays as it is, with a finding', () => {
+    const deep = `${'('.repeat(1_500)}1${')'.repeat(1_500)}`;
+    const text = ["import { showZone } from '@placeos/ts-client';", `showZone(${deep});`].join(
+        '\n',
+    );
+    const result = migrate(text);
+    expect(result.text).toBe(text);
+    expect(result.findings[0]?.message).toContain('deeper than');
+});
+
+test('a test double of a function whose arguments the tool cannot rebuild stays v1', () => {
+    const text = [
+        "import { executeOnZone } from '@placeos/ts-client';",
+        'vi.mocked(executeOnZone).mockImplementation((id, method, module, index) => Promise.resolve(index));',
+        'expect(executeOnZone).toHaveBeenCalled();',
+    ].join('\n');
+    const result = migrate(text, 'zone.spec.ts');
+    expect(result.text).toBe(text);
+    expect(result.findings.map((finding) => `${finding.line} ${finding.name}`)).toEqual([
+        '2 executeOnZone',
+        '3 executeOnZone',
+    ]);
+});
+
+test('the hoisted helper gets its own name when the file imports fromV1Mock', () => {
+    const result = migrate(
+        [
+            "import { showZone } from '@placeos/ts-client';",
+            "import { fromV1Mock } from '@placeos/ts-client/compat';",
+            "vi.mock('@placeos/ts-client', () => ({ showZone: vi.fn() }));",
+        ].join('\n'),
+    );
+    expect(result.text.split('\n')).toEqual([
+        "const { fromV1Mock: fromV1MockV2 } = await vi.hoisted(() => import('@placeos/ts-client/compat'));",
+        "import { fromV1Mock } from '@placeos/ts-client/compat';",
+        "vi.mock('@placeos/ts-client', () => ({ zones: { show: vi.fn(fromV1MockV2(undefined, ['id', '...'])) } }));",
     ]);
 });

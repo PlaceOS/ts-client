@@ -513,6 +513,12 @@ arguments, and it finds the v2 operation with the same method and path.
   that the parser output has the type of the schema. The tests check the parser.
 - `configure` keeps one client in module state, so a call does not need a client argument. A
   call before `configure` is a run-time assertion, not a compile error.
+- The mocks keep their registries in module state, as v1 did: the endpoints of
+  `registerMockEndpoint` and the systems of `registerSystem` (`@placeos/ts-client/compat`), and
+  the mocks of `mockEndpoint` (`@placeos/ts-client/mock`). A test owns them. It removes them with
+  `clearMockEndpoints`, `deregisterSystem` and `clearEndpointMocks`. Each registry has a named
+  limit. The status variables of a mock module are properties with setters that notify the
+  bindings, as in v1.
 - `createAuthSession` keeps its state in a closure. The login is a state machine with I/O, and
   one object with one owner is the clearest model of it.
 - Records from the server are plain objects, not `Map`s. A `Map` does not go through

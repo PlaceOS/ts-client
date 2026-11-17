@@ -17,7 +17,13 @@
  */
 export type Template =
     | { readonly kind: 'arg'; readonly index: number }
-    | { readonly kind: 'member'; readonly index: number; readonly key: string }
+    | {
+          readonly kind: 'member';
+          readonly index: number;
+          readonly key: string;
+          /** The value that v1 sends when the argument does not have the member. */
+          readonly fallback?: string | number | boolean | null;
+      }
     | { readonly kind: 'literal'; readonly value: string | number | boolean | null }
     | { readonly kind: 'concat'; readonly parts: readonly (string | number)[] }
     | { readonly kind: 'object'; readonly entries: readonly ObjectEntry[] }

@@ -143,10 +143,14 @@ export const mockFetch: FetchFunction = async (url, init) => {
     }
     await delay(handler, init.signal ?? null);
     if (body === undefined) return new Response(null, { status: 204, headers });
-    const text = typeof body === 'string' ? body : JSON.stringify(body);
+    // v1 gave the value of the callback as it was, also a string. A JSON response has the string
+    // as JSON. A handler with another `content-type`, such as `text/plain`, sends its text.
+    const contentType = headers['content-type'] ?? 'application/json';
+    const text =
+        typeof body === 'string' && !contentType.includes('json') ? body : JSON.stringify(body);
     return new Response(text, {
         status: 200,
-        headers: { 'content-type': 'application/json', ...headers },
+        headers: { 'content-type': contentType, ...headers },
     });
 };
 
