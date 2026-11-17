@@ -134,20 +134,29 @@ export interface Operation<
 
 export type AnyOperation = Operation<AnySchema, AnySchema | null, AnySchema | null>;
 
-/** The input of an operation: the path and query parameters, and `body` if it has one. */
+/**
+ * The input of an operation: the path and query parameters, and `body` if it has one.
+ *
+ * The `null` check is first, and on a tuple. Without `strictNullChecks`, `null extends AnySchema`
+ * is true, so the order `B extends AnySchema` would ask for a body on each operation.
+ */
 export type OperationInput<O> =
     O extends Operation<infer P, infer B, AnySchema | null>
-        ? B extends AnySchema
-            ? Simplify<Input<P> & { readonly body: Input<B> }>
-            : Input<P>
+        ? [B] extends [null]
+            ? Input<P>
+            : B extends AnySchema
+              ? Simplify<Input<P> & { readonly body: Input<B> }>
+              : never
         : never;
 
-/** The data of a successful response of an operation. */
+/** The data of a successful response of an operation. The `null` check is first, as above. */
 export type OperationData<O> =
     O extends Operation<AnySchema, AnySchema | null, infer R>
-        ? R extends AnySchema
-            ? Output<R>
-            : Uint8Array
+        ? [R] extends [null]
+            ? Uint8Array
+            : R extends AnySchema
+              ? Output<R>
+              : never
         : never;
 
 export interface Reply<T> {

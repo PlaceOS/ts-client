@@ -24,5 +24,7 @@
         "noUnusedParameters": true,
         "useUnknownInCatchVariables": true
     },
-    "include": ["src", "test", "scripts"]
+    "include": ["src", "test", "scripts"],
+    // `bun run build` checks it against `dist`, without `strict`.
+    "exclude": ["test/loose"]
 }

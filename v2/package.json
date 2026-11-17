@@ -13,7 +13,14 @@
         ".": {
             "types": "./dist/index.d.ts",
             "default": "./dist/index.js"
+        },
+        "./compat": {
+            "types": "./dist/compat.d.ts",
+            "default": "./dist/compat.js"
         }
+    },
+    "bin": {
+        "placeos-migrate": "./dist/migrate/cli.js"
     },
     "files": [
         "dist",
@@ -27,14 +34,17 @@
     "scripts": {
         "generate": "bun scripts/generate.ts",
         "generate:check": "bun scripts/generate.ts --check",
-        "check": "tsc --noEmit && tsc --noEmit -p tsconfig.build.json",
+        "v1-map": "bun scripts/v1-map.ts",
+        "v1-map:check": "bun scripts/v1-map.ts --check",
+        "check": "tsc --noEmit && tsc --noEmit -p tsconfig.build.json && tsc --noEmit -p tsconfig.cli.json",
         "test": "bun test",
-        "build": "rm -rf dist && tsc -p tsconfig.build.json",
+        "build": "rm -rf dist && tsc -p tsconfig.build.json && tsc -p tsconfig.cli.json && tsc -p test/loose",
         "format": "prettier --write ."
     },
     "devDependencies": {
         "@types/bun": "1.4.3",
         "prettier": "3.9.10",
-        "typescript": "7.0.2"
+        "typescript": "7.0.2",
+        "typescript-5": "npm:typescript@5.8.3"
     }
 }

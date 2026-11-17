@@ -61,6 +61,9 @@ A function does not throw for an expected failure. It returns a `Result`. Examin
 A function throws only for a programmer error. For example, a parameter that the operation does
 not have, an empty path parameter, or a call before `configure`.
 
+In a project without `strictNullChecks`, `if (!result.ok)` does not narrow the `Result`. Use
+`if (result.ok === false)`.
+
 ### More than one client
 
 `configure` makes the client that each call uses. To use a different client for one call, make it
@@ -289,8 +292,65 @@ support to `scripts/generate.ts` and `src/core/schema.ts`.
 bun install
 bun run check   # Type checks the library, the tests and the scripts.
 bun test
-bun run build   # Writes dist/.
+bun run build   # Writes dist/. Then it type checks test/loose without `strict`.
+bun run v1-map  # Writes the v1 to v2 map. It needs `npm install` in the v1 folder.
 ```
+
+## Migrate from v1
+
+The migration tool rewrites the v1 calls of a project to v2. Commit your work first, so that you
+can examine and undo the changes. Run it in the folder of the project, because it uses the
+`typescript` package of the project:
+
+```sh
+npx -p @placeos/ts-client@2 placeos-migrate src           # Shows the changes. Writes no file.
+npx -p @placeos/ts-client@2 placeos-migrate --write src   # Writes the changes.
+```
+
+The tool makes these changes:
+
+- A call of a v1 REST function becomes the v2 operation. `.then(orThrow)` gives the data, and an
+  error rejects the promise, as in v1. A v1 query function gets `.then(orThrowPage)`, which gives
+  `{ data, total, nextOffset }`.
+
+    ```ts
+    // v1
+    const zone = await showZone(id, { complete: true });
+    const list = await queryZones({ limit: 10 });
+    // v2, after the tool
+    const zone = await zones.show({ id, complete: true }).then(orThrow);
+    const list = await zones.index({ limit: 10 }).then(orThrowPage);
+    ```
+
+- A type reference to a v1 class becomes the v2 type. For example, `PlaceZone` becomes `Zone`.
+- The imports of the v1 enums, such as `PlaceDriverRole`, and of `QueryResponse` move to
+  `@placeos/ts-client/compat`. The enums have the v2 values, so they fit the v2 fields of the
+  data. A query parameter takes the name: the `role` of `drivers.index` is `'logic'`, not `99`.
+- A new import gets another name when the file has the name. For example, a file with a
+  `zones` variable gets `zones as zonesV2`.
+
+The tool does not change a use that it cannot rewrite safely. It shows each one with a hint, and
+it keeps its v1 import, so the compiler also shows it. These uses are:
+
+- the login and the realtime functions, such as `setup`, `token` and `getModule`;
+- `get`, `post` and the other HTTP functions, and the mock endpoints of tests;
+- `new` on a v1 class, because v2 has plain objects;
+- a function that is not called, such as a test double of `showZone`;
+- an argument that has no place in v2, and an argument with side effects that v2 uses two times.
+
+After the tool:
+
+1. Run Prettier, or your formatter. The tool writes long imports on one line.
+2. Install v2, and call `configure` once before the first call (see [Log in](#log-in)).
+3. Run the compiler. It shows the differences of the data. For example, a field that can be
+   `null`, an array that is `readonly`, or a query parameter that has a different type in v2.
+4. Change the uses that the tool showed.
+
+`orThrow` and `orThrowPage` keep the v1 behavior. In new code, examine the `Result`.
+
+The tool parses each file. It does not type check it. The map from v1 to v2 is
+`src/migrate/v1-map.ts`. `scripts/v1-map.ts` makes it: it calls each v1 REST function with marker
+arguments, and it finds the v2 operation with the same method and path.
 
 ## What v1 has that v2 does not have
 
@@ -299,6 +359,8 @@ bun run build   # Writes dist/.
 
 ## Where v2 does not follow TigerStyle
 
+- `orThrow` and `orThrowPage` of `@placeos/ts-client/compat` throw. They are for code that moves
+  from v1.
 - `parseResponse`, `checkRequest` and `call` each have one `as` cast. The compiler cannot prove
   that the parser output has the type of the schema. The tests check the parser.
 - `configure` keeps one client in module state, so a call does not need a client argument. A

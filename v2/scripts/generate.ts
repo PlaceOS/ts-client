@@ -18,6 +18,7 @@ import { join } from 'node:path';
 import { format, resolveConfig } from 'prettier';
 import { assert } from '../src/core/assert.ts';
 import { isRecord } from '../src/core/schema.ts';
+import { ANIMATIONS } from './value-enums.ts';
 
 const ROOT = join(import.meta.dir, '..');
 const SPEC_URL =
@@ -110,15 +111,6 @@ const STRING_TIME_FIELDS: ReadonlyMap<string, readonly string[]> = new Map([
  * same converter in the models source, but the server sends its name, so it is not here.
  */
 const DRIVER_ROLES = { ssh: 0, device: 1, service: 2, websocket: 3, logic: 99 };
-const ANIMATIONS = {
-    default: 0,
-    cut: 1,
-    cross_fade: 2,
-    slide_top: 3,
-    slide_left: 4,
-    slide_right: 5,
-    slide_bottom: 6,
-};
 const VALUE_ENUM_FIELDS: ReadonlyMap<string, Readonly<Record<string, ValueEnum>>> = new Map([
     [
         'PlaceOS.Model.Broker',

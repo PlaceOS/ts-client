@@ -14,5 +14,7 @@
         "rootDir": "src",
         "outDir": "dist"
     },
-    "include": ["src"]
+    "include": ["src"],
+    // The migration tool uses Node APIs. tsconfig.cli.json builds it.
+    "exclude": ["src/migrate/cli.ts"]
 }
