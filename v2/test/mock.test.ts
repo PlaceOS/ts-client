@@ -42,11 +42,11 @@ test('a mock gets the typed input and gives the parsed data', async () => {
 });
 
 test('respond sets the status and the page total, and the body reaches the mock', async () => {
-    mockEndpoint('zones.index', () => respond([{ id: 'zone-1' }], { total: 25 }));
+    mockEndpoint('zones.query', () => respond([{ id: 'zone-1' }], { total: 25 }));
     mockEndpoint('systems.update', (input) => ({ id: input.sys_id, ...input.body }), {
         delayMs: 1,
     });
-    const page = await zones.index({ limit: 1 }, options);
+    const page = await zones.query({ limit: 1 }, options);
     expect(page.ok && pageInfo(page.value.headers).total).toBe(25);
     const updated = await systems.update(
         { sys_id: 'sys-1', version: 2, body: { name: 'Room' } },
@@ -91,4 +91,16 @@ test('the compiler checks the name, the input and the data', () => {
     });
     // An endpoint without a response schema gives bytes, text or nothing.
     mockEndpoint('zones.destroy', () => undefined);
+});
+
+test('a staff API endpoint has a typed mock too', async () => {
+    const { bookings } = await import('../src/staff.ts');
+    mockEndpoint('staff.bookings.show', (input) => ({
+        id: Number(input.id),
+        booking_type: 'desk',
+    }));
+    const result = await bookings.show({ id: 7 }, options);
+    expect(result.ok && result.value.data).toMatchObject({ id: 7, booking_type: 'desk' });
+    // @ts-expect-error the staff endpoints start with `staff.`
+    mockEndpoint('bookings.show', () => ({}));
 });

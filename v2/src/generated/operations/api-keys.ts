@@ -64,18 +64,40 @@ const DESTROY = /* @__PURE__ */ operation({
 });
 
 /**
+ * Obtain the a JSON JWT representation of the API key permissions.
+ *
+ * `GET /api/engine/v2/api_keys/inspect`
+ */
+export function inspectKey(
+    input: OperationInput<typeof INSPECT_KEY> = {},
+    options?: CallOptions,
+): Promise<CallResult<typeof INSPECT_KEY>> {
+    return call(INSPECT_KEY, input, options);
+}
+
+const INSPECT_KEY = /* @__PURE__ */ operation({
+    method: 'GET',
+    path: '/api/engine/v2/api_keys/inspect',
+    pathKeys: [],
+    params: /* @__PURE__ */ parameters({}),
+    body: null,
+    response: UserJwt,
+    name: 'apiKeys.inspectKey',
+});
+
+/**
  * Returns a list of the API keys associated with the provided domain, otherwise all domains.
  *
  * `GET /api/engine/v2/api_keys`
  */
-export function index(
-    input: OperationInput<typeof INDEX> = {},
+export function query(
+    input: OperationInput<typeof QUERY> = {},
     options?: CallOptions,
-): Promise<CallResult<typeof INDEX>> {
-    return call(INDEX, input, options);
+): Promise<CallResult<typeof QUERY>> {
+    return call(QUERY, input, options);
 }
 
-const INDEX = /* @__PURE__ */ operation({
+const QUERY = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/api_keys',
     pathKeys: [],
@@ -98,29 +120,7 @@ const INDEX = /* @__PURE__ */ operation({
     }),
     body: null,
     response: /* @__PURE__ */ array(ApiKeysResponse),
-    name: 'apiKeys.index',
-});
-
-/**
- * Obtain the a JSON JWT representation of the API key permissions.
- *
- * `GET /api/engine/v2/api_keys/inspect`
- */
-export function inspectKey(
-    input: OperationInput<typeof INSPECT_KEY> = {},
-    options?: CallOptions,
-): Promise<CallResult<typeof INSPECT_KEY>> {
-    return call(INSPECT_KEY, input, options);
-}
-
-const INSPECT_KEY = /* @__PURE__ */ operation({
-    method: 'GET',
-    path: '/api/engine/v2/api_keys/inspect',
-    pathKeys: [],
-    params: /* @__PURE__ */ parameters({}),
-    body: null,
-    response: UserJwt,
-    name: 'apiKeys.inspectKey',
+    name: 'apiKeys.query',
 });
 
 /**

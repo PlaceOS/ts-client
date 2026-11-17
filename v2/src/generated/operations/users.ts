@@ -169,18 +169,48 @@ const GROUPS = /* @__PURE__ */ operation({
 });
 
 /**
+ * Return a users metadata.
+ *
+ * `GET /api/engine/v2/users/{id}/metadata`
+ */
+export function metadata(
+    input: OperationInput<typeof METADATA>,
+    options?: CallOptions,
+): Promise<CallResult<typeof METADATA>> {
+    return call(METADATA, input, options);
+}
+
+const METADATA = /* @__PURE__ */ operation({
+    method: 'GET',
+    path: '/api/engine/v2/users/{id}/metadata',
+    pathKeys: ['id'],
+    params: /* @__PURE__ */ parameters(
+        {
+            /** the id of the user */
+            id: /* @__PURE__ */ string(),
+            /** filter metadata by a particular entry */
+            name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        },
+        ['id'],
+    ),
+    body: null,
+    response: /* @__PURE__ */ record(MetadataInterface),
+    name: 'users.metadata',
+});
+
+/**
  * Returns a list of users.
  *
  * `GET /api/engine/v2/users`
  */
-export function index(
-    input: OperationInput<typeof INDEX> = {},
+export function query(
+    input: OperationInput<typeof QUERY> = {},
     options?: CallOptions,
-): Promise<CallResult<typeof INDEX>> {
-    return call(INDEX, input, options);
+): Promise<CallResult<typeof QUERY>> {
+    return call(QUERY, input, options);
 }
 
-const INDEX = /* @__PURE__ */ operation({
+const QUERY = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/users',
     pathKeys: [],
@@ -214,37 +244,7 @@ const INDEX = /* @__PURE__ */ operation({
             UserPublicResponse,
         ]),
     ),
-    name: 'users.index',
-});
-
-/**
- * Return a users metadata.
- *
- * `GET /api/engine/v2/users/{id}/metadata`
- */
-export function metadata(
-    input: OperationInput<typeof METADATA>,
-    options?: CallOptions,
-): Promise<CallResult<typeof METADATA>> {
-    return call(METADATA, input, options);
-}
-
-const METADATA = /* @__PURE__ */ operation({
-    method: 'GET',
-    path: '/api/engine/v2/users/{id}/metadata',
-    pathKeys: ['id'],
-    params: /* @__PURE__ */ parameters(
-        {
-            /** the id of the user */
-            id: /* @__PURE__ */ string(),
-            /** filter metadata by a particular entry */
-            name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-        },
-        ['id'],
-    ),
-    body: null,
-    response: /* @__PURE__ */ record(MetadataInterface),
-    name: 'users.metadata',
+    name: 'users.query',
 });
 
 /**

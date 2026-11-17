@@ -73,18 +73,47 @@ const DESTROY = /* @__PURE__ */ operation({
 });
 
 /**
+ * Return metadata associcated with the selected zone.
+ *
+ * `GET /api/engine/v2/zones/{id}/metadata`
+ */
+export function metadata(
+    input: OperationInput<typeof METADATA>,
+    options?: CallOptions,
+): Promise<CallResult<typeof METADATA>> {
+    return call(METADATA, input, options);
+}
+
+const METADATA = /* @__PURE__ */ operation({
+    method: 'GET',
+    path: '/api/engine/v2/zones/{id}/metadata',
+    pathKeys: ['id'],
+    params: /* @__PURE__ */ parameters(
+        {
+            id: /* @__PURE__ */ string(),
+            /** only return the metadata key we are interested in */
+            name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        },
+        ['id'],
+    ),
+    body: null,
+    response: /* @__PURE__ */ record(MetadataInterface),
+    name: 'zones.metadata',
+});
+
+/**
  * List the configured zones.
  *
  * `GET /api/engine/v2/zones`
  */
-export function index(
-    input: OperationInput<typeof INDEX> = {},
+export function query(
+    input: OperationInput<typeof QUERY> = {},
     options?: CallOptions,
-): Promise<CallResult<typeof INDEX>> {
-    return call(INDEX, input, options);
+): Promise<CallResult<typeof QUERY>> {
+    return call(QUERY, input, options);
 }
 
-const INDEX = /* @__PURE__ */ operation({
+const QUERY = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/zones',
     pathKeys: [],
@@ -123,36 +152,7 @@ const INDEX = /* @__PURE__ */ operation({
     }),
     body: null,
     response: /* @__PURE__ */ array(Zone),
-    name: 'zones.index',
-});
-
-/**
- * Return metadata associcated with the selected zone.
- *
- * `GET /api/engine/v2/zones/{id}/metadata`
- */
-export function metadata(
-    input: OperationInput<typeof METADATA>,
-    options?: CallOptions,
-): Promise<CallResult<typeof METADATA>> {
-    return call(METADATA, input, options);
-}
-
-const METADATA = /* @__PURE__ */ operation({
-    method: 'GET',
-    path: '/api/engine/v2/zones/{id}/metadata',
-    pathKeys: ['id'],
-    params: /* @__PURE__ */ parameters(
-        {
-            id: /* @__PURE__ */ string(),
-            /** only return the metadata key we are interested in */
-            name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-        },
-        ['id'],
-    ),
-    body: null,
-    response: /* @__PURE__ */ record(MetadataInterface),
-    name: 'zones.metadata',
+    name: 'zones.query',
 });
 
 /**

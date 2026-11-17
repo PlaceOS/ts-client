@@ -161,6 +161,11 @@ export interface Operation<
     readonly response: R;
     /** The namespace and the function, for example `zones.show`. */
     readonly name: string;
+    /**
+     * The query name of a parameter that has another key in the input. A query parameter named
+     * `body` is an example, because `body` of the input is the request body.
+     */
+    readonly wireNames?: Readonly<Record<string, string>>;
 }
 
 export type AnyOperation = Operation<AnySchema, AnySchema | null, AnySchema | null>;
@@ -250,7 +255,8 @@ export function operation<
     R extends AnySchema | null,
 >(definition: Operation<P, B, R>): Operation<P, B, R> {
     assert(definition.path.startsWith('/'), 'the path starts with a slash');
-    assert(/^\w+\.\w+$/.test(definition.name), 'the name is <namespace>.<function>');
+    // `staff.` is the prefix of the staff API.
+    assert(/^(staff\.)?\w+\.\w+$/.test(definition.name), 'the name is <namespace>.<function>');
     assert(definition.params.node.kind === 'object', 'the params schema is an object');
     // `[^{}]` cannot match a brace, so the match is linear also for a path with many braces.
     const templateKeys = [...definition.path.matchAll(/\{([^{}]+)\}/g)].map((match) => match[1]);
@@ -458,11 +464,12 @@ function buildUrl(
         if (operation.pathKeys.includes(field.key)) continue;
         const value = params[field.key];
         if (value === undefined || value === null) continue;
+        const name = operation.wireNames?.[field.key] ?? field.key;
         if (Array.isArray(value)) {
             const items: readonly unknown[] = value;
-            query.append(field.key, items.map(queryScalar).join(','));
+            query.append(name, items.map(queryScalar).join(','));
         } else {
-            query.append(field.key, queryScalar(value));
+            query.append(name, queryScalar(value));
         }
     }
     const queryText = query.toString();

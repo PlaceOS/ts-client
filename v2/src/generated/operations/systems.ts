@@ -197,18 +197,46 @@ const FUNCTIONS = /* @__PURE__ */ operation({
 });
 
 /**
+ * Return metadata for the system.
+ *
+ * `GET /api/engine/v2/systems/{sys_id}/metadata`
+ */
+export function metadata(
+    input: OperationInput<typeof METADATA>,
+    options?: CallOptions,
+): Promise<CallResult<typeof METADATA>> {
+    return call(METADATA, input, options);
+}
+
+const METADATA = /* @__PURE__ */ operation({
+    method: 'GET',
+    path: '/api/engine/v2/systems/{sys_id}/metadata',
+    pathKeys: ['sys_id'],
+    params: /* @__PURE__ */ parameters(
+        {
+            sys_id: /* @__PURE__ */ string(),
+            name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        },
+        ['sys_id'],
+    ),
+    body: null,
+    response: /* @__PURE__ */ record(MetadataInterface),
+    name: 'systems.metadata',
+});
+
+/**
  * List the systems in a cluster.
  *
  * `GET /api/engine/v2/systems`
  */
-export function index(
-    input: OperationInput<typeof INDEX> = {},
+export function query(
+    input: OperationInput<typeof QUERY> = {},
     options?: CallOptions,
-): Promise<CallResult<typeof INDEX>> {
-    return call(INDEX, input, options);
+): Promise<CallResult<typeof QUERY>> {
+    return call(QUERY, input, options);
 }
 
-const INDEX = /* @__PURE__ */ operation({
+const QUERY = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/systems',
     pathKeys: [],
@@ -258,35 +286,7 @@ const INDEX = /* @__PURE__ */ operation({
     }),
     body: null,
     response: /* @__PURE__ */ array(ControlSystem),
-    name: 'systems.index',
-});
-
-/**
- * Return metadata for the system.
- *
- * `GET /api/engine/v2/systems/{sys_id}/metadata`
- */
-export function metadata(
-    input: OperationInput<typeof METADATA>,
-    options?: CallOptions,
-): Promise<CallResult<typeof METADATA>> {
-    return call(METADATA, input, options);
-}
-
-const METADATA = /* @__PURE__ */ operation({
-    method: 'GET',
-    path: '/api/engine/v2/systems/{sys_id}/metadata',
-    pathKeys: ['sys_id'],
-    params: /* @__PURE__ */ parameters(
-        {
-            sys_id: /* @__PURE__ */ string(),
-            name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-        },
-        ['sys_id'],
-    ),
-    body: null,
-    response: /* @__PURE__ */ record(MetadataInterface),
-    name: 'systems.metadata',
+    name: 'systems.query',
 });
 
 /**

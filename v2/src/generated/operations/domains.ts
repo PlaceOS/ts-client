@@ -64,42 +64,6 @@ const DESTROY = /* @__PURE__ */ operation({
 });
 
 /**
- * List the domains.
- *
- * `GET /api/engine/v2/domains`
- */
-export function index(
-    input: OperationInput<typeof INDEX> = {},
-    options?: CallOptions,
-): Promise<CallResult<typeof INDEX>> {
-    return call(INDEX, input, options);
-}
-
-const INDEX = /* @__PURE__ */ operation({
-    method: 'GET',
-    path: '/api/engine/v2/domains',
-    pathKeys: [],
-    params: /* @__PURE__ */ parameters({
-        /**
-         * filters results by the given text: a record matches when any word matches its searchable
-         * fields as a whole word, and the last word also matches as a prefix (search as you type)
-         */
-        q: /* @__PURE__ */ string(),
-        /** the maximum number of results to return */
-        limit: /* @__PURE__ */ integer('UInt32'),
-        /** the starting offset of the result set, used to implement pagination */
-        offset: /* @__PURE__ */ integer('UInt32'),
-        /** deprecated, ignored — pagination follows the `Link` header's offset */
-        ref: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-        /** deprecated, ignored — search covers the resource's indexed fields */
-        fields: /* @__PURE__ */ array(/* @__PURE__ */ string()),
-    }),
-    body: null,
-    response: /* @__PURE__ */ array(Authority),
-    name: 'domains.index',
-});
-
-/**
  * Find the domain name by looking into domain registerd email domains.
  *
  * `GET /api/engine/v2/domains/lookup/{email}`
@@ -125,6 +89,42 @@ const LOOKUP = /* @__PURE__ */ operation({
     body: null,
     response: /* @__PURE__ */ string(),
     name: 'domains.lookup',
+});
+
+/**
+ * List the domains.
+ *
+ * `GET /api/engine/v2/domains`
+ */
+export function query(
+    input: OperationInput<typeof QUERY> = {},
+    options?: CallOptions,
+): Promise<CallResult<typeof QUERY>> {
+    return call(QUERY, input, options);
+}
+
+const QUERY = /* @__PURE__ */ operation({
+    method: 'GET',
+    path: '/api/engine/v2/domains',
+    pathKeys: [],
+    params: /* @__PURE__ */ parameters({
+        /**
+         * filters results by the given text: a record matches when any word matches its searchable
+         * fields as a whole word, and the last word also matches as a prefix (search as you type)
+         */
+        q: /* @__PURE__ */ string(),
+        /** the maximum number of results to return */
+        limit: /* @__PURE__ */ integer('UInt32'),
+        /** the starting offset of the result set, used to implement pagination */
+        offset: /* @__PURE__ */ integer('UInt32'),
+        /** deprecated, ignored — pagination follows the `Link` header's offset */
+        ref: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        /** deprecated, ignored — search covers the resource's indexed fields */
+        fields: /* @__PURE__ */ array(/* @__PURE__ */ string()),
+    }),
+    body: null,
+    response: /* @__PURE__ */ array(Authority),
+    name: 'domains.query',
 });
 
 /**

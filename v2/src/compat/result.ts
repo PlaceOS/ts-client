@@ -47,7 +47,7 @@ export interface Page<T> {
 /** The v1 type of a query function, such as `QueryResponse<PlaceZone>`. */
 export type QueryResponse<T> = Promise<Page<T[]>>;
 
-/** Gives the data and the totals of an index call, or throws `CallFailed`. */
+/** Gives the data and the totals of a `query` call, or throws `CallFailed`. */
 export function orThrowPage<T>(result: Result<Reply<T>, CallError>): Page<T> {
     if (!result.ok) throw new CallFailed(result.error);
     const page = pageInfo(result.value.headers);
@@ -66,11 +66,11 @@ export function mockReply<T>(data: T, status = 200): Result<Reply<T>, CallError>
 }
 
 /**
- * The v2 result for a v1 page, for a test double of an index call. `total` goes in the
+ * The v2 result for a v1 page, for a test double of a `query` call. `total` goes in the
  * `X-Total-Count` header, so `orThrowPage` gives it back.
  *
  * ```ts
- * vi.mocked(zones.index).mockResolvedValue(mockPage({ data: [zone], total: 1 }));
+ * vi.mocked(zones.query).mockResolvedValue(mockPage({ data: [zone], total: 1 }));
  * ```
  */
 export function mockPage<T>(page: {

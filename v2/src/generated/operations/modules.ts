@@ -108,54 +108,6 @@ const EXECUTE = /* @__PURE__ */ operation({
 });
 
 /**
- * Return a list of modules configured on the cluster.
- *
- * `GET /api/engine/v2/modules`
- */
-export function index(
-    input: OperationInput<typeof INDEX> = {},
-    options?: CallOptions,
-): Promise<CallResult<typeof INDEX>> {
-    return call(INDEX, input, options);
-}
-
-const INDEX = /* @__PURE__ */ operation({
-    method: 'GET',
-    path: '/api/engine/v2/modules',
-    pathKeys: [],
-    params: /* @__PURE__ */ parameters({
-        /** only return modules updated before this time (unix epoch) */
-        as_of: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
-        /**
-         * only return modules running in this system (query params are ignored if this is provided)
-         */
-        control_system_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-        /** only return instances of this driver */
-        driver_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-        /** do not return logic modules (return only modules that can exist in multiple systems) */
-        no_logic: /* @__PURE__ */ boolean(),
-        /** return only running modules */
-        running: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
-        /**
-         * filters results by the given text: a record matches when any word matches its searchable
-         * fields as a whole word, and the last word also matches as a prefix (search as you type)
-         */
-        q: /* @__PURE__ */ string(),
-        /** the maximum number of results to return */
-        limit: /* @__PURE__ */ integer('UInt32'),
-        /** the starting offset of the result set, used to implement pagination */
-        offset: /* @__PURE__ */ integer('UInt32'),
-        /** deprecated, ignored — pagination follows the `Link` header's offset */
-        ref: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-        /** deprecated, ignored — search covers the resource's indexed fields */
-        fields: /* @__PURE__ */ array(/* @__PURE__ */ string()),
-    }),
-    body: null,
-    response: /* @__PURE__ */ array(Module),
-    name: 'modules.index',
-});
-
-/**
  * Loads the module if not already loaded.
  *
  * Loads the module if not already loaded If the module is already running, it will be updated to
@@ -249,6 +201,54 @@ const PING = /* @__PURE__ */ operation({
     body: null,
     response: ModulesPingResult,
     name: 'modules.ping',
+});
+
+/**
+ * Return a list of modules configured on the cluster.
+ *
+ * `GET /api/engine/v2/modules`
+ */
+export function query(
+    input: OperationInput<typeof QUERY> = {},
+    options?: CallOptions,
+): Promise<CallResult<typeof QUERY>> {
+    return call(QUERY, input, options);
+}
+
+const QUERY = /* @__PURE__ */ operation({
+    method: 'GET',
+    path: '/api/engine/v2/modules',
+    pathKeys: [],
+    params: /* @__PURE__ */ parameters({
+        /** only return modules updated before this time (unix epoch) */
+        as_of: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+        /**
+         * only return modules running in this system (query params are ignored if this is provided)
+         */
+        control_system_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        /** only return instances of this driver */
+        driver_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        /** do not return logic modules (return only modules that can exist in multiple systems) */
+        no_logic: /* @__PURE__ */ boolean(),
+        /** return only running modules */
+        running: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+        /**
+         * filters results by the given text: a record matches when any word matches its searchable
+         * fields as a whole word, and the last word also matches as a prefix (search as you type)
+         */
+        q: /* @__PURE__ */ string(),
+        /** the maximum number of results to return */
+        limit: /* @__PURE__ */ integer('UInt32'),
+        /** the starting offset of the result set, used to implement pagination */
+        offset: /* @__PURE__ */ integer('UInt32'),
+        /** deprecated, ignored — pagination follows the `Link` header's offset */
+        ref: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        /** deprecated, ignored — search covers the resource's indexed fields */
+        fields: /* @__PURE__ */ array(/* @__PURE__ */ string()),
+    }),
+    body: null,
+    response: /* @__PURE__ */ array(Module),
+    name: 'modules.query',
 });
 
 /**

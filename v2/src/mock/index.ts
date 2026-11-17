@@ -9,7 +9,7 @@
  *
  * configure({ baseUrl: '', auth: { kind: 'none' }, mock: endpointMocks });
  * mockEndpoint('zones.show', (input) => ({ id: input.id, name: 'Level 1' }));
- * mockEndpoint('zones.index', (input) => respond([{ id: 'zone-1' }], { total: 1 }));
+ * mockEndpoint('zones.query', (input) => respond([{ id: 'zone-1' }], { total: 1 }));
  *
  * const result = await zones.show({ id: 'zone-1' }); // `ok`, with a `Zone`
  * ```
@@ -27,24 +27,34 @@ import { assert } from '../core/assert.ts';
 import type { CallError, CallMock, MockAnswer, Reply } from '../core/client.ts';
 import type { Result } from '../core/result.ts';
 import type * as Operations from '../generated/operations/index.ts';
+import type * as StaffOperations from '../generated/staff/operations/index.ts';
 
 type Namespaces = typeof Operations;
+type StaffNamespaces = typeof StaffOperations;
 
-/** The name of each endpoint, such as `zones.show`. */
-export type EndpointName = {
-    [N in keyof Namespaces]: {
-        [F in keyof Namespaces[N]]: `${N & string}.${F & string}`;
-    }[keyof Namespaces[N]];
-}[keyof Namespaces];
+/** `<namespace>.<function>` for each function of the namespaces. */
+type Names<T> = {
+    [N in keyof T]: { [F in keyof T[N]]: `${N & string}.${F & string}` }[keyof T[N]];
+}[keyof T];
 
-/** The function of an endpoint, such as `zones.show` for `'zones.show'`. */
-type EndpointFunction<K extends EndpointName> = K extends `${infer N}.${infer F}`
-    ? N extends keyof Namespaces
-        ? F extends keyof Namespaces[N]
-            ? Namespaces[N][F]
+/**
+ * The name of each endpoint, such as `zones.show`. The staff API endpoints start with `staff.`,
+ * such as `staff.bookings.query`.
+ */
+export type EndpointName = Names<Namespaces> | `staff.${Names<StaffNamespaces>}`;
+
+type FunctionOf<T, K> = K extends `${infer N}.${infer F}`
+    ? N extends keyof T
+        ? F extends keyof T[N]
+            ? T[N][F]
             : never
         : never
     : never;
+
+/** The function of an endpoint, such as `zones.show` for `'zones.show'`. */
+type EndpointFunction<K extends EndpointName> = K extends `staff.${infer S}`
+    ? FunctionOf<StaffNamespaces, S>
+    : FunctionOf<Namespaces, K>;
 
 /** The input of an endpoint: its path and query parameters, and `body` if it has one. */
 export type EndpointInput<K extends EndpointName> =

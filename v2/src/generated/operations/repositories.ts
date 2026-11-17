@@ -287,42 +287,6 @@ const FOLDERS = /* @__PURE__ */ operation({
 });
 
 /**
- * Lists the repositories added to the system.
- *
- * `GET /api/engine/v2/repositories`
- */
-export function index(
-    input: OperationInput<typeof INDEX> = {},
-    options?: CallOptions,
-): Promise<CallResult<typeof INDEX>> {
-    return call(INDEX, input, options);
-}
-
-const INDEX = /* @__PURE__ */ operation({
-    method: 'GET',
-    path: '/api/engine/v2/repositories',
-    pathKeys: [],
-    params: /* @__PURE__ */ parameters({
-        /**
-         * filters results by the given text: a record matches when any word matches its searchable
-         * fields as a whole word, and the last word also matches as a prefix (search as you type)
-         */
-        q: /* @__PURE__ */ string(),
-        /** the maximum number of results to return */
-        limit: /* @__PURE__ */ integer('UInt32'),
-        /** the starting offset of the result set, used to implement pagination */
-        offset: /* @__PURE__ */ integer('UInt32'),
-        /** deprecated, ignored — pagination follows the `Link` header's offset */
-        ref: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-        /** deprecated, ignored — search covers the resource's indexed fields */
-        fields: /* @__PURE__ */ array(/* @__PURE__ */ string()),
-    }),
-    body: null,
-    response: /* @__PURE__ */ array(Repository),
-    name: 'repositories.index',
-});
-
-/**
  * Determine loaded interfaces and their current commit.
  *
  * Determine loaded interfaces and their current commit
@@ -378,6 +342,42 @@ const PULL = /* @__PURE__ */ operation({
         ['commit_hash'],
     ),
     name: 'repositories.pull',
+});
+
+/**
+ * Lists the repositories added to the system.
+ *
+ * `GET /api/engine/v2/repositories`
+ */
+export function query(
+    input: OperationInput<typeof QUERY> = {},
+    options?: CallOptions,
+): Promise<CallResult<typeof QUERY>> {
+    return call(QUERY, input, options);
+}
+
+const QUERY = /* @__PURE__ */ operation({
+    method: 'GET',
+    path: '/api/engine/v2/repositories',
+    pathKeys: [],
+    params: /* @__PURE__ */ parameters({
+        /**
+         * filters results by the given text: a record matches when any word matches its searchable
+         * fields as a whole word, and the last word also matches as a prefix (search as you type)
+         */
+        q: /* @__PURE__ */ string(),
+        /** the maximum number of results to return */
+        limit: /* @__PURE__ */ integer('UInt32'),
+        /** the starting offset of the result set, used to implement pagination */
+        offset: /* @__PURE__ */ integer('UInt32'),
+        /** deprecated, ignored — pagination follows the `Link` header's offset */
+        ref: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        /** deprecated, ignored — search covers the resource's indexed fields */
+        fields: /* @__PURE__ */ array(/* @__PURE__ */ string()),
+    }),
+    body: null,
+    response: /* @__PURE__ */ array(Repository),
+    name: 'repositories.query',
 });
 
 /**

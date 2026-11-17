@@ -21,10 +21,11 @@
  */
 import type * as TS from 'typescript-5';
 import { assert } from '../core/assert.ts';
-import type { CallMap, CallMapping, ObjectEntry, Template } from './map.ts';
+import type { CallMap, CallMapping, ObjectEntry, Template, TypeMapping } from './map.ts';
 
 export const V1_MODULE = '@placeos/ts-client';
 export const COMPAT_MODULE = '@placeos/ts-client/compat';
+export const STAFF_MODULE = '@placeos/ts-client/staff';
 /** The objects of the test frameworks: `vi` of Vitest and `jest` of Jest. */
 const TEST_GLOBALS: ReadonlySet<string> = new Set(['vi', 'jest']);
 /** The mock methods that set the value of a promise. The value becomes a v2 result. */
@@ -61,7 +62,7 @@ const ALIASES_MAX = 100;
 
 export interface MigrateTables {
     readonly calls: CallMap;
-    readonly types: Readonly<Record<string, string>>;
+    readonly types: Readonly<Record<string, TypeMapping>>;
     /** The v1 names that `@placeos/ts-client/compat` has. Their imports move there. */
     readonly compat: Readonly<Record<string, 'type' | 'value'>>;
     readonly unmapped: Readonly<Record<string, string>>;
@@ -107,16 +108,25 @@ export function migrateSource(
     if (imports.declarations.length === 0) {
         return { text, changes: 0, findings: [], migrated: new Set() };
     }
-    const taken = declaredNames(ts, source);
+    // A v1 class that the file uses only as a type loses its import, so a v2 type can take its
+    // name, such as `Survey` for the v1 `Survey`.
+    const typeOnly = (name: string) => {
+        const imported = imports.named.get(name);
+        return imported !== undefined && imported in tables.types;
+    };
+    const taken = declaredNames(ts, source, typeOnly);
     const edits: Edit[] = [];
     const findings: Finding[] = [];
     const migrated = new Set<string>();
     /** The uses of each local name of a named import, and how many the tool changed. */
     const uses = new Map<string, { total: number; changed: number }>();
-    /** The local names of the v2 namespaces that the new import gives. */
-    const namespaceNames = new Map<string, string>();
-    /** The v2 types that the new import gives, by local name. */
-    const typeNames = new Map<string, string>();
+    /** The v2 namespaces that the new imports give, by module and name, with the local name. */
+    const namespaceNames = new Map<
+        string,
+        { module: 'staff' | null; name: string; local: string }
+    >();
+    /** The v2 types that the new imports give, by local name. */
+    const typeNames = new Map<string, { module: 'staff' | null; name: string }>();
     const compatNames = new Set<string>();
     /** The local names of the v1 imports that move to the compat module. */
     const moved = new Set<string>();
@@ -149,12 +159,26 @@ export function migrateSource(
         assert(false, `a free local name for ${name}`);
     }
 
-    function namespaceLocal(namespace: string): string {
-        const known = namespaceNames.get(namespace);
-        if (known !== undefined) return known;
-        const name = localName(namespace);
-        namespaceNames.set(namespace, name);
-        return name;
+    function namespaceLocal(namespace: string, module: 'staff' | null = null): string {
+        const key = `${module ?? ''}|${namespace}`;
+        const known = namespaceNames.get(key);
+        if (known !== undefined) return known.local;
+        // A staff namespace, such as `assets`, can have the name of a REST API namespace.
+        const staffName = `staff${namespace.charAt(0).toUpperCase()}${namespace.slice(1)}`;
+        const local =
+            module === 'staff' && taken.has(namespace) && !taken.has(staffName)
+                ? localName(staffName)
+                : localName(namespace);
+        namespaceNames.set(key, { module, name: namespace, local });
+        return local;
+    }
+
+    /** The v2 namespace of a mapping. A namespace import of v1 has the REST API namespaces only. */
+    function namespaceOf(mapping: CallMapping, prefix: string | null): string {
+        if (prefix === null || mapping.module === 'staff') {
+            return namespaceLocal(mapping.namespace, mapping.module ?? null);
+        }
+        return `${prefix}.${mapping.namespace}`;
     }
 
     /** The local name of a compat export that a namespace import used, such as `PlaceDriverRole`. */
@@ -169,10 +193,13 @@ export function migrateSource(
         return local;
     }
 
-    function typeLocal(v2Name: string): string {
-        for (const [local, name] of typeNames) if (name === v2Name) return local;
-        const local = localName(v2Name);
-        typeNames.set(local, v2Name);
+    function typeLocal(type: TypeMapping): string {
+        const module = type.module ?? null;
+        for (const [local, known] of typeNames) {
+            if (known.name === type.name && known.module === module) return local;
+        }
+        const local = localName(type.name);
+        typeNames.set(local, { module, name: type.name });
         return local;
     }
 
@@ -208,8 +235,7 @@ export function migrateSource(
             find(call, name, rendered);
             return false;
         }
-        const namespace =
-            prefix === null ? namespaceLocal(mapping.namespace) : `${prefix}.${mapping.namespace}`;
+        const namespace = namespaceOf(mapping, prefix);
         const helper = mapping.result === 'page' ? 'orThrowPage' : 'orThrow';
         compatNames.add(helper);
         const pick =
@@ -244,8 +270,7 @@ export function migrateSource(
     ): void {
         const mapping = tables.calls[name];
         assert(mapping !== undefined, `${name} has a mapping`);
-        const namespace =
-            prefix === null ? namespaceLocal(mapping.namespace) : `${prefix}.${mapping.namespace}`;
+        const namespace = namespaceOf(mapping, prefix);
         replace(node, `${namespace}.${mapping.operation}`);
         doubles.set(wrapper, { name, mapping });
         migrated.add(name);
@@ -334,6 +359,20 @@ export function migrateSource(
         vitest: boolean,
     ): void {
         const objects = factoryObjects(ts, factory);
+        for (const object of objects) {
+            for (const property of object.properties) {
+                const name = property.name;
+                if (name === undefined || !(ts.isIdentifier(name) || ts.isStringLiteral(name)))
+                    continue;
+                const mapping = tables.calls[name.text];
+                if (mapping?.module !== 'staff') continue;
+                find(
+                    property,
+                    name.text,
+                    `mock ${STAFF_MODULE} for ${mapping.namespace}.${mapping.operation}`,
+                );
+            }
+        }
         const mapped = objects.some((object) =>
             object.properties.some((property) => mappingOf(property) !== null),
         );
@@ -355,7 +394,9 @@ export function migrateSource(
         if (!ts.isPropertyAssignment(property) && !ts.isShorthandPropertyAssignment(property)) {
             return null;
         }
-        return tables.calls[name.text] ?? null;
+        const mapping = tables.calls[name.text] ?? null;
+        // The staff functions are in another module, which this factory does not mock.
+        return mapping?.module === 'staff' ? null : mapping;
     }
 
     function rewriteFactoryObject(object: TS.ObjectLiteralExpression): void {
@@ -442,7 +483,13 @@ export function migrateSource(
                     ts.isStringLiteral(method)
                 ) {
                     const mapping = tables.calls[method.text];
-                    if (mapping !== undefined) {
+                    if (mapping?.module === 'staff') {
+                        find(
+                            node,
+                            method.text,
+                            `spy on ${STAFF_MODULE} for ${mapping.namespace}.${mapping.operation}`,
+                        );
+                    } else if (mapping !== undefined) {
                         replace(method, `'${mapping.operation}'`);
                         replace(target, `${target.text}.${mapping.namespace}`);
                         doubles.set(node, { name: method.text, mapping });
@@ -504,10 +551,14 @@ export function migrateSource(
             }
             const left = typeName.left;
             const right = typeName.right.text;
-            const v2Name = tables.types[right];
+            const type = tables.types[right];
             if (!ts.isIdentifier(left) || !imports.namespaces.has(left.text)) return;
-            if (v2Name !== undefined) {
-                replace(typeName.right, v2Name);
+            if (type !== undefined && type.module === undefined) {
+                replace(typeName.right, type.name);
+                changes += 1;
+            } else if (type !== undefined) {
+                // A staff type is not in the namespace of v1. It gets its own import.
+                replace(typeName, typeLocal(type));
                 changes += 1;
             } else if (right in tables.compat) {
                 replace(typeName, compatLocal(right));
@@ -596,21 +647,29 @@ export function migrateSource(
     // The hoisted `fromV1Mock` of a factory is also there for the tests.
     if (importsFromV1Mock && !usesFromV1Mock) compatNames.add('fromV1Mock');
 
-    // The new import of the v2 namespaces and types, and of the helpers.
-    const added = [
-        ...[...namespaceNames].map(([name, local]) =>
-            name === local ? name : `${name} as ${local}`,
-        ),
-        ...[...typeNames].map(([local, name]) =>
-            name === local ? `type ${name}` : `type ${name} as ${local}`,
-        ),
-    ].sort(compareSpecifiers);
+    // The new imports of the v2 namespaces and types, and of the helpers.
+    const specifiers = (module: 'staff' | null): string[] =>
+        [
+            ...[...namespaceNames.values()]
+                .filter((entry) => entry.module === module)
+                .map(({ name, local }) => (name === local ? name : `${name} as ${local}`)),
+            ...[...typeNames]
+                .filter(([, entry]) => entry.module === module)
+                .map(([local, { name }]) =>
+                    name === local ? `type ${name}` : `type ${name} as ${local}`,
+                ),
+        ].sort(compareSpecifiers);
+    const added = specifiers(null);
+    const staffAdded = specifiers('staff');
     const changed = importEdits(ts, source, imports.declarations, uses, tables, added, moved);
     edits.push(...changed.edits);
     // The new imports go after the last v1 import, or in its place when the tool removes it.
     const lines: string[] = [];
     if (changed.pending.length > 0) {
         lines.push(`import { ${changed.pending.join(', ')} } from '${V1_MODULE}';`);
+    }
+    if (staffAdded.length > 0) {
+        lines.push(`import { ${staffAdded.join(', ')} } from '${STAFF_MODULE}';`);
     }
     if (compatNames.size > 0) {
         const names = [...compatNames].sort(compareSpecifiers).join(', ');
@@ -674,10 +733,18 @@ function readImports(ts: typeof TS, source: TS.SourceFile): V1Imports {
 }
 
 /** The names that the file declares or uses, so that a new import does not hide one. */
-function declaredNames(ts: typeof TS, source: TS.SourceFile): Set<string> {
+function declaredNames(
+    ts: typeof TS,
+    source: TS.SourceFile,
+    replacedType: (name: string) => boolean,
+): Set<string> {
     const names = new Set<string>();
     function visit(node: TS.Node): void {
-        if (ts.isIdentifier(node) && isReference(ts, node)) names.add(node.text);
+        if (ts.isIdentifier(node) && isReference(ts, node)) {
+            const parent = node.parent;
+            const typeName = ts.isTypeReferenceNode(parent) && parent.typeName === node;
+            if (!typeName || !replacedType(node.text)) names.add(node.text);
+        }
         ts.forEachChild(node, visit);
     }
     visit(source);
@@ -806,10 +873,11 @@ function isV1Name(tables: MigrateTables, name: string): boolean {
 /** The hint for a use that the tool did not change. */
 function hint(tables: MigrateTables, name: string): string {
     const type = tables.types[name];
-    if (type !== undefined) return `v2 has no classes: use an object of the type ${type}`;
+    if (type !== undefined) return `v2 has no classes: use an object of the type ${type.name}`;
     const mapping = tables.calls[name];
     if (mapping !== undefined) {
-        return `a use that is not a call: use ${mapping.namespace}.${mapping.operation}`;
+        const from = mapping.module === 'staff' ? ` of ${STAFF_MODULE}` : '';
+        return `a use that is not a call: use ${mapping.namespace}.${mapping.operation}${from}`;
     }
     return tables.unmapped[name] ?? 'v2 has no replacement';
 }
@@ -869,7 +937,7 @@ function renderCall(
         const initializer = mapping.parameters[index]?.initializer ?? null;
         return initializer === null ? null : { text: initializer, node: null };
     };
-    // An input that is only a spread of one argument is that argument: `zones.index(query)`.
+    // An input that is only a spread of one argument is that argument: `zones.query(query)`.
     const [only] = template.kind === 'object' ? template.entries : [];
     const whole =
         template.kind === 'object' && template.entries.length === 1 && only?.kind === 'spread'

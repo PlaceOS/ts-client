@@ -19,14 +19,14 @@ import { History, PgOrmBase } from '../schemas.ts';
  *
  * `GET /api/engine/v2/history`
  */
-export function index(
-    input: OperationInput<typeof INDEX> = {},
+export function query(
+    input: OperationInput<typeof QUERY> = {},
     options?: CallOptions,
-): Promise<CallResult<typeof INDEX>> {
-    return call(INDEX, input, options);
+): Promise<CallResult<typeof QUERY>> {
+    return call(QUERY, input, options);
 }
 
-const INDEX = /* @__PURE__ */ operation({
+const QUERY = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/history',
     pathKeys: [],
@@ -65,7 +65,7 @@ const INDEX = /* @__PURE__ */ operation({
     }),
     body: null,
     response: /* @__PURE__ */ array(History),
-    name: 'history.index',
+    name: 'history.query',
 });
 
 /** `GET /api/engine/v2/history/{id}` */

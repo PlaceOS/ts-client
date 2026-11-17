@@ -1,7 +1,7 @@
 /** A longer `Link` header is not from this API. The parser ignores it. */
 export const LINK_HEADER_LENGTH_MAX = 8_192;
 
-/** The pagination data of an index response. */
+/** The pagination data of a `query` response. */
 export interface PageInfo {
     /** The `X-Total-Count` header: the number of results for all pages. */
     readonly total: number | null;
@@ -10,14 +10,14 @@ export interface PageInfo {
 }
 
 /**
- * Reads the pagination headers of an index response.
+ * Reads the pagination headers of a `query` response.
  *
  * ```ts
- * const first = await zones.index({ limit: 100 });
+ * const first = await zones.query({ limit: 100 });
  * if (first.ok) {
  *     const page = pageInfo(first.value.headers);
  *     if (page.nextOffset !== null) {
- *         const second = await zones.index({ limit: 100, offset: page.nextOffset });
+ *         const second = await zones.query({ limit: 100, offset: page.nextOffset });
  *     }
  * }
  * ```

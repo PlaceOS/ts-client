@@ -18,6 +18,10 @@
             "types": "./dist/compat/index.d.ts",
             "default": "./dist/compat/index.js"
         },
+        "./staff": {
+            "types": "./dist/staff.d.ts",
+            "default": "./dist/staff.js"
+        },
         "./mock": {
             "types": "./dist/mock/index.d.ts",
             "default": "./dist/mock/index.js"

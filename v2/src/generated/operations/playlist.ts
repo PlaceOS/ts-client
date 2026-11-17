@@ -210,45 +210,6 @@ const HISTORY = /* @__PURE__ */ operation({
 });
 
 /**
- * List media playlists in the current authority.
- *
- * list media playlists in the current authority.
- *
- * Non-admin callers see only playlists linked to groups they're a member of (direct or transitive).
- * Pass `group_id=...` to scope to a specific group (caller must have Read on that group). Pass
- * `q=...` for a case-insensitive substring search over `name` and `description`.
- *
- * `GET /api/engine/v2/signage/playlists`
- */
-export function index(
-    input: OperationInput<typeof INDEX> = {},
-    options?: CallOptions,
-): Promise<CallResult<typeof INDEX>> {
-    return call(INDEX, input, options);
-}
-
-const INDEX = /* @__PURE__ */ operation({
-    method: 'GET',
-    path: '/api/engine/v2/signage/playlists',
-    pathKeys: [],
-    params: /* @__PURE__ */ parameters({
-        /** filter to playlists linked to this group (caller must have Read on the group) */
-        group_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-        /** case-insensitive substring search on name and description (SQL ILIKE) */
-        q: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-        limit: /* @__PURE__ */ integer('Int32'),
-        offset: /* @__PURE__ */ integer('Int32'),
-        /** deprecated, ignored — pagination follows the `Link` header's offset */
-        ref: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-        /** deprecated, ignored — search covers the resource's indexed fields */
-        fields: /* @__PURE__ */ array(/* @__PURE__ */ string()),
-    }),
-    body: null,
-    response: /* @__PURE__ */ array(Playlist),
-    name: 'playlist.index',
-});
-
-/**
  * Get the current list of media for the playlist.
  *
  * `GET /api/engine/v2/signage/playlists/{id}/media`
@@ -301,6 +262,45 @@ const MEDIA_REVISIONS = /* @__PURE__ */ operation({
     body: null,
     response: /* @__PURE__ */ array(PlaylistRevision),
     name: 'playlist.mediaRevisions',
+});
+
+/**
+ * List media playlists in the current authority.
+ *
+ * list media playlists in the current authority.
+ *
+ * Non-admin callers see only playlists linked to groups they're a member of (direct or transitive).
+ * Pass `group_id=...` to scope to a specific group (caller must have Read on that group). Pass
+ * `q=...` for a case-insensitive substring search over `name` and `description`.
+ *
+ * `GET /api/engine/v2/signage/playlists`
+ */
+export function query(
+    input: OperationInput<typeof QUERY> = {},
+    options?: CallOptions,
+): Promise<CallResult<typeof QUERY>> {
+    return call(QUERY, input, options);
+}
+
+const QUERY = /* @__PURE__ */ operation({
+    method: 'GET',
+    path: '/api/engine/v2/signage/playlists',
+    pathKeys: [],
+    params: /* @__PURE__ */ parameters({
+        /** filter to playlists linked to this group (caller must have Read on the group) */
+        group_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        /** case-insensitive substring search on name and description (SQL ILIKE) */
+        q: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        limit: /* @__PURE__ */ integer('Int32'),
+        offset: /* @__PURE__ */ integer('Int32'),
+        /** deprecated, ignored — pagination follows the `Link` header's offset */
+        ref: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        /** deprecated, ignored — search covers the resource's indexed fields */
+        fields: /* @__PURE__ */ array(/* @__PURE__ */ string()),
+    }),
+    body: null,
+    response: /* @__PURE__ */ array(Playlist),
+    name: 'playlist.query',
 });
 
 /**

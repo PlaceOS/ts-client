@@ -10,7 +10,7 @@ import { mockEndpoint, respond } from '../../dist/mock/index.js';
 export async function calls(): Promise<string> {
     // An operation without a body does not ask for one.
     const zone: Zone = await zones.show({ id: 'zone-1' }).then(orThrow);
-    const page = await zones.index({ limit: 10 }).then(orThrowPage);
+    const page = await zones.query({ limit: 10 }).then(orThrowPage);
     await zones.update({ id: zone.id, body: { name: 'name' } }).then(orThrow);
     await metadata.show({ id: 'zone-1', name: 'settings' }).then(orThrow);
     // A v1 enum value fits the v2 field.
@@ -21,7 +21,7 @@ export async function calls(): Promise<string> {
     await zones.show({ id: 'zone-1', no_such_parameter: true });
     // A typed mock: the input and the data have the types of the endpoint.
     mockEndpoint('zones.show', (input) => ({ id: input.id, name: 'Level 1' }));
-    mockEndpoint('zones.index', () => respond([{ id: 'zone-1' }], { total: 1 }));
+    mockEndpoint('zones.query', () => respond([{ id: 'zone-1' }], { total: 1 }));
     mockEndpoint('metadata.show', () => ({ settings: { details: { theme: 'dark' } } }));
     // @ts-expect-error there is no such endpoint
     mockEndpoint('zones.no_such_endpoint', () => ({}));

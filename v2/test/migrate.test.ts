@@ -34,7 +34,7 @@ test('rewrites calls, types and imports', () => {
             "import { type Zone, zones } from '@placeos/ts-client';",
             "import { orThrow, orThrowPage } from '@placeos/ts-client/compat';",
             'async function load(id: string, query: object): Promise<Zone> {',
-            '    const list = await zones.index(query).then(orThrowPage);',
+            '    const list = await zones.query(query).then(orThrowPage);',
             '    return zones.show({ id, complete: true }).then(orThrow);',
             '}',
         ].join('\n'),
@@ -88,7 +88,7 @@ test('gives a new import another name when the file has the name', () => {
         [
             "import { zones as zonesV2 } from '@placeos/ts-client';",
             "import { orThrowPage } from '@placeos/ts-client/compat';",
-            'const zones = await zonesV2.index({}).then(orThrowPage);',
+            'const zones = await zonesV2.query({}).then(orThrowPage);',
         ].join('\n'),
     );
 });
@@ -181,7 +181,7 @@ test('rewrites test doubles: the function, the mock values and the argument chec
         "import { fromV1Mock, mockPage, mockReply } from '@placeos/ts-client/compat';",
         "vi.mock('@placeos/ts-client', { spy: true });",
         "vi.mocked(zones.show).mockResolvedValue(mockReply({ id: 'zone-1' } as any));",
-        'vi.mocked(zones.index).mockResolvedValueOnce(mockPage({ data: [], total: 0 }));',
+        'vi.mocked(zones.query).mockResolvedValueOnce(mockPage({ data: [], total: 0 }));',
         "vi.mocked(zones.show).mockRejectedValue(new Error('403'));",
         "expect(zones.show).toHaveBeenCalledWith({ id: 'zone-1' });",
         'expect(zones.show).not.toHaveBeenCalled();',
@@ -226,7 +226,7 @@ test('rewrites the v1 functions of a vi.mock factory to v2 namespaces', () => {
         "const { fromV1Mock } = await vi.hoisted(() => import('@placeos/ts-client/compat'));",
         "vi.mock('@placeos/ts-client', () => ({ authority: vi.fn(() => null), " +
             "zones: { show: vi.fn(fromV1Mock((id: string) => Promise.resolve({ id }), ['id', '...'])), " +
-            "index: vi.fn(fromV1Mock(undefined, ['...'], 'page')) }, " +
+            "query: vi.fn(fromV1Mock(undefined, ['...'], 'page')) }, " +
             "metadata: { show: vi.fn(fromV1Mock(() => ({ details: {} }), ['id', 'name'], 'data', 'name')) } }));",
     ]);
 });
@@ -243,10 +243,45 @@ test('fromV1Mock gives the v1 arguments and a v2 result', async () => {
     await show({ id: 'zone-1', complete: true });
     // An empty last argument is left out, as the v1 call left it out.
     expect(calls).toEqual([['zone-1'], ['zone-1', { complete: true }]]);
-    const index = fromV1Mock(() => ({ data: [1], total: 9 }), ['...'], 'page');
-    expect(orThrowPage(await index({})).total).toBe(9);
+    const query = fromV1Mock(() => ({ data: [1], total: 9 }), ['...'], 'page');
+    expect(orThrowPage(await query({})).total).toBe(9);
     const meta = fromV1Mock(() => ({ details: 1 }), ['id', 'name'], 'data', 'name');
     expect(orThrow(await meta({ id: 'z', name: 'settings' }))).toEqual({
         settings: { details: 1 },
     });
+});
+
+test('a v2 type gets an alias when the v1 class stays for a value use', () => {
+    const result = migrate(
+        [
+            "import { SignagePlugin } from '@placeos/ts-client';",
+            'const plugin: SignagePlugin = new SignagePlugin();',
+        ].join('\n'),
+    );
+    expect(result.text.split('\n')).toEqual([
+        "import { SignagePlugin, type SignagePlugin as SignagePluginV2 } from '@placeos/ts-client';",
+        'const plugin: SignagePluginV2 = new SignagePlugin();',
+    ]);
+});
+
+test('rewrites the v1 staff functions to @placeos/ts-client/staff', () => {
+    const result = migrate(
+        [
+            "import { querySurveys, showSurvey, Survey, showZone } from '@placeos/ts-client';",
+            'const assets = 1;',
+            'const survey: Survey = await showSurvey(id);',
+            'const list = await querySurveys({ zone_id: zone });',
+            'await showZone(id);',
+        ].join('\n'),
+    );
+    expect(result.text.split('\n')).toEqual([
+        "import { zones } from '@placeos/ts-client';",
+        "import { type Survey, surveys } from '@placeos/ts-client/staff';",
+        "import { orThrow } from '@placeos/ts-client/compat';",
+        'const assets = 1;',
+        'const survey: Survey = await surveys.show({ id }).then(orThrow);',
+        // v1 `querySurveys` gave a list, not a page.
+        'const list = await surveys.query({ zone_id: zone }).then(orThrow);',
+        'await zones.show({ id }).then(orThrow);',
+    ]);
 });

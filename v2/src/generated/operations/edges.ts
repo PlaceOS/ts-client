@@ -336,6 +336,28 @@ const EDGES_STATISTICS = /* @__PURE__ */ operation({
 });
 
 /**
+ * Real-time error summary.
+ *
+ * `GET /api/engine/v2/edges/monitoring/summary`
+ */
+export function monitoringSummary(
+    input: OperationInput<typeof MONITORING_SUMMARY> = {},
+    options?: CallOptions,
+): Promise<CallResult<typeof MONITORING_SUMMARY>> {
+    return call(MONITORING_SUMMARY, input, options);
+}
+
+const MONITORING_SUMMARY = /* @__PURE__ */ operation({
+    method: 'GET',
+    path: '/api/engine/v2/edges/monitoring/summary',
+    pathKeys: [],
+    params: /* @__PURE__ */ parameters({}),
+    body: null,
+    response: /* @__PURE__ */ record(/* @__PURE__ */ record(/* @__PURE__ */ json())),
+    name: 'edges.monitoringSummary',
+});
+
+/**
  * List the edges in the system.
  *
  * list the edges in the system. an edge can be thought of as a location and each edge location can
@@ -343,14 +365,14 @@ const EDGES_STATISTICS = /* @__PURE__ */ operation({
  *
  * `GET /api/engine/v2/edges`
  */
-export function index(
-    input: OperationInput<typeof INDEX> = {},
+export function query(
+    input: OperationInput<typeof QUERY> = {},
     options?: CallOptions,
-): Promise<CallResult<typeof INDEX>> {
-    return call(INDEX, input, options);
+): Promise<CallResult<typeof QUERY>> {
+    return call(QUERY, input, options);
 }
 
-const INDEX = /* @__PURE__ */ operation({
+const QUERY = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/edges',
     pathKeys: [],
@@ -371,29 +393,7 @@ const INDEX = /* @__PURE__ */ operation({
     }),
     body: null,
     response: /* @__PURE__ */ array(Edge),
-    name: 'edges.index',
-});
-
-/**
- * Real-time error summary.
- *
- * `GET /api/engine/v2/edges/monitoring/summary`
- */
-export function monitoringSummary(
-    input: OperationInput<typeof MONITORING_SUMMARY> = {},
-    options?: CallOptions,
-): Promise<CallResult<typeof MONITORING_SUMMARY>> {
-    return call(MONITORING_SUMMARY, input, options);
-}
-
-const MONITORING_SUMMARY = /* @__PURE__ */ operation({
-    method: 'GET',
-    path: '/api/engine/v2/edges/monitoring/summary',
-    pathKeys: [],
-    params: /* @__PURE__ */ parameters({}),
-    body: null,
-    response: /* @__PURE__ */ record(/* @__PURE__ */ record(/* @__PURE__ */ json())),
-    name: 'edges.monitoringSummary',
+    name: 'edges.query',
 });
 
 /**

@@ -47,14 +47,14 @@ const DESTROY = /* @__PURE__ */ operation({
  *
  * `GET /api/engine/v2/chatgpt`
  */
-export function index(
-    input: OperationInput<typeof INDEX> = {},
+export function query(
+    input: OperationInput<typeof QUERY> = {},
     options?: CallOptions,
-): Promise<CallResult<typeof INDEX>> {
-    return call(INDEX, input, options);
+): Promise<CallResult<typeof QUERY>> {
+    return call(QUERY, input, options);
 }
 
-const INDEX = /* @__PURE__ */ operation({
+const QUERY = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/chatgpt',
     pathKeys: [],
@@ -75,7 +75,7 @@ const INDEX = /* @__PURE__ */ operation({
     }),
     body: null,
     response: /* @__PURE__ */ array(Chat),
-    name: 'chatGpt.index',
+    name: 'chatGpt.query',
 });
 
 /**

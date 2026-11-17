@@ -195,14 +195,14 @@ const DESTROY_DRAFT = /* @__PURE__ */ operation({
  *
  * `GET /api/engine/v2/signage/templates`
  */
-export function index(
-    input: OperationInput<typeof INDEX> = {},
+export function query(
+    input: OperationInput<typeof QUERY> = {},
     options?: CallOptions,
-): Promise<CallResult<typeof INDEX>> {
-    return call(INDEX, input, options);
+): Promise<CallResult<typeof QUERY>> {
+    return call(QUERY, input, options);
 }
 
-const INDEX = /* @__PURE__ */ operation({
+const QUERY = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/signage/templates',
     pathKeys: [],
@@ -222,7 +222,7 @@ const INDEX = /* @__PURE__ */ operation({
     }),
     body: null,
     response: /* @__PURE__ */ array(SignageTemplate),
-    name: 'signageTemplates.index',
+    name: 'signageTemplates.query',
 });
 
 /**

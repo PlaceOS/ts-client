@@ -63,14 +63,14 @@ const GUEST_TOKEN = /* @__PURE__ */ operation({
  *
  * `GET /api/engine/v2/public_events/{system_id}/events`
  */
-export function index(
-    input: OperationInput<typeof INDEX>,
+export function query(
+    input: OperationInput<typeof QUERY>,
     options?: CallOptions,
-): Promise<CallResult<typeof INDEX>> {
-    return call(INDEX, input, options);
+): Promise<CallResult<typeof QUERY>> {
+    return call(QUERY, input, options);
 }
 
-const INDEX = /* @__PURE__ */ operation({
+const QUERY = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/public_events/{system_id}/events',
     pathKeys: ['system_id'],
@@ -97,7 +97,7 @@ const INDEX = /* @__PURE__ */ operation({
     ),
     body: null,
     response: /* @__PURE__ */ array(/* @__PURE__ */ json()),
-    name: 'publicEvents.index',
+    name: 'publicEvents.query',
 });
 
 /**

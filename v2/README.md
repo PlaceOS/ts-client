@@ -1,8 +1,9 @@
 # @placeos/ts-client v2
 
-A typed client for the PlaceOS REST API. A script generates the types and the request functions
-from the [OpenAPI document](https://github.com/PlaceOS/rest-api/blob/master/OPENAPI_DOC.yml) of
-the API. The code follows [TigerStyle for JS/TS](https://github.com/tigerbeetle/tigerbeetle/blob/main/docs/TIGER_STYLE.md)
+A typed client for the PlaceOS REST API and the staff API. A script generates the types and the
+request functions from the OpenAPI documents of
+[PlaceOS/rest-api](https://github.com/PlaceOS/rest-api/blob/master/OPENAPI_DOC.yml) and
+[PlaceOS/staff-api](https://github.com/PlaceOS/staff-api/blob/master/OPENAPI_DOC.yml). The code follows [TigerStyle for JS/TS](https://github.com/tigerbeetle/tigerbeetle/blob/main/docs/TIGER_STYLE.md)
 where possible.
 
 The library has no runtime dependencies. It runs in browsers, in Node 20.3 and later, and in Bun.
@@ -71,7 +72,7 @@ with `createClient` and give it in the options. The configured client does not c
 
 ```ts
 const other = createClient({ baseUrl: 'https://other.example.com', auth: { kind: 'none' } });
-await zones.index({}, { client: other });
+await zones.query({}, { client: other });
 ```
 
 ### Timeouts and cancel
@@ -82,7 +83,7 @@ for one request:
 ```ts
 configure({ baseUrl: '', auth: { kind: 'none' }, timeoutMs: 10_000 });
 const controller = new AbortController();
-await zones.index({}, { signal: controller.signal, timeoutMs: 60_000 });
+await zones.query({}, { signal: controller.signal, timeoutMs: 60_000 });
 ```
 
 ### Pages
@@ -92,7 +93,7 @@ An `index` operation returns one page. Use `pageInfo` to get the total and the n
 ```ts
 import { pageInfo, zones } from '@placeos/ts-client';
 
-const result = await zones.index({ limit: 100 });
+const result = await zones.query({ limit: 100 });
 if (result.ok) {
     const { total, nextOffset } = pageInfo(result.value.headers);
 }
@@ -123,7 +124,7 @@ import { endpointMocks, httpError, mockEndpoint, respond } from '@placeos/ts-cli
 configure({ baseUrl: '', auth: { kind: 'none' }, mock: endpointMocks });
 
 mockEndpoint('zones.show', (input) => ({ id: input.id, name: 'Level 1' }));
-mockEndpoint('zones.index', () => respond([{ id: 'zone-1' }], { total: 1 }));
+mockEndpoint('zones.query', () => respond([{ id: 'zone-1' }], { total: 1 }));
 mockEndpoint('systems.update', (input) => ({ id: input.sys_id, ...input.body }), { delayMs: 300 });
 mockEndpoint('zones.destroy', () => {
     throw httpError(403);
@@ -148,7 +149,7 @@ A test double of a v2 call gives a `Result`. `mockReply` and `mockPage` of
 ```ts
 vi.mock('@placeos/ts-client', { spy: true });
 vi.mocked(zones.show).mockResolvedValue(mockReply(zone));
-vi.mocked(zones.index).mockResolvedValue(mockPage({ data: [zone], total: 1 }));
+vi.mocked(zones.query).mockResolvedValue(mockPage({ data: [zone], total: 1 }));
 ```
 
 ### Mock mode
@@ -180,6 +181,24 @@ const realtime = createRealtime({
 - A mock endpoint that throws an error with a `status`, such as `404`, gives that HTTP status.
 - A change to a variable of a mock module, such as `mockSystem('sys-1')['Display'][0]['power']
 = true`, notifies its bindings.
+
+## Staff API
+
+The staff API (bookings, events, guests, desks, surveys and more) is at
+`@placeos/ts-client/staff`. It uses the client of `configure`, as the REST API functions do:
+
+```ts
+import { bookings } from '@placeos/ts-client/staff';
+
+const now = Math.floor(Date.now() / 1000);
+const result = await bookings.query({ period_start: now, period_end: now + 86_400, type: 'desk' });
+```
+
+- The staff API has its own schemas, such as `Booking` and `Guest`. A schema that both APIs have,
+  such as `Zone`, is in both entries with the same shape.
+- The typed mocks of the staff API start with `staff.`: `mockEndpoint('staff.bookings.show', ...)`.
+- Some routes of the staff API have an occurrence of a recurring booking: `bookings.showInstance`
+  is `GET /bookings/{id}/instance/{instance}`, the occurrence of `bookings.show`.
 
 ## Log in
 
@@ -348,6 +367,13 @@ The generator changes some parts of the document. Each change has a comment in
   `zone_id=a,b`. The items of an array parameter must not contain commas.
 - **PATCH and PUT.** The server sends PATCH and PUT of `update` to the same method. The client has
   only `update`, which sends PATCH.
+- **Numbered routes.** The document numbers the routes of one action: `show` and `show_2`. A second
+  path with the same signature is an alias, such as `checkin` for `check_in` in the staff API. The
+  client has only the first path. A path with more segments gets a name from them, such as
+  `showInstance` for `bookings/{id}/instance/{instance}`.
+- **A query parameter named `body`.** `body` of the input is the request body, so the `body` query
+  parameter of `staff.events.book` (the description of the meeting) is `body_text` in the input.
+  The query keeps the name `body`.
 - **Responses without a schema.** The data is a `Uint8Array` with the raw body. `systems.execute`,
   `modules.execute` and `modules.stateValue` are exceptions: they return a `JsonValue`.
 - **WebSocket endpoints** (`systems/control`, `webrtc/signaller` and others) are not in the
@@ -355,13 +381,15 @@ The generator changes some parts of the document. Each change has a comment in
 
 ## Change the generated code
 
-Do not edit `src/generated`. The generator downloads the API document from the master branch of
-[PlaceOS/rest-api](https://github.com/PlaceOS/rest-api) on each run. It does not keep a copy in
-this repository.
+Do not edit `src/generated`. The generator downloads the API documents from the master branches of
+[PlaceOS/rest-api](https://github.com/PlaceOS/rest-api) and
+[PlaceOS/staff-api](https://github.com/PlaceOS/staff-api) on each run. It does not keep a copy in
+this repository. `APIS` in `scripts/generate.ts` has the list: the repository, the output folder
+and the prefix of the operation IDs and names.
 
 ```sh
-bun run generate         # Downloads the document and writes src/generated.
-bun run generate:check   # Fails if src/generated does not match the current document.
+bun run generate         # Downloads the documents and writes src/generated and src/generated/staff.
+bun run generate:check   # Fails if the generated files do not match the current documents.
 ```
 
 The generated files are in the repository, so a change to the API shows as a diff. Examine the
@@ -404,13 +432,13 @@ The tool makes these changes:
     const list = await queryZones({ limit: 10 });
     // v2, after the tool
     const zone = await zones.show({ id, complete: true }).then(orThrow);
-    const list = await zones.index({ limit: 10 }).then(orThrowPage);
+    const list = await zones.query({ limit: 10 }).then(orThrowPage);
     ```
 
 - A type reference to a v1 class becomes the v2 type. For example, `PlaceZone` becomes `Zone`.
 - The imports of the v1 enums, such as `PlaceDriverRole`, and of `QueryResponse` move to
   `@placeos/ts-client/compat`. The enums have the v2 values, so they fit the v2 fields of the
-  data. A query parameter takes the name: the `role` of `drivers.index` is `'logic'`, not `99`.
+  data. A query parameter takes the name: the `role` of `drivers.query` is `'logic'`, not `99`.
 - A new import gets another name when the file has the name. For example, a file with a
   `zones` variable gets `zones as zonesV2`.
 
@@ -426,6 +454,8 @@ The tool also changes the test doubles, so that the tests of the app still work:
   namespaces: `showZone: vi.fn(impl)` becomes `zones: { show: vi.fn(fromV1Mock(impl, ['id',
 '...'])) }`. The factory runs before the imports, so the tool adds `fromV1Mock` with
   `vi.hoisted`.
+- The v1 staff functions, such as `querySurveys`, become the operations of
+  `@placeos/ts-client/staff`, with their own import.
 - The imports of the mock endpoints and mock systems move to `@placeos/ts-client/compat`. See
   [Mock mode](#mock-mode).
 

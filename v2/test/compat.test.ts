@@ -55,7 +55,7 @@ test('a v2 call gets the response of a v1 mock endpoint', async () => {
     });
     const [zone, page] = await Promise.all([
         zones.show({ id: 'zone-1', complete: true }, options).then(orThrow),
-        zones.index({ tags: ['level'] }, options).then(orThrowPage),
+        zones.query({ tags: ['level'] }, options).then(orThrowPage),
     ]);
     expect(zone).toMatchObject({ id: 'zone-1', name: 'Level 1', tags: ['level'] });
     // A required field that the mock leaves out gets its empty value.

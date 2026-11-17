@@ -43,8 +43,16 @@ export interface V1Parameter {
     readonly use: 'mapped' | 'ignored' | 'unsupported';
 }
 
+/** The v2 type of a v1 class. `staff` is a type of `@placeos/ts-client/staff`. */
+export interface TypeMapping {
+    readonly name: string;
+    readonly module?: 'staff';
+}
+
 /** The v2 call for one v1 function. */
 export interface CallMapping {
+    /** `staff` for an operation of `@placeos/ts-client/staff`. */
+    readonly module?: 'staff';
     /** The namespace export of v2, such as `zones`. */
     readonly namespace: string;
     /** The operation of the namespace, such as `show`. */
