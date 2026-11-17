@@ -26,13 +26,13 @@ export function clusterVersion(
     return call(CLUSTER_VERSION, input, options);
 }
 
-const CLUSTER_VERSION = operation({
+const CLUSTER_VERSION = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/cluster/versions',
     pathKeys: [],
-    params: parameters({}),
+    params: /* @__PURE__ */ parameters({}),
     body: null,
-    response: array(Version),
+    response: /* @__PURE__ */ array(Version),
 });
 
 /**
@@ -47,11 +47,11 @@ export function platformInfo(
     return call(PLATFORM_INFO, input, options);
 }
 
-const PLATFORM_INFO = operation({
+const PLATFORM_INFO = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/platform',
     pathKeys: [],
-    params: parameters({}),
+    params: /* @__PURE__ */ parameters({}),
     body: null,
     response: RootPlatformInfo,
 });
@@ -68,11 +68,11 @@ export function root(
     return call(ROOT, input, options);
 }
 
-const ROOT = operation({
+const ROOT = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2',
     pathKeys: [],
-    params: parameters({}),
+    params: /* @__PURE__ */ parameters({}),
     body: null,
     response: null,
 });
@@ -89,13 +89,13 @@ export function scopes(
     return call(SCOPES, input, options);
 }
 
-const SCOPES = operation({
+const SCOPES = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/scopes',
     pathKeys: [],
-    params: parameters({}),
+    params: /* @__PURE__ */ parameters({}),
     body: null,
-    response: array(string()),
+    response: /* @__PURE__ */ array(/* @__PURE__ */ string()),
 });
 
 /**
@@ -113,14 +113,14 @@ export function signal(
     return call(SIGNAL, input, options);
 }
 
-const SIGNAL = operation({
+const SIGNAL = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/signal',
     pathKeys: [],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
             /** the path we would like to send data to */
-            channel: string(),
+            channel: /* @__PURE__ */ string(),
         },
         ['channel'],
     ),
@@ -145,13 +145,13 @@ export function sourceResync(
     return call(SOURCE_RESYNC, input, options);
 }
 
-const SOURCE_RESYNC = operation({
+const SOURCE_RESYNC = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/source/resync',
     pathKeys: [],
-    params: parameters({
+    params: /* @__PURE__ */ parameters({
         /** remove everything source publishes from the brokers first */
-        clear: boolean(),
+        clear: /* @__PURE__ */ boolean(),
     }),
     body: null,
     response: RootSourceResyncStatus,
@@ -169,11 +169,11 @@ export function sourceResyncStatus(
     return call(SOURCE_RESYNC_STATUS, input, options);
 }
 
-const SOURCE_RESYNC_STATUS = operation({
+const SOURCE_RESYNC_STATUS = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/source/resync',
     pathKeys: [],
-    params: parameters({}),
+    params: /* @__PURE__ */ parameters({}),
     body: null,
     response: RootSourceResyncStatus,
 });
@@ -190,11 +190,11 @@ export function version(
     return call(VERSION, input, options);
 }
 
-const VERSION = operation({
+const VERSION = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/version',
     pathKeys: [],
-    params: parameters({}),
+    params: /* @__PURE__ */ parameters({}),
     body: null,
     response: Version,
 });

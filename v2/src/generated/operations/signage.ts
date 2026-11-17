@@ -26,22 +26,22 @@ export function display(
     return call(DISPLAY, input, options);
 }
 
-const DISPLAY = operation({
+const DISPLAY = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/signage/{system_id}',
     pathKeys: ['system_id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            system_id: string(),
+            system_id: /* @__PURE__ */ string(),
             /** currently playing item, if the player is playing content */
-            item_id: nullable(string()),
+            item_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
             /** is this the preview player */
-            preview: boolean(),
+            preview: /* @__PURE__ */ boolean(),
         },
         ['system_id'],
     ),
     body: null,
-    response: nullable(ControlSystem),
+    response: /* @__PURE__ */ nullable(ControlSystem),
 });
 
 /**
@@ -59,18 +59,18 @@ export function fetchStaticMedia(
     return call(FETCH_STATIC_MEDIA, input, options);
 }
 
-const FETCH_STATIC_MEDIA = operation({
+const FETCH_STATIC_MEDIA = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/signage/{system_id}/static/{item_id}',
     pathKeys: ['system_id', 'item_id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
             /** the display showing the media, sizes web page captures */
-            system_id: string(),
+            system_id: /* @__PURE__ */ string(),
             /** the link to the media item for display on an e-ink or other static device */
-            item_id: string(),
+            item_id: /* @__PURE__ */ string(),
             /** how many minutes the media can be cached before taking a new screenshot */
-            expires_after: integer('UInt32'),
+            expires_after: /* @__PURE__ */ integer('UInt32'),
         },
         ['system_id', 'item_id'],
     ),
@@ -93,18 +93,18 @@ export function samsungEinkManifest(
     return call(SAMSUNG_EINK_MANIFEST, input, options);
 }
 
-const SAMSUNG_EINK_MANIFEST = operation({
+const SAMSUNG_EINK_MANIFEST = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/signage/{system_id}/samsung/eink/{item_id}/{expires_after}',
     pathKeys: ['system_id', 'item_id', 'expires_after'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
             /** the display showing the media, sizes web page captures */
-            system_id: string(),
+            system_id: /* @__PURE__ */ string(),
             /** the link to the media item for display on an e-ink or other static device */
-            item_id: string(),
+            item_id: /* @__PURE__ */ string(),
             /** how many minutes the media can be cached before taking a new screenshot */
-            expires_after: integer('UInt32'),
+            expires_after: /* @__PURE__ */ integer('UInt32'),
         },
         ['system_id', 'item_id', 'expires_after'],
     ),
@@ -127,16 +127,16 @@ export function samsungEinkManifestWithoutExpiresAfter(
     return call(SAMSUNG_EINK_MANIFEST_WITHOUT_EXPIRES_AFTER, input, options);
 }
 
-const SAMSUNG_EINK_MANIFEST_WITHOUT_EXPIRES_AFTER = operation({
+const SAMSUNG_EINK_MANIFEST_WITHOUT_EXPIRES_AFTER = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/signage/{system_id}/samsung/eink/{item_id}',
     pathKeys: ['system_id', 'item_id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
             /** the display showing the media, sizes web page captures */
-            system_id: string(),
+            system_id: /* @__PURE__ */ string(),
             /** the link to the media item for display on an e-ink or other static device */
-            item_id: string(),
+            item_id: /* @__PURE__ */ string(),
         },
         ['system_id', 'item_id'],
     ),
@@ -156,13 +156,13 @@ export function updateMetrics(
     return call(UPDATE_METRICS, input, options);
 }
 
-const UPDATE_METRICS = operation({
+const UPDATE_METRICS = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/signage/{system_id}/metrics',
     pathKeys: ['system_id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            system_id: string(),
+            system_id: /* @__PURE__ */ string(),
         },
         ['system_id'],
     ),

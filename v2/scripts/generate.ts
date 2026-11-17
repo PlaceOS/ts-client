@@ -233,6 +233,27 @@ const RESERVED_WORDS: ReadonlySet<string> = new Set(
 
 /** Schema keys that change nothing in the output. Other keys stop the generator. */
 const IGNORED_SCHEMA_KEYS: ReadonlySet<string> = new Set(['description', 'example', 'title']);
+/** The schema combinators of `src/core/schema.ts` that the generated code calls. */
+const SCHEMA_COMBINATORS = [
+    'array',
+    'boolean',
+    'integer',
+    'json',
+    'literal',
+    'nullable',
+    'number',
+    'object',
+    'record',
+    'string',
+    'tuple',
+    'union',
+] as const;
+/** The calls of the generated code: the schema combinators and `operation`. */
+const PURE_CALL = new RegExp(
+    `(?<![\\w.$])(${['operation', 'parameters', ...SCHEMA_COMBINATORS].join('|')})\\(`,
+    'g',
+);
+
 /** Schema keys that the generator supports. */
 const SCHEMA_KEYS: ReadonlySet<string> = new Set([
     '$ref',
@@ -374,7 +395,10 @@ async function main(): Promise<void> {
     const config = (await resolveConfig(join(ROOT, 'package.json'))) ?? {};
     const stale: string[] = [];
     for (const [filePath, code] of files) {
-        const formatted = wrapLongComments(await format(code, { ...config, filepath: filePath }));
+        const annotated = markPure(code);
+        const formatted = wrapLongComments(
+            await format(annotated, { ...config, filepath: filePath }),
+        );
         const current = await readFile(filePath, 'utf8').catch(() => null);
         if (current === formatted) continue;
         stale.push(filePath);
@@ -1004,6 +1028,23 @@ function sentence(text: string): string {
     if (trimmed.length === 0) return '';
     const capital = trimmed.charAt(0).toUpperCase() + trimmed.slice(1);
     return /[.!?]$/.test(capital) ? capital : `${capital}.`;
+}
+
+/**
+ * Marks each schema and operation call as pure. Each one runs when its module loads, so without
+ * the mark a bundler must keep every operation and schema of a module that the application
+ * imports. With it, the bundler drops the ones that the application does not use. Comment lines
+ * are not changed.
+ */
+function markPure(code: string): string {
+    return code
+        .split('\n')
+        .map((line) => {
+            const text = line.trimStart();
+            if (text.startsWith('/*') || text.startsWith('*') || text.startsWith('//')) return line;
+            return line.replace(PURE_CALL, '/* @__PURE__ */ $1(');
+        })
+        .join('\n');
 }
 
 /**

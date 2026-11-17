@@ -30,14 +30,14 @@ export function guestEntry(
     return call(GUEST_ENTRY, input, options);
 }
 
-const GUEST_ENTRY = operation({
+const GUEST_ENTRY = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/webrtc/guest_entry/{system_id}',
     pathKeys: ['system_id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
             /** either a system id or a unique permalink */
-            system_id: string(),
+            system_id: /* @__PURE__ */ string(),
         },
         ['system_id'],
     ),
@@ -60,11 +60,11 @@ export function guestExit(
     return call(GUEST_EXIT, input, options);
 }
 
-const GUEST_EXIT = operation({
+const GUEST_EXIT = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/webrtc/guest/exit',
     pathKeys: [],
-    params: parameters({}),
+    params: /* @__PURE__ */ parameters({}),
     body: null,
     response: null,
 });
@@ -81,27 +81,27 @@ export function index(
     return call(INDEX, input, options);
 }
 
-const INDEX = operation({
+const INDEX = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/webrtc/rooms',
     pathKeys: [],
-    params: parameters({
+    params: /* @__PURE__ */ parameters({
         /**
          * filters results by the given text: a record matches when any word matches its searchable
          * fields as a whole word, and the last word also matches as a prefix (search as you type)
          */
-        q: string(),
+        q: /* @__PURE__ */ string(),
         /** the maximum number of results to return */
-        limit: integer('UInt32'),
+        limit: /* @__PURE__ */ integer('UInt32'),
         /** the starting offset of the result set, used to implement pagination */
-        offset: integer('UInt32'),
+        offset: /* @__PURE__ */ integer('UInt32'),
         /** deprecated, ignored — pagination follows the `Link` header's offset */
-        ref: nullable(string()),
+        ref: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /** deprecated, ignored — search covers the resource's indexed fields */
-        fields: array(string()),
+        fields: /* @__PURE__ */ array(/* @__PURE__ */ string()),
     }),
     body: null,
-    response: array(ControlSystem),
+    response: /* @__PURE__ */ array(ControlSystem),
 });
 
 /**
@@ -119,14 +119,14 @@ export function kickUser(
     return call(KICK_USER, input, options);
 }
 
-const KICK_USER = operation({
+const KICK_USER = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/webrtc/kick/{user_id}/{session_id}',
     pathKeys: ['user_id', 'session_id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            user_id: string(),
-            session_id: string(),
+            user_id: /* @__PURE__ */ string(),
+            session_id: /* @__PURE__ */ string(),
         },
         ['user_id', 'session_id'],
     ),
@@ -146,18 +146,18 @@ export function members(
     return call(MEMBERS, input, options);
 }
 
-const MEMBERS = operation({
+const MEMBERS = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/webrtc/members/{session_id}',
     pathKeys: ['session_id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            session_id: string(),
+            session_id: /* @__PURE__ */ string(),
         },
         ['session_id'],
     ),
     body: null,
-    response: array(string()),
+    response: /* @__PURE__ */ array(/* @__PURE__ */ string()),
 });
 
 /**
@@ -175,14 +175,14 @@ export function publicRoom(
     return call(PUBLIC_ROOM, input, options);
 }
 
-const PUBLIC_ROOM = operation({
+const PUBLIC_ROOM = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/webrtc/room/{system_id}',
     pathKeys: ['system_id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
             /** either a system id or a unique permalink */
-            system_id: string(),
+            system_id: /* @__PURE__ */ string(),
         },
         ['system_id'],
     ),
@@ -205,18 +205,18 @@ export function transferGuest(
     return call(TRANSFER_GUEST, input, options);
 }
 
-const TRANSFER_GUEST = operation({
+const TRANSFER_GUEST = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/webrtc/transfer/{user_id}/{session_id}',
     pathKeys: ['user_id', 'session_id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            user_id: string(),
-            session_id: nullable(string()),
+            user_id: /* @__PURE__ */ string(),
+            session_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         },
         ['user_id', 'session_id'],
     ),
-    body: nullable(json()),
+    body: /* @__PURE__ */ nullable(/* @__PURE__ */ json()),
     response: null,
 });
 
@@ -235,16 +235,16 @@ export function transferGuestWithoutSessionId(
     return call(TRANSFER_GUEST_WITHOUT_SESSION_ID, input, options);
 }
 
-const TRANSFER_GUEST_WITHOUT_SESSION_ID = operation({
+const TRANSFER_GUEST_WITHOUT_SESSION_ID = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/webrtc/transfer/{user_id}',
     pathKeys: ['user_id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            user_id: string(),
+            user_id: /* @__PURE__ */ string(),
         },
         ['user_id'],
     ),
-    body: nullable(json()),
+    body: /* @__PURE__ */ nullable(/* @__PURE__ */ json()),
     response: null,
 });

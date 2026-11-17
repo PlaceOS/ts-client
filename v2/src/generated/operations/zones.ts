@@ -35,11 +35,11 @@ export function create(
     return call(CREATE, input, options);
 }
 
-const CREATE = operation({
+const CREATE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/zones',
     pathKeys: [],
-    params: parameters({}),
+    params: /* @__PURE__ */ parameters({}),
     body: Zone,
     response: Zone,
 });
@@ -56,13 +56,13 @@ export function destroy(
     return call(DESTROY, input, options);
 }
 
-const DESTROY = operation({
+const DESTROY = /* @__PURE__ */ operation({
     method: 'DELETE',
     path: '/api/engine/v2/zones/{id}',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
@@ -82,45 +82,45 @@ export function index(
     return call(INDEX, input, options);
 }
 
-const INDEX = operation({
+const INDEX = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/zones',
     pathKeys: [],
-    params: parameters({
+    params: /* @__PURE__ */ parameters({
         /**
          * only return zones who have this zone as a parent (supports comma-separated list). Use
          * 'root'
          * to get zones with no parent
          */
-        parent_id: nullable(array(string())),
+        parent_id: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
         /** return zones with particular tags */
-        tags: nullable(array(string())),
+        tags: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
         /**
          * filter to zones a group has direct GroupZone anchors on; non-support callers must have
          * Read
          * on the group. Forces include_children_count=true so callers can drill down.
          */
-        group_id: nullable(string()),
+        group_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /** include children_count for each zone (useful for tree views) */
-        include_children_count: boolean(),
+        include_children_count: /* @__PURE__ */ boolean(),
         /** with group_id, include anchor zones and their descendants, excluding denied subtrees */
-        descendants: boolean(),
+        descendants: /* @__PURE__ */ boolean(),
         /**
          * filters results by the given text: a record matches when any word matches its searchable
          * fields as a whole word, and the last word also matches as a prefix (search as you type)
          */
-        q: string(),
+        q: /* @__PURE__ */ string(),
         /** the maximum number of results to return */
-        limit: integer('UInt32'),
+        limit: /* @__PURE__ */ integer('UInt32'),
         /** the starting offset of the result set, used to implement pagination */
-        offset: integer('UInt32'),
+        offset: /* @__PURE__ */ integer('UInt32'),
         /** deprecated, ignored — pagination follows the `Link` header's offset */
-        ref: nullable(string()),
+        ref: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /** deprecated, ignored — search covers the resource's indexed fields */
-        fields: array(string()),
+        fields: /* @__PURE__ */ array(/* @__PURE__ */ string()),
     }),
     body: null,
-    response: array(Zone),
+    response: /* @__PURE__ */ array(Zone),
 });
 
 /**
@@ -135,20 +135,20 @@ export function metadata(
     return call(METADATA, input, options);
 }
 
-const METADATA = operation({
+const METADATA = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/zones/{id}/metadata',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
             /** only return the metadata key we are interested in */
-            name: nullable(string()),
+            name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         },
         ['id'],
     ),
     body: null,
-    response: record(MetadataInterface),
+    response: /* @__PURE__ */ record(MetadataInterface),
 });
 
 /**
@@ -163,15 +163,15 @@ export function show(
     return call(SHOW, input, options);
 }
 
-const SHOW = operation({
+const SHOW = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/zones/{id}',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
             /** also return any triggers associated with the zone */
-            complete: boolean(),
+            complete: /* @__PURE__ */ boolean(),
         },
         ['id'],
     ),
@@ -191,13 +191,13 @@ export function tags(
     return call(TAGS, input, options);
 }
 
-const TAGS = operation({
+const TAGS = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/zones/tags',
     pathKeys: [],
-    params: parameters({}),
+    params: /* @__PURE__ */ parameters({}),
     body: null,
-    response: array(string()),
+    response: /* @__PURE__ */ array(/* @__PURE__ */ string()),
 });
 
 /**
@@ -212,18 +212,18 @@ export function triggerInstances(
     return call(TRIGGER_INSTANCES, input, options);
 }
 
-const TRIGGER_INSTANCES = operation({
+const TRIGGER_INSTANCES = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/zones/{id}/triggers',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
     body: null,
-    response: array(Trigger),
+    response: /* @__PURE__ */ array(Trigger),
 });
 
 /**
@@ -238,13 +238,13 @@ export function update(
     return call(UPDATE, input, options);
 }
 
-const UPDATE = operation({
+const UPDATE = /* @__PURE__ */ operation({
     method: 'PATCH',
     path: '/api/engine/v2/zones/{id}',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
@@ -264,20 +264,20 @@ export function zoneExecute(
     return call(ZONE_EXECUTE, input, options);
 }
 
-const ZONE_EXECUTE = operation({
+const ZONE_EXECUTE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/zones/{id}/exec/{module_slug}/{method}',
     pathKeys: ['id', 'module_slug', 'method'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
             /** the combined module class and index, index is optional and defaults to 1 */
-            module_slug: string(),
+            module_slug: /* @__PURE__ */ string(),
             /** the method to execute on the module */
-            method: string(),
+            method: /* @__PURE__ */ string(),
         },
         ['id', 'module_slug', 'method'],
     ),
-    body: array(json()),
+    body: /* @__PURE__ */ array(/* @__PURE__ */ json()),
     response: ZonesZoneExecResponse,
 });

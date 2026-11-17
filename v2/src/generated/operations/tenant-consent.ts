@@ -30,21 +30,21 @@ export function azureAdminConsentCallback(
     return call(AZURE_ADMIN_CONSENT_CALLBACK, input, options);
 }
 
-const AZURE_ADMIN_CONSENT_CALLBACK = operation({
+const AZURE_ADMIN_CONSENT_CALLBACK = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/admin_consent/callback',
     pathKeys: [],
-    params: parameters({
+    params: /* @__PURE__ */ parameters({
         /** Azure AD tenant identifier */
-        tenant: nullable(string()),
+        tenant: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /** Indicates if admin consent was granted */
-        admin_consent: nullable(boolean()),
+        admin_consent: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
         /** Custom state (sent in state param) */
-        state: nullable(string()),
+        state: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /** Error code if consent failed */
-        error: nullable(string()),
+        error: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /** Description of the error */
-        error_description: nullable(string()),
+        error_description: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     }),
     body: null,
     response: null,
@@ -65,14 +65,14 @@ export function flowStatus(
     return call(FLOW_STATUS, input, options);
 }
 
-const FLOW_STATUS = operation({
+const FLOW_STATUS = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/admin_consent/flow/{flow_id}',
     pathKeys: ['flow_id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
             /** Flow identifier issued by the consent callback */
-            flow_id: string(),
+            flow_id: /* @__PURE__ */ string(),
         },
         ['flow_id'],
     ),
@@ -88,35 +88,35 @@ export function index(
     return call(INDEX, input, options);
 }
 
-const INDEX = operation({
+const INDEX = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/admin_consent/{id}',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
             /**
              * filters results by the given text: a record matches when any word matches its
              * searchable
              * fields as a whole word, and the last word also matches as a prefix (search as you
              * type)
              */
-            q: string(),
+            q: /* @__PURE__ */ string(),
             /** the maximum number of results to return */
-            limit: integer('UInt32'),
+            limit: /* @__PURE__ */ integer('UInt32'),
             /** the starting offset of the result set, used to implement pagination */
-            offset: integer('UInt32'),
+            offset: /* @__PURE__ */ integer('UInt32'),
             /** deprecated, ignored — pagination follows the `Link` header's offset */
-            ref: nullable(string()),
+            ref: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
             /** deprecated, ignored — search covers the resource's indexed fields */
-            fields: array(string()),
+            fields: /* @__PURE__ */ array(/* @__PURE__ */ string()),
         },
         ['id'],
     ),
     body: null,
-    response: object(
+    response: /* @__PURE__ */ object(
         {
-            url: string(),
+            url: /* @__PURE__ */ string(),
         },
         ['url'],
     ),

@@ -38,21 +38,21 @@ export function bulkFetch(
     return call(BULK_FETCH, input, options);
 }
 
-const BULK_FETCH = operation({
+const BULK_FETCH = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/metadata/{name}/bulk',
     pathKeys: ['name'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
             /** the name of the metadata key to fetch */
-            name: string(),
+            name: /* @__PURE__ */ string(),
             /** comma-separated list of parent IDs (zones, systems, users, etc.) */
-            parent_ids: array(string()),
+            parent_ids: /* @__PURE__ */ array(/* @__PURE__ */ string()),
         },
         ['name', 'parent_ids'],
     ),
     body: null,
-    response: record(nullable(MetadataInterface)),
+    response: /* @__PURE__ */ record(/* @__PURE__ */ nullable(MetadataInterface)),
 });
 
 /**
@@ -72,23 +72,23 @@ export function childrenMetadata(
     return call(CHILDREN_METADATA, input, options);
 }
 
-const CHILDREN_METADATA = operation({
+const CHILDREN_METADATA = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/metadata/{id}/children',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
             /** the parent id of the metadata to be returned */
-            id: string(),
+            id: /* @__PURE__ */ string(),
             /** the parent metadata is included in the results by default */
-            include_parent: boolean(),
+            include_parent: /* @__PURE__ */ boolean(),
             /** filter for a particular metadata key */
-            name: nullable(string()),
+            name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         },
         ['id'],
     ),
     body: null,
-    response: array(MetadataChildren),
+    response: /* @__PURE__ */ array(MetadataChildren),
 });
 
 /**
@@ -103,16 +103,16 @@ export function destroy(
     return call(DESTROY, input, options);
 }
 
-const DESTROY = operation({
+const DESTROY = /* @__PURE__ */ operation({
     method: 'DELETE',
     path: '/api/engine/v2/metadata/{id}',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
             /** the parent id of the metadata to be returned */
-            id: string(),
+            id: /* @__PURE__ */ string(),
             /** the name of the metadata key */
-            name: string(),
+            name: /* @__PURE__ */ string(),
         },
         ['id', 'name'],
     ),
@@ -132,25 +132,25 @@ export function history(
     return call(HISTORY, input, options);
 }
 
-const HISTORY = operation({
+const HISTORY = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/metadata/{id}/history',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
             /** the parent id of the metadata to be returned */
-            id: string(),
+            id: /* @__PURE__ */ string(),
             /** the name of the metadata key */
-            name: nullable(string()),
+            name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
             /** the maximum number of results to return */
-            limit: integer('Int32'),
+            limit: /* @__PURE__ */ integer('Int32'),
             /** the starting offset of the result set. Used to implement pagination */
-            offset: integer('Int32'),
+            offset: /* @__PURE__ */ integer('Int32'),
         },
         ['id'],
     ),
     body: null,
-    response: record(array(MetadataInterface)),
+    response: /* @__PURE__ */ record(/* @__PURE__ */ array(MetadataInterface)),
 });
 
 /**
@@ -168,14 +168,14 @@ export function merge(
     return call(MERGE, input, options);
 }
 
-const MERGE = operation({
+const MERGE = /* @__PURE__ */ operation({
     method: 'PATCH',
     path: '/api/engine/v2/metadata/{id}',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
             /** the parent id of the metadata to be updated */
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
@@ -197,14 +197,14 @@ export function rename(
     return call(RENAME, input, options);
 }
 
-const RENAME = operation({
+const RENAME = /* @__PURE__ */ operation({
     method: 'PATCH',
     path: '/api/engine/v2/metadata/{id}/name',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
             /** the parent id of the metadata to be renamed */
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
@@ -228,21 +228,21 @@ export function show(
     return call(SHOW, input, options);
 }
 
-const SHOW = operation({
+const SHOW = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/metadata/{id}',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
             /** the parent id of the metadata to be returned */
-            id: string(),
+            id: /* @__PURE__ */ string(),
             /** the name of the metadata key */
-            name: nullable(string()),
+            name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         },
         ['id'],
     ),
     body: null,
-    response: record(MetadataInterface),
+    response: /* @__PURE__ */ record(MetadataInterface),
 });
 
 /**
@@ -260,14 +260,14 @@ export function update(
     return call(UPDATE, input, options);
 }
 
-const UPDATE = operation({
+const UPDATE = /* @__PURE__ */ operation({
     method: 'PUT',
     path: '/api/engine/v2/metadata/{id}',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
             /** the parent id of the metadata to be replaced */
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),

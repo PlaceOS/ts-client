@@ -25,11 +25,11 @@ export function query(
     return call(QUERY, input, options);
 }
 
-const QUERY = operation({
+const QUERY = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/v2/query',
     pathKeys: [],
-    params: parameters({}),
-    body: string(),
+    params: /* @__PURE__ */ parameters({}),
+    body: /* @__PURE__ */ string(),
     response: null,
 });

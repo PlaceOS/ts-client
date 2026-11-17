@@ -35,18 +35,18 @@ export function branches(
     return call(BRANCHES, input, options);
 }
 
-const BRANCHES = operation({
+const BRANCHES = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/repositories/{id}/branches',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
     body: null,
-    response: array(string()),
+    response: /* @__PURE__ */ array(/* @__PURE__ */ string()),
 });
 
 /**
@@ -61,24 +61,24 @@ export function commits(
     return call(COMMITS, input, options);
 }
 
-const COMMITS = operation({
+const COMMITS = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/repositories/{id}/commits',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
             /** the maximum number of commits to return */
-            limit: nullable(integer('Int32')),
+            limit: /* @__PURE__ */ nullable(/* @__PURE__ */ integer('Int32')),
             /** the path to the file we want commits for */
-            driver: nullable(string()),
+            driver: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
             /** the branch to grab commits from */
-            branch: nullable(string()),
+            branch: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         },
         ['id'],
     ),
     body: null,
-    response: array(GitRepositoryCommit),
+    response: /* @__PURE__ */ array(GitRepositoryCommit),
 });
 
 /**
@@ -93,11 +93,11 @@ export function create(
     return call(CREATE, input, options);
 }
 
-const CREATE = operation({
+const CREATE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/repositories',
     pathKeys: [],
-    params: parameters({}),
+    params: /* @__PURE__ */ parameters({}),
     body: Repository,
     response: Repository,
 });
@@ -114,18 +114,18 @@ export function defaultBranch(
     return call(DEFAULT_BRANCH, input, options);
 }
 
-const DEFAULT_BRANCH = operation({
+const DEFAULT_BRANCH = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/repositories/{id}/default_branch',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
     body: null,
-    response: string(),
+    response: /* @__PURE__ */ string(),
 });
 
 /**
@@ -140,13 +140,13 @@ export function destroy(
     return call(DESTROY, input, options);
 }
 
-const DESTROY = operation({
+const DESTROY = /* @__PURE__ */ operation({
     method: 'DELETE',
     path: '/api/engine/v2/repositories/{id}',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
@@ -170,17 +170,17 @@ export function details(
     return call(DETAILS, input, options);
 }
 
-const DETAILS = operation({
+const DETAILS = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/repositories/{id}/details',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
             /** the file we would like metadata for */
-            driver: string(),
+            driver: /* @__PURE__ */ string(),
             /** the commit level of the file */
-            commit: string(),
+            commit: /* @__PURE__ */ string(),
         },
         ['id', 'driver', 'commit'],
     ),
@@ -200,18 +200,18 @@ export function drivers(
     return call(DRIVERS, input, options);
 }
 
-const DRIVERS = operation({
+const DRIVERS = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/repositories/{id}/drivers',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
     body: null,
-    response: array(string()),
+    response: /* @__PURE__ */ array(/* @__PURE__ */ string()),
 });
 
 /**
@@ -229,24 +229,24 @@ export function files(
     return call(FILES, input, options);
 }
 
-const FILES = operation({
+const FILES = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/repositories/{id}/files',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
             /**
              * glob pattern. Without a `/` it matches file names at any depth, otherwise the full
              * path (use
              * `**` to recurse)
              */
-            pattern: string(),
+            pattern: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
     body: null,
-    response: array(string()),
+    response: /* @__PURE__ */ array(/* @__PURE__ */ string()),
 });
 
 /**
@@ -261,20 +261,20 @@ export function folders(
     return call(FOLDERS, input, options);
 }
 
-const FOLDERS = operation({
+const FOLDERS = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/repositories/{id}/folders',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
             /** include dots folders, default to false */
-            include_dots: boolean(),
+            include_dots: /* @__PURE__ */ boolean(),
         },
         ['id'],
     ),
     body: null,
-    response: array(string()),
+    response: /* @__PURE__ */ array(/* @__PURE__ */ string()),
 });
 
 /**
@@ -289,27 +289,27 @@ export function index(
     return call(INDEX, input, options);
 }
 
-const INDEX = operation({
+const INDEX = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/repositories',
     pathKeys: [],
-    params: parameters({
+    params: /* @__PURE__ */ parameters({
         /**
          * filters results by the given text: a record matches when any word matches its searchable
          * fields as a whole word, and the last word also matches as a prefix (search as you type)
          */
-        q: string(),
+        q: /* @__PURE__ */ string(),
         /** the maximum number of results to return */
-        limit: integer('UInt32'),
+        limit: /* @__PURE__ */ integer('UInt32'),
         /** the starting offset of the result set, used to implement pagination */
-        offset: integer('UInt32'),
+        offset: /* @__PURE__ */ integer('UInt32'),
         /** deprecated, ignored — pagination follows the `Link` header's offset */
-        ref: nullable(string()),
+        ref: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /** deprecated, ignored — search covers the resource's indexed fields */
-        fields: array(string()),
+        fields: /* @__PURE__ */ array(/* @__PURE__ */ string()),
     }),
     body: null,
-    response: array(Repository),
+    response: /* @__PURE__ */ array(Repository),
 });
 
 /**
@@ -328,13 +328,13 @@ export function loadedInterfaces(
     return call(LOADED_INTERFACES, input, options);
 }
 
-const LOADED_INTERFACES = operation({
+const LOADED_INTERFACES = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/repositories/interfaces',
     pathKeys: [],
-    params: parameters({}),
+    params: /* @__PURE__ */ parameters({}),
     body: null,
-    response: record(string()),
+    response: /* @__PURE__ */ record(/* @__PURE__ */ string()),
 });
 
 /**
@@ -349,20 +349,20 @@ export function pull(
     return call(PULL, input, options);
 }
 
-const PULL = operation({
+const PULL = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/repositories/{id}/pull',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
     body: null,
-    response: object(
+    response: /* @__PURE__ */ object(
         {
-            commit_hash: string(),
+            commit_hash: /* @__PURE__ */ string(),
         },
         ['commit_hash'],
     ),
@@ -380,18 +380,18 @@ export function releases(
     return call(RELEASES, input, options);
 }
 
-const RELEASES = operation({
+const RELEASES = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/repositories/{id}/releases',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
     body: null,
-    response: array(string()),
+    response: /* @__PURE__ */ array(/* @__PURE__ */ string()),
 });
 
 /**
@@ -406,23 +406,23 @@ export function remoteBranches(
     return call(REMOTE_BRANCHES, input, options);
 }
 
-const REMOTE_BRANCHES = operation({
+const REMOTE_BRANCHES = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/repositories/remote_branches',
     pathKeys: [],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
             /** the git url that represents the repository */
-            repository_url: string(),
+            repository_url: /* @__PURE__ */ string(),
             /** a username for access if required */
-            username: nullable(string()),
+            username: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
             /** the password or access token as required */
-            password: nullable(string()),
+            password: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         },
         ['repository_url'],
     ),
     body: null,
-    response: array(string()),
+    response: /* @__PURE__ */ array(/* @__PURE__ */ string()),
 });
 
 /**
@@ -437,27 +437,27 @@ export function remoteCommits(
     return call(REMOTE_COMMITS, input, options);
 }
 
-const REMOTE_COMMITS = operation({
+const REMOTE_COMMITS = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/repositories/remote_commits',
     pathKeys: [],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
             /** the branch to grab commits from */
-            branch: nullable(string()),
+            branch: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
             /** the number of commits to return */
-            depth: integer('Int32'),
+            depth: /* @__PURE__ */ integer('Int32'),
             /** the git url that represents the repository */
-            repository_url: string(),
+            repository_url: /* @__PURE__ */ string(),
             /** a username for access if required */
-            username: nullable(string()),
+            username: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
             /** the password or access token as required */
-            password: nullable(string()),
+            password: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         },
         ['repository_url'],
     ),
     body: null,
-    response: array(GitRepositoryCommit),
+    response: /* @__PURE__ */ array(GitRepositoryCommit),
 });
 
 /**
@@ -472,23 +472,23 @@ export function remoteDefaultBranch(
     return call(REMOTE_DEFAULT_BRANCH, input, options);
 }
 
-const REMOTE_DEFAULT_BRANCH = operation({
+const REMOTE_DEFAULT_BRANCH = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/repositories/remote_default_branch',
     pathKeys: [],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
             /** the git url that represents the repository */
-            repository_url: string(),
+            repository_url: /* @__PURE__ */ string(),
             /** a username for access if required */
-            username: nullable(string()),
+            username: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
             /** the password or access token as required */
-            password: nullable(string()),
+            password: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         },
         ['repository_url'],
     ),
     body: null,
-    response: string(),
+    response: /* @__PURE__ */ string(),
 });
 
 /**
@@ -503,23 +503,23 @@ export function remoteTags(
     return call(REMOTE_TAGS, input, options);
 }
 
-const REMOTE_TAGS = operation({
+const REMOTE_TAGS = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/repositories/remote_tags',
     pathKeys: [],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
             /** the git url that represents the repository */
-            repository_url: string(),
+            repository_url: /* @__PURE__ */ string(),
             /** a username for access if required */
-            username: nullable(string()),
+            username: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
             /** the password or access token as required */
-            password: nullable(string()),
+            password: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         },
         ['repository_url'],
     ),
     body: null,
-    response: array(string()),
+    response: /* @__PURE__ */ array(/* @__PURE__ */ string()),
 });
 
 /**
@@ -534,13 +534,13 @@ export function show(
     return call(SHOW, input, options);
 }
 
-const SHOW = operation({
+const SHOW = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/repositories/{id}',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
@@ -560,18 +560,18 @@ export function tags(
     return call(TAGS, input, options);
 }
 
-const TAGS = operation({
+const TAGS = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/repositories/{id}/tags',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
     body: null,
-    response: array(string()),
+    response: /* @__PURE__ */ array(/* @__PURE__ */ string()),
 });
 
 /**
@@ -586,13 +586,13 @@ export function update(
     return call(UPDATE, input, options);
 }
 
-const UPDATE = operation({
+const UPDATE = /* @__PURE__ */ operation({
     method: 'PATCH',
     path: '/api/engine/v2/repositories/{id}',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),

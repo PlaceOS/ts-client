@@ -35,18 +35,18 @@ export function guestToken(
     return call(GUEST_TOKEN, input, options);
 }
 
-const GUEST_TOKEN = operation({
+const GUEST_TOKEN = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/public_events/guest_token/{system_id}',
     pathKeys: ['system_id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            system_id: string(),
+            system_id: /* @__PURE__ */ string(),
         },
         ['system_id'],
     ),
     body: PublicEventsTokenRequest,
-    response: string(),
+    response: /* @__PURE__ */ string(),
 });
 
 /**
@@ -69,33 +69,33 @@ export function index(
     return call(INDEX, input, options);
 }
 
-const INDEX = operation({
+const INDEX = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/public_events/{system_id}/events',
     pathKeys: ['system_id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            system_id: string(),
+            system_id: /* @__PURE__ */ string(),
             /**
              * filters results by the given text: a record matches when any word matches its
              * searchable
              * fields as a whole word, and the last word also matches as a prefix (search as you
              * type)
              */
-            q: string(),
+            q: /* @__PURE__ */ string(),
             /** the maximum number of results to return */
-            limit: integer('UInt32'),
+            limit: /* @__PURE__ */ integer('UInt32'),
             /** the starting offset of the result set, used to implement pagination */
-            offset: integer('UInt32'),
+            offset: /* @__PURE__ */ integer('UInt32'),
             /** deprecated, ignored — pagination follows the `Link` header's offset */
-            ref: nullable(string()),
+            ref: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
             /** deprecated, ignored — search covers the resource's indexed fields */
-            fields: array(string()),
+            fields: /* @__PURE__ */ array(/* @__PURE__ */ string()),
         },
         ['system_id'],
     ),
     body: null,
-    response: array(json()),
+    response: /* @__PURE__ */ array(/* @__PURE__ */ json()),
 });
 
 /**
@@ -117,13 +117,13 @@ export function register(
     return call(REGISTER, input, options);
 }
 
-const REGISTER = operation({
+const REGISTER = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/public_events/{system_id}/register',
     pathKeys: ['system_id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            system_id: string(),
+            system_id: /* @__PURE__ */ string(),
         },
         ['system_id'],
     ),

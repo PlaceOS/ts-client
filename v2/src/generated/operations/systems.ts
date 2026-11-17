@@ -41,14 +41,14 @@ export function addModule(
     return call(ADD_MODULE, input, options);
 }
 
-const ADD_MODULE = operation({
+const ADD_MODULE = /* @__PURE__ */ operation({
     method: 'PUT',
     path: '/api/engine/v2/systems/{sys_id}/module/{module_id}',
     pathKeys: ['sys_id', 'module_id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            sys_id: string(),
-            module_id: string(),
+            sys_id: /* @__PURE__ */ string(),
+            module_id: /* @__PURE__ */ string(),
         },
         ['sys_id', 'module_id'],
     ),
@@ -68,11 +68,11 @@ export function create(
     return call(CREATE, input, options);
 }
 
-const CREATE = operation({
+const CREATE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/systems',
     pathKeys: [],
-    params: parameters({}),
+    params: /* @__PURE__ */ parameters({}),
     body: ControlSystem,
     response: ControlSystem,
 });
@@ -89,13 +89,13 @@ export function destroy(
     return call(DESTROY, input, options);
 }
 
-const DESTROY = operation({
+const DESTROY = /* @__PURE__ */ operation({
     method: 'DELETE',
     path: '/api/engine/v2/systems/{sys_id}',
     pathKeys: ['sys_id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            sys_id: string(),
+            sys_id: /* @__PURE__ */ string(),
         },
         ['sys_id'],
     ),
@@ -115,22 +115,22 @@ export function execute(
     return call(EXECUTE, input, options);
 }
 
-const EXECUTE = operation({
+const EXECUTE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/systems/{sys_id}/{module_slug}/{method}',
     pathKeys: ['sys_id', 'module_slug', 'method'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            sys_id: string(),
+            sys_id: /* @__PURE__ */ string(),
             /** the combined module class and index, index is optional and defaults to 1 */
-            module_slug: string(),
+            module_slug: /* @__PURE__ */ string(),
             /** the method to execute on the module */
-            method: string(),
+            method: /* @__PURE__ */ string(),
         },
         ['sys_id', 'module_slug', 'method'],
     ),
-    body: array(json()),
-    response: json(),
+    body: /* @__PURE__ */ array(/* @__PURE__ */ json()),
+    response: /* @__PURE__ */ json(),
 });
 
 /**
@@ -145,19 +145,19 @@ export function findByEmail(
     return call(FIND_BY_EMAIL, input, options);
 }
 
-const FIND_BY_EMAIL = operation({
+const FIND_BY_EMAIL = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/systems/with_emails',
     pathKeys: [],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
             /** comma seperated list of emails */
-            in: array(string()),
+            in: /* @__PURE__ */ array(/* @__PURE__ */ string()),
         },
         ['in'],
     ),
     body: null,
-    response: array(ControlSystem),
+    response: /* @__PURE__ */ array(ControlSystem),
 });
 
 /**
@@ -174,20 +174,20 @@ export function functions(
     return call(FUNCTIONS, input, options);
 }
 
-const FUNCTIONS = operation({
+const FUNCTIONS = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/systems/{sys_id}/functions/{module_slug}',
     pathKeys: ['sys_id', 'module_slug'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            sys_id: string(),
+            sys_id: /* @__PURE__ */ string(),
             /** the combined module class and index, index is optional and defaults to 1 */
-            module_slug: string(),
+            module_slug: /* @__PURE__ */ string(),
         },
         ['sys_id', 'module_slug'],
     ),
     body: null,
-    response: record(SystemsFunctionDetails),
+    response: /* @__PURE__ */ record(SystemsFunctionDetails),
 });
 
 /**
@@ -202,56 +202,56 @@ export function index(
     return call(INDEX, input, options);
 }
 
-const INDEX = operation({
+const INDEX = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/systems',
     pathKeys: [],
-    params: parameters({
+    params: /* @__PURE__ */ parameters({
         /** return only bookable or non-bookable rooms (returns both when not specified) */
-        bookable: nullable(boolean()),
+        bookable: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
         /** return only rooms with capacity equal or greater than that provided */
-        capacity: nullable(integer('Int32')),
+        capacity: /* @__PURE__ */ nullable(/* @__PURE__ */ integer('Int32')),
         /** return only systems whos resource address match one of the emails provided */
-        email: nullable(array(string())),
+        email: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
         /** return only rooms who have all of the features requested */
-        features: nullable(array(string())),
+        features: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
         /** return only systems which have the module id provided */
-        module_id: nullable(string()),
+        module_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /** return systems which are using the trigger id provided */
-        trigger_id: nullable(string()),
+        trigger_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /** return systems which are in the zones provided */
-        zone_id: nullable(array(string())),
+        zone_id: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
         /**
          * return systems anchored by this group's GroupZone rows; non-support callers must have
          * Read on
          * the group
          */
-        group_id: nullable(string()),
+        group_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /**
          * return systems in any zone the caller can reach (transitively) within the given subsystem
          * code, e.g. 'signage'
          */
-        subsystem: nullable(string()),
+        subsystem: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /** return systems which are public */
-        public: nullable(boolean()),
+        public: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
         /** return systems which are signage */
-        signage: nullable(boolean()),
+        signage: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
         /**
          * filters results by the given text: a record matches when any word matches its searchable
          * fields as a whole word, and the last word also matches as a prefix (search as you type)
          */
-        q: string(),
+        q: /* @__PURE__ */ string(),
         /** the maximum number of results to return */
-        limit: integer('UInt32'),
+        limit: /* @__PURE__ */ integer('UInt32'),
         /** the starting offset of the result set, used to implement pagination */
-        offset: integer('UInt32'),
+        offset: /* @__PURE__ */ integer('UInt32'),
         /** deprecated, ignored — pagination follows the `Link` header's offset */
-        ref: nullable(string()),
+        ref: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /** deprecated, ignored — search covers the resource's indexed fields */
-        fields: array(string()),
+        fields: /* @__PURE__ */ array(/* @__PURE__ */ string()),
     }),
     body: null,
-    response: array(ControlSystem),
+    response: /* @__PURE__ */ array(ControlSystem),
 });
 
 /**
@@ -266,19 +266,19 @@ export function metadata(
     return call(METADATA, input, options);
 }
 
-const METADATA = operation({
+const METADATA = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/systems/{sys_id}/metadata',
     pathKeys: ['sys_id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            sys_id: string(),
-            name: nullable(string()),
+            sys_id: /* @__PURE__ */ string(),
+            name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         },
         ['sys_id'],
     ),
     body: null,
-    response: record(MetadataInterface),
+    response: /* @__PURE__ */ record(MetadataInterface),
 });
 
 /**
@@ -293,14 +293,14 @@ export function removeModule(
     return call(REMOVE_MODULE, input, options);
 }
 
-const REMOVE_MODULE = operation({
+const REMOVE_MODULE = /* @__PURE__ */ operation({
     method: 'DELETE',
     path: '/api/engine/v2/systems/{sys_id}/module/{module_id}',
     pathKeys: ['sys_id', 'module_id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            sys_id: string(),
-            module_id: string(),
+            sys_id: /* @__PURE__ */ string(),
+            module_id: /* @__PURE__ */ string(),
         },
         ['sys_id', 'module_id'],
     ),
@@ -320,18 +320,18 @@ export function settings(
     return call(SETTINGS, input, options);
 }
 
-const SETTINGS = operation({
+const SETTINGS = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/systems/{sys_id}/settings',
     pathKeys: ['sys_id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            sys_id: string(),
+            sys_id: /* @__PURE__ */ string(),
         },
         ['sys_id'],
     ),
     body: null,
-    response: array(Settings),
+    response: /* @__PURE__ */ array(Settings),
 });
 
 /**
@@ -346,15 +346,15 @@ export function show(
     return call(SHOW, input, options);
 }
 
-const SHOW = operation({
+const SHOW = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/systems/{sys_id}',
     pathKeys: ['sys_id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            sys_id: string(),
+            sys_id: /* @__PURE__ */ string(),
             /** return the system with the zone, module and driver information collected */
-            complete: boolean(),
+            complete: /* @__PURE__ */ boolean(),
         },
         ['sys_id'],
     ),
@@ -374,15 +374,15 @@ export function start(
     return call(START, input, options);
 }
 
-const START = operation({
+const START = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/systems/{sys_id}/start',
     pathKeys: ['sys_id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            sys_id: string(),
+            sys_id: /* @__PURE__ */ string(),
             /** start modules that only occur in the selected system */
-            single_occurrence: boolean(),
+            single_occurrence: /* @__PURE__ */ boolean(),
         },
         ['sys_id'],
     ),
@@ -402,20 +402,20 @@ export function state(
     return call(STATE, input, options);
 }
 
-const STATE = operation({
+const STATE = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/systems/{sys_id}/{module_slug}',
     pathKeys: ['sys_id', 'module_slug'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            sys_id: string(),
+            sys_id: /* @__PURE__ */ string(),
             /** the combined module class and index, index is optional and defaults to 1 */
-            module_slug: string(),
+            module_slug: /* @__PURE__ */ string(),
         },
         ['sys_id', 'module_slug'],
     ),
     body: null,
-    response: record(string()),
+    response: /* @__PURE__ */ record(/* @__PURE__ */ string()),
 });
 
 /**
@@ -433,22 +433,22 @@ export function stateLookup(
     return call(STATE_LOOKUP, input, options);
 }
 
-const STATE_LOOKUP = operation({
+const STATE_LOOKUP = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/systems/{sys_id}/{module_slug}/{key}',
     pathKeys: ['sys_id', 'module_slug', 'key'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            sys_id: string(),
+            sys_id: /* @__PURE__ */ string(),
             /** the combined module class and index, index is optional and defaults to 1 */
-            module_slug: string(),
+            module_slug: /* @__PURE__ */ string(),
             /** the status key we are interested in */
-            key: string(),
+            key: /* @__PURE__ */ string(),
         },
         ['sys_id', 'module_slug', 'key'],
     ),
     body: null,
-    response: json(),
+    response: /* @__PURE__ */ json(),
 });
 
 /**
@@ -463,15 +463,15 @@ export function stop(
     return call(STOP, input, options);
 }
 
-const STOP = operation({
+const STOP = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/systems/{sys_id}/stop',
     pathKeys: ['sys_id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            sys_id: string(),
+            sys_id: /* @__PURE__ */ string(),
             /** stop modules that only occur in the selected system */
-            single_occurrence: boolean(),
+            single_occurrence: /* @__PURE__ */ boolean(),
         },
         ['sys_id'],
     ),
@@ -491,18 +491,18 @@ export function sysZones(
     return call(SYS_ZONES, input, options);
 }
 
-const SYS_ZONES = operation({
+const SYS_ZONES = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/systems/{sys_id}/zones',
     pathKeys: ['sys_id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            sys_id: string(),
+            sys_id: /* @__PURE__ */ string(),
         },
         ['sys_id'],
     ),
     body: null,
-    response: array(Zone),
+    response: /* @__PURE__ */ array(Zone),
 });
 
 /**
@@ -517,18 +517,18 @@ export function types(
     return call(TYPES, input, options);
 }
 
-const TYPES = operation({
+const TYPES = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/systems/{sys_id}/types',
     pathKeys: ['sys_id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            sys_id: string(),
+            sys_id: /* @__PURE__ */ string(),
         },
         ['sys_id'],
     ),
     body: null,
-    response: record(integer('Int32')),
+    response: /* @__PURE__ */ record(/* @__PURE__ */ integer('Int32')),
 });
 
 /**
@@ -543,19 +543,19 @@ export function update(
     return call(UPDATE, input, options);
 }
 
-const UPDATE = operation({
+const UPDATE = /* @__PURE__ */ operation({
     method: 'PATCH',
     path: '/api/engine/v2/systems/{sys_id}',
     pathKeys: ['sys_id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            sys_id: string(),
+            sys_id: /* @__PURE__ */ string(),
             /**
              * must be provided to prevent overwriting newer config with old, in the case where
              * multiple
              * people might be editing a system
              */
-            version: integer('Int32'),
+            version: /* @__PURE__ */ integer('Int32'),
         },
         ['sys_id', 'version'],
     ),

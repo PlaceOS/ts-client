@@ -30,16 +30,16 @@ export function mqttAccess(
     return call(MQTT_ACCESS, input, options);
 }
 
-const MQTT_ACCESS = operation({
+const MQTT_ACCESS = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/mqtt/access',
     pathKeys: [],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            topic: string(),
+            topic: /* @__PURE__ */ string(),
             /** access level required */
             acc: MqttMqttAcl,
-            clientid: nullable(string()),
+            clientid: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         },
         ['topic', 'acc'],
     ),
@@ -62,11 +62,11 @@ export function mqttUser(
     return call(MQTT_USER, input, options);
 }
 
-const MQTT_USER = operation({
+const MQTT_USER = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/mqtt/user',
     pathKeys: [],
-    params: parameters({}),
+    params: /* @__PURE__ */ parameters({}),
     body: null,
     response: null,
 });

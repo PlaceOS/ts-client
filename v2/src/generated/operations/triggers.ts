@@ -26,11 +26,11 @@ export function create(
     return call(CREATE, input, options);
 }
 
-const CREATE = operation({
+const CREATE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/triggers',
     pathKeys: [],
-    params: parameters({}),
+    params: /* @__PURE__ */ parameters({}),
     body: Trigger,
     response: Trigger,
 });
@@ -47,13 +47,13 @@ export function destroy(
     return call(DESTROY, input, options);
 }
 
-const DESTROY = operation({
+const DESTROY = /* @__PURE__ */ operation({
     method: 'DELETE',
     path: '/api/engine/v2/triggers/{id}',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
@@ -73,27 +73,27 @@ export function index(
     return call(INDEX, input, options);
 }
 
-const INDEX = operation({
+const INDEX = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/triggers',
     pathKeys: [],
-    params: parameters({
+    params: /* @__PURE__ */ parameters({
         /**
          * filters results by the given text: a record matches when any word matches its searchable
          * fields as a whole word, and the last word also matches as a prefix (search as you type)
          */
-        q: string(),
+        q: /* @__PURE__ */ string(),
         /** the maximum number of results to return */
-        limit: integer('UInt32'),
+        limit: /* @__PURE__ */ integer('UInt32'),
         /** the starting offset of the result set, used to implement pagination */
-        offset: integer('UInt32'),
+        offset: /* @__PURE__ */ integer('UInt32'),
         /** deprecated, ignored — pagination follows the `Link` header's offset */
-        ref: nullable(string()),
+        ref: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /** deprecated, ignored — search covers the resource's indexed fields */
-        fields: array(string()),
+        fields: /* @__PURE__ */ array(/* @__PURE__ */ string()),
     }),
     body: null,
-    response: array(Trigger),
+    response: /* @__PURE__ */ array(Trigger),
 });
 
 /**
@@ -108,18 +108,18 @@ export function instances(
     return call(INSTANCES, input, options);
 }
 
-const INSTANCES = operation({
+const INSTANCES = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/triggers/{id}/instances',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
     body: null,
-    response: array(TriggerInstance),
+    response: /* @__PURE__ */ array(TriggerInstance),
 });
 
 /**
@@ -134,15 +134,15 @@ export function show(
     return call(SHOW, input, options);
 }
 
-const SHOW = operation({
+const SHOW = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/triggers/{id}',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
             /** return the instances associated with this trigger */
-            instances: nullable(boolean()),
+            instances: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
         },
         ['id'],
     ),
@@ -162,13 +162,13 @@ export function update(
     return call(UPDATE, input, options);
 }
 
-const UPDATE = operation({
+const UPDATE = /* @__PURE__ */ operation({
     method: 'PATCH',
     path: '/api/engine/v2/triggers/{id}',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),

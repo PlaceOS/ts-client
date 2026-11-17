@@ -17,11 +17,11 @@ import {
     union,
 } from '../core/schema.ts';
 
-const AdminConsentFlowStepSchema = object(
+const AdminConsentFlowStepSchema = /* @__PURE__ */ object(
     {
-        key: string(),
-        label: string(),
-        state: string(),
+        key: /* @__PURE__ */ string(),
+        label: /* @__PURE__ */ string(),
+        state: /* @__PURE__ */ string(),
     },
     ['key', 'label', 'state'],
 );
@@ -30,16 +30,16 @@ export interface AdminConsentFlowStepInput extends Input<typeof AdminConsentFlow
 export const AdminConsentFlowStep: Schema<AdminConsentFlowStep, AdminConsentFlowStepInput> =
     AdminConsentFlowStepSchema;
 
-const AdminConsentFlowSchema = object(
+const AdminConsentFlowSchema = /* @__PURE__ */ object(
     {
-        id: string(),
-        state: string(),
-        steps: array(AdminConsentFlowStep),
-        detail: nullable(string()),
-        error: nullable(string()),
-        redirect: string(),
-        authority_id: string(),
-        updated_at: integer(),
+        id: /* @__PURE__ */ string(),
+        state: /* @__PURE__ */ string(),
+        steps: /* @__PURE__ */ array(AdminConsentFlowStep),
+        detail: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        error: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        redirect: /* @__PURE__ */ string(),
+        authority_id: /* @__PURE__ */ string(),
+        updated_at: /* @__PURE__ */ integer(),
     },
     ['id', 'state', 'steps', 'redirect', 'authority_id', 'updated_at'],
 );
@@ -60,32 +60,32 @@ export interface AdminConsentFlowInput extends Input<typeof AdminConsentFlowSche
 export const AdminConsentFlow: Schema<AdminConsentFlow, AdminConsentFlowInput> =
     AdminConsentFlowSchema;
 
-const AlertAlertTypeSchema = literal(['threshold', 'status', 'custom']);
+const AlertAlertTypeSchema = /* @__PURE__ */ literal(['threshold', 'status', 'custom']);
 export type AlertAlertType = Output<typeof AlertAlertTypeSchema>;
 export type AlertAlertTypeInput = Input<typeof AlertAlertTypeSchema>;
 export const AlertAlertType: Schema<AlertAlertType, AlertAlertTypeInput> = AlertAlertTypeSchema;
 
-const AlertDashboardSchema = object({
+const AlertDashboardSchema = /* @__PURE__ */ object({
     /** Unix time in seconds. */
-    created_at: nullable(integer()),
+    created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     /** Unix time in seconds. */
-    updated_at: nullable(integer()),
-    name: nullable(string()),
-    description: nullable(string()),
-    enabled: nullable(boolean()),
-    authority_id: nullable(string()),
-    id: nullable(string()),
+    updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    description: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    enabled: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    authority_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
 });
 export interface AlertDashboard extends Output<typeof AlertDashboardSchema> {}
 export interface AlertDashboardInput extends Input<typeof AlertDashboardSchema> {}
 export const AlertDashboard: Schema<AlertDashboard, AlertDashboardInput> = AlertDashboardSchema;
 
-const AlertSeveritySchema = literal(['low', 'medium', 'high', 'critical']);
+const AlertSeveritySchema = /* @__PURE__ */ literal(['low', 'medium', 'high', 'critical']);
 export type AlertSeverity = Output<typeof AlertSeveritySchema>;
 export type AlertSeverityInput = Input<typeof AlertSeveritySchema>;
 export const AlertSeverity: Schema<AlertSeverity, AlertSeverityInput> = AlertSeveritySchema;
 
-const TriggerConditionsComparisonOperatorSchema = literal([
+const TriggerConditionsComparisonOperatorSchema = /* @__PURE__ */ literal([
     'and',
     'equal',
     'exclusive_or',
@@ -107,11 +107,11 @@ export const TriggerConditionsComparisonOperator: Schema<
     TriggerConditionsComparisonOperatorInput
 > = TriggerConditionsComparisonOperatorSchema;
 
-const TriggerConditionsComparisonStatusVariableSchema = object(
+const TriggerConditionsComparisonStatusVariableSchema = /* @__PURE__ */ object(
     {
-        mod: string(),
-        status: string(),
-        keys: array(string()),
+        mod: /* @__PURE__ */ string(),
+        status: /* @__PURE__ */ string(),
+        keys: /* @__PURE__ */ array(/* @__PURE__ */ string()),
     },
     ['mod', 'status', 'keys'],
 );
@@ -126,24 +126,24 @@ export const TriggerConditionsComparisonStatusVariable: Schema<
     TriggerConditionsComparisonStatusVariableInput
 > = TriggerConditionsComparisonStatusVariableSchema;
 
-const TriggerConditionsComparisonSchema = object({
-    left: nullable(
-        union([
-            boolean(),
-            number(),
-            integer(),
+const TriggerConditionsComparisonSchema = /* @__PURE__ */ object({
+    left: /* @__PURE__ */ nullable(
+        /* @__PURE__ */ union([
+            /* @__PURE__ */ boolean(),
+            /* @__PURE__ */ number(),
+            /* @__PURE__ */ integer(),
             TriggerConditionsComparisonStatusVariable,
-            string(),
+            /* @__PURE__ */ string(),
         ]),
     ),
-    operator: nullable(TriggerConditionsComparisonOperator),
-    right: nullable(
-        union([
-            boolean(),
-            number(),
-            integer(),
+    operator: /* @__PURE__ */ nullable(TriggerConditionsComparisonOperator),
+    right: /* @__PURE__ */ nullable(
+        /* @__PURE__ */ union([
+            /* @__PURE__ */ boolean(),
+            /* @__PURE__ */ number(),
+            /* @__PURE__ */ integer(),
             TriggerConditionsComparisonStatusVariable,
-            string(),
+            /* @__PURE__ */ string(),
         ]),
     ),
 });
@@ -158,7 +158,7 @@ export const TriggerConditionsComparison: Schema<
     TriggerConditionsComparisonInput
 > = TriggerConditionsComparisonSchema;
 
-const TriggerConditionsTimeDependentTypeSchema = literal(['at', 'cron']);
+const TriggerConditionsTimeDependentTypeSchema = /* @__PURE__ */ literal(['at', 'cron']);
 export type TriggerConditionsTimeDependentType = Output<
     typeof TriggerConditionsTimeDependentTypeSchema
 >;
@@ -170,12 +170,12 @@ export const TriggerConditionsTimeDependentType: Schema<
     TriggerConditionsTimeDependentTypeInput
 > = TriggerConditionsTimeDependentTypeSchema;
 
-const TriggerConditionsTimeDependentSchema = object({
-    type: nullable(TriggerConditionsTimeDependentType),
+const TriggerConditionsTimeDependentSchema = /* @__PURE__ */ object({
+    type: /* @__PURE__ */ nullable(TriggerConditionsTimeDependentType),
     /** Unix time in seconds. */
-    time: nullable(integer()),
-    cron: nullable(string()),
-    timezone: nullable(string()),
+    time: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    cron: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    timezone: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
 });
 export interface TriggerConditionsTimeDependent extends Output<
     typeof TriggerConditionsTimeDependentSchema
@@ -188,87 +188,94 @@ export const TriggerConditionsTimeDependent: Schema<
     TriggerConditionsTimeDependentInput
 > = TriggerConditionsTimeDependentSchema;
 
-const TriggerConditionsSchema = object({
-    comparisons: nullable(array(TriggerConditionsComparison)),
-    time_dependents: nullable(array(TriggerConditionsTimeDependent)),
+const TriggerConditionsSchema = /* @__PURE__ */ object({
+    comparisons: /* @__PURE__ */ nullable(/* @__PURE__ */ array(TriggerConditionsComparison)),
+    time_dependents: /* @__PURE__ */ nullable(
+        /* @__PURE__ */ array(TriggerConditionsTimeDependent),
+    ),
 });
 export interface TriggerConditions extends Output<typeof TriggerConditionsSchema> {}
 export interface TriggerConditionsInput extends Input<typeof TriggerConditionsSchema> {}
 export const TriggerConditions: Schema<TriggerConditions, TriggerConditionsInput> =
     TriggerConditionsSchema;
 
-const AlertSchema = object({
+const AlertSchema = /* @__PURE__ */ object({
     /** Unix time in seconds. */
-    created_at: nullable(integer()),
+    created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     /** Unix time in seconds. */
-    updated_at: nullable(integer()),
-    name: nullable(string()),
-    description: nullable(string()),
-    enabled: nullable(boolean()),
-    any_match: nullable(boolean()),
-    conditions: nullable(TriggerConditions),
-    severity: nullable(AlertSeverity),
-    alert_type: nullable(AlertAlertType),
-    debounce_period: nullable(integer('Int32')),
-    alert_dashboard_id: nullable(string()),
-    alert_dashboard_details: nullable(AlertDashboard),
-    id: nullable(string()),
+    updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    description: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    enabled: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    any_match: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    conditions: /* @__PURE__ */ nullable(TriggerConditions),
+    severity: /* @__PURE__ */ nullable(AlertSeverity),
+    alert_type: /* @__PURE__ */ nullable(AlertAlertType),
+    debounce_period: /* @__PURE__ */ nullable(/* @__PURE__ */ integer('Int32')),
+    alert_dashboard_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    alert_dashboard_details: /* @__PURE__ */ nullable(AlertDashboard),
+    id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
 });
 export interface Alert extends Output<typeof AlertSchema> {}
 export interface AlertInput extends Input<typeof AlertSchema> {}
 export const Alert: Schema<Alert, AlertInput> = AlertSchema;
 
-const UserJwtPermissionsSchema = literal(['user', 'support', 'admin', 'admin_support']);
+const UserJwtPermissionsSchema = /* @__PURE__ */ literal([
+    'user',
+    'support',
+    'admin',
+    'admin_support',
+]);
 export type UserJwtPermissions = Output<typeof UserJwtPermissionsSchema>;
 export type UserJwtPermissionsInput = Input<typeof UserJwtPermissionsSchema>;
 export const UserJwtPermissions: Schema<UserJwtPermissions, UserJwtPermissionsInput> =
     UserJwtPermissionsSchema;
 
-const ApiKeySchema = object({
+const ApiKeySchema = /* @__PURE__ */ object({
     /** Unix time in seconds. */
-    created_at: nullable(integer()),
+    created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     /** Unix time in seconds. */
-    updated_at: nullable(integer()),
-    name: nullable(string()),
-    description: nullable(string()),
-    scopes: nullable(array(json())),
-    permissions: nullable(UserJwtPermissions),
-    secret: nullable(string()),
+    updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    description: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    scopes: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ json())),
+    permissions: /* @__PURE__ */ nullable(UserJwtPermissions),
+    secret: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     /** Unix time in seconds. */
-    expires_at: nullable(integer()),
-    ttl: nullable(integer('Int32')),
-    user_id: nullable(string()),
-    authority_id: nullable(string()),
-    id: nullable(string()),
+    expires_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    ttl: /* @__PURE__ */ nullable(/* @__PURE__ */ integer('Int32')),
+    user_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    authority_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
 });
 export interface ApiKey extends Output<typeof ApiKeySchema> {}
 export interface ApiKeyInput extends Input<typeof ApiKeySchema> {}
 export const ApiKey: Schema<ApiKey, ApiKeyInput> = ApiKeySchema;
 
-const AuthoritySchema = object({
+const AuthoritySchema = /* @__PURE__ */ object({
     /** Unix time in seconds. */
-    created_at: nullable(integer()),
+    created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     /** Unix time in seconds. */
-    updated_at: nullable(integer()),
-    name: nullable(string()),
-    description: nullable(string()),
-    domain: nullable(string()),
-    login_url: nullable(string()),
-    logout_url: nullable(string()),
-    internals: nullable(record(json())),
-    config: nullable(record(json())),
-    email_domains: nullable(array(string())),
-    id: nullable(string()),
+    updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    description: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    domain: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    login_url: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    logout_url: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    internals: /* @__PURE__ */ nullable(/* @__PURE__ */ record(/* @__PURE__ */ json())),
+    config: /* @__PURE__ */ nullable(/* @__PURE__ */ record(/* @__PURE__ */ json())),
+    email_domains: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
+    id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
 });
 export interface Authority extends Output<typeof AuthoritySchema> {}
 export interface AuthorityInput extends Input<typeof AuthoritySchema> {}
 export const Authority: Schema<Authority, AuthorityInput> = AuthoritySchema;
 
-const UserWorktimeBlockSchema = object(
+const UserWorktimeBlockSchema = /* @__PURE__ */ object(
     {
-        start_time: number(),
-        end_time: number(),
-        location: string(),
+        start_time: /* @__PURE__ */ number(),
+        end_time: /* @__PURE__ */ number(),
+        location: /* @__PURE__ */ string(),
     },
     ['start_time', 'end_time', 'location'],
 );
@@ -277,10 +284,10 @@ export interface UserWorktimeBlockInput extends Input<typeof UserWorktimeBlockSc
 export const UserWorktimeBlock: Schema<UserWorktimeBlock, UserWorktimeBlockInput> =
     UserWorktimeBlockSchema;
 
-const UserWorktimePreferenceSchema = object(
+const UserWorktimePreferenceSchema = /* @__PURE__ */ object(
     {
-        day_of_week: integer('Int32'),
-        blocks: array(UserWorktimeBlock),
+        day_of_week: /* @__PURE__ */ integer('Int32'),
+        blocks: /* @__PURE__ */ array(UserWorktimeBlock),
     },
     ['day_of_week', 'blocks'],
 );
@@ -289,40 +296,40 @@ export interface UserWorktimePreferenceInput extends Input<typeof UserWorktimePr
 export const UserWorktimePreference: Schema<UserWorktimePreference, UserWorktimePreferenceInput> =
     UserWorktimePreferenceSchema;
 
-const UserAdminResponseSchema = object(
+const UserAdminResponseSchema = /* @__PURE__ */ object(
     {
         /** Unix time in seconds. */
-        created_at: integer(),
-        name: string(),
-        nickname: nullable(string()),
-        email: string(),
-        phone: nullable(string()),
-        country: nullable(string()),
-        image: nullable(string()),
-        ui_theme: nullable(string()),
-        misc: nullable(string()),
-        login_name: nullable(string()),
-        staff_id: nullable(string()),
-        first_name: nullable(string()),
-        last_name: nullable(string()),
-        building: nullable(string()),
-        department: nullable(string()),
-        preferred_language: nullable(string()),
-        email_digest: nullable(string()),
-        card_number: nullable(string()),
-        deleted: boolean(),
-        groups: array(string()),
-        sys_admin: boolean(),
-        support: boolean(),
-        locatable: boolean(),
-        login_count: integer(),
+        created_at: /* @__PURE__ */ integer(),
+        name: /* @__PURE__ */ string(),
+        nickname: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        email: /* @__PURE__ */ string(),
+        phone: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        country: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        image: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        ui_theme: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        misc: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        login_name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        staff_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        first_name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        last_name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        building: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        department: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        preferred_language: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        email_digest: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        card_number: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        deleted: /* @__PURE__ */ boolean(),
+        groups: /* @__PURE__ */ array(/* @__PURE__ */ string()),
+        sys_admin: /* @__PURE__ */ boolean(),
+        support: /* @__PURE__ */ boolean(),
+        locatable: /* @__PURE__ */ boolean(),
+        login_count: /* @__PURE__ */ integer(),
         /** Unix time in seconds. */
-        last_login: nullable(integer()),
-        work_preferences: array(UserWorktimePreference),
-        work_overrides: record(UserWorktimePreference),
-        authority_id: nullable(string()),
-        photo_upload_id: nullable(string()),
-        id: nullable(string()),
+        last_login: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+        work_preferences: /* @__PURE__ */ array(UserWorktimePreference),
+        work_overrides: /* @__PURE__ */ record(UserWorktimePreference),
+        authority_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        photo_upload_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     },
     [
         'created_at',
@@ -343,22 +350,22 @@ export interface UserAdminResponseInput extends Input<typeof UserAdminResponseSc
 export const UserAdminResponse: Schema<UserAdminResponse, UserAdminResponseInput> =
     UserAdminResponseSchema;
 
-const ApiKeysResponseSchema = object(
+const ApiKeysResponseSchema = /* @__PURE__ */ object(
     {
-        id: nullable(string()),
-        name: string(),
-        description: string(),
-        scopes: array(json()),
-        permissions: nullable(UserJwtPermissions),
-        user_id: nullable(string()),
-        authority_id: nullable(string()),
-        created_at: integer(),
-        updated_at: integer(),
+        id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        name: /* @__PURE__ */ string(),
+        description: /* @__PURE__ */ string(),
+        scopes: /* @__PURE__ */ array(/* @__PURE__ */ json()),
+        permissions: /* @__PURE__ */ nullable(UserJwtPermissions),
+        user_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        authority_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        created_at: /* @__PURE__ */ integer(),
+        updated_at: /* @__PURE__ */ integer(),
         /** Unix time in seconds. */
-        expires_at: nullable(integer()),
-        x_api_key: nullable(string()),
-        user: nullable(UserAdminResponse),
-        authority: nullable(Authority),
+        expires_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+        x_api_key: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        user: /* @__PURE__ */ nullable(UserAdminResponse),
+        authority: /* @__PURE__ */ nullable(Authority),
     },
     ['name', 'description', 'scopes', 'created_at', 'updated_at'],
 );
@@ -368,118 +375,120 @@ export interface ApiKeysResponseInput extends Input<typeof ApiKeysResponseSchema
 /** An API key, with its owner's admin view (never their credentials) */
 export const ApiKeysResponse: Schema<ApiKeysResponse, ApiKeysResponseInput> = ApiKeysResponseSchema;
 
-const AssetSchema = object({
+const AssetSchema = /* @__PURE__ */ object({
     /** Unix time in seconds. */
-    created_at: nullable(integer()),
+    created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     /** Unix time in seconds. */
-    updated_at: nullable(integer()),
-    identifier: nullable(string()),
-    serial_number: nullable(string()),
-    other_data: nullable(json()),
-    barcode: nullable(string()),
-    name: nullable(string()),
-    client_ids: nullable(json()),
-    map_id: nullable(string()),
-    bookable: nullable(boolean()),
-    accessible: nullable(boolean()),
-    zones: nullable(array(string())),
-    place_groups: nullable(array(string())),
-    assigned_to: nullable(string()),
-    assigned_name: nullable(string()),
-    features: nullable(array(string())),
-    images: nullable(array(string())),
-    notes: nullable(string()),
-    security_system_groups: nullable(array(string())),
-    parent_id: nullable(string()),
-    asset_type_id: nullable(string()),
-    purchase_order_id: nullable(string()),
-    zone_id: nullable(string()),
-    id: nullable(string()),
+    updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    identifier: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    serial_number: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    other_data: /* @__PURE__ */ nullable(/* @__PURE__ */ json()),
+    barcode: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    client_ids: /* @__PURE__ */ nullable(/* @__PURE__ */ json()),
+    map_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    bookable: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    accessible: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    zones: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
+    place_groups: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
+    assigned_to: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    assigned_name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    features: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
+    images: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
+    notes: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    security_system_groups: /* @__PURE__ */ nullable(
+        /* @__PURE__ */ array(/* @__PURE__ */ string()),
+    ),
+    parent_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    asset_type_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    purchase_order_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    zone_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
 });
 export interface Asset extends Output<typeof AssetSchema> {}
 export interface AssetInput extends Input<typeof AssetSchema> {}
 export const Asset: Schema<Asset, AssetInput> = AssetSchema;
 
-const AssetCategorySchema = object({
+const AssetCategorySchema = /* @__PURE__ */ object({
     /** Unix time in seconds. */
-    created_at: nullable(integer()),
+    created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     /** Unix time in seconds. */
-    updated_at: nullable(integer()),
-    name: nullable(string()),
-    description: nullable(string()),
-    hidden: nullable(boolean()),
-    authority_id: nullable(string()),
-    parent_category_id: nullable(string()),
-    id: nullable(string()),
+    updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    description: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    hidden: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    authority_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    parent_category_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
 });
 export interface AssetCategory extends Output<typeof AssetCategorySchema> {}
 export interface AssetCategoryInput extends Input<typeof AssetCategorySchema> {}
 export const AssetCategory: Schema<AssetCategory, AssetCategoryInput> = AssetCategorySchema;
 
-const AssetPurchaseOrderSchema = object({
+const AssetPurchaseOrderSchema = /* @__PURE__ */ object({
     /** Unix time in seconds. */
-    created_at: nullable(integer()),
+    created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     /** Unix time in seconds. */
-    updated_at: nullable(integer()),
-    purchase_order_number: nullable(string()),
-    invoice_number: nullable(string()),
-    supplier_details: nullable(json()),
-    purchase_date: nullable(integer()),
-    unit_price: nullable(integer()),
-    expected_service_start_date: nullable(integer()),
-    expected_service_end_date: nullable(integer()),
-    authority_id: nullable(string()),
-    id: nullable(string()),
+    updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    purchase_order_number: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    invoice_number: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    supplier_details: /* @__PURE__ */ nullable(/* @__PURE__ */ json()),
+    purchase_date: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    unit_price: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    expected_service_start_date: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    expected_service_end_date: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    authority_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
 });
 export interface AssetPurchaseOrder extends Output<typeof AssetPurchaseOrderSchema> {}
 export interface AssetPurchaseOrderInput extends Input<typeof AssetPurchaseOrderSchema> {}
 export const AssetPurchaseOrder: Schema<AssetPurchaseOrder, AssetPurchaseOrderInput> =
     AssetPurchaseOrderSchema;
 
-const AssetTypeSchema = object({
+const AssetTypeSchema = /* @__PURE__ */ object({
     /** Unix time in seconds. */
-    created_at: nullable(integer()),
+    created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     /** Unix time in seconds. */
-    updated_at: nullable(integer()),
-    name: nullable(string()),
-    brand: nullable(string()),
-    description: nullable(string()),
-    model_number: nullable(string()),
-    images: nullable(array(string())),
-    category_id: nullable(string()),
-    id: nullable(string()),
+    updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    brand: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    description: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    model_number: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    images: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
+    category_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
 });
 export interface AssetType extends Output<typeof AssetTypeSchema> {}
 export interface AssetTypeInput extends Input<typeof AssetTypeSchema> {}
 export const AssetType: Schema<AssetType, AssetTypeInput> = AssetTypeSchema;
 
-const BrokerSchema = object({
+const BrokerSchema = /* @__PURE__ */ object({
     /** Unix time in seconds. */
-    created_at: nullable(integer()),
+    created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     /** Unix time in seconds. */
-    updated_at: nullable(integer()),
+    updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     /** The number of the enum: 0 certificate, 1 no_auth, 2 user_password. */
-    auth_type: nullable(literal([0, 1, 2])),
-    name: nullable(string()),
-    description: nullable(string()),
-    host: nullable(string()),
-    port: nullable(integer('Int32')),
-    tls: nullable(boolean()),
-    username: nullable(string()),
-    password: nullable(string()),
-    certificate: nullable(string()),
-    secret: nullable(string()),
-    filters: nullable(array(string())),
-    id: nullable(string()),
+    auth_type: /* @__PURE__ */ nullable(/* @__PURE__ */ literal([0, 1, 2])),
+    name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    description: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    host: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    port: /* @__PURE__ */ nullable(/* @__PURE__ */ integer('Int32')),
+    tls: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    username: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    password: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    certificate: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    secret: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    filters: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
+    id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
 });
 export interface Broker extends Output<typeof BrokerSchema> {}
 export interface BrokerInput extends Input<typeof BrokerSchema> {}
 export const Broker: Schema<Broker, BrokerInput> = BrokerSchema;
 
-const BuildMonitorCancelStatusSchema = object(
+const BuildMonitorCancelStatusSchema = /* @__PURE__ */ object(
     {
-        status: string(),
-        message: string(),
+        status: /* @__PURE__ */ string(),
+        message: /* @__PURE__ */ string(),
     },
     ['status', 'message'],
 );
@@ -492,22 +501,28 @@ export const BuildMonitorCancelStatus: Schema<
     BuildMonitorCancelStatusInput
 > = BuildMonitorCancelStatusSchema;
 
-const BuildMonitorStateSchema = literal(['pending', 'running', 'cancelled', 'error', 'done']);
+const BuildMonitorStateSchema = /* @__PURE__ */ literal([
+    'pending',
+    'running',
+    'cancelled',
+    'error',
+    'done',
+]);
 export type BuildMonitorState = Output<typeof BuildMonitorStateSchema>;
 export type BuildMonitorStateInput = Input<typeof BuildMonitorStateSchema>;
 export const BuildMonitorState: Schema<BuildMonitorState, BuildMonitorStateInput> =
     BuildMonitorStateSchema;
 
-const BuildMonitorTaskStatusSchema = object(
+const BuildMonitorTaskStatusSchema = /* @__PURE__ */ object(
     {
         state: BuildMonitorState,
-        id: string(),
-        message: string(),
-        driver: string(),
-        repo: string(),
-        branch: string(),
-        commit: string(),
-        timestamp: string(),
+        id: /* @__PURE__ */ string(),
+        message: /* @__PURE__ */ string(),
+        driver: /* @__PURE__ */ string(),
+        repo: /* @__PURE__ */ string(),
+        branch: /* @__PURE__ */ string(),
+        commit: /* @__PURE__ */ string(),
+        timestamp: /* @__PURE__ */ string(),
     },
     ['state', 'id', 'message', 'driver', 'repo', 'branch', 'commit', 'timestamp'],
 );
@@ -516,24 +531,24 @@ export interface BuildMonitorTaskStatusInput extends Input<typeof BuildMonitorTa
 export const BuildMonitorTaskStatus: Schema<BuildMonitorTaskStatus, BuildMonitorTaskStatusInput> =
     BuildMonitorTaskStatusSchema;
 
-const ChatSchema = object({
+const ChatSchema = /* @__PURE__ */ object({
     /** Unix time in seconds. */
-    created_at: nullable(integer()),
+    created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     /** Unix time in seconds. */
-    updated_at: nullable(integer()),
-    summary: nullable(string()),
-    user_id: nullable(string()),
-    system_id: nullable(string()),
-    id: nullable(string()),
+    updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    summary: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    user_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    system_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
 });
 export interface Chat extends Output<typeof ChatSchema> {}
 export interface ChatInput extends Input<typeof ChatSchema> {}
 export const Chat: Schema<Chat, ChatInput> = ChatSchema;
 
-const ChatGptPluginDetailsCapabilitiesSchema = object(
+const ChatGptPluginDetailsCapabilitiesSchema = /* @__PURE__ */ object(
     {
-        id: string(),
-        capability: string(),
+        id: /* @__PURE__ */ string(),
+        capability: /* @__PURE__ */ string(),
     },
     ['id', 'capability'],
 );
@@ -548,13 +563,13 @@ export const ChatGptPluginDetailsCapabilities: Schema<
     ChatGptPluginDetailsCapabilitiesInput
 > = ChatGptPluginDetailsCapabilitiesSchema;
 
-const ChatGptPluginDetailsUserInformationSchema = object(
+const ChatGptPluginDetailsUserInformationSchema = /* @__PURE__ */ object(
     {
-        id: string(),
-        name: string(),
-        email: string(),
-        phone: nullable(string()),
-        swipe_card_number: nullable(string()),
+        id: /* @__PURE__ */ string(),
+        name: /* @__PURE__ */ string(),
+        email: /* @__PURE__ */ string(),
+        phone: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        swipe_card_number: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     },
     ['id', 'name', 'email'],
 );
@@ -569,14 +584,14 @@ export const ChatGptPluginDetailsUserInformation: Schema<
     ChatGptPluginDetailsUserInformationInput
 > = ChatGptPluginDetailsUserInformationSchema;
 
-const ChatGptPluginDetailsSchema = object(
+const ChatGptPluginDetailsSchema = /* @__PURE__ */ object(
     {
-        prompt: string(),
-        capabilities: array(ChatGptPluginDetailsCapabilities),
-        system_id: string(),
-        user_information: nullable(ChatGptPluginDetailsUserInformation),
-        current_time: nullable(string()),
-        day_of_week: nullable(string()),
+        prompt: /* @__PURE__ */ string(),
+        capabilities: /* @__PURE__ */ array(ChatGptPluginDetailsCapabilities),
+        system_id: /* @__PURE__ */ string(),
+        user_information: /* @__PURE__ */ nullable(ChatGptPluginDetailsUserInformation),
+        current_time: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        day_of_week: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     },
     ['prompt', 'capabilities', 'system_id'],
 );
@@ -585,16 +600,16 @@ export interface ChatGptPluginDetailsInput extends Input<typeof ChatGptPluginDet
 export const ChatGptPluginDetails: Schema<ChatGptPluginDetails, ChatGptPluginDetailsInput> =
     ChatGptPluginDetailsSchema;
 
-const DriverStatusMetadataSchema = object(
+const DriverStatusMetadataSchema = /* @__PURE__ */ object(
     {
-        running: boolean(),
-        module_instances: integer('Int32'),
-        last_exit_code: integer('Int32'),
-        launch_count: integer('Int32'),
-        launch_time: integer(),
-        percentage_cpu: nullable(number()),
-        memory_total: nullable(integer()),
-        memory_usage: nullable(integer()),
+        running: /* @__PURE__ */ boolean(),
+        module_instances: /* @__PURE__ */ integer('Int32'),
+        last_exit_code: /* @__PURE__ */ integer('Int32'),
+        launch_count: /* @__PURE__ */ integer('Int32'),
+        launch_time: /* @__PURE__ */ integer(),
+        percentage_cpu: /* @__PURE__ */ nullable(/* @__PURE__ */ number()),
+        memory_total: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+        memory_usage: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     },
     ['running', 'module_instances', 'last_exit_code', 'launch_count', 'launch_time'],
 );
@@ -603,10 +618,10 @@ export interface DriverStatusMetadataInput extends Input<typeof DriverStatusMeta
 export const DriverStatusMetadata: Schema<DriverStatusMetadata, DriverStatusMetadataInput> =
     DriverStatusMetadataSchema;
 
-const ClusterDriverSchema = object(
+const ClusterDriverSchema = /* @__PURE__ */ object(
     {
-        modules: array(string()),
-        status: nullable(DriverStatusMetadata),
+        modules: /* @__PURE__ */ array(/* @__PURE__ */ string()),
+        status: /* @__PURE__ */ nullable(DriverStatusMetadata),
     },
     ['modules'],
 );
@@ -614,11 +629,11 @@ export interface ClusterDriver extends Output<typeof ClusterDriverSchema> {}
 export interface ClusterDriverInput extends Input<typeof ClusterDriverSchema> {}
 export const ClusterDriver: Schema<ClusterDriver, ClusterDriverInput> = ClusterDriverSchema;
 
-const ClusterDriverStatusSchema = object(
+const ClusterDriverStatusSchema = /* @__PURE__ */ object(
     {
-        driver: string(),
+        driver: /* @__PURE__ */ string(),
         local: ClusterDriver,
-        edge: record(ClusterDriver),
+        edge: /* @__PURE__ */ record(ClusterDriver),
     },
     ['driver', 'local', 'edge'],
 );
@@ -627,10 +642,10 @@ export interface ClusterDriverStatusInput extends Input<typeof ClusterDriverStat
 export const ClusterDriverStatus: Schema<ClusterDriverStatus, ClusterDriverStatusInput> =
     ClusterDriverStatusSchema;
 
-const CoreStatusErrorSchema = object(
+const CoreStatusErrorSchema = /* @__PURE__ */ object(
     {
-        name: string(),
-        reason: string(),
+        name: /* @__PURE__ */ string(),
+        reason: /* @__PURE__ */ string(),
     },
     ['name', 'reason'],
 );
@@ -638,10 +653,10 @@ export interface CoreStatusError extends Output<typeof CoreStatusErrorSchema> {}
 export interface CoreStatusErrorInput extends Input<typeof CoreStatusErrorSchema> {}
 export const CoreStatusError: Schema<CoreStatusError, CoreStatusErrorInput> = CoreStatusErrorSchema;
 
-const CoreStatusCountSchema = object(
+const CoreStatusCountSchema = /* @__PURE__ */ object(
     {
-        modules: integer('Int32'),
-        drivers: integer('Int32'),
+        modules: /* @__PURE__ */ integer('Int32'),
+        drivers: /* @__PURE__ */ integer('Int32'),
     },
     ['modules', 'drivers'],
 );
@@ -649,10 +664,10 @@ export interface CoreStatusCount extends Output<typeof CoreStatusCountSchema> {}
 export interface CoreStatusCountInput extends Input<typeof CoreStatusCountSchema> {}
 export const CoreStatusCount: Schema<CoreStatusCount, CoreStatusCountInput> = CoreStatusCountSchema;
 
-const CoreStatusRunCountSchema = object(
+const CoreStatusRunCountSchema = /* @__PURE__ */ object(
     {
         local: CoreStatusCount,
-        edge: record(CoreStatusCount),
+        edge: /* @__PURE__ */ record(CoreStatusCount),
     },
     ['local', 'edge'],
 );
@@ -661,12 +676,12 @@ export interface CoreStatusRunCountInput extends Input<typeof CoreStatusRunCount
 export const CoreStatusRunCount: Schema<CoreStatusRunCount, CoreStatusRunCountInput> =
     CoreStatusRunCountSchema;
 
-const CoreStatusSchema = object(
+const CoreStatusSchema = /* @__PURE__ */ object(
     {
-        available_repositories: array(string()),
-        unavailable_repositories: array(CoreStatusError),
-        compiled_drivers: array(string()),
-        unavailable_drivers: array(CoreStatusError),
+        available_repositories: /* @__PURE__ */ array(/* @__PURE__ */ string()),
+        unavailable_repositories: /* @__PURE__ */ array(CoreStatusError),
+        compiled_drivers: /* @__PURE__ */ array(/* @__PURE__ */ string()),
+        unavailable_drivers: /* @__PURE__ */ array(CoreStatusError),
         run_count: CoreStatusRunCount,
     },
     [
@@ -681,15 +696,15 @@ export interface CoreStatus extends Output<typeof CoreStatusSchema> {}
 export interface CoreStatusInput extends Input<typeof CoreStatusSchema> {}
 export const CoreStatus: Schema<CoreStatus, CoreStatusInput> = CoreStatusSchema;
 
-const SystemLoadSchema = object(
+const SystemLoadSchema = /* @__PURE__ */ object(
     {
-        hostname: string(),
-        cpu_count: integer('Int32'),
-        core_cpu: number(),
-        total_cpu: number(),
-        memory_total: integer(),
-        memory_usage: integer(),
-        core_memory: integer(),
+        hostname: /* @__PURE__ */ string(),
+        cpu_count: /* @__PURE__ */ integer('Int32'),
+        core_cpu: /* @__PURE__ */ number(),
+        total_cpu: /* @__PURE__ */ number(),
+        memory_total: /* @__PURE__ */ integer(),
+        memory_usage: /* @__PURE__ */ integer(),
+        core_memory: /* @__PURE__ */ integer(),
     },
     [
         'hostname',
@@ -705,10 +720,10 @@ export interface SystemLoad extends Output<typeof SystemLoadSchema> {}
 export interface SystemLoadInput extends Input<typeof SystemLoadSchema> {}
 export const SystemLoad: Schema<SystemLoad, SystemLoadInput> = SystemLoadSchema;
 
-const LoadSchema = object(
+const LoadSchema = /* @__PURE__ */ object(
     {
         local: SystemLoad,
-        edge: record(SystemLoad),
+        edge: /* @__PURE__ */ record(SystemLoad),
     },
     ['local', 'edge'],
 );
@@ -716,12 +731,12 @@ export interface Load extends Output<typeof LoadSchema> {}
 export interface LoadInput extends Input<typeof LoadSchema> {}
 export const Load: Schema<Load, LoadInput> = LoadSchema;
 
-const ClusterNodeStatusSchema = object(
+const ClusterNodeStatusSchema = /* @__PURE__ */ object(
     {
-        id: string(),
-        uri: json(),
-        load: nullable(Load),
-        status: nullable(CoreStatus),
+        id: /* @__PURE__ */ string(),
+        uri: /* @__PURE__ */ json(),
+        load: /* @__PURE__ */ nullable(Load),
+        status: /* @__PURE__ */ nullable(CoreStatus),
     },
     ['id', 'uri'],
 );
@@ -730,22 +745,22 @@ export interface ClusterNodeStatusInput extends Input<typeof ClusterNodeStatusSc
 export const ClusterNodeStatus: Schema<ClusterNodeStatus, ClusterNodeStatusInput> =
     ClusterNodeStatusSchema;
 
-const ClusterVersionsSchema = object({
-    old_version: nullable(string()),
-    new_version: nullable(string()),
+const ClusterVersionsSchema = /* @__PURE__ */ object({
+    old_version: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    new_version: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
 });
 export interface ClusterVersions extends Output<typeof ClusterVersionsSchema> {}
 export interface ClusterVersionsInput extends Input<typeof ClusterVersionsSchema> {}
 export const ClusterVersions: Schema<ClusterVersions, ClusterVersionsInput> = ClusterVersionsSchema;
 
-const ConnectionMetricsSchema = object(
+const ConnectionMetricsSchema = /* @__PURE__ */ object(
     {
-        edge_id: string(),
-        total_connections: integer('Int32'),
-        failed_connections: integer('Int32'),
-        average_uptime: integer(),
-        last_connection_attempt: integer(),
-        last_successful_connection: integer(),
+        edge_id: /* @__PURE__ */ string(),
+        total_connections: /* @__PURE__ */ integer('Int32'),
+        failed_connections: /* @__PURE__ */ integer('Int32'),
+        average_uptime: /* @__PURE__ */ integer(),
+        last_connection_attempt: /* @__PURE__ */ integer(),
+        last_successful_connection: /* @__PURE__ */ integer(),
     },
     [
         'edge_id',
@@ -761,37 +776,37 @@ export interface ConnectionMetricsInput extends Input<typeof ConnectionMetricsSc
 export const ConnectionMetrics: Schema<ConnectionMetrics, ConnectionMetricsInput> =
     ConnectionMetricsSchema;
 
-const TriggerActionsEmailSchema = object({
-    emails: nullable(array(string())),
-    content: nullable(string()),
+const TriggerActionsEmailSchema = /* @__PURE__ */ object({
+    emails: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
+    content: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
 });
 export interface TriggerActionsEmail extends Output<typeof TriggerActionsEmailSchema> {}
 export interface TriggerActionsEmailInput extends Input<typeof TriggerActionsEmailSchema> {}
 export const TriggerActionsEmail: Schema<TriggerActionsEmail, TriggerActionsEmailInput> =
     TriggerActionsEmailSchema;
 
-const TriggerActionsFunctionSchema = object({
-    mod: nullable(string()),
-    method: nullable(string()),
-    args: nullable(record(json())),
+const TriggerActionsFunctionSchema = /* @__PURE__ */ object({
+    mod: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    method: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    args: /* @__PURE__ */ nullable(/* @__PURE__ */ record(/* @__PURE__ */ json())),
 });
 export interface TriggerActionsFunction extends Output<typeof TriggerActionsFunctionSchema> {}
 export interface TriggerActionsFunctionInput extends Input<typeof TriggerActionsFunctionSchema> {}
 export const TriggerActionsFunction: Schema<TriggerActionsFunction, TriggerActionsFunctionInput> =
     TriggerActionsFunctionSchema;
 
-const TriggerActionsSchema = object({
-    functions: nullable(array(TriggerActionsFunction)),
-    mailers: nullable(array(TriggerActionsEmail)),
+const TriggerActionsSchema = /* @__PURE__ */ object({
+    functions: /* @__PURE__ */ nullable(/* @__PURE__ */ array(TriggerActionsFunction)),
+    mailers: /* @__PURE__ */ nullable(/* @__PURE__ */ array(TriggerActionsEmail)),
 });
 export interface TriggerActions extends Output<typeof TriggerActionsSchema> {}
 export interface TriggerActionsInput extends Input<typeof TriggerActionsSchema> {}
 export const TriggerActions: Schema<TriggerActions, TriggerActionsInput> = TriggerActionsSchema;
 
-const SystemTriggersControlSystemDetailsSchema = object(
+const SystemTriggersControlSystemDetailsSchema = /* @__PURE__ */ object(
     {
-        name: string(),
-        id: string(),
+        name: /* @__PURE__ */ string(),
+        id: /* @__PURE__ */ string(),
     },
     ['name', 'id'],
 );
@@ -806,79 +821,79 @@ export const SystemTriggersControlSystemDetails: Schema<
     SystemTriggersControlSystemDetailsInput
 > = SystemTriggersControlSystemDetailsSchema;
 
-const TriggerInstanceSchema = object({
+const TriggerInstanceSchema = /* @__PURE__ */ object({
     /** Unix time in seconds. */
-    created_at: nullable(integer()),
+    created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     /** Unix time in seconds. */
-    updated_at: nullable(integer()),
-    enabled: nullable(boolean()),
-    triggered: nullable(boolean()),
-    important: nullable(boolean()),
-    exec_enabled: nullable(boolean()),
-    playlists: nullable(array(string())),
-    webhook_secret: nullable(string()),
-    trigger_count: nullable(integer('Int32')),
-    control_system_id: nullable(string()),
-    trigger_id: nullable(string()),
-    zone_id: nullable(string()),
-    name: nullable(string()),
-    control_system: nullable(SystemTriggersControlSystemDetails),
-    id: nullable(string()),
+    updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    enabled: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    triggered: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    important: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    exec_enabled: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    playlists: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
+    webhook_secret: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    trigger_count: /* @__PURE__ */ nullable(/* @__PURE__ */ integer('Int32')),
+    control_system_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    trigger_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    zone_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    control_system: /* @__PURE__ */ nullable(SystemTriggersControlSystemDetails),
+    id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
 });
 export interface TriggerInstance extends Output<typeof TriggerInstanceSchema> {}
 export interface TriggerInstanceInput extends Input<typeof TriggerInstanceSchema> {}
 export const TriggerInstance: Schema<TriggerInstance, TriggerInstanceInput> = TriggerInstanceSchema;
 
-const TriggerSchema = object({
+const TriggerSchema = /* @__PURE__ */ object({
     /** Unix time in seconds. */
-    created_at: nullable(integer()),
+    created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     /** Unix time in seconds. */
-    updated_at: nullable(integer()),
-    name: nullable(string()),
-    description: nullable(string()),
-    actions: nullable(TriggerActions),
-    conditions: nullable(TriggerConditions),
-    debounce_period: nullable(integer('Int32')),
-    important: nullable(boolean()),
-    enable_webhook: nullable(boolean()),
-    any_match: nullable(boolean()),
-    supported_methods: nullable(array(string())),
-    control_system_id: nullable(string()),
-    trigger_instances: nullable(array(TriggerInstance)),
-    id: nullable(string()),
+    updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    description: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    actions: /* @__PURE__ */ nullable(TriggerActions),
+    conditions: /* @__PURE__ */ nullable(TriggerConditions),
+    debounce_period: /* @__PURE__ */ nullable(/* @__PURE__ */ integer('Int32')),
+    important: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    enable_webhook: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    any_match: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    supported_methods: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
+    control_system_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    trigger_instances: /* @__PURE__ */ nullable(/* @__PURE__ */ array(TriggerInstance)),
+    id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
 });
 export interface Trigger extends Output<typeof TriggerSchema> {}
 export interface TriggerInput extends Input<typeof TriggerSchema> {}
 export const Trigger: Schema<Trigger, TriggerInput> = TriggerSchema;
 
-const ZoneSchema = object(
+const ZoneSchema = /* @__PURE__ */ object(
     {
         /** Unix time in seconds. */
-        created_at: nullable(integer()),
+        created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
         /** Unix time in seconds. */
-        updated_at: nullable(integer()),
-        name: nullable(string()),
-        description: nullable(string()),
-        tags: nullable(array(string())),
-        location: nullable(string()),
-        display_name: nullable(string()),
-        code: nullable(string()),
-        type: nullable(string()),
-        count: nullable(integer('Int32')),
-        capacity: nullable(integer('Int32')),
-        map_id: nullable(string()),
-        timezone: nullable(json()),
-        triggers: nullable(array(string())),
-        images: nullable(array(string())),
-        playlists: nullable(array(string())),
-        place_id: nullable(string()),
-        parent_id: nullable(string()),
-        remove_triggers: nullable(array(string())),
-        add_triggers: nullable(array(string())),
-        trigger_data: nullable(array(Trigger)),
-        children_count: nullable(integer('Int32')),
-        id: nullable(string()),
-        update_systems: boolean(),
+        updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+        name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        description: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        tags: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
+        location: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        display_name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        code: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        type: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        count: /* @__PURE__ */ nullable(/* @__PURE__ */ integer('Int32')),
+        capacity: /* @__PURE__ */ nullable(/* @__PURE__ */ integer('Int32')),
+        map_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        timezone: /* @__PURE__ */ nullable(/* @__PURE__ */ json()),
+        triggers: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
+        images: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
+        playlists: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
+        place_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        parent_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        remove_triggers: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
+        add_triggers: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
+        trigger_data: /* @__PURE__ */ nullable(/* @__PURE__ */ array(Trigger)),
+        children_count: /* @__PURE__ */ nullable(/* @__PURE__ */ integer('Int32')),
+        id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        update_systems: /* @__PURE__ */ boolean(),
     },
     ['update_systems'],
 );
@@ -886,10 +901,10 @@ export interface Zone extends Output<typeof ZoneSchema> {}
 export interface ZoneInput extends Input<typeof ZoneSchema> {}
 export const Zone: Schema<Zone, ZoneInput> = ZoneSchema;
 
-const ModulesControlSystemDetailsSchema = object(
+const ModulesControlSystemDetailsSchema = /* @__PURE__ */ object(
     {
-        name: string(),
-        zone_data: array(Zone),
+        name: /* @__PURE__ */ string(),
+        zone_data: /* @__PURE__ */ array(Zone),
     },
     ['name', 'zone_data'],
 );
@@ -904,11 +919,11 @@ export const ModulesControlSystemDetails: Schema<
     ModulesControlSystemDetailsInput
 > = ModulesControlSystemDetailsSchema;
 
-const ModulesDriverDetailsSchema = object(
+const ModulesDriverDetailsSchema = /* @__PURE__ */ object(
     {
-        name: string(),
-        description: nullable(string()),
-        module_name: nullable(string()),
+        name: /* @__PURE__ */ string(),
+        description: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        module_name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     },
     ['name'],
 );
@@ -917,60 +932,65 @@ export interface ModulesDriverDetailsInput extends Input<typeof ModulesDriverDet
 export const ModulesDriverDetails: Schema<ModulesDriverDetails, ModulesDriverDetailsInput> =
     ModulesDriverDetailsSchema;
 
-const ModuleSchema = object({
+const ModuleSchema = /* @__PURE__ */ object({
     /** Unix time in seconds. */
-    created_at: nullable(integer()),
+    created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     /** Unix time in seconds. */
-    updated_at: nullable(integer()),
-    ip: nullable(string()),
-    port: nullable(integer('Int32')),
-    tls: nullable(boolean()),
-    udp: nullable(boolean()),
-    makebreak: nullable(boolean()),
-    uri: nullable(string()),
-    name: nullable(string()),
-    custom_name: nullable(string()),
+    updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    ip: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    port: /* @__PURE__ */ nullable(/* @__PURE__ */ integer('Int32')),
+    tls: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    udp: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    makebreak: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    uri: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    custom_name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     /** The number of the enum: 0 ssh, 1 device, 2 service, 3 websocket, 99 logic. */
-    role: nullable(literal([0, 1, 2, 3, 99])),
+    role: /* @__PURE__ */ nullable(/* @__PURE__ */ literal([0, 1, 2, 3, 99])),
     /** the alert level for stagehand issues */
-    alert_level: nullable(AlertSeverity),
-    connected: nullable(boolean()),
-    running: nullable(boolean()),
-    notes: nullable(string()),
-    ignore_connected: nullable(boolean()),
-    ignore_startstop: nullable(boolean()),
-    has_runtime_error: nullable(boolean()),
+    alert_level: /* @__PURE__ */ nullable(AlertSeverity),
+    connected: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    running: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    notes: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    ignore_connected: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    ignore_startstop: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    has_runtime_error: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
     /** Unix time in seconds. */
-    error_timestamp: nullable(integer()),
-    launch_on_execute: nullable(boolean()),
-    control_system_id: nullable(string()),
-    driver_id: nullable(string()),
-    edge_id: nullable(string()),
-    driver: nullable(ModulesDriverDetails),
-    control_system: nullable(ModulesControlSystemDetails),
-    core_node: nullable(string()),
-    id: nullable(string()),
+    error_timestamp: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    launch_on_execute: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    control_system_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    driver_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    edge_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    driver: /* @__PURE__ */ nullable(ModulesDriverDetails),
+    control_system: /* @__PURE__ */ nullable(ModulesControlSystemDetails),
+    core_node: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
 });
 export interface Module extends Output<typeof ModuleSchema> {}
 export interface ModuleInput extends Input<typeof ModuleSchema> {}
 export const Module: Schema<Module, ModuleInput> = ModuleSchema;
 
-const PlaylistOrientationSchema = literal(['unspecified', 'landscape', 'portrait', 'square']);
+const PlaylistOrientationSchema = /* @__PURE__ */ literal([
+    'unspecified',
+    'landscape',
+    'portrait',
+    'square',
+]);
 export type PlaylistOrientation = Output<typeof PlaylistOrientationSchema>;
 export type PlaylistOrientationInput = Input<typeof PlaylistOrientationSchema>;
 export const PlaylistOrientation: Schema<PlaylistOrientation, PlaylistOrientationInput> =
     PlaylistOrientationSchema;
 
-const PlaylistScheduleSchema = object(
+const PlaylistScheduleSchema = /* @__PURE__ */ object(
     {
-        play_at: nullable(integer()),
-        play_at_local: nullable(string()),
-        valid_until: nullable(integer()),
-        valid_from: nullable(integer()),
-        play_takeover: boolean(),
-        play_period: integer('Int32'),
-        play_cron: string(),
-        mask: nullable(string()),
+        play_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+        play_at_local: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        valid_until: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+        valid_from: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+        play_takeover: /* @__PURE__ */ boolean(),
+        play_period: /* @__PURE__ */ integer('Int32'),
+        play_cron: /* @__PURE__ */ string(),
+        mask: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     },
     ['play_takeover', 'play_period', 'play_cron'],
 );
@@ -979,36 +999,36 @@ export interface PlaylistScheduleInput extends Input<typeof PlaylistScheduleSche
 export const PlaylistSchedule: Schema<PlaylistSchedule, PlaylistScheduleInput> =
     PlaylistScheduleSchema;
 
-const PlaylistSchema = object({
+const PlaylistSchema = /* @__PURE__ */ object({
     /** Unix time in seconds. */
-    created_at: nullable(integer()),
+    created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     /** Unix time in seconds. */
-    updated_at: nullable(integer()),
-    name: nullable(string()),
-    description: nullable(string()),
-    authority_id: nullable(string()),
-    orientation: nullable(PlaylistOrientation),
-    play_count: nullable(integer()),
-    play_through_count: nullable(integer()),
+    updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    description: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    authority_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    orientation: /* @__PURE__ */ nullable(PlaylistOrientation),
+    play_count: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    play_through_count: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     /**
      * The number of the enum: 0 default, 1 cut, 2 cross_fade, 3 slide_top, 4 slide_left, 5
      * slide_right, 6 slide_bottom.
      */
-    default_animation: nullable(literal([0, 1, 2, 3, 4, 5, 6])),
-    random: nullable(boolean()),
-    enabled: nullable(boolean()),
-    distribution: nullable(boolean()),
-    default_duration: nullable(integer('Int32')),
-    valid_from: nullable(integer()),
-    valid_until: nullable(integer()),
-    schedules: nullable(array(PlaylistSchedule)),
-    id: nullable(string()),
+    default_animation: /* @__PURE__ */ nullable(/* @__PURE__ */ literal([0, 1, 2, 3, 4, 5, 6])),
+    random: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    enabled: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    distribution: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    default_duration: /* @__PURE__ */ nullable(/* @__PURE__ */ integer('Int32')),
+    valid_from: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    valid_until: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    schedules: /* @__PURE__ */ nullable(/* @__PURE__ */ array(PlaylistSchedule)),
+    id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
 });
 export interface Playlist extends Output<typeof PlaylistSchema> {}
 export interface PlaylistInput extends Input<typeof PlaylistSchema> {}
 export const Playlist: Schema<Playlist, PlaylistInput> = PlaylistSchema;
 
-const PlaylistItemMediaTypeSchema = literal([
+const PlaylistItemMediaTypeSchema = /* @__PURE__ */ literal([
     'image',
     'video',
     'plugin',
@@ -1020,40 +1040,44 @@ export type PlaylistItemMediaTypeInput = Input<typeof PlaylistItemMediaTypeSchem
 export const PlaylistItemMediaType: Schema<PlaylistItemMediaType, PlaylistItemMediaTypeInput> =
     PlaylistItemMediaTypeSchema;
 
-const PlaylistItemSchema = object({
+const PlaylistItemSchema = /* @__PURE__ */ object({
     /** Unix time in seconds. */
-    created_at: nullable(integer()),
+    created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     /** Unix time in seconds. */
-    updated_at: nullable(integer()),
-    name: nullable(string()),
-    description: nullable(string()),
-    tags: nullable(array(string())),
-    authority_id: nullable(string()),
-    video_length: nullable(integer('Int32')),
-    start_time: nullable(integer('Int32')),
-    play_time: nullable(integer('Int32')),
+    updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    description: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    tags: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
+    authority_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    video_length: /* @__PURE__ */ nullable(/* @__PURE__ */ integer('Int32')),
+    start_time: /* @__PURE__ */ nullable(/* @__PURE__ */ integer('Int32')),
+    play_time: /* @__PURE__ */ nullable(/* @__PURE__ */ integer('Int32')),
     /**
      * The number of the enum: 0 default, 1 cut, 2 cross_fade, 3 slide_top, 4 slide_left, 5
      * slide_right, 6 slide_bottom.
      */
-    animation: nullable(literal([0, 1, 2, 3, 4, 5, 6])),
-    media_type: nullable(PlaylistItemMediaType),
-    orientation: nullable(PlaylistOrientation),
-    media_uri: nullable(string()),
-    media_id: nullable(string()),
-    thumbnail_id: nullable(string()),
-    plugin_id: nullable(string()),
-    plugin_params: nullable(record(json())),
-    play_count: nullable(integer()),
-    valid_from: nullable(integer()),
-    valid_until: nullable(integer()),
-    id: nullable(string()),
+    animation: /* @__PURE__ */ nullable(/* @__PURE__ */ literal([0, 1, 2, 3, 4, 5, 6])),
+    media_type: /* @__PURE__ */ nullable(PlaylistItemMediaType),
+    orientation: /* @__PURE__ */ nullable(PlaylistOrientation),
+    media_uri: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    media_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    thumbnail_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    plugin_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    plugin_params: /* @__PURE__ */ nullable(/* @__PURE__ */ record(/* @__PURE__ */ json())),
+    play_count: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    valid_from: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    valid_until: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
 });
 export interface PlaylistItem extends Output<typeof PlaylistItemSchema> {}
 export interface PlaylistItemInput extends Input<typeof PlaylistItemSchema> {}
 export const PlaylistItem: Schema<PlaylistItem, PlaylistItemInput> = PlaylistItemSchema;
 
-const SignagePluginPlaybackTypeSchema = literal(['static', 'interactive', 'playsthrough']);
+const SignagePluginPlaybackTypeSchema = /* @__PURE__ */ literal([
+    'static',
+    'interactive',
+    'playsthrough',
+]);
 export type SignagePluginPlaybackType = Output<typeof SignagePluginPlaybackTypeSchema>;
 export type SignagePluginPlaybackTypeInput = Input<typeof SignagePluginPlaybackTypeSchema>;
 export const SignagePluginPlaybackType: Schema<
@@ -1061,7 +1085,7 @@ export const SignagePluginPlaybackType: Schema<
     SignagePluginPlaybackTypeInput
 > = SignagePluginPlaybackTypeSchema;
 
-const SignagePluginPluginTypeSchema = literal(['plugin', 'widget']);
+const SignagePluginPluginTypeSchema = /* @__PURE__ */ literal(['plugin', 'widget']);
 export type SignagePluginPluginType = Output<typeof SignagePluginPluginTypeSchema>;
 export type SignagePluginPluginTypeInput = Input<typeof SignagePluginPluginTypeSchema>;
 export const SignagePluginPluginType: Schema<
@@ -1069,34 +1093,34 @@ export const SignagePluginPluginType: Schema<
     SignagePluginPluginTypeInput
 > = SignagePluginPluginTypeSchema;
 
-const SignagePluginSchema = object({
+const SignagePluginSchema = /* @__PURE__ */ object({
     /** Unix time in seconds. */
-    created_at: nullable(integer()),
+    created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     /** Unix time in seconds. */
-    updated_at: nullable(integer()),
-    name: nullable(string()),
-    description: nullable(string()),
-    uri: nullable(string()),
-    playback_type: nullable(SignagePluginPlaybackType),
-    plugin_type: nullable(SignagePluginPluginType),
-    authority_id: nullable(string()),
-    enabled: nullable(boolean()),
-    params: nullable(record(json())),
-    defaults: nullable(record(json())),
-    id: nullable(string()),
+    updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    description: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    uri: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    playback_type: /* @__PURE__ */ nullable(SignagePluginPlaybackType),
+    plugin_type: /* @__PURE__ */ nullable(SignagePluginPluginType),
+    authority_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    enabled: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    params: /* @__PURE__ */ nullable(/* @__PURE__ */ record(/* @__PURE__ */ json())),
+    defaults: /* @__PURE__ */ nullable(/* @__PURE__ */ record(/* @__PURE__ */ json())),
+    id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
 });
 export interface SignagePlugin extends Output<typeof SignagePluginSchema> {}
 export interface SignagePluginInput extends Input<typeof SignagePluginSchema> {}
 export const SignagePlugin: Schema<SignagePlugin, SignagePluginInput> = SignagePluginSchema;
 
-const SignageTemplateSystemTemplateSchema = object({
-    created_at: nullable(string()),
-    updated_at: nullable(string()),
-    id: nullable(string()),
-    control_system_id: nullable(string()),
-    zone_id: nullable(string()),
-    template_id: nullable(string()),
-    schedule: nullable(PlaylistSchedule),
+const SignageTemplateSystemTemplateSchema = /* @__PURE__ */ object({
+    created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    control_system_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    zone_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    template_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    schedule: /* @__PURE__ */ nullable(PlaylistSchedule),
 });
 export interface SignageTemplateSystemTemplate extends Output<
     typeof SignageTemplateSystemTemplateSchema
@@ -1109,56 +1133,66 @@ export const SignageTemplateSystemTemplate: Schema<
     SignageTemplateSystemTemplateInput
 > = SignageTemplateSystemTemplateSchema;
 
-const ControlSystemSchema = object(
+const ControlSystemSchema = /* @__PURE__ */ object(
     {
         /** Unix time in seconds. */
-        created_at: nullable(integer()),
+        created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
         /** Unix time in seconds. */
-        updated_at: nullable(integer()),
-        name: nullable(string()),
-        description: nullable(string()),
-        features: nullable(array(string())),
-        email: nullable(string()),
-        bookable: nullable(boolean()),
-        public: nullable(boolean()),
-        display_name: nullable(string()),
-        code: nullable(string()),
-        type: nullable(string()),
-        capacity: nullable(integer('Int32')),
-        map_id: nullable(string()),
-        approval: nullable(boolean()),
-        images: nullable(array(string())),
-        security_groups: nullable(array(string())),
-        timezone: nullable(json()),
-        support_url: nullable(string()),
-        timetable_url: nullable(string()),
-        camera_snapshot_urls: nullable(array(string())),
-        camera_url: nullable(string()),
-        room_booking_url: nullable(string()),
-        version: nullable(integer('Int32')),
-        installed_ui_devices: nullable(integer('Int32')),
-        zones: nullable(array(string())),
-        modules: nullable(array(string())),
-        orientation: nullable(PlaylistOrientation),
-        sign_height: nullable(integer('Int32')),
-        sign_width: nullable(integer('Int32')),
-        playlists: nullable(array(string())),
-        signage: nullable(boolean()),
+        updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+        name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        description: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        features: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
+        email: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        bookable: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+        public: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+        display_name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        code: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        type: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        capacity: /* @__PURE__ */ nullable(/* @__PURE__ */ integer('Int32')),
+        map_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        approval: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+        images: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
+        security_groups: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
+        timezone: /* @__PURE__ */ nullable(/* @__PURE__ */ json()),
+        support_url: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        timetable_url: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        camera_snapshot_urls: /* @__PURE__ */ nullable(
+            /* @__PURE__ */ array(/* @__PURE__ */ string()),
+        ),
+        camera_url: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        room_booking_url: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        version: /* @__PURE__ */ nullable(/* @__PURE__ */ integer('Int32')),
+        installed_ui_devices: /* @__PURE__ */ nullable(/* @__PURE__ */ integer('Int32')),
+        zones: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
+        modules: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
+        orientation: /* @__PURE__ */ nullable(PlaylistOrientation),
+        sign_height: /* @__PURE__ */ nullable(/* @__PURE__ */ integer('Int32')),
+        sign_width: /* @__PURE__ */ nullable(/* @__PURE__ */ integer('Int32')),
+        playlists: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
+        signage: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
         /** Unix time in seconds. */
-        signage_last_seen: nullable(integer()),
-        playlist_item_id: nullable(string()),
-        space_config: nullable(record(json())),
-        remove_zones: nullable(array(string())),
-        add_zones: nullable(array(string())),
-        zone_data: nullable(array(Zone)),
-        module_data: nullable(array(Module)),
-        playlist_mappings: nullable(record(array(string()))),
-        playlist_config: nullable(record(tuple([Playlist, array(string())]))),
-        playlist_media: nullable(array(PlaylistItem)),
-        signage_plugins: nullable(array(SignagePlugin)),
-        template_schedules: nullable(array(SignageTemplateSystemTemplate)),
-        id: nullable(string()),
-        update_triggers: boolean(),
+        signage_last_seen: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+        playlist_item_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        space_config: /* @__PURE__ */ nullable(/* @__PURE__ */ record(/* @__PURE__ */ json())),
+        remove_zones: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
+        add_zones: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
+        zone_data: /* @__PURE__ */ nullable(/* @__PURE__ */ array(Zone)),
+        module_data: /* @__PURE__ */ nullable(/* @__PURE__ */ array(Module)),
+        playlist_mappings: /* @__PURE__ */ nullable(
+            /* @__PURE__ */ record(/* @__PURE__ */ array(/* @__PURE__ */ string())),
+        ),
+        playlist_config: /* @__PURE__ */ nullable(
+            /* @__PURE__ */ record(
+                /* @__PURE__ */ tuple([Playlist, /* @__PURE__ */ array(/* @__PURE__ */ string())]),
+            ),
+        ),
+        playlist_media: /* @__PURE__ */ nullable(/* @__PURE__ */ array(PlaylistItem)),
+        signage_plugins: /* @__PURE__ */ nullable(/* @__PURE__ */ array(SignagePlugin)),
+        template_schedules: /* @__PURE__ */ nullable(
+            /* @__PURE__ */ array(SignageTemplateSystemTemplate),
+        ),
+        id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        update_triggers: /* @__PURE__ */ boolean(),
     },
     ['update_triggers'],
 );
@@ -1166,33 +1200,33 @@ export interface ControlSystem extends Output<typeof ControlSystemSchema> {}
 export interface ControlSystemInput extends Input<typeof ControlSystemSchema> {}
 export const ControlSystem: Schema<ControlSystem, ControlSystemInput> = ControlSystemSchema;
 
-const DoorkeeperApplicationSchema = object({
-    name: nullable(string()),
-    secret: nullable(string()),
-    scopes: nullable(string()),
-    owner_id: nullable(string()),
-    redirect_uri: nullable(string()),
-    confidential: nullable(boolean()),
-    skip_authorization: nullable(boolean()),
-    subsystems: nullable(array(string())),
-    uid: nullable(string()),
-    id: nullable(integer()),
+const DoorkeeperApplicationSchema = /* @__PURE__ */ object({
+    name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    secret: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    scopes: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    owner_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    redirect_uri: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    confidential: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    skip_authorization: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    subsystems: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
+    uid: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    id: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     /** Unix time in seconds. */
-    created_at: nullable(integer()),
+    created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     /** Unix time in seconds. */
-    updated_at: nullable(integer()),
+    updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
 });
 export interface DoorkeeperApplication extends Output<typeof DoorkeeperApplicationSchema> {}
 export interface DoorkeeperApplicationInput extends Input<typeof DoorkeeperApplicationSchema> {}
 export const DoorkeeperApplication: Schema<DoorkeeperApplication, DoorkeeperApplicationInput> =
     DoorkeeperApplicationSchema;
 
-const DriverUpdateInfoSchema = object(
+const DriverUpdateInfoSchema = /* @__PURE__ */ object(
     {
-        commit: string(),
-        message: string(),
-        author: nullable(string()),
-        date: nullable(string()),
+        commit: /* @__PURE__ */ string(),
+        message: /* @__PURE__ */ string(),
+        author: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        date: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     },
     ['commit', 'message'],
 );
@@ -1201,63 +1235,69 @@ export interface DriverUpdateInfoInput extends Input<typeof DriverUpdateInfoSche
 export const DriverUpdateInfo: Schema<DriverUpdateInfo, DriverUpdateInfoInput> =
     DriverUpdateInfoSchema;
 
-const DriverSchema = object({
+const DriverSchema = /* @__PURE__ */ object({
     /** Unix time in seconds. */
-    created_at: nullable(integer()),
+    created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     /** Unix time in seconds. */
-    updated_at: nullable(integer()),
-    name: nullable(string()),
-    description: nullable(string()),
-    json_schema: nullable(json()),
-    default_uri: nullable(string()),
-    default_port: nullable(integer('Int32')),
+    updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    description: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    json_schema: /* @__PURE__ */ nullable(/* @__PURE__ */ json()),
+    default_uri: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    default_port: /* @__PURE__ */ nullable(/* @__PURE__ */ integer('Int32')),
     /** The number of the enum: 0 ssh, 1 device, 2 service, 3 websocket, 99 logic. */
-    role: nullable(literal([0, 1, 2, 3, 99])),
+    role: /* @__PURE__ */ nullable(/* @__PURE__ */ literal([0, 1, 2, 3, 99])),
     /** the default alert level for stagehand issues */
-    alert_level: nullable(AlertSeverity),
-    file_name: nullable(string()),
-    commit: nullable(string()),
-    compilation_output: nullable(string()),
-    module_name: nullable(string()),
-    ignore_connected: nullable(boolean()),
-    update_available: nullable(boolean()),
-    update_info: nullable(DriverUpdateInfo),
-    repository_id: nullable(string()),
-    compilation_status: nullable(record(boolean())),
-    id: nullable(string()),
+    alert_level: /* @__PURE__ */ nullable(AlertSeverity),
+    file_name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    commit: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    compilation_output: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    module_name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    ignore_connected: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    update_available: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    update_info: /* @__PURE__ */ nullable(DriverUpdateInfo),
+    repository_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    compilation_status: /* @__PURE__ */ nullable(/* @__PURE__ */ record(/* @__PURE__ */ boolean())),
+    id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
 });
 export interface Driver extends Output<typeof DriverSchema> {}
 export interface DriverInput extends Input<typeof DriverSchema> {}
 export const Driver: Schema<Driver, DriverInput> = DriverSchema;
 
-const DriverRoleSchema = literal(['ssh', 'device', 'service', 'websocket', 'logic']);
+const DriverRoleSchema = /* @__PURE__ */ literal([
+    'ssh',
+    'device',
+    'service',
+    'websocket',
+    'logic',
+]);
 export type DriverRole = Output<typeof DriverRoleSchema>;
 export type DriverRoleInput = Input<typeof DriverRoleSchema>;
 export const DriverRole: Schema<DriverRole, DriverRoleInput> = DriverRoleSchema;
 
-const EdgeSchema = object({
+const EdgeSchema = /* @__PURE__ */ object({
     /** Unix time in seconds. */
-    created_at: nullable(integer()),
+    created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     /** Unix time in seconds. */
-    updated_at: nullable(integer()),
-    name: nullable(string()),
-    description: nullable(string()),
-    api_key_id: nullable(string()),
-    user_id: nullable(string()),
+    updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    description: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    api_key_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    user_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     /** Unix time in seconds. */
-    last_seen: nullable(integer()),
-    online: nullable(boolean()),
-    id: nullable(string()),
+    last_seen: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    online: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
 });
 export interface Edge extends Output<typeof EdgeSchema> {}
 export interface EdgeInput extends Input<typeof EdgeSchema> {}
 export const Edge: Schema<Edge, EdgeInput> = EdgeSchema;
 
-const EdgeCreateBodySchema = object(
+const EdgeCreateBodySchema = /* @__PURE__ */ object(
     {
-        name: string(),
-        user_id: nullable(string()),
-        description: string(),
+        name: /* @__PURE__ */ string(),
+        user_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        description: /* @__PURE__ */ string(),
     },
     ['name', 'description'],
 );
@@ -1265,14 +1305,14 @@ export interface EdgeCreateBody extends Output<typeof EdgeCreateBodySchema> {}
 export interface EdgeCreateBodyInput extends Input<typeof EdgeCreateBodySchema> {}
 export const EdgeCreateBody: Schema<EdgeCreateBody, EdgeCreateBodyInput> = EdgeCreateBodySchema;
 
-const EdgeErrorSchema = object(
+const EdgeErrorSchema = /* @__PURE__ */ object(
     {
-        timestamp: integer(),
-        edge_id: string(),
-        error_type: string(),
-        message: string(),
-        context: record(string()),
-        severity: string(),
+        timestamp: /* @__PURE__ */ integer(),
+        edge_id: /* @__PURE__ */ string(),
+        error_type: /* @__PURE__ */ string(),
+        message: /* @__PURE__ */ string(),
+        context: /* @__PURE__ */ record(/* @__PURE__ */ string()),
+        severity: /* @__PURE__ */ string(),
     },
     ['timestamp', 'edge_id', 'error_type', 'message', 'context', 'severity'],
 );
@@ -1280,15 +1320,15 @@ export interface EdgeError extends Output<typeof EdgeErrorSchema> {}
 export interface EdgeErrorInput extends Input<typeof EdgeErrorSchema> {}
 export const EdgeError: Schema<EdgeError, EdgeErrorInput> = EdgeErrorSchema;
 
-const EdgeHealthSchema = object(
+const EdgeHealthSchema = /* @__PURE__ */ object(
     {
-        edge_id: string(),
-        connected: boolean(),
-        last_seen: integer(),
-        connection_uptime: integer(),
-        error_count_24h: integer('Int32'),
-        module_count: integer('Int32'),
-        failed_modules: array(string()),
+        edge_id: /* @__PURE__ */ string(),
+        connected: /* @__PURE__ */ boolean(),
+        last_seen: /* @__PURE__ */ integer(),
+        connection_uptime: /* @__PURE__ */ integer(),
+        error_count_24h: /* @__PURE__ */ integer('Int32'),
+        module_count: /* @__PURE__ */ integer('Int32'),
+        failed_modules: /* @__PURE__ */ array(/* @__PURE__ */ string()),
     },
     [
         'edge_id',
@@ -1304,19 +1344,19 @@ export interface EdgeHealth extends Output<typeof EdgeHealthSchema> {}
 export interface EdgeHealthInput extends Input<typeof EdgeHealthSchema> {}
 export const EdgeHealth: Schema<EdgeHealth, EdgeHealthInput> = EdgeHealthSchema;
 
-const EdgeKeyResponseSchema = object(
+const EdgeKeyResponseSchema = /* @__PURE__ */ object(
     {
         /** Unix time in seconds. */
-        created_at: integer(),
+        created_at: /* @__PURE__ */ integer(),
         /** Unix time in seconds. */
-        updated_at: integer(),
-        name: string(),
-        description: string(),
-        user_id: string(),
+        updated_at: /* @__PURE__ */ integer(),
+        name: /* @__PURE__ */ string(),
+        description: /* @__PURE__ */ string(),
+        user_id: /* @__PURE__ */ string(),
         /** Unix time in seconds. */
-        last_seen: nullable(integer()),
-        online: boolean(),
-        x_api_key: string(),
+        last_seen: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+        online: /* @__PURE__ */ boolean(),
+        x_api_key: /* @__PURE__ */ string(),
     },
     ['created_at', 'updated_at', 'name', 'description', 'user_id', 'online', 'x_api_key'],
 );
@@ -1324,13 +1364,15 @@ export interface EdgeKeyResponse extends Output<typeof EdgeKeyResponseSchema> {}
 export interface EdgeKeyResponseInput extends Input<typeof EdgeKeyResponseSchema> {}
 export const EdgeKeyResponse: Schema<EdgeKeyResponse, EdgeKeyResponseInput> = EdgeKeyResponseSchema;
 
-const EdgeModuleStatusSchema = object(
+const EdgeModuleStatusSchema = /* @__PURE__ */ object(
     {
-        edge_id: string(),
-        total_modules: integer('Int32'),
-        running_modules: integer('Int32'),
-        failed_modules: array(string()),
-        initialization_errors: array(record(json())),
+        edge_id: /* @__PURE__ */ string(),
+        total_modules: /* @__PURE__ */ integer('Int32'),
+        running_modules: /* @__PURE__ */ integer('Int32'),
+        failed_modules: /* @__PURE__ */ array(/* @__PURE__ */ string()),
+        initialization_errors: /* @__PURE__ */ array(
+            /* @__PURE__ */ record(/* @__PURE__ */ json()),
+        ),
     },
     ['edge_id', 'total_modules', 'running_modules', 'failed_modules', 'initialization_errors'],
 );
@@ -1339,15 +1381,15 @@ export interface EdgeModuleStatusInput extends Input<typeof EdgeModuleStatusSche
 export const EdgeModuleStatus: Schema<EdgeModuleStatus, EdgeModuleStatusInput> =
     EdgeModuleStatusSchema;
 
-const EdgeStatisticsSchema = object(
+const EdgeStatisticsSchema = /* @__PURE__ */ object(
     {
-        total_edges: integer('Int32'),
-        connected_edges: integer('Int32'),
-        edges_with_errors: integer('Int32'),
-        total_errors_24h: integer('Int32'),
-        total_modules: integer('Int32'),
-        failed_modules: integer('Int32'),
-        timestamp: string(),
+        total_edges: /* @__PURE__ */ integer('Int32'),
+        connected_edges: /* @__PURE__ */ integer('Int32'),
+        edges_with_errors: /* @__PURE__ */ integer('Int32'),
+        total_errors_24h: /* @__PURE__ */ integer('Int32'),
+        total_modules: /* @__PURE__ */ integer('Int32'),
+        failed_modules: /* @__PURE__ */ integer('Int32'),
+        timestamp: /* @__PURE__ */ string(),
     },
     [
         'total_edges',
@@ -1363,13 +1405,13 @@ export interface EdgeStatistics extends Output<typeof EdgeStatisticsSchema> {}
 export interface EdgeStatisticsInput extends Input<typeof EdgeStatisticsSchema> {}
 export const EdgeStatistics: Schema<EdgeStatistics, EdgeStatisticsInput> = EdgeStatisticsSchema;
 
-const GitRepositoryCommitSchema = object(
+const GitRepositoryCommitSchema = /* @__PURE__ */ object(
     {
-        hash: string(),
-        subject: string(),
-        author: nullable(string()),
-        date: nullable(string()),
-        commit: string(),
+        hash: /* @__PURE__ */ string(),
+        subject: /* @__PURE__ */ string(),
+        author: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        date: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        commit: /* @__PURE__ */ string(),
     },
     ['hash', 'subject', 'commit'],
 );
@@ -1378,66 +1420,72 @@ export interface GitRepositoryCommitInput extends Input<typeof GitRepositoryComm
 export const GitRepositoryCommit: Schema<GitRepositoryCommit, GitRepositoryCommitInput> =
     GitRepositoryCommitSchema;
 
-const GroupSchema = object({
-    created_at: nullable(string()),
-    updated_at: nullable(string()),
-    id: nullable(string()),
-    name: nullable(string()),
-    description: nullable(string()),
-    subsystems: nullable(array(string())),
-    default_permissions: nullable(integer('Int32')),
-    ad_group_mappings: nullable(record(tuple([string(), integer('Int32')]))),
-    features: nullable(record(record(json()))),
-    authority_id: nullable(string()),
-    parent_id: nullable(string()),
-    children_count: nullable(integer('Int32')),
+const GroupSchema = /* @__PURE__ */ object({
+    created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    description: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    subsystems: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
+    default_permissions: /* @__PURE__ */ nullable(/* @__PURE__ */ integer('Int32')),
+    ad_group_mappings: /* @__PURE__ */ nullable(
+        /* @__PURE__ */ record(
+            /* @__PURE__ */ tuple([/* @__PURE__ */ string(), /* @__PURE__ */ integer('Int32')]),
+        ),
+    ),
+    features: /* @__PURE__ */ nullable(
+        /* @__PURE__ */ record(/* @__PURE__ */ record(/* @__PURE__ */ json())),
+    ),
+    authority_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    parent_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    children_count: /* @__PURE__ */ nullable(/* @__PURE__ */ integer('Int32')),
 });
 export interface Group extends Output<typeof GroupSchema> {}
 export interface GroupInput extends Input<typeof GroupSchema> {}
 export const Group: Schema<Group, GroupInput> = GroupSchema;
 
-const GroupInvitationSchema = object({
-    created_at: nullable(string()),
-    updated_at: nullable(string()),
-    id: nullable(string()),
-    email: nullable(string()),
-    secret_digest: nullable(string()),
-    permissions: nullable(integer('Int32')),
-    expires_at: nullable(string()),
-    group_id: nullable(string()),
+const GroupInvitationSchema = /* @__PURE__ */ object({
+    created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    email: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    secret_digest: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    permissions: /* @__PURE__ */ nullable(/* @__PURE__ */ integer('Int32')),
+    expires_at: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    group_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
 });
 export interface GroupInvitation extends Output<typeof GroupInvitationSchema> {}
 export interface GroupInvitationInput extends Input<typeof GroupInvitationSchema> {}
 export const GroupInvitation: Schema<GroupInvitation, GroupInvitationInput> = GroupInvitationSchema;
 
-const UserPublicResponseSchema = object(
+const UserPublicResponseSchema = /* @__PURE__ */ object(
     {
         /** Unix time in seconds. */
-        created_at: integer(),
-        name: string(),
-        nickname: nullable(string()),
-        email: string(),
-        phone: nullable(string()),
-        country: nullable(string()),
-        image: nullable(string()),
-        staff_id: nullable(string()),
-        first_name: nullable(string()),
-        last_name: nullable(string()),
-        building: nullable(string()),
-        department: nullable(string()),
-        preferred_language: nullable(string()),
-        email_digest: nullable(string()),
-        deleted: boolean(),
-        groups: array(string()),
-        locatable: boolean(),
-        login_count: integer(),
+        created_at: /* @__PURE__ */ integer(),
+        name: /* @__PURE__ */ string(),
+        nickname: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        email: /* @__PURE__ */ string(),
+        phone: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        country: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        image: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        staff_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        first_name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        last_name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        building: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        department: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        preferred_language: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        email_digest: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        deleted: /* @__PURE__ */ boolean(),
+        groups: /* @__PURE__ */ array(/* @__PURE__ */ string()),
+        locatable: /* @__PURE__ */ boolean(),
+        login_count: /* @__PURE__ */ integer(),
         /** Unix time in seconds. */
-        last_login: nullable(integer()),
-        work_preferences: array(UserWorktimePreference),
-        work_overrides: record(UserWorktimePreference),
-        authority_id: nullable(string()),
-        photo_upload_id: nullable(string()),
-        id: nullable(string()),
+        last_login: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+        work_preferences: /* @__PURE__ */ array(UserWorktimePreference),
+        work_overrides: /* @__PURE__ */ record(UserWorktimePreference),
+        authority_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        photo_upload_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     },
     [
         'created_at',
@@ -1456,38 +1504,38 @@ export interface UserPublicResponseInput extends Input<typeof UserPublicResponse
 export const UserPublicResponse: Schema<UserPublicResponse, UserPublicResponseInput> =
     UserPublicResponseSchema;
 
-const GroupUserSchema = object({
-    created_at: nullable(string()),
-    updated_at: nullable(string()),
-    user_id: nullable(string()),
-    group_id: nullable(string()),
-    permissions: nullable(integer('Int32')),
-    auto_assigned: nullable(string()),
-    group: nullable(Group),
-    user: nullable(UserPublicResponse),
+const GroupUserSchema = /* @__PURE__ */ object({
+    created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    user_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    group_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    permissions: /* @__PURE__ */ nullable(/* @__PURE__ */ integer('Int32')),
+    auto_assigned: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    group: /* @__PURE__ */ nullable(Group),
+    user: /* @__PURE__ */ nullable(UserPublicResponse),
 });
 export interface GroupUser extends Output<typeof GroupUserSchema> {}
 export interface GroupUserInput extends Input<typeof GroupUserSchema> {}
 export const GroupUser: Schema<GroupUser, GroupUserInput> = GroupUserSchema;
 
-const GroupZoneSchema = object({
-    created_at: nullable(string()),
-    updated_at: nullable(string()),
-    group_id: nullable(string()),
-    zone_id: nullable(string()),
-    permissions: nullable(integer('Int32')),
-    deny: nullable(boolean()),
-    group: nullable(Group),
-    zone: nullable(Zone),
+const GroupZoneSchema = /* @__PURE__ */ object({
+    created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    group_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    zone_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    permissions: /* @__PURE__ */ nullable(/* @__PURE__ */ integer('Int32')),
+    deny: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    group: /* @__PURE__ */ nullable(Group),
+    zone: /* @__PURE__ */ nullable(Zone),
 });
 export interface GroupZone extends Output<typeof GroupZoneSchema> {}
 export interface GroupZoneInput extends Input<typeof GroupZoneSchema> {}
 export const GroupZone: Schema<GroupZone, GroupZoneInput> = GroupZoneSchema;
 
-const GroupsAdGroupSyncSchema = object(
+const GroupsAdGroupSyncSchema = /* @__PURE__ */ object(
     {
-        user_id: string(),
-        ad_groups: array(string()),
+        user_id: /* @__PURE__ */ string(),
+        ad_groups: /* @__PURE__ */ array(/* @__PURE__ */ string()),
     },
     ['user_id', 'ad_groups'],
 );
@@ -1496,10 +1544,10 @@ export interface GroupsAdGroupSyncInput extends Input<typeof GroupsAdGroupSyncSc
 export const GroupsAdGroupSync: Schema<GroupsAdGroupSync, GroupsAdGroupSyncInput> =
     GroupsAdGroupSyncSchema;
 
-const GroupsCurrentGroupSchema = object(
+const GroupsCurrentGroupSchema = /* @__PURE__ */ object(
     {
         group: Group,
-        permissions: integer('Int32'),
+        permissions: /* @__PURE__ */ integer('Int32'),
     },
     ['group', 'permissions'],
 );
@@ -1516,12 +1564,12 @@ export interface GroupsCurrentGroupInput extends Input<typeof GroupsCurrentGroup
 export const GroupsCurrentGroup: Schema<GroupsCurrentGroup, GroupsCurrentGroupInput> =
     GroupsCurrentGroupSchema;
 
-const GroupsInvitationsInvitationCreatePayloadSchema = object(
+const GroupsInvitationsInvitationCreatePayloadSchema = /* @__PURE__ */ object(
     {
-        group_id: string(),
-        email: string(),
-        permissions: integer('Int32'),
-        expires_at: nullable(string()),
+        group_id: /* @__PURE__ */ string(),
+        email: /* @__PURE__ */ string(),
+        permissions: /* @__PURE__ */ integer('Int32'),
+        expires_at: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     },
     ['group_id', 'email', 'permissions'],
 );
@@ -1544,10 +1592,10 @@ export const GroupsInvitationsInvitationCreatePayload: Schema<
     GroupsInvitationsInvitationCreatePayloadInput
 > = GroupsInvitationsInvitationCreatePayloadSchema;
 
-const GroupsInvitationsInvitationCreatedResponseSchema = object(
+const GroupsInvitationsInvitationCreatedResponseSchema = /* @__PURE__ */ object(
     {
         invitation: GroupInvitation,
-        plaintext_secret: string(),
+        plaintext_secret: /* @__PURE__ */ string(),
     },
     ['invitation', 'plaintext_secret'],
 );
@@ -1564,16 +1612,16 @@ export const GroupsInvitationsInvitationCreatedResponse: Schema<
     GroupsInvitationsInvitationCreatedResponseInput
 > = GroupsInvitationsInvitationCreatedResponseSchema;
 
-const GuestParticipantSchema = object(
+const GuestParticipantSchema = /* @__PURE__ */ object(
     {
-        captcha: string(),
-        name: string(),
-        email: nullable(string()),
-        phone: nullable(string()),
-        type: nullable(string()),
-        chat_to_user_id: nullable(string()),
-        user_id: string(),
-        session_id: string(),
+        captcha: /* @__PURE__ */ string(),
+        name: /* @__PURE__ */ string(),
+        email: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        phone: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        type: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        chat_to_user_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        user_id: /* @__PURE__ */ string(),
+        session_id: /* @__PURE__ */ string(),
     },
     ['captcha', 'name', 'user_id', 'session_id'],
 );
@@ -1582,36 +1630,36 @@ export interface GuestParticipantInput extends Input<typeof GuestParticipantSche
 export const GuestParticipant: Schema<GuestParticipant, GuestParticipantInput> =
     GuestParticipantSchema;
 
-const HistorySchema = object({
-    id: nullable(string()),
-    resource_type: nullable(string()),
-    resource_id: nullable(string()),
-    correlation_id: nullable(string()),
-    action: nullable(string()),
-    changed_fields: nullable(array(string())),
-    diff: nullable(json()),
-    snapshot: nullable(json()),
-    user_id: nullable(string()),
-    user_email: nullable(string()),
-    context: nullable(json()),
+const HistorySchema = /* @__PURE__ */ object({
+    id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    resource_type: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    resource_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    correlation_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    action: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    changed_fields: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
+    diff: /* @__PURE__ */ nullable(/* @__PURE__ */ json()),
+    snapshot: /* @__PURE__ */ nullable(/* @__PURE__ */ json()),
+    user_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    user_email: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    context: /* @__PURE__ */ nullable(/* @__PURE__ */ json()),
     /** Unix time in seconds. */
-    created_at: nullable(integer()),
+    created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
 });
 export interface History extends Output<typeof HistorySchema> {}
 export interface HistoryInput extends Input<typeof HistorySchema> {}
 export const History: Schema<History, HistoryInput> = HistorySchema;
 
-const ImageGenModelCapabilitiesSchema = object(
+const ImageGenModelCapabilitiesSchema = /* @__PURE__ */ object(
     {
-        id: string(),
-        name: string(),
-        generate: boolean(),
-        edit: boolean(),
-        enhance: boolean(),
-        max_references: integer('Int32'),
-        max_candidates: integer('Int32'),
-        qualities: array(string()),
-        aspect_ratios: array(string()),
+        id: /* @__PURE__ */ string(),
+        name: /* @__PURE__ */ string(),
+        generate: /* @__PURE__ */ boolean(),
+        edit: /* @__PURE__ */ boolean(),
+        enhance: /* @__PURE__ */ boolean(),
+        max_references: /* @__PURE__ */ integer('Int32'),
+        max_candidates: /* @__PURE__ */ integer('Int32'),
+        qualities: /* @__PURE__ */ array(/* @__PURE__ */ string()),
+        aspect_ratios: /* @__PURE__ */ array(/* @__PURE__ */ string()),
     },
     [
         'id',
@@ -1634,14 +1682,14 @@ export const ImageGenModelCapabilities: Schema<
     ImageGenModelCapabilitiesInput
 > = ImageGenModelCapabilitiesSchema;
 
-const ImageGenProviderCapabilitiesSchema = object(
+const ImageGenProviderCapabilitiesSchema = /* @__PURE__ */ object(
     {
-        id: string(),
-        name: string(),
-        provider: string(),
-        region: nullable(string()),
-        default_model: nullable(string()),
-        models: array(ImageGenModelCapabilities),
+        id: /* @__PURE__ */ string(),
+        name: /* @__PURE__ */ string(),
+        provider: /* @__PURE__ */ string(),
+        region: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        default_model: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        models: /* @__PURE__ */ array(ImageGenModelCapabilities),
     },
     ['id', 'name', 'provider', 'models'],
 );
@@ -1656,23 +1704,23 @@ export const ImageGenProviderCapabilities: Schema<
     ImageGenProviderCapabilitiesInput
 > = ImageGenProviderCapabilitiesSchema;
 
-const JsonSchemaSchema = object({
+const JsonSchemaSchema = /* @__PURE__ */ object({
     /** Unix time in seconds. */
-    created_at: nullable(integer()),
+    created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     /** Unix time in seconds. */
-    updated_at: nullable(integer()),
-    name: nullable(string()),
-    description: nullable(string()),
-    schema: nullable(json()),
-    id: nullable(string()),
+    updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    description: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    schema: /* @__PURE__ */ nullable(/* @__PURE__ */ json()),
+    id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
 });
 export interface JsonSchema extends Output<typeof JsonSchemaSchema> {}
 export interface JsonSchemaInput extends Input<typeof JsonSchemaSchema> {}
 export const JsonSchema: Schema<JsonSchema, JsonSchemaInput> = JsonSchemaSchema;
 
-const KickReasonSchema = object(
+const KickReasonSchema = /* @__PURE__ */ object(
     {
-        reason: string(),
+        reason: /* @__PURE__ */ string(),
     },
     ['reason'],
 );
@@ -1680,35 +1728,35 @@ export interface KickReason extends Output<typeof KickReasonSchema> {}
 export interface KickReasonInput extends Input<typeof KickReasonSchema> {}
 export const KickReason: Schema<KickReason, KickReasonInput> = KickReasonSchema;
 
-const LdapAuthenticationSchema = object({
+const LdapAuthenticationSchema = /* @__PURE__ */ object({
     /** Unix time in seconds. */
-    created_at: nullable(integer()),
+    created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     /** Unix time in seconds. */
-    updated_at: nullable(integer()),
-    name: nullable(string()),
-    port: nullable(integer('Int32')),
-    auth_method: nullable(string()),
-    uid: nullable(string()),
-    host: nullable(string()),
-    base: nullable(string()),
-    bind_dn: nullable(string()),
-    password: nullable(string()),
-    filter: nullable(string()),
-    authority_id: nullable(string()),
-    id: nullable(string()),
+    updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    port: /* @__PURE__ */ nullable(/* @__PURE__ */ integer('Int32')),
+    auth_method: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    uid: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    host: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    base: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    bind_dn: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    password: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    filter: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    authority_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
 });
 export interface LdapAuthentication extends Output<typeof LdapAuthenticationSchema> {}
 export interface LdapAuthenticationInput extends Input<typeof LdapAuthenticationSchema> {}
 export const LdapAuthentication: Schema<LdapAuthentication, LdapAuthenticationInput> =
     LdapAuthenticationSchema;
 
-const LlmProviderCapabilitiesSchema = object(
+const LlmProviderCapabilitiesSchema = /* @__PURE__ */ object(
     {
-        id: string(),
-        name: string(),
-        provider: string(),
-        text_model: string(),
-        text_models: array(string()),
+        id: /* @__PURE__ */ string(),
+        name: /* @__PURE__ */ string(),
+        provider: /* @__PURE__ */ string(),
+        text_model: /* @__PURE__ */ string(),
+        text_models: /* @__PURE__ */ array(/* @__PURE__ */ string()),
     },
     ['id', 'name', 'provider', 'text_model', 'text_models'],
 );
@@ -1719,21 +1767,21 @@ export const LlmProviderCapabilities: Schema<
     LlmProviderCapabilitiesInput
 > = LlmProviderCapabilitiesSchema;
 
-const MapAiCapabilitiesSchema = object(
+const MapAiCapabilitiesSchema = /* @__PURE__ */ object(
     {
-        enabled: boolean(),
-        reason: nullable(string()),
-        providers: array(LlmProviderCapabilities),
-        default_provider_id: nullable(string()),
-        quota: object({
-            user_remaining_today: nullable(integer('Int32')),
-            domain_remaining_month: nullable(integer('Int32')),
+        enabled: /* @__PURE__ */ boolean(),
+        reason: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        providers: /* @__PURE__ */ array(LlmProviderCapabilities),
+        default_provider_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        quota: /* @__PURE__ */ object({
+            user_remaining_today: /* @__PURE__ */ nullable(/* @__PURE__ */ integer('Int32')),
+            domain_remaining_month: /* @__PURE__ */ nullable(/* @__PURE__ */ integer('Int32')),
         }),
-        limits: object(
+        limits: /* @__PURE__ */ object(
             {
-                max_context_bytes: integer('Int32'),
-                max_ops: integer('Int32'),
-                max_instruction_chars: integer('Int32'),
+                max_context_bytes: /* @__PURE__ */ integer('Int32'),
+                max_ops: /* @__PURE__ */ integer('Int32'),
+                max_instruction_chars: /* @__PURE__ */ integer('Int32'),
             },
             ['max_context_bytes', 'max_ops', 'max_instruction_chars'],
         ),
@@ -1745,16 +1793,16 @@ export interface MapAiCapabilitiesInput extends Input<typeof MapAiCapabilitiesSc
 export const MapAiCapabilities: Schema<MapAiCapabilities, MapAiCapabilitiesInput> =
     MapAiCapabilitiesSchema;
 
-const MapAiEditParamsSchema = object(
+const MapAiEditParamsSchema = /* @__PURE__ */ object(
     {
-        zone_id: string(),
-        instruction: string(),
-        context: nullable(json()),
-        markup_upload_id: nullable(string()),
-        parent_job_id: nullable(string()),
-        provider_id: nullable(string()),
-        model: nullable(string()),
-        idempotency_key: nullable(string()),
+        zone_id: /* @__PURE__ */ string(),
+        instruction: /* @__PURE__ */ string(),
+        context: /* @__PURE__ */ nullable(/* @__PURE__ */ json()),
+        markup_upload_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        parent_job_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        provider_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        model: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        idempotency_key: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     },
     ['zone_id', 'instruction'],
 );
@@ -1762,32 +1810,32 @@ export interface MapAiEditParams extends Output<typeof MapAiEditParamsSchema> {}
 export interface MapAiEditParamsInput extends Input<typeof MapAiEditParamsSchema> {}
 export const MapAiEditParams: Schema<MapAiEditParams, MapAiEditParamsInput> = MapAiEditParamsSchema;
 
-const MapAiJobResponseSchema = object(
+const MapAiJobResponseSchema = /* @__PURE__ */ object(
     {
-        id: string(),
-        state: string(),
-        kind: string(),
-        zone_id: nullable(string()),
-        provider: nullable(string()),
-        model: nullable(string()),
-        parent_job_id: nullable(string()),
-        version: integer('Int32'),
-        instruction: nullable(string()),
-        markup_upload_id: nullable(string()),
-        schema_version: nullable(integer()),
-        summary: nullable(string()),
-        ops: array(json()),
-        server_issues: record(string()),
-        questions: array(json()),
-        usage: nullable(json()),
-        repair: nullable(json()),
-        resolution: nullable(json()),
-        error_kind: nullable(string()),
-        error_message: nullable(string()),
-        cost_units: nullable(number()),
-        latency_ms: nullable(integer()),
-        created_at: nullable(integer()),
-        finished_at: nullable(integer()),
+        id: /* @__PURE__ */ string(),
+        state: /* @__PURE__ */ string(),
+        kind: /* @__PURE__ */ string(),
+        zone_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        provider: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        model: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        parent_job_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        version: /* @__PURE__ */ integer('Int32'),
+        instruction: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        markup_upload_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        schema_version: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+        summary: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        ops: /* @__PURE__ */ array(/* @__PURE__ */ json()),
+        server_issues: /* @__PURE__ */ record(/* @__PURE__ */ string()),
+        questions: /* @__PURE__ */ array(/* @__PURE__ */ json()),
+        usage: /* @__PURE__ */ nullable(/* @__PURE__ */ json()),
+        repair: /* @__PURE__ */ nullable(/* @__PURE__ */ json()),
+        resolution: /* @__PURE__ */ nullable(/* @__PURE__ */ json()),
+        error_kind: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        error_message: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        cost_units: /* @__PURE__ */ nullable(/* @__PURE__ */ number()),
+        latency_ms: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+        created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+        finished_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     },
     ['id', 'state', 'kind', 'version', 'ops', 'server_issues', 'questions'],
 );
@@ -1804,13 +1852,13 @@ export interface MapAiJobResponseInput extends Input<typeof MapAiJobResponseSche
 export const MapAiJobResponse: Schema<MapAiJobResponse, MapAiJobResponseInput> =
     MapAiJobResponseSchema;
 
-const MapAiResolveParamsSchema = object(
+const MapAiResolveParamsSchema = /* @__PURE__ */ object(
     {
-        decision: string(),
-        accepted_op_ids: array(string()),
-        rejected_op_ids: array(string()),
-        reasons: nullable(json()),
-        saved_upload_id: nullable(string()),
+        decision: /* @__PURE__ */ string(),
+        accepted_op_ids: /* @__PURE__ */ array(/* @__PURE__ */ string()),
+        rejected_op_ids: /* @__PURE__ */ array(/* @__PURE__ */ string()),
+        reasons: /* @__PURE__ */ nullable(/* @__PURE__ */ json()),
+        saved_upload_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     },
     ['decision', 'accepted_op_ids', 'rejected_op_ids'],
 );
@@ -1819,17 +1867,17 @@ export interface MapAiResolveParamsInput extends Input<typeof MapAiResolveParams
 export const MapAiResolveParams: Schema<MapAiResolveParams, MapAiResolveParamsInput> =
     MapAiResolveParamsSchema;
 
-const MetadataInterfaceSchema = object(
+const MetadataInterfaceSchema = /* @__PURE__ */ object(
     {
-        name: string(),
-        description: string(),
-        details: json(),
-        parent_id: nullable(string()),
-        schema_id: nullable(string()),
-        editors: array(string()),
-        modified_by_id: nullable(string()),
-        updated_at: integer(),
-        created_at: integer(),
+        name: /* @__PURE__ */ string(),
+        description: /* @__PURE__ */ string(),
+        details: /* @__PURE__ */ json(),
+        parent_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        schema_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        editors: /* @__PURE__ */ array(/* @__PURE__ */ string()),
+        modified_by_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        updated_at: /* @__PURE__ */ integer(),
+        created_at: /* @__PURE__ */ integer(),
     },
     ['name', 'description', 'details', 'editors', 'updated_at', 'created_at'],
 );
@@ -1838,10 +1886,10 @@ export interface MetadataInterfaceInput extends Input<typeof MetadataInterfaceSc
 export const MetadataInterface: Schema<MetadataInterface, MetadataInterfaceInput> =
     MetadataInterfaceSchema;
 
-const MetadataChildrenSchema = object(
+const MetadataChildrenSchema = /* @__PURE__ */ object(
     {
         zone: Zone,
-        metadata: record(MetadataInterface),
+        metadata: /* @__PURE__ */ record(MetadataInterface),
     },
     ['zone', 'metadata'],
 );
@@ -1850,10 +1898,10 @@ export interface MetadataChildrenInput extends Input<typeof MetadataChildrenSche
 export const MetadataChildren: Schema<MetadataChildren, MetadataChildrenInput> =
     MetadataChildrenSchema;
 
-const MetadataRenameSchema = object(
+const MetadataRenameSchema = /* @__PURE__ */ object(
     {
-        current_name: string(),
-        new_name: string(),
+        current_name: /* @__PURE__ */ string(),
+        new_name: /* @__PURE__ */ string(),
     },
     ['current_name', 'new_name'],
 );
@@ -1861,7 +1909,7 @@ export interface MetadataRename extends Output<typeof MetadataRenameSchema> {}
 export interface MetadataRenameInput extends Input<typeof MetadataRenameSchema> {}
 export const MetadataRename: Schema<MetadataRename, MetadataRenameInput> = MetadataRenameSchema;
 
-const MicrosoftNotificationChangeNotificationChangeTypeSchema = literal([
+const MicrosoftNotificationChangeNotificationChangeTypeSchema = /* @__PURE__ */ literal([
     'created',
     'updated',
     'deleted',
@@ -1877,7 +1925,7 @@ export const MicrosoftNotificationChangeNotificationChangeType: Schema<
     MicrosoftNotificationChangeNotificationChangeTypeInput
 > = MicrosoftNotificationChangeNotificationChangeTypeSchema;
 
-const MicrosoftNotificationChangeNotificationLifecycleEventSchema = literal([
+const MicrosoftNotificationChangeNotificationLifecycleEventSchema = /* @__PURE__ */ literal([
     'missed',
     'subscription_removed',
     'reauthorization_required',
@@ -1894,12 +1942,12 @@ export const MicrosoftNotificationChangeNotificationLifecycleEvent: Schema<
     MicrosoftNotificationChangeNotificationLifecycleEventInput
 > = MicrosoftNotificationChangeNotificationLifecycleEventSchema;
 
-const MicrosoftNotificationEncryptedContentSchema = object({
-    data: nullable(string()),
-    dataKey: nullable(string()),
-    dataSignature: nullable(string()),
-    encryptionCertificateId: nullable(string()),
-    encryptionCertificateThumbprint: nullable(string()),
+const MicrosoftNotificationEncryptedContentSchema = /* @__PURE__ */ object({
+    data: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    dataKey: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    dataSignature: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    encryptionCertificateId: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    encryptionCertificateThumbprint: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
 });
 export interface MicrosoftNotificationEncryptedContent extends Output<
     typeof MicrosoftNotificationEncryptedContentSchema
@@ -1912,8 +1960,8 @@ export const MicrosoftNotificationEncryptedContent: Schema<
     MicrosoftNotificationEncryptedContentInput
 > = MicrosoftNotificationEncryptedContentSchema;
 
-const MicrosoftNotificationResourceDataSchema = object({
-    id: nullable(string()),
+const MicrosoftNotificationResourceDataSchema = /* @__PURE__ */ object({
+    id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
 });
 /** Only present for Outlook resources */
 export interface MicrosoftNotificationResourceData extends Output<
@@ -1928,18 +1976,20 @@ export const MicrosoftNotificationResourceData: Schema<
     MicrosoftNotificationResourceDataInput
 > = MicrosoftNotificationResourceDataSchema;
 
-const MicrosoftNotificationChangeNotificationSchema = object(
+const MicrosoftNotificationChangeNotificationSchema = /* @__PURE__ */ object(
     {
-        changeType: nullable(MicrosoftNotificationChangeNotificationChangeType),
-        clientState: nullable(string()),
-        encryptedContent: nullable(MicrosoftNotificationEncryptedContent),
-        id: nullable(string()),
-        lifecycleEvent: nullable(MicrosoftNotificationChangeNotificationLifecycleEvent),
-        resource: nullable(string()),
-        resourceData: nullable(MicrosoftNotificationResourceData),
-        subscriptionExpirationDateTime: string(),
-        subscriptionId: string(),
-        tenantId: string(),
+        changeType: /* @__PURE__ */ nullable(MicrosoftNotificationChangeNotificationChangeType),
+        clientState: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        encryptedContent: /* @__PURE__ */ nullable(MicrosoftNotificationEncryptedContent),
+        id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        lifecycleEvent: /* @__PURE__ */ nullable(
+            MicrosoftNotificationChangeNotificationLifecycleEvent,
+        ),
+        resource: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        resourceData: /* @__PURE__ */ nullable(MicrosoftNotificationResourceData),
+        subscriptionExpirationDateTime: /* @__PURE__ */ string(),
+        subscriptionId: /* @__PURE__ */ string(),
+        tenantId: /* @__PURE__ */ string(),
     },
     ['subscriptionExpirationDateTime', 'subscriptionId', 'tenantId'],
 );
@@ -1954,10 +2004,10 @@ export const MicrosoftNotificationChangeNotification: Schema<
     MicrosoftNotificationChangeNotificationInput
 > = MicrosoftNotificationChangeNotificationSchema;
 
-const MicrosoftNotificationSchema = object(
+const MicrosoftNotificationSchema = /* @__PURE__ */ object(
     {
-        validationTokens: nullable(array(string())),
-        value: array(MicrosoftNotificationChangeNotification),
+        validationTokens: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
+        value: /* @__PURE__ */ array(MicrosoftNotificationChangeNotification),
     },
     ['value'],
 );
@@ -1966,12 +2016,12 @@ export interface MicrosoftNotificationInput extends Input<typeof MicrosoftNotifi
 export const MicrosoftNotification: Schema<MicrosoftNotification, MicrosoftNotificationInput> =
     MicrosoftNotificationSchema;
 
-const ModulesPingResultSchema = object(
+const ModulesPingResultSchema = /* @__PURE__ */ object(
     {
-        host: string(),
-        pingable: nullable(boolean()),
-        warning: nullable(string()),
-        exception: nullable(string()),
+        host: /* @__PURE__ */ string(),
+        pingable: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+        warning: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        exception: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     },
     ['host'],
 );
@@ -1980,7 +2030,14 @@ export interface ModulesPingResultInput extends Input<typeof ModulesPingResultSc
 export const ModulesPingResult: Schema<ModulesPingResult, ModulesPingResultInput> =
     ModulesPingResultSchema;
 
-const MqttMqttAclSchema = literal(['read', 'write', 'subscribe', 'deny', 'none', 'all']);
+const MqttMqttAclSchema = /* @__PURE__ */ literal([
+    'read',
+    'write',
+    'subscribe',
+    'deny',
+    'none',
+    'all',
+]);
 /**
  * Mosquitto MQTT broker accepts a flag enum for its ACL. Source:
  * https://github.com/iegomez/mosquitto-go-auth/blob/master/backends/constants/constants.go
@@ -1993,69 +2050,82 @@ export type MqttMqttAclInput = Input<typeof MqttMqttAclSchema>;
  */
 export const MqttMqttAcl: Schema<MqttMqttAcl, MqttMqttAclInput> = MqttMqttAclSchema;
 
-const OauthAuthenticationSchema = object({
+const OauthAuthenticationSchema = /* @__PURE__ */ object({
     /** Unix time in seconds. */
-    created_at: nullable(integer()),
+    created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     /** Unix time in seconds. */
-    updated_at: nullable(integer()),
-    name: nullable(string()),
-    client_id: nullable(string()),
-    client_secret: nullable(string()),
-    info_mappings: nullable(record(string())),
-    authorize_params: nullable(record(string())),
-    ensure_matching: nullable(record(array(string()))),
-    site: nullable(string()),
-    authorize_url: nullable(string()),
-    token_method: nullable(string()),
-    auth_scheme: nullable(string()),
-    token_url: nullable(string()),
-    scope: nullable(string()),
-    raw_info_url: nullable(string()),
-    authority_id: nullable(string()),
-    id: nullable(string()),
+    updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    client_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    client_secret: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    info_mappings: /* @__PURE__ */ nullable(/* @__PURE__ */ record(/* @__PURE__ */ string())),
+    authorize_params: /* @__PURE__ */ nullable(/* @__PURE__ */ record(/* @__PURE__ */ string())),
+    ensure_matching: /* @__PURE__ */ nullable(
+        /* @__PURE__ */ record(/* @__PURE__ */ array(/* @__PURE__ */ string())),
+    ),
+    site: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    authorize_url: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    token_method: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    auth_scheme: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    token_url: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    scope: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    raw_info_url: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    authority_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
 });
 export interface OauthAuthentication extends Output<typeof OauthAuthenticationSchema> {}
 export interface OauthAuthenticationInput extends Input<typeof OauthAuthenticationSchema> {}
 export const OauthAuthentication: Schema<OauthAuthentication, OauthAuthenticationInput> =
     OauthAuthenticationSchema;
 
-const PendingMailSchema = object({
-    created_at: nullable(string()),
-    updated_at: nullable(string()),
-    id: nullable(string()),
-    send_at: nullable(string()),
-    expiry: nullable(string()),
-    send_to: nullable(array(string())),
-    template: nullable(array(string())),
-    args: nullable(record(nullable(union([boolean(), number(), integer(), string()])))),
-    resource_attachments: nullable(array(string())),
-    attachments: nullable(array(string())),
-    cc: nullable(array(string())),
-    bcc: nullable(array(string())),
-    send_from: nullable(string()),
-    reply_to: nullable(string()),
-    zones: nullable(array(string())),
-    sent_at: nullable(string()),
-    sent_by: nullable(string()),
-    rejected_at: nullable(string()),
-    rejected_reason: nullable(string()),
-    source_service: nullable(string()),
-    source_reference: nullable(string()),
-    authority_id: nullable(string()),
-    user_id: nullable(string()),
+const PendingMailSchema = /* @__PURE__ */ object({
+    created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    send_at: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    expiry: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    send_to: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
+    template: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
+    args: /* @__PURE__ */ nullable(
+        /* @__PURE__ */ record(
+            /* @__PURE__ */ nullable(
+                /* @__PURE__ */ union([
+                    /* @__PURE__ */ boolean(),
+                    /* @__PURE__ */ number(),
+                    /* @__PURE__ */ integer(),
+                    /* @__PURE__ */ string(),
+                ]),
+            ),
+        ),
+    ),
+    resource_attachments: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
+    attachments: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
+    cc: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
+    bcc: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
+    send_from: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    reply_to: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    zones: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
+    sent_at: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    sent_by: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    rejected_at: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    rejected_reason: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    source_service: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    source_reference: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    authority_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    user_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
 });
 export interface PendingMail extends Output<typeof PendingMailSchema> {}
 export interface PendingMailInput extends Input<typeof PendingMailSchema> {}
 export const PendingMail: Schema<PendingMail, PendingMailInput> = PendingMailSchema;
 
-const PgOrmBaseSchema = json();
+const PgOrmBaseSchema = /* @__PURE__ */ json();
 export type PgOrmBase = Output<typeof PgOrmBaseSchema>;
 export type PgOrmBaseInput = Input<typeof PgOrmBaseSchema>;
 export const PgOrmBase: Schema<PgOrmBase, PgOrmBaseInput> = PgOrmBaseSchema;
 
-const PlaylistApprovalMessageSchema = object(
+const PlaylistApprovalMessageSchema = /* @__PURE__ */ object(
     {
-        message: string(),
+        message: /* @__PURE__ */ string(),
     },
     ['message'],
 );
@@ -2068,10 +2138,10 @@ export const PlaylistApprovalMessage: Schema<
     PlaylistApprovalMessageInput
 > = PlaylistApprovalMessageSchema;
 
-const PlaylistApproverSchema = object(
+const PlaylistApproverSchema = /* @__PURE__ */ object(
     {
-        id: string(),
-        name: string(),
+        id: /* @__PURE__ */ string(),
+        name: /* @__PURE__ */ string(),
     },
     ['id', 'name'],
 );
@@ -2080,49 +2150,49 @@ export interface PlaylistApproverInput extends Input<typeof PlaylistApproverSche
 export const PlaylistApprover: Schema<PlaylistApprover, PlaylistApproverInput> =
     PlaylistApproverSchema;
 
-const PlaylistItemScheduleSchema = object({
+const PlaylistItemScheduleSchema = /* @__PURE__ */ object({
     /** Unix time in seconds. */
-    created_at: nullable(integer()),
+    created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     /** Unix time in seconds. */
-    updated_at: nullable(integer()),
-    playlist_id: nullable(string()),
-    item_id: nullable(string()),
-    schedules: nullable(array(PlaylistSchedule)),
-    id: nullable(string()),
+    updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    playlist_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    item_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    schedules: /* @__PURE__ */ nullable(/* @__PURE__ */ array(PlaylistSchedule)),
+    id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
 });
 export interface PlaylistItemSchedule extends Output<typeof PlaylistItemScheduleSchema> {}
 export interface PlaylistItemScheduleInput extends Input<typeof PlaylistItemScheduleSchema> {}
 export const PlaylistItemSchedule: Schema<PlaylistItemSchedule, PlaylistItemScheduleInput> =
     PlaylistItemScheduleSchema;
 
-const PlaylistRevisionSchema = object({
+const PlaylistRevisionSchema = /* @__PURE__ */ object({
     /** Unix time in seconds. */
-    created_at: nullable(integer()),
+    created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     /** Unix time in seconds. */
-    updated_at: nullable(integer()),
-    user_id: nullable(string()),
-    user_email: nullable(string()),
-    user_name: nullable(string()),
-    approval_requested: nullable(boolean()),
-    requested_by_id: nullable(string()),
-    approved: nullable(boolean()),
-    approved_by_id: nullable(string()),
-    approved_by_name: nullable(string()),
-    approved_by_email: nullable(string()),
-    items: nullable(array(string())),
-    playlist_id: nullable(string()),
-    id: nullable(string()),
+    updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    user_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    user_email: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    user_name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    approval_requested: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    requested_by_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    approved: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    approved_by_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    approved_by_name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    approved_by_email: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    items: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
+    playlist_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
 });
 export interface PlaylistRevision extends Output<typeof PlaylistRevisionSchema> {}
 export interface PlaylistRevisionInput extends Input<typeof PlaylistRevisionSchema> {}
 export const PlaylistRevision: Schema<PlaylistRevision, PlaylistRevisionInput> =
     PlaylistRevisionSchema;
 
-const PublicEventsRegistrationRequestSchema = object(
+const PublicEventsRegistrationRequestSchema = /* @__PURE__ */ object(
     {
-        event_id: string(),
-        name: string(),
-        email: string(),
+        event_id: /* @__PURE__ */ string(),
+        name: /* @__PURE__ */ string(),
+        email: /* @__PURE__ */ string(),
     },
     ['event_id', 'name', 'email'],
 );
@@ -2137,11 +2207,11 @@ export const PublicEventsRegistrationRequest: Schema<
     PublicEventsRegistrationRequestInput
 > = PublicEventsRegistrationRequestSchema;
 
-const PublicEventsTokenRequestSchema = object(
+const PublicEventsTokenRequestSchema = /* @__PURE__ */ object(
     {
-        captcha: string(),
-        name: string(),
-        email: string(),
+        captcha: /* @__PURE__ */ string(),
+        name: /* @__PURE__ */ string(),
+        email: /* @__PURE__ */ string(),
     },
     ['captcha', 'name', 'email'],
 );
@@ -2154,40 +2224,40 @@ export const PublicEventsTokenRequest: Schema<
     PublicEventsTokenRequestInput
 > = PublicEventsTokenRequestSchema;
 
-const RepositoryTypeSchema = literal(['driver', 'interface']);
+const RepositoryTypeSchema = /* @__PURE__ */ literal(['driver', 'interface']);
 export type RepositoryType = Output<typeof RepositoryTypeSchema>;
 export type RepositoryTypeInput = Input<typeof RepositoryTypeSchema>;
 export const RepositoryType: Schema<RepositoryType, RepositoryTypeInput> = RepositoryTypeSchema;
 
-const RepositorySchema = object({
+const RepositorySchema = /* @__PURE__ */ object({
     /** Unix time in seconds. */
-    created_at: nullable(integer()),
+    created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     /** Unix time in seconds. */
-    updated_at: nullable(integer()),
-    name: nullable(string()),
-    description: nullable(string()),
-    folder_name: nullable(string()),
-    uri: nullable(string()),
-    commit_hash: nullable(string()),
-    branch: nullable(string()),
-    deployed_commit_hash: nullable(string()),
-    release: nullable(boolean()),
-    username: nullable(string()),
-    password: nullable(string()),
-    repo_type: nullable(RepositoryType),
-    root_path: nullable(string()),
-    has_runtime_error: nullable(boolean()),
-    error_message: nullable(string()),
-    id: nullable(string()),
+    updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    description: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    folder_name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    uri: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    commit_hash: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    branch: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    deployed_commit_hash: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    release: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    username: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    password: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    repo_type: /* @__PURE__ */ nullable(RepositoryType),
+    root_path: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    has_runtime_error: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    error_message: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
 });
 export interface Repository extends Output<typeof RepositorySchema> {}
 export interface RepositoryInput extends Input<typeof RepositorySchema> {}
 export const Repository: Schema<Repository, RepositoryInput> = RepositorySchema;
 
-const RootPlatformInfoSchema = object(
+const RootPlatformInfoSchema = /* @__PURE__ */ object(
     {
-        version: string(),
-        changelog: string(),
+        version: /* @__PURE__ */ string(),
+        changelog: /* @__PURE__ */ string(),
     },
     ['version', 'changelog'],
 );
@@ -2196,15 +2266,15 @@ export interface RootPlatformInfoInput extends Input<typeof RootPlatformInfoSche
 export const RootPlatformInfo: Schema<RootPlatformInfo, RootPlatformInfoInput> =
     RootPlatformInfoSchema;
 
-const RootSourceResyncStatusSchema = object(
+const RootSourceResyncStatusSchema = /* @__PURE__ */ object(
     {
-        state: string(),
-        clear: boolean(),
-        started_at: nullable(string()),
-        finished_at: nullable(string()),
-        cleared: integer(),
-        metadata: integer('Int32'),
-        error: nullable(string()),
+        state: /* @__PURE__ */ string(),
+        clear: /* @__PURE__ */ boolean(),
+        started_at: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        finished_at: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        cleared: /* @__PURE__ */ integer(),
+        metadata: /* @__PURE__ */ integer('Int32'),
+        error: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     },
     ['state', 'clear', 'cleared', 'metadata'],
 );
@@ -2215,117 +2285,126 @@ export interface RootSourceResyncStatusInput extends Input<typeof RootSourceResy
 export const RootSourceResyncStatus: Schema<RootSourceResyncStatus, RootSourceResyncStatusInput> =
     RootSourceResyncStatusSchema;
 
-const SamlAuthenticationSchema = object({
+const SamlAuthenticationSchema = /* @__PURE__ */ object({
     /** Unix time in seconds. */
-    created_at: nullable(integer()),
+    created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     /** Unix time in seconds. */
-    updated_at: nullable(integer()),
-    name: nullable(string()),
-    issuer: nullable(string()),
-    idp_sso_target_url_runtime_params: nullable(record(string())),
-    name_identifier_format: nullable(string()),
-    uid_attribute: nullable(string()),
-    assertion_consumer_service_url: nullable(string()),
-    idp_sso_target_url: nullable(string()),
-    idp_cert: nullable(string()),
-    idp_cert_fingerprint: nullable(string()),
-    attribute_service_name: nullable(string()),
-    attribute_statements: nullable(record(array(string()))),
-    request_attributes: nullable(
-        array(
-            object(
+    updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    issuer: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    idp_sso_target_url_runtime_params: /* @__PURE__ */ nullable(
+        /* @__PURE__ */ record(/* @__PURE__ */ string()),
+    ),
+    name_identifier_format: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    uid_attribute: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    assertion_consumer_service_url: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    idp_sso_target_url: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    idp_cert: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    idp_cert_fingerprint: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    attribute_service_name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    attribute_statements: /* @__PURE__ */ nullable(
+        /* @__PURE__ */ record(/* @__PURE__ */ array(/* @__PURE__ */ string())),
+    ),
+    request_attributes: /* @__PURE__ */ nullable(
+        /* @__PURE__ */ array(
+            /* @__PURE__ */ object(
                 {
-                    name: string(),
-                    name_format: string(),
-                    friendly_name: string(),
+                    name: /* @__PURE__ */ string(),
+                    name_format: /* @__PURE__ */ string(),
+                    friendly_name: /* @__PURE__ */ string(),
                 },
                 ['name', 'name_format', 'friendly_name'],
             ),
         ),
     ),
-    idp_slo_target_url: nullable(string()),
-    slo_default_relay_state: nullable(string()),
-    authority_id: nullable(string()),
-    id: nullable(string()),
+    idp_slo_target_url: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    slo_default_relay_state: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    authority_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
 });
 export interface SamlAuthentication extends Output<typeof SamlAuthenticationSchema> {}
 export interface SamlAuthenticationInput extends Input<typeof SamlAuthenticationSchema> {}
 export const SamlAuthentication: Schema<SamlAuthentication, SamlAuthenticationInput> =
     SamlAuthenticationSchema;
 
-const ScreenshotFormatSchema = literal(['png', 'jpeg', 'webp']);
+const ScreenshotFormatSchema = /* @__PURE__ */ literal(['png', 'jpeg', 'webp']);
 export type ScreenshotFormat = Output<typeof ScreenshotFormatSchema>;
 export type ScreenshotFormatInput = Input<typeof ScreenshotFormatSchema>;
 export const ScreenshotFormat: Schema<ScreenshotFormat, ScreenshotFormatInput> =
     ScreenshotFormatSchema;
 
-const SettingsParentTypeSchema = literal(['control_system', 'driver', 'module', 'zone']);
+const SettingsParentTypeSchema = /* @__PURE__ */ literal([
+    'control_system',
+    'driver',
+    'module',
+    'zone',
+]);
 export type SettingsParentType = Output<typeof SettingsParentTypeSchema>;
 export type SettingsParentTypeInput = Input<typeof SettingsParentTypeSchema>;
 export const SettingsParentType: Schema<SettingsParentType, SettingsParentTypeInput> =
     SettingsParentTypeSchema;
 
-const SettingsSchema = object({
+const SettingsSchema = /* @__PURE__ */ object({
     /** Unix time in seconds. */
-    created_at: nullable(integer()),
+    created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     /** Unix time in seconds. */
-    updated_at: nullable(integer()),
-    modified_by_id: nullable(string()),
-    settings_id: nullable(string()),
+    updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    modified_by_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    settings_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     /** The number of the enum: 0 none, 1 support, 2 admin, 3 never_display. */
-    encryption_level: nullable(literal([0, 1, 2, 3])),
-    settings_string: nullable(string()),
-    keys: nullable(array(string())),
-    parent_type: nullable(SettingsParentType),
-    parent_id: nullable(string()),
-    id: nullable(string()),
+    encryption_level: /* @__PURE__ */ nullable(/* @__PURE__ */ literal([0, 1, 2, 3])),
+    settings_string: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    keys: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
+    parent_type: /* @__PURE__ */ nullable(SettingsParentType),
+    parent_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
 });
 export interface Settings extends Output<typeof SettingsSchema> {}
 export interface SettingsInput extends Input<typeof SettingsSchema> {}
 export const Settings: Schema<Settings, SettingsInput> = SettingsSchema;
 
-const ShortUrlFormatSchema = literal(['svg', 'png']);
+const ShortUrlFormatSchema = /* @__PURE__ */ literal(['svg', 'png']);
 export type ShortUrlFormat = Output<typeof ShortUrlFormatSchema>;
 export type ShortUrlFormatInput = Input<typeof ShortUrlFormatSchema>;
 export const ShortUrlFormat: Schema<ShortUrlFormat, ShortUrlFormatInput> = ShortUrlFormatSchema;
 
-const ShortenerSchema = object({
+const ShortenerSchema = /* @__PURE__ */ object({
     /** Unix time in seconds. */
-    created_at: nullable(integer()),
+    created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     /** Unix time in seconds. */
-    updated_at: nullable(integer()),
-    name: nullable(string()),
-    uri: nullable(string()),
-    description: nullable(string()),
-    user_id: nullable(string()),
-    user_email: nullable(string()),
-    user_name: nullable(string()),
-    redirect_count: nullable(integer()),
-    enabled: nullable(boolean()),
+    updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    uri: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    description: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    user_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    user_email: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    user_name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    redirect_count: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    enabled: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
     /** Unix time in seconds. */
-    valid_from: nullable(integer()),
+    valid_from: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     /** Unix time in seconds. */
-    valid_until: nullable(integer()),
-    authority_id: nullable(string()),
-    id: nullable(string()),
+    valid_until: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    authority_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
 });
 export interface Shortener extends Output<typeof ShortenerSchema> {}
 export interface ShortenerInput extends Input<typeof ShortenerSchema> {}
 export const Shortener: Schema<Shortener, ShortenerInput> = ShortenerSchema;
 
-const SignageAiCapabilitiesSchema = object(
+const SignageAiCapabilitiesSchema = /* @__PURE__ */ object(
     {
-        enabled: boolean(),
-        reason: nullable(string()),
-        providers: array(ImageGenProviderCapabilities),
-        default_provider_id: nullable(string()),
-        aspect_ratios: array(string()),
-        qualities: array(string()),
-        max_candidates: integer('Int32'),
-        logo_layer: boolean(),
-        quota: object({
-            user_remaining_today: nullable(integer('Int32')),
-            domain_remaining_month: nullable(integer('Int32')),
+        enabled: /* @__PURE__ */ boolean(),
+        reason: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        providers: /* @__PURE__ */ array(ImageGenProviderCapabilities),
+        default_provider_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        aspect_ratios: /* @__PURE__ */ array(/* @__PURE__ */ string()),
+        qualities: /* @__PURE__ */ array(/* @__PURE__ */ string()),
+        max_candidates: /* @__PURE__ */ integer('Int32'),
+        logo_layer: /* @__PURE__ */ boolean(),
+        quota: /* @__PURE__ */ object({
+            user_remaining_today: /* @__PURE__ */ nullable(/* @__PURE__ */ integer('Int32')),
+            domain_remaining_month: /* @__PURE__ */ nullable(/* @__PURE__ */ integer('Int32')),
         }),
     },
     ['enabled', 'providers', 'aspect_ratios', 'qualities', 'max_candidates', 'logo_layer', 'quota'],
@@ -2335,10 +2414,10 @@ export interface SignageAiCapabilitiesInput extends Input<typeof SignageAiCapabi
 export const SignageAiCapabilities: Schema<SignageAiCapabilities, SignageAiCapabilitiesInput> =
     SignageAiCapabilitiesSchema;
 
-const SignageAiClaimParamsSchema = object(
+const SignageAiClaimParamsSchema = /* @__PURE__ */ object(
     {
-        upload_id: string(),
-        item_id: string(),
+        upload_id: /* @__PURE__ */ string(),
+        item_id: /* @__PURE__ */ string(),
     },
     ['upload_id', 'item_id'],
 );
@@ -2347,24 +2426,24 @@ export interface SignageAiClaimParamsInput extends Input<typeof SignageAiClaimPa
 export const SignageAiClaimParams: Schema<SignageAiClaimParams, SignageAiClaimParamsInput> =
     SignageAiClaimParamsSchema;
 
-const SignageAiEditParamsSchema = object(
+const SignageAiEditParamsSchema = /* @__PURE__ */ object(
     {
-        prompt: string(),
-        aspect_ratio: string(),
-        quality: string(),
-        candidates: integer('Int32'),
-        references: array(string()),
-        include_logo: boolean(),
-        add_text_with_layer: boolean(),
-        use_branding: boolean(),
-        words: nullable(string()),
-        provider_id: nullable(string()),
-        model: nullable(string()),
-        group_id: nullable(string()),
-        idempotency_key: nullable(string()),
-        source_upload_id: string(),
-        source_item_id: nullable(string()),
-        parent_job_id: nullable(string()),
+        prompt: /* @__PURE__ */ string(),
+        aspect_ratio: /* @__PURE__ */ string(),
+        quality: /* @__PURE__ */ string(),
+        candidates: /* @__PURE__ */ integer('Int32'),
+        references: /* @__PURE__ */ array(/* @__PURE__ */ string()),
+        include_logo: /* @__PURE__ */ boolean(),
+        add_text_with_layer: /* @__PURE__ */ boolean(),
+        use_branding: /* @__PURE__ */ boolean(),
+        words: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        provider_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        model: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        group_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        idempotency_key: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        source_upload_id: /* @__PURE__ */ string(),
+        source_item_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        parent_job_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     },
     [
         'prompt',
@@ -2383,21 +2462,21 @@ export interface SignageAiEditParamsInput extends Input<typeof SignageAiEditPara
 export const SignageAiEditParams: Schema<SignageAiEditParams, SignageAiEditParamsInput> =
     SignageAiEditParamsSchema;
 
-const SignageAiGenerateParamsSchema = object(
+const SignageAiGenerateParamsSchema = /* @__PURE__ */ object(
     {
-        prompt: string(),
-        aspect_ratio: string(),
-        quality: string(),
-        candidates: integer('Int32'),
-        references: array(string()),
-        include_logo: boolean(),
-        add_text_with_layer: boolean(),
-        use_branding: boolean(),
-        words: nullable(string()),
-        provider_id: nullable(string()),
-        model: nullable(string()),
-        group_id: nullable(string()),
-        idempotency_key: nullable(string()),
+        prompt: /* @__PURE__ */ string(),
+        aspect_ratio: /* @__PURE__ */ string(),
+        quality: /* @__PURE__ */ string(),
+        candidates: /* @__PURE__ */ integer('Int32'),
+        references: /* @__PURE__ */ array(/* @__PURE__ */ string()),
+        include_logo: /* @__PURE__ */ boolean(),
+        add_text_with_layer: /* @__PURE__ */ boolean(),
+        use_branding: /* @__PURE__ */ boolean(),
+        words: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        provider_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        model: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        group_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        idempotency_key: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     },
     [
         'prompt',
@@ -2417,25 +2496,25 @@ export const SignageAiGenerateParams: Schema<
     SignageAiGenerateParamsInput
 > = SignageAiGenerateParamsSchema;
 
-const SignageAiJobResponseSchema = object(
+const SignageAiJobResponseSchema = /* @__PURE__ */ object(
     {
-        id: string(),
-        state: string(),
-        kind: string(),
-        provider: nullable(string()),
-        model: nullable(string()),
-        candidates: integer('Int32'),
-        images_produced: integer('Int32'),
-        parent_job_id: nullable(string()),
-        version: integer('Int32'),
-        prompt: nullable(string()),
-        images: array(json()),
-        error_kind: nullable(string()),
-        error_message: nullable(string()),
-        cost_units: nullable(number()),
-        latency_ms: nullable(integer()),
-        created_at: nullable(integer()),
-        finished_at: nullable(integer()),
+        id: /* @__PURE__ */ string(),
+        state: /* @__PURE__ */ string(),
+        kind: /* @__PURE__ */ string(),
+        provider: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        model: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        candidates: /* @__PURE__ */ integer('Int32'),
+        images_produced: /* @__PURE__ */ integer('Int32'),
+        parent_job_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        version: /* @__PURE__ */ integer('Int32'),
+        prompt: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        images: /* @__PURE__ */ array(/* @__PURE__ */ json()),
+        error_kind: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        error_message: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        cost_units: /* @__PURE__ */ nullable(/* @__PURE__ */ number()),
+        latency_ms: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+        created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+        finished_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     },
     ['id', 'state', 'kind', 'candidates', 'images_produced', 'version', 'images'],
 );
@@ -2444,15 +2523,15 @@ export interface SignageAiJobResponseInput extends Input<typeof SignageAiJobResp
 export const SignageAiJobResponse: Schema<SignageAiJobResponse, SignageAiJobResponseInput> =
     SignageAiJobResponseSchema;
 
-const SignageAiJobUsageRowSchema = object(
+const SignageAiJobUsageRowSchema = /* @__PURE__ */ object(
     {
-        kind: string(),
-        provider: string(),
-        model: string(),
-        jobs: integer(),
-        candidates: integer(),
-        images_produced: integer(),
-        cost_units: number(),
+        kind: /* @__PURE__ */ string(),
+        provider: /* @__PURE__ */ string(),
+        model: /* @__PURE__ */ string(),
+        jobs: /* @__PURE__ */ integer(),
+        candidates: /* @__PURE__ */ integer(),
+        images_produced: /* @__PURE__ */ integer(),
+        cost_units: /* @__PURE__ */ number(),
     },
     ['kind', 'provider', 'model', 'jobs', 'candidates', 'images_produced', 'cost_units'],
 );
@@ -2461,19 +2540,19 @@ export interface SignageAiJobUsageRowInput extends Input<typeof SignageAiJobUsag
 export const SignageAiJobUsageRow: Schema<SignageAiJobUsageRow, SignageAiJobUsageRowInput> =
     SignageAiJobUsageRowSchema;
 
-const SignageAiProvidersProviderParamsSchema = object({
-    name: nullable(string()),
-    provider: nullable(string()),
-    authority_id: nullable(string()),
-    credentials: nullable(json()),
-    endpoint: nullable(string()),
-    location: nullable(string()),
-    default_model: nullable(string()),
-    text_model: nullable(string()),
-    allowed_models: nullable(array(string())),
-    enabled: nullable(boolean()),
-    is_default: nullable(boolean()),
-    quotas: nullable(json()),
+const SignageAiProvidersProviderParamsSchema = /* @__PURE__ */ object({
+    name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    provider: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    authority_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    credentials: /* @__PURE__ */ nullable(/* @__PURE__ */ json()),
+    endpoint: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    location: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    default_model: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    text_model: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    allowed_models: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
+    enabled: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    is_default: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    quotas: /* @__PURE__ */ nullable(/* @__PURE__ */ json()),
 });
 /**
  * What a client may send. `credentials` is a JSON object whose shape depends on the provider; it is
@@ -2494,13 +2573,13 @@ export const SignageAiProvidersProviderParams: Schema<
     SignageAiProvidersProviderParamsInput
 > = SignageAiProvidersProviderParamsSchema;
 
-const SignageAiProvidersTestResultSchema = object(
+const SignageAiProvidersTestResultSchema = /* @__PURE__ */ object(
     {
-        ok: boolean(),
-        latency_ms: integer(),
-        model: nullable(string()),
-        error: nullable(string()),
-        kind: nullable(string()),
+        ok: /* @__PURE__ */ boolean(),
+        latency_ms: /* @__PURE__ */ integer(),
+        model: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        error: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        kind: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     },
     ['ok', 'latency_ms'],
 );
@@ -2515,11 +2594,11 @@ export const SignageAiProvidersTestResult: Schema<
     SignageAiProvidersTestResultInput
 > = SignageAiProvidersTestResultSchema;
 
-const SignageMetricsSchema = object(
+const SignageMetricsSchema = /* @__PURE__ */ object(
     {
-        play_through_counts: record(integer('Int32')),
-        playlist_counts: record(integer('Int32')),
-        media_counts: record(integer('Int32')),
+        play_through_counts: /* @__PURE__ */ record(/* @__PURE__ */ integer('Int32')),
+        playlist_counts: /* @__PURE__ */ record(/* @__PURE__ */ integer('Int32')),
+        media_counts: /* @__PURE__ */ record(/* @__PURE__ */ integer('Int32')),
     },
     ['play_through_counts', 'playlist_counts', 'media_counts'],
 );
@@ -2527,14 +2606,14 @@ export interface SignageMetrics extends Output<typeof SignageMetricsSchema> {}
 export interface SignageMetricsInput extends Input<typeof SignageMetricsSchema> {}
 export const SignageMetrics: Schema<SignageMetrics, SignageMetricsInput> = SignageMetricsSchema;
 
-const SignageSamsungEinkManifestContentSchema = object(
+const SignageSamsungEinkManifestContentSchema = /* @__PURE__ */ object(
     {
-        image_url: string(),
-        file_id: string(),
-        file_path: string(),
-        duration: integer(),
-        file_size: string(),
-        file_name: string(),
+        image_url: /* @__PURE__ */ string(),
+        file_id: /* @__PURE__ */ string(),
+        file_path: /* @__PURE__ */ string(),
+        duration: /* @__PURE__ */ integer(),
+        file_size: /* @__PURE__ */ string(),
+        file_name: /* @__PURE__ */ string(),
     },
     ['image_url', 'file_id', 'file_path', 'duration', 'file_size', 'file_name'],
 );
@@ -2549,12 +2628,12 @@ export const SignageSamsungEinkManifestContent: Schema<
     SignageSamsungEinkManifestContentInput
 > = SignageSamsungEinkManifestContentSchema;
 
-const SignageSamsungEinkManifestScheduleSchema = object(
+const SignageSamsungEinkManifestScheduleSchema = /* @__PURE__ */ object(
     {
-        start_date: string(),
-        stop_date: string(),
-        start_time: string(),
-        contents: array(SignageSamsungEinkManifestContent),
+        start_date: /* @__PURE__ */ string(),
+        stop_date: /* @__PURE__ */ string(),
+        start_time: /* @__PURE__ */ string(),
+        contents: /* @__PURE__ */ array(SignageSamsungEinkManifestContent),
     },
     ['start_date', 'stop_date', 'start_time', 'contents'],
 );
@@ -2569,16 +2648,16 @@ export const SignageSamsungEinkManifestSchedule: Schema<
     SignageSamsungEinkManifestScheduleInput
 > = SignageSamsungEinkManifestScheduleSchema;
 
-const SignageSamsungEinkManifestSchema = object(
+const SignageSamsungEinkManifestSchema = /* @__PURE__ */ object(
     {
-        schedule: array(SignageSamsungEinkManifestSchedule),
-        name: string(),
-        version: integer('Int32'),
-        create_time: string(),
-        id: string(),
-        program_id: string(),
-        content_type: string(),
-        deploy_type: string(),
+        schedule: /* @__PURE__ */ array(SignageSamsungEinkManifestSchedule),
+        name: /* @__PURE__ */ string(),
+        version: /* @__PURE__ */ integer('Int32'),
+        create_time: /* @__PURE__ */ string(),
+        id: /* @__PURE__ */ string(),
+        program_id: /* @__PURE__ */ string(),
+        content_type: /* @__PURE__ */ string(),
+        deploy_type: /* @__PURE__ */ string(),
     },
     [
         'schedule',
@@ -2604,7 +2683,13 @@ export const SignageSamsungEinkManifest: Schema<
     SignageSamsungEinkManifestInput
 > = SignageSamsungEinkManifestSchema;
 
-const SignageTemplateLayoutPositionSchema = literal(['top', 'bottom', 'left', 'right', 'floating']);
+const SignageTemplateLayoutPositionSchema = /* @__PURE__ */ literal([
+    'top',
+    'bottom',
+    'left',
+    'right',
+    'floating',
+]);
 export type SignageTemplateLayoutPosition = Output<typeof SignageTemplateLayoutPositionSchema>;
 export type SignageTemplateLayoutPositionInput = Input<typeof SignageTemplateLayoutPositionSchema>;
 export const SignageTemplateLayoutPosition: Schema<
@@ -2612,13 +2697,13 @@ export const SignageTemplateLayoutPosition: Schema<
     SignageTemplateLayoutPositionInput
 > = SignageTemplateLayoutPositionSchema;
 
-const SignageTemplateLayoutSchema = object(
+const SignageTemplateLayoutSchema = /* @__PURE__ */ object(
     {
-        plugin_id: nullable(string()),
+        plugin_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         position: SignageTemplateLayoutPosition,
-        x_pos: nullable(number()),
-        y_pos: nullable(number()),
-        plugin_params: record(json()),
+        x_pos: /* @__PURE__ */ nullable(/* @__PURE__ */ number()),
+        y_pos: /* @__PURE__ */ nullable(/* @__PURE__ */ number()),
+        plugin_params: /* @__PURE__ */ record(/* @__PURE__ */ json()),
     },
     ['position', 'plugin_params'],
 );
@@ -2627,33 +2712,33 @@ export interface SignageTemplateLayoutInput extends Input<typeof SignageTemplate
 export const SignageTemplateLayout: Schema<SignageTemplateLayout, SignageTemplateLayoutInput> =
     SignageTemplateLayoutSchema;
 
-const SignageTemplateSchema = object({
-    created_at: nullable(string()),
-    updated_at: nullable(string()),
-    id: nullable(string()),
-    name: nullable(string()),
-    description: nullable(string()),
-    tags: nullable(array(string())),
-    authority_id: nullable(string()),
-    background_item_id: nullable(string()),
-    layouts: nullable(array(SignageTemplateLayout)),
-    full_screen_takeover: nullable(boolean()),
-    merge: nullable(boolean()),
-    approval_requested: nullable(boolean()),
-    requested_by_id: nullable(string()),
-    approved: nullable(boolean()),
-    approved_by_id: nullable(string()),
-    approved_by_name: nullable(string()),
-    approved_by_email: nullable(string()),
-    live_template_id: nullable(string()),
+const SignageTemplateSchema = /* @__PURE__ */ object({
+    created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    description: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    tags: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
+    authority_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    background_item_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    layouts: /* @__PURE__ */ nullable(/* @__PURE__ */ array(SignageTemplateLayout)),
+    full_screen_takeover: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    merge: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    approval_requested: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    requested_by_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    approved: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    approved_by_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    approved_by_name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    approved_by_email: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    live_template_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
 });
 export interface SignageTemplate extends Output<typeof SignageTemplateSchema> {}
 export interface SignageTemplateInput extends Input<typeof SignageTemplateSchema> {}
 export const SignageTemplate: Schema<SignageTemplate, SignageTemplateInput> = SignageTemplateSchema;
 
-const SignageTemplatesApprovalMessageSchema = object(
+const SignageTemplatesApprovalMessageSchema = /* @__PURE__ */ object(
     {
-        message: string(),
+        message: /* @__PURE__ */ string(),
     },
     ['message'],
 );
@@ -2670,10 +2755,10 @@ export const SignageTemplatesApprovalMessage: Schema<
     SignageTemplatesApprovalMessageInput
 > = SignageTemplatesApprovalMessageSchema;
 
-const SignageTemplatesApproverSchema = object(
+const SignageTemplatesApproverSchema = /* @__PURE__ */ object(
     {
-        id: string(),
-        name: string(),
+        id: /* @__PURE__ */ string(),
+        name: /* @__PURE__ */ string(),
     },
     ['id', 'name'],
 );
@@ -2686,42 +2771,42 @@ export const SignageTemplatesApprover: Schema<
     SignageTemplatesApproverInput
 > = SignageTemplatesApproverSchema;
 
-const StateSchema = literal(['pending', 'running', 'cancelled', 'error', 'done']);
+const StateSchema = /* @__PURE__ */ literal(['pending', 'running', 'cancelled', 'error', 'done']);
 export type State = Output<typeof StateSchema>;
 export type StateInput = Input<typeof StateSchema>;
 export const State: Schema<State, StateInput> = StateSchema;
 
-const StorageTypeSchema = literal(['s3', 'azure', 'google']);
+const StorageTypeSchema = /* @__PURE__ */ literal(['s3', 'azure', 'google']);
 export type StorageType = Output<typeof StorageTypeSchema>;
 export type StorageTypeInput = Input<typeof StorageTypeSchema>;
 export const StorageType: Schema<StorageType, StorageTypeInput> = StorageTypeSchema;
 
-const StorageSchema = object({
+const StorageSchema = /* @__PURE__ */ object({
     /** Unix time in seconds. */
-    created_at: nullable(integer()),
+    created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     /** Unix time in seconds. */
-    updated_at: nullable(integer()),
-    storage_type: nullable(StorageType),
-    bucket_name: nullable(string()),
-    region: nullable(string()),
-    access_key: nullable(string()),
-    access_secret: nullable(string()),
-    authority_id: nullable(string()),
-    endpoint: nullable(string()),
-    is_default: nullable(boolean()),
-    ext_filter: nullable(array(string())),
-    mime_filter: nullable(array(string())),
-    id: nullable(string()),
+    updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    storage_type: /* @__PURE__ */ nullable(StorageType),
+    bucket_name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    region: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    access_key: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    access_secret: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    authority_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    endpoint: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    is_default: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    ext_filter: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
+    mime_filter: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
+    id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
 });
 export interface Storage extends Output<typeof StorageSchema> {}
 export interface StorageInput extends Input<typeof StorageSchema> {}
 export const Storage: Schema<Storage, StorageInput> = StorageSchema;
 
-const SystemTriggersUpdateParamsSchema = object({
-    enabled: nullable(boolean()),
-    important: nullable(boolean()),
-    exec_enabled: nullable(boolean()),
-    playlists: nullable(array(string())),
+const SystemTriggersUpdateParamsSchema = /* @__PURE__ */ object({
+    enabled: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    important: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    exec_enabled: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    playlists: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
 });
 export interface SystemTriggersUpdateParams extends Output<
     typeof SystemTriggersUpdateParamsSchema
@@ -2734,11 +2819,11 @@ export const SystemTriggersUpdateParams: Schema<
     SystemTriggersUpdateParamsInput
 > = SystemTriggersUpdateParamsSchema;
 
-const SystemsFunctionDetailsSchema = object(
+const SystemsFunctionDetailsSchema = /* @__PURE__ */ object(
     {
-        arity: integer('Int32'),
-        params: record(json()),
-        order: array(string()),
+        arity: /* @__PURE__ */ integer('Int32'),
+        params: /* @__PURE__ */ record(/* @__PURE__ */ json()),
+        order: /* @__PURE__ */ array(/* @__PURE__ */ string()),
     },
     ['arity', 'params', 'order'],
 );
@@ -2747,46 +2832,46 @@ export interface SystemsFunctionDetailsInput extends Input<typeof SystemsFunctio
 export const SystemsFunctionDetails: Schema<SystemsFunctionDetails, SystemsFunctionDetailsInput> =
     SystemsFunctionDetailsSchema;
 
-const UploadPermissionsSchema = literal(['none', 'admin', 'support']);
+const UploadPermissionsSchema = /* @__PURE__ */ literal(['none', 'admin', 'support']);
 export type UploadPermissions = Output<typeof UploadPermissionsSchema>;
 export type UploadPermissionsInput = Input<typeof UploadPermissionsSchema>;
 export const UploadPermissions: Schema<UploadPermissions, UploadPermissionsInput> =
     UploadPermissionsSchema;
 
-const UploadSchema = object({
+const UploadSchema = /* @__PURE__ */ object({
     /** Unix time in seconds. */
-    created_at: nullable(integer()),
+    created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     /** Unix time in seconds. */
-    updated_at: nullable(integer()),
-    uploaded_email: nullable(string()),
-    file_name: nullable(string()),
-    file_size: nullable(integer()),
-    file_path: nullable(string()),
-    object_key: nullable(string()),
-    file_md5: nullable(string()),
-    cache_etag: nullable(string()),
-    cache_modified: nullable(string()),
-    public: nullable(boolean()),
-    permissions: nullable(UploadPermissions),
-    object_options: nullable(record(json())),
-    resumable_id: nullable(string()),
-    resumable: nullable(boolean()),
-    part_list: nullable(array(integer('Int32'))),
-    part_data: nullable(record(json())),
-    upload_complete: nullable(boolean()),
-    tags: nullable(array(string())),
-    storage_id: nullable(string()),
-    uploaded_by: nullable(string()),
-    id: nullable(string()),
+    updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    uploaded_email: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    file_name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    file_size: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    file_path: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    object_key: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    file_md5: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    cache_etag: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    cache_modified: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    public: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    permissions: /* @__PURE__ */ nullable(UploadPermissions),
+    object_options: /* @__PURE__ */ nullable(/* @__PURE__ */ record(/* @__PURE__ */ json())),
+    resumable_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    resumable: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    part_list: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ integer('Int32'))),
+    part_data: /* @__PURE__ */ nullable(/* @__PURE__ */ record(/* @__PURE__ */ json())),
+    upload_complete: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    tags: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
+    storage_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    uploaded_by: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
 });
 export interface Upload extends Output<typeof UploadSchema> {}
 export interface UploadInput extends Input<typeof UploadSchema> {}
 export const Upload: Schema<Upload, UploadInput> = UploadSchema;
 
-const UploadsPartInfoSchema = object(
+const UploadsPartInfoSchema = /* @__PURE__ */ object(
     {
-        md5: string(),
-        part: integer('Int32'),
+        md5: /* @__PURE__ */ string(),
+        part: /* @__PURE__ */ integer('Int32'),
     },
     ['md5', 'part'],
 );
@@ -2794,18 +2879,18 @@ export interface UploadsPartInfo extends Output<typeof UploadsPartInfoSchema> {}
 export interface UploadsPartInfoInput extends Input<typeof UploadsPartInfoSchema> {}
 export const UploadsPartInfo: Schema<UploadsPartInfo, UploadsPartInfoInput> = UploadsPartInfoSchema;
 
-const UploadsScreenshotInfoSchema = object(
+const UploadsScreenshotInfoSchema = /* @__PURE__ */ object(
     {
-        url: string(),
-        width: integer('Int32'),
-        height: integer('Int32'),
-        scale: number(),
+        url: /* @__PURE__ */ string(),
+        width: /* @__PURE__ */ integer('Int32'),
+        height: /* @__PURE__ */ integer('Int32'),
+        scale: /* @__PURE__ */ number(),
         format: ScreenshotFormat,
-        full_page: boolean(),
-        settle: integer('Int32'),
-        file_name: nullable(string()),
-        public: boolean(),
-        tags: array(string()),
+        full_page: /* @__PURE__ */ boolean(),
+        settle: /* @__PURE__ */ integer('Int32'),
+        file_name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        public: /* @__PURE__ */ boolean(),
+        tags: /* @__PURE__ */ array(/* @__PURE__ */ string()),
     },
     ['url', 'width', 'height', 'scale', 'format', 'full_page', 'settle', 'public', 'tags'],
 );
@@ -2814,29 +2899,29 @@ export interface UploadsScreenshotInfoInput extends Input<typeof UploadsScreensh
 export const UploadsScreenshotInfo: Schema<UploadsScreenshotInfo, UploadsScreenshotInfoInput> =
     UploadsScreenshotInfoSchema;
 
-const UploadsUpdateInfoSchema = object({
-    resumable_id: nullable(string()),
-    part_data: nullable(array(UploadsPartInfo)),
-    part_list: nullable(array(integer('Int32'))),
+const UploadsUpdateInfoSchema = /* @__PURE__ */ object({
+    resumable_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    part_data: /* @__PURE__ */ nullable(/* @__PURE__ */ array(UploadsPartInfo)),
+    part_list: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ integer('Int32'))),
 });
 export interface UploadsUpdateInfo extends Output<typeof UploadsUpdateInfoSchema> {}
 export interface UploadsUpdateInfoInput extends Input<typeof UploadsUpdateInfoSchema> {}
 export const UploadsUpdateInfo: Schema<UploadsUpdateInfo, UploadsUpdateInfoInput> =
     UploadsUpdateInfoSchema;
 
-const UploadsUploadInfoSchema = object(
+const UploadsUploadInfoSchema = /* @__PURE__ */ object(
     {
-        file_name: string(),
-        file_size: union([integer(), string()]),
-        file_id: string(),
-        file_mime: nullable(string()),
-        file_path: nullable(string()),
+        file_name: /* @__PURE__ */ string(),
+        file_size: /* @__PURE__ */ union([/* @__PURE__ */ integer(), /* @__PURE__ */ string()]),
+        file_id: /* @__PURE__ */ string(),
+        file_mime: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        file_path: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         permissions: UploadPermissions,
-        public: boolean(),
-        expires: integer('Int32'),
-        tags: array(string()),
-        cache_etag: nullable(string()),
-        cache_modified: nullable(string()),
+        public: /* @__PURE__ */ boolean(),
+        expires: /* @__PURE__ */ integer('Int32'),
+        tags: /* @__PURE__ */ array(/* @__PURE__ */ string()),
+        cache_etag: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        cache_modified: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     },
     ['file_name', 'file_size', 'file_id', 'permissions', 'public', 'expires', 'tags'],
 );
@@ -2845,41 +2930,41 @@ export interface UploadsUploadInfoInput extends Input<typeof UploadsUploadInfoSc
 export const UploadsUploadInfo: Schema<UploadsUploadInfo, UploadsUploadInfoInput> =
     UploadsUploadInfoSchema;
 
-const UserAdminMetadataResponseSchema = object(
+const UserAdminMetadataResponseSchema = /* @__PURE__ */ object(
     {
         /** Unix time in seconds. */
-        created_at: integer(),
-        name: string(),
-        nickname: nullable(string()),
-        email: string(),
-        phone: nullable(string()),
-        country: nullable(string()),
-        image: nullable(string()),
-        ui_theme: nullable(string()),
-        misc: nullable(string()),
-        login_name: nullable(string()),
-        staff_id: nullable(string()),
-        first_name: nullable(string()),
-        last_name: nullable(string()),
-        building: nullable(string()),
-        department: nullable(string()),
-        preferred_language: nullable(string()),
-        email_digest: nullable(string()),
-        card_number: nullable(string()),
-        deleted: boolean(),
-        groups: array(string()),
-        sys_admin: boolean(),
-        support: boolean(),
-        locatable: boolean(),
-        login_count: integer(),
+        created_at: /* @__PURE__ */ integer(),
+        name: /* @__PURE__ */ string(),
+        nickname: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        email: /* @__PURE__ */ string(),
+        phone: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        country: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        image: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        ui_theme: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        misc: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        login_name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        staff_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        first_name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        last_name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        building: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        department: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        preferred_language: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        email_digest: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        card_number: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        deleted: /* @__PURE__ */ boolean(),
+        groups: /* @__PURE__ */ array(/* @__PURE__ */ string()),
+        sys_admin: /* @__PURE__ */ boolean(),
+        support: /* @__PURE__ */ boolean(),
+        locatable: /* @__PURE__ */ boolean(),
+        login_count: /* @__PURE__ */ integer(),
         /** Unix time in seconds. */
-        last_login: nullable(integer()),
-        work_preferences: array(UserWorktimePreference),
-        work_overrides: record(UserWorktimePreference),
-        authority_id: nullable(string()),
-        photo_upload_id: nullable(string()),
-        id: nullable(string()),
-        subsystem_access: array(string()),
+        last_login: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+        work_preferences: /* @__PURE__ */ array(UserWorktimePreference),
+        work_overrides: /* @__PURE__ */ record(UserWorktimePreference),
+        authority_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        photo_upload_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        subsystem_access: /* @__PURE__ */ array(/* @__PURE__ */ string()),
     },
     [
         'created_at',
@@ -2905,10 +2990,10 @@ export const UserAdminMetadataResponse: Schema<
     UserAdminMetadataResponseInput
 > = UserAdminMetadataResponseSchema;
 
-const UserGroupResponseSchema = object(
+const UserGroupResponseSchema = /* @__PURE__ */ object(
     {
-        groups: array(string()),
-        id: nullable(string()),
+        groups: /* @__PURE__ */ array(/* @__PURE__ */ string()),
+        id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     },
     ['groups'],
 );
@@ -2917,12 +3002,12 @@ export interface UserGroupResponseInput extends Input<typeof UserGroupResponseSc
 export const UserGroupResponse: Schema<UserGroupResponse, UserGroupResponseInput> =
     UserGroupResponseSchema;
 
-const UserJwtMetadataSchema = object(
+const UserJwtMetadataSchema = /* @__PURE__ */ object(
     {
-        n: string(),
-        e: string(),
-        p: literal([0, 1, 2, 3]),
-        r: array(string()),
+        n: /* @__PURE__ */ string(),
+        e: /* @__PURE__ */ string(),
+        p: /* @__PURE__ */ literal([0, 1, 2, 3]),
+        r: /* @__PURE__ */ array(/* @__PURE__ */ string()),
     },
     ['n', 'e', 'p', 'r'],
 );
@@ -2930,14 +3015,14 @@ export interface UserJwtMetadata extends Output<typeof UserJwtMetadataSchema> {}
 export interface UserJwtMetadataInput extends Input<typeof UserJwtMetadataSchema> {}
 export const UserJwtMetadata: Schema<UserJwtMetadata, UserJwtMetadataInput> = UserJwtMetadataSchema;
 
-const UserJwtSchema = object(
+const UserJwtSchema = /* @__PURE__ */ object(
     {
-        iss: string(),
-        iat: integer(),
-        exp: integer(),
-        aud: string(),
-        sub: string(),
-        scope: array(json()),
+        iss: /* @__PURE__ */ string(),
+        iat: /* @__PURE__ */ integer(),
+        exp: /* @__PURE__ */ integer(),
+        aud: /* @__PURE__ */ string(),
+        sub: /* @__PURE__ */ string(),
+        scope: /* @__PURE__ */ array(/* @__PURE__ */ json()),
         u: UserJwtMetadata,
     },
     ['iss', 'iat', 'exp', 'aud', 'sub', 'scope', 'u'],
@@ -2946,34 +3031,34 @@ export interface UserJwt extends Output<typeof UserJwtSchema> {}
 export interface UserJwtInput extends Input<typeof UserJwtSchema> {}
 export const UserJwt: Schema<UserJwt, UserJwtInput> = UserJwtSchema;
 
-const UserPublicMetadataResponseSchema = object(
+const UserPublicMetadataResponseSchema = /* @__PURE__ */ object(
     {
         /** Unix time in seconds. */
-        created_at: integer(),
-        name: string(),
-        nickname: nullable(string()),
-        email: string(),
-        phone: nullable(string()),
-        country: nullable(string()),
-        image: nullable(string()),
-        staff_id: nullable(string()),
-        first_name: nullable(string()),
-        last_name: nullable(string()),
-        building: nullable(string()),
-        department: nullable(string()),
-        preferred_language: nullable(string()),
-        email_digest: nullable(string()),
-        deleted: boolean(),
-        groups: array(string()),
-        locatable: boolean(),
-        login_count: integer(),
+        created_at: /* @__PURE__ */ integer(),
+        name: /* @__PURE__ */ string(),
+        nickname: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        email: /* @__PURE__ */ string(),
+        phone: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        country: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        image: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        staff_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        first_name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        last_name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        building: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        department: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        preferred_language: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        email_digest: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        deleted: /* @__PURE__ */ boolean(),
+        groups: /* @__PURE__ */ array(/* @__PURE__ */ string()),
+        locatable: /* @__PURE__ */ boolean(),
+        login_count: /* @__PURE__ */ integer(),
         /** Unix time in seconds. */
-        last_login: nullable(integer()),
-        work_preferences: array(UserWorktimePreference),
-        work_overrides: record(UserWorktimePreference),
-        authority_id: nullable(string()),
-        photo_upload_id: nullable(string()),
-        id: nullable(string()),
+        last_login: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+        work_preferences: /* @__PURE__ */ array(UserWorktimePreference),
+        work_overrides: /* @__PURE__ */ record(UserWorktimePreference),
+        authority_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        photo_upload_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     },
     [
         'created_at',
@@ -2998,10 +3083,10 @@ export const UserPublicMetadataResponse: Schema<
     UserPublicMetadataResponseInput
 > = UserPublicMetadataResponseSchema;
 
-const UserResourceTokenSchema = object(
+const UserResourceTokenSchema = /* @__PURE__ */ object(
     {
-        token: string(),
-        expires: nullable(integer()),
+        token: /* @__PURE__ */ string(),
+        expires: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     },
     ['token'],
 );
@@ -3010,13 +3095,13 @@ export interface UserResourceTokenInput extends Input<typeof UserResourceTokenSc
 export const UserResourceToken: Schema<UserResourceToken, UserResourceTokenInput> =
     UserResourceTokenSchema;
 
-const VersionSchema = object(
+const VersionSchema = /* @__PURE__ */ object(
     {
-        service: string(),
-        commit: string(),
-        version: string(),
-        build_time: string(),
-        platform_version: string(),
+        service: /* @__PURE__ */ string(),
+        commit: /* @__PURE__ */ string(),
+        version: /* @__PURE__ */ string(),
+        build_time: /* @__PURE__ */ string(),
+        platform_version: /* @__PURE__ */ string(),
     },
     ['service', 'commit', 'version', 'build_time', 'platform_version'],
 );
@@ -3024,10 +3109,10 @@ export interface Version extends Output<typeof VersionSchema> {}
 export interface VersionInput extends Input<typeof VersionSchema> {}
 export const Version: Schema<Version, VersionInput> = VersionSchema;
 
-const WebRtcRoomDetailsSchema = object(
+const WebRtcRoomDetailsSchema = /* @__PURE__ */ object(
     {
         system: ControlSystem,
-        metadata: record(MetadataInterface),
+        metadata: /* @__PURE__ */ record(MetadataInterface),
     },
     ['system', 'metadata'],
 );
@@ -3036,11 +3121,11 @@ export interface WebRtcRoomDetailsInput extends Input<typeof WebRtcRoomDetailsSc
 export const WebRtcRoomDetails: Schema<WebRtcRoomDetails, WebRtcRoomDetailsInput> =
     WebRtcRoomDetailsSchema;
 
-const ZonesZoneExecResponseSchema = object(
+const ZonesZoneExecResponseSchema = /* @__PURE__ */ object(
     {
-        success: array(string()),
-        failure: array(string()),
-        module_missing: array(string()),
+        success: /* @__PURE__ */ array(/* @__PURE__ */ string()),
+        failure: /* @__PURE__ */ array(/* @__PURE__ */ string()),
+        module_missing: /* @__PURE__ */ array(/* @__PURE__ */ string()),
     },
     ['success', 'failure', 'module_missing'],
 );

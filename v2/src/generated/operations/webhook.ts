@@ -26,14 +26,14 @@ export function show(
     return call(SHOW, input, options);
 }
 
-const SHOW = operation({
+const SHOW = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/webhook/{id}',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
-            secret: string(),
+            id: /* @__PURE__ */ string(),
+            secret: /* @__PURE__ */ string(),
         },
         ['id', 'secret'],
     ),

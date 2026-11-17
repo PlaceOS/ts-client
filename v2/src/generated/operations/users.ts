@@ -44,13 +44,13 @@ export function create(
     return call(CREATE, input, options);
 }
 
-const CREATE = operation({
+const CREATE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/users',
     pathKeys: [],
-    params: parameters({}),
-    body: json(),
-    response: union([
+    params: /* @__PURE__ */ parameters({}),
+    body: /* @__PURE__ */ json(),
+    response: /* @__PURE__ */ union([
         UserAdminMetadataResponse,
         UserAdminResponse,
         UserPublicMetadataResponse,
@@ -70,11 +70,11 @@ export function current(
     return call(CURRENT, input, options);
 }
 
-const CURRENT = operation({
+const CURRENT = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/users/current',
     pathKeys: [],
-    params: parameters({}),
+    params: /* @__PURE__ */ parameters({}),
     body: null,
     response: UserAdminMetadataResponse,
 });
@@ -93,14 +93,14 @@ export function deleteResourceToken(
     return call(DELETE_RESOURCE_TOKEN, input, options);
 }
 
-const DELETE_RESOURCE_TOKEN = operation({
+const DELETE_RESOURCE_TOKEN = /* @__PURE__ */ operation({
     method: 'DELETE',
     path: '/api/engine/v2/users/{id}/resource_token',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
             /** the id of the user */
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
@@ -120,15 +120,15 @@ export function destroy(
     return call(DESTROY, input, options);
 }
 
-const DESTROY = operation({
+const DESTROY = /* @__PURE__ */ operation({
     method: 'DELETE',
     path: '/api/engine/v2/users/{id}',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
             /** the id of the user */
-            id: string(),
-            force_removal: boolean(),
+            id: /* @__PURE__ */ string(),
+            force_removal: /* @__PURE__ */ boolean(),
         },
         ['id'],
     ),
@@ -148,19 +148,19 @@ export function groups(
     return call(GROUPS, input, options);
 }
 
-const GROUPS = operation({
+const GROUPS = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/users/groups',
     pathKeys: [],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
             /** the user emails whos group membership we are interested */
-            emails: array(string()),
+            emails: /* @__PURE__ */ array(/* @__PURE__ */ string()),
         },
         ['emails'],
     ),
     body: null,
-    response: array(UserGroupResponse),
+    response: /* @__PURE__ */ array(UserGroupResponse),
 });
 
 /**
@@ -175,34 +175,34 @@ export function index(
     return call(INDEX, input, options);
 }
 
-const INDEX = operation({
+const INDEX = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/users',
     pathKeys: [],
-    params: parameters({
+    params: /* @__PURE__ */ parameters({
         /** include soft deleted users in the results */
-        include_deleted: boolean(),
+        include_deleted: /* @__PURE__ */ boolean(),
         /** include user metadata in the response */
-        include_metadata: boolean(),
+        include_metadata: /* @__PURE__ */ boolean(),
         /** admin users can view other domains, ignored for other users */
-        authority_id: nullable(string()),
+        authority_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /**
          * filters results by the given text: a record matches when any word matches its searchable
          * fields as a whole word, and the last word also matches as a prefix (search as you type)
          */
-        q: string(),
+        q: /* @__PURE__ */ string(),
         /** the maximum number of results to return */
-        limit: integer('UInt32'),
+        limit: /* @__PURE__ */ integer('UInt32'),
         /** the starting offset of the result set, used to implement pagination */
-        offset: integer('UInt32'),
+        offset: /* @__PURE__ */ integer('UInt32'),
         /** deprecated, ignored — pagination follows the `Link` header's offset */
-        ref: nullable(string()),
+        ref: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /** deprecated, ignored — search covers the resource's indexed fields */
-        fields: array(string()),
+        fields: /* @__PURE__ */ array(/* @__PURE__ */ string()),
     }),
     body: null,
-    response: array(
-        union([
+    response: /* @__PURE__ */ array(
+        /* @__PURE__ */ union([
             UserAdminMetadataResponse,
             UserAdminResponse,
             UserPublicMetadataResponse,
@@ -223,21 +223,21 @@ export function metadata(
     return call(METADATA, input, options);
 }
 
-const METADATA = operation({
+const METADATA = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/users/{id}/metadata',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
             /** the id of the user */
-            id: string(),
+            id: /* @__PURE__ */ string(),
             /** filter metadata by a particular entry */
-            name: nullable(string()),
+            name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         },
         ['id'],
     ),
     body: null,
-    response: record(MetadataInterface),
+    response: /* @__PURE__ */ record(MetadataInterface),
 });
 
 /**
@@ -256,11 +256,11 @@ export function resourceToken(
     return call(RESOURCE_TOKEN, input, options);
 }
 
-const RESOURCE_TOKEN = operation({
+const RESOURCE_TOKEN = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/users/resource_token',
     pathKeys: [],
-    params: parameters({}),
+    params: /* @__PURE__ */ parameters({}),
     body: null,
     response: UserResourceToken,
 });
@@ -277,14 +277,14 @@ export function revive(
     return call(REVIVE, input, options);
 }
 
-const REVIVE = operation({
+const REVIVE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/users/{id}/revive',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
             /** the id of the user */
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
@@ -307,24 +307,24 @@ export function search(
     return call(SEARCH, input, options);
 }
 
-const SEARCH = operation({
+const SEARCH = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/users/metadata/search',
     pathKeys: [],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
             /** filter expression in JSONPath format */
-            filter: string(),
+            filter: /* @__PURE__ */ string(),
             /** the maximum number of results to return */
-            limit: integer('Int32'),
+            limit: /* @__PURE__ */ integer('Int32'),
             /** the starting offset of the result set. Used to implement pagination */
-            offset: integer('Int32'),
+            offset: /* @__PURE__ */ integer('Int32'),
         },
         ['filter'],
     ),
     body: null,
-    response: array(
-        union([
+    response: /* @__PURE__ */ array(
+        /* @__PURE__ */ union([
             UserAdminMetadataResponse,
             UserAdminResponse,
             UserPublicMetadataResponse,
@@ -345,21 +345,21 @@ export function show(
     return call(SHOW, input, options);
 }
 
-const SHOW = operation({
+const SHOW = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/users/{id}',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
             /** the id of the user */
-            id: string(),
+            id: /* @__PURE__ */ string(),
             /** include user metadata in the response */
-            include_metadata: boolean(),
+            include_metadata: /* @__PURE__ */ boolean(),
         },
         ['id'],
     ),
     body: null,
-    response: union([
+    response: /* @__PURE__ */ union([
         UserAdminMetadataResponse,
         UserAdminResponse,
         UserPublicMetadataResponse,
@@ -379,19 +379,19 @@ export function update(
     return call(UPDATE, input, options);
 }
 
-const UPDATE = operation({
+const UPDATE = /* @__PURE__ */ operation({
     method: 'PATCH',
     path: '/api/engine/v2/users/{id}',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
             /** the id of the user */
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
-    body: json(),
-    response: union([
+    body: /* @__PURE__ */ json(),
+    response: /* @__PURE__ */ union([
         UserAdminMetadataResponse,
         UserAdminResponse,
         UserPublicMetadataResponse,
@@ -414,14 +414,14 @@ export function userResourceToken(
     return call(USER_RESOURCE_TOKEN, input, options);
 }
 
-const USER_RESOURCE_TOKEN = operation({
+const USER_RESOURCE_TOKEN = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/users/{id}/resource_token',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
             /** the id of the user */
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),

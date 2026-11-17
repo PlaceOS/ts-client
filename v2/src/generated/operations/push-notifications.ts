@@ -22,11 +22,11 @@ export function google(
     return call(GOOGLE, input, options);
 }
 
-const GOOGLE = operation({
+const GOOGLE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/notifications/google',
     pathKeys: [],
-    params: parameters({}),
+    params: /* @__PURE__ */ parameters({}),
     body: null,
     response: null,
 });
@@ -39,11 +39,11 @@ export function microsoft(
     return call(MICROSOFT, input, options);
 }
 
-const MICROSOFT = operation({
+const MICROSOFT = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/notifications/office365',
     pathKeys: [],
-    params: parameters({}),
+    params: /* @__PURE__ */ parameters({}),
     body: MicrosoftNotification,
     response: null,
 });

@@ -39,13 +39,13 @@ export function create(
     return call(CREATE, input, options);
 }
 
-const CREATE = operation({
+const CREATE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/signage/media',
     pathKeys: [],
-    params: parameters({
+    params: /* @__PURE__ */ parameters({
         /** group id to auto-link the new item to (required for non-admin callers) */
-        group_id: nullable(string()),
+        group_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     }),
     body: PlaylistItem,
     response: PlaylistItem,
@@ -67,19 +67,19 @@ export function destroy(
     return call(DESTROY, input, options);
 }
 
-const DESTROY = operation({
+const DESTROY = /* @__PURE__ */ operation({
     method: 'DELETE',
     path: '/api/engine/v2/signage/media/{id}',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
             /**
              * remove the item from this group instead of deleting it outright (caller needs Delete
              * or
              * Manage on the group); the item is deleted if no group links remain
              */
-            group_id: nullable(string()),
+            group_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         },
         ['id'],
     ),
@@ -105,26 +105,26 @@ export function index(
     return call(INDEX, input, options);
 }
 
-const INDEX = operation({
+const INDEX = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/signage/media',
     pathKeys: [],
-    params: parameters({
+    params: /* @__PURE__ */ parameters({
         /** filter to items linked to this group (caller must have Read on the group) */
-        group_id: nullable(string()),
+        group_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /** case-insensitive substring search on name and description (SQL ILIKE) */
-        q: nullable(string()),
+        q: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /** return items carrying any of these tags */
-        tags: nullable(array(string())),
-        limit: integer('Int32'),
-        offset: integer('Int32'),
+        tags: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
+        limit: /* @__PURE__ */ integer('Int32'),
+        offset: /* @__PURE__ */ integer('Int32'),
         /** deprecated, ignored — pagination follows the `Link` header's offset */
-        ref: nullable(string()),
+        ref: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /** deprecated, ignored — search covers the resource's indexed fields */
-        fields: array(string()),
+        fields: /* @__PURE__ */ array(/* @__PURE__ */ string()),
     }),
     body: null,
-    response: array(PlaylistItem),
+    response: /* @__PURE__ */ array(PlaylistItem),
 });
 
 /**
@@ -145,22 +145,22 @@ export function removeTag(
     return call(REMOVE_TAG, input, options);
 }
 
-const REMOVE_TAG = operation({
+const REMOVE_TAG = /* @__PURE__ */ operation({
     method: 'DELETE',
     path: '/api/engine/v2/signage/media/tags',
     pathKeys: [],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
             /** the tag to be removed */
-            tag: string(),
+            tag: /* @__PURE__ */ string(),
             /** if true, removes the tag by removing all the media with this tag */
-            remove_media: boolean(),
+            remove_media: /* @__PURE__ */ boolean(),
             /**
              * limit to media linked to this group (caller must have Read and Update on the group,
              * Read and
              * Delete when removing media)
              */
-            group_id: nullable(string()),
+            group_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         },
         ['tag'],
     ),
@@ -184,20 +184,20 @@ export function renameTag(
     return call(RENAME_TAG, input, options);
 }
 
-const RENAME_TAG = operation({
+const RENAME_TAG = /* @__PURE__ */ operation({
     method: 'PATCH',
     path: '/api/engine/v2/signage/media/tags',
     pathKeys: [],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
             /** the existing tag to be renamed */
-            current_tag: string(),
+            current_tag: /* @__PURE__ */ string(),
             /** the replacement tag name */
-            new_tag: string(),
+            new_tag: /* @__PURE__ */ string(),
             /**
              * limit to media linked to this group (caller must have Read and Update on the group)
              */
-            group_id: nullable(string()),
+            group_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         },
         ['current_tag', 'new_tag'],
     ),
@@ -227,24 +227,24 @@ export function share(
     return call(SHARE, input, options);
 }
 
-const SHARE = operation({
+const SHARE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/signage/media/share',
     pathKeys: [],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
             /** comma-separated item ids to share into the target group */
-            items: array(string()),
+            items: /* @__PURE__ */ array(/* @__PURE__ */ string()),
             /** target group id (must participate in the 'signage' subsystem) */
-            to: string(),
+            to: /* @__PURE__ */ string(),
         },
         ['items', 'to'],
     ),
     body: null,
-    response: object(
+    response: /* @__PURE__ */ object(
         {
-            linked: array(string()),
-            already_present: array(string()),
+            linked: /* @__PURE__ */ array(/* @__PURE__ */ string()),
+            already_present: /* @__PURE__ */ array(/* @__PURE__ */ string()),
         },
         ['linked', 'already_present'],
     ),
@@ -265,13 +265,13 @@ export function show(
     return call(SHOW, input, options);
 }
 
-const SHOW = operation({
+const SHOW = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/signage/media/{id}',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
@@ -296,16 +296,16 @@ export function tagCounts(
     return call(TAG_COUNTS, input, options);
 }
 
-const TAG_COUNTS = operation({
+const TAG_COUNTS = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/signage/media/tag_counts',
     pathKeys: [],
-    params: parameters({
+    params: /* @__PURE__ */ parameters({
         /** limit to media linked to this group (caller must have Read on the group) */
-        group_id: nullable(string()),
+        group_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     }),
     body: null,
-    response: record(integer('Int32')),
+    response: /* @__PURE__ */ record(/* @__PURE__ */ integer('Int32')),
 });
 
 /**
@@ -325,16 +325,16 @@ export function tags(
     return call(TAGS, input, options);
 }
 
-const TAGS = operation({
+const TAGS = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/signage/media/tags',
     pathKeys: [],
-    params: parameters({
+    params: /* @__PURE__ */ parameters({
         /** limit to media linked to this group (caller must have Read on the group) */
-        group_id: nullable(string()),
+        group_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     }),
     body: null,
-    response: array(string()),
+    response: /* @__PURE__ */ array(/* @__PURE__ */ string()),
 });
 
 /**
@@ -349,13 +349,13 @@ export function thumbnail(
     return call(THUMBNAIL, input, options);
 }
 
-const THUMBNAIL = operation({
+const THUMBNAIL = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/signage/media/{id}/thumbnail',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
@@ -375,13 +375,13 @@ export function update(
     return call(UPDATE, input, options);
 }
 
-const UPDATE = operation({
+const UPDATE = /* @__PURE__ */ operation({
     method: 'PATCH',
     path: '/api/engine/v2/signage/media/{id}',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),

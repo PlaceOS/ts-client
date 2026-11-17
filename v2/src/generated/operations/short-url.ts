@@ -26,11 +26,11 @@ export function create(
     return call(CREATE, input, options);
 }
 
-const CREATE = operation({
+const CREATE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/short_url',
     pathKeys: [],
-    params: parameters({}),
+    params: /* @__PURE__ */ parameters({}),
     body: Shortener,
     response: Shortener,
 });
@@ -47,13 +47,13 @@ export function destroy(
     return call(DESTROY, input, options);
 }
 
-const DESTROY = operation({
+const DESTROY = /* @__PURE__ */ operation({
     method: 'DELETE',
     path: '/api/engine/v2/short_url/{id}',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
@@ -73,19 +73,19 @@ export function generateQrCode(
     return call(GENERATE_QR_CODE, input, options);
 }
 
-const GENERATE_QR_CODE = operation({
+const GENERATE_QR_CODE = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/short_url/qr_code',
     pathKeys: [],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
             /** the contents of the QR code */
-            content: string(),
+            content: /* @__PURE__ */ string(),
             /** file format of the response */
             format: ShortUrlFormat,
             /** size of the QR code in pixels. Between 72px and 512px */
-            size: integer('Int32'),
-            id: string(),
+            size: /* @__PURE__ */ integer('Int32'),
+            id: /* @__PURE__ */ string(),
         },
         ['content', 'id'],
     ),
@@ -105,27 +105,27 @@ export function index(
     return call(INDEX, input, options);
 }
 
-const INDEX = operation({
+const INDEX = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/short_url',
     pathKeys: [],
-    params: parameters({
+    params: /* @__PURE__ */ parameters({
         /**
          * filters results by the given text: a record matches when any word matches its searchable
          * fields as a whole word, and the last word also matches as a prefix (search as you type)
          */
-        q: string(),
+        q: /* @__PURE__ */ string(),
         /** the maximum number of results to return */
-        limit: integer('UInt32'),
+        limit: /* @__PURE__ */ integer('UInt32'),
         /** the starting offset of the result set, used to implement pagination */
-        offset: integer('UInt32'),
+        offset: /* @__PURE__ */ integer('UInt32'),
         /** deprecated, ignored — pagination follows the `Link` header's offset */
-        ref: nullable(string()),
+        ref: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /** deprecated, ignored — search covers the resource's indexed fields */
-        fields: array(string()),
+        fields: /* @__PURE__ */ array(/* @__PURE__ */ string()),
     }),
     body: null,
-    response: array(Shortener),
+    response: /* @__PURE__ */ array(Shortener),
 });
 
 /**
@@ -140,15 +140,15 @@ export function pngQr(
     return call(PNG_QR, input, options);
 }
 
-const PNG_QR = operation({
+const PNG_QR = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/short_url/{id}/qr_code.png',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
             /** size of the QR code in pixels. Between 72px and 512px */
-            size: integer('Int32'),
+            size: /* @__PURE__ */ integer('Int32'),
         },
         ['id'],
     ),
@@ -168,13 +168,13 @@ export function redirect(
     return call(REDIRECT, input, options);
 }
 
-const REDIRECT = operation({
+const REDIRECT = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/short_url/{id}/redirect',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
@@ -194,13 +194,13 @@ export function show(
     return call(SHOW, input, options);
 }
 
-const SHOW = operation({
+const SHOW = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/short_url/{id}',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
@@ -220,13 +220,13 @@ export function svgQr(
     return call(SVG_QR, input, options);
 }
 
-const SVG_QR = operation({
+const SVG_QR = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/short_url/{id}/qr_code.svg',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
@@ -246,13 +246,13 @@ export function update(
     return call(UPDATE, input, options);
 }
 
-const UPDATE = operation({
+const UPDATE = /* @__PURE__ */ operation({
     method: 'PATCH',
     path: '/api/engine/v2/short_url/{id}',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),

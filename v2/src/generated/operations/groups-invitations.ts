@@ -34,13 +34,13 @@ export function accept(
     return call(ACCEPT, input, options);
 }
 
-const ACCEPT = operation({
+const ACCEPT = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/group_invitations/{id}/accept',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
@@ -63,11 +63,11 @@ export function create(
     return call(CREATE, input, options);
 }
 
-const CREATE = operation({
+const CREATE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/group_invitations',
     pathKeys: [],
-    params: parameters({}),
+    params: /* @__PURE__ */ parameters({}),
     body: GroupsInvitationsInvitationCreatePayload,
     response: GroupsInvitationsInvitationCreatedResponse,
 });
@@ -80,13 +80,13 @@ export function destroy(
     return call(DESTROY, input, options);
 }
 
-const DESTROY = operation({
+const DESTROY = /* @__PURE__ */ operation({
     method: 'DELETE',
     path: '/api/engine/v2/group_invitations/{id}',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
@@ -109,26 +109,26 @@ export function index(
     return call(INDEX, input, options);
 }
 
-const INDEX = operation({
+const INDEX = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/group_invitations',
     pathKeys: [],
-    params: parameters({
-        group_id: nullable(string()),
-        limit: integer('Int32'),
-        offset: integer('Int32'),
+    params: /* @__PURE__ */ parameters({
+        group_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        limit: /* @__PURE__ */ integer('Int32'),
+        offset: /* @__PURE__ */ integer('Int32'),
         /**
          * filters results by the given text: a record matches when any word matches its searchable
          * fields as a whole word, and the last word also matches as a prefix (search as you type)
          */
-        q: string(),
+        q: /* @__PURE__ */ string(),
         /** deprecated, ignored — pagination follows the `Link` header's offset */
-        ref: nullable(string()),
+        ref: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /** deprecated, ignored — search covers the resource's indexed fields */
-        fields: array(string()),
+        fields: /* @__PURE__ */ array(/* @__PURE__ */ string()),
     }),
     body: null,
-    response: array(GroupInvitation),
+    response: /* @__PURE__ */ array(GroupInvitation),
 });
 
 /** `GET /api/engine/v2/group_invitations/{id}` */
@@ -139,13 +139,13 @@ export function show(
     return call(SHOW, input, options);
 }
 
-const SHOW = operation({
+const SHOW = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/group_invitations/{id}',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),

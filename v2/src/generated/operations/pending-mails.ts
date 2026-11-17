@@ -26,13 +26,13 @@ export function cleanup(
     return call(CLEANUP, input, options);
 }
 
-const CLEANUP = operation({
+const CLEANUP = /* @__PURE__ */ operation({
     method: 'DELETE',
     path: '/api/engine/v2/emails/cleanup',
     pathKeys: [],
-    params: parameters({
+    params: /* @__PURE__ */ parameters({
         /** authority to clean up (defaults to the caller's authority) */
-        authority_id: nullable(string()),
+        authority_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     }),
     body: null,
     response: null,
@@ -50,13 +50,13 @@ export function destroy(
     return call(DESTROY, input, options);
 }
 
-const DESTROY = operation({
+const DESTROY = /* @__PURE__ */ operation({
     method: 'DELETE',
     path: '/api/engine/v2/emails/{id}',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
@@ -76,55 +76,55 @@ export function index(
     return call(INDEX, input, options);
 }
 
-const INDEX = operation({
+const INDEX = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/emails',
     pathKeys: [],
-    params: parameters({
+    params: /* @__PURE__ */ parameters({
         /** only mail whose zones are anchored to this group */
-        group_id: nullable(string()),
+        group_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /** only mail referencing any of these zones */
-        zones: nullable(array(string())),
+        zones: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
         /** only mail queued by this service */
-        source_service: nullable(string()),
+        source_service: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /** only mail with this external reference / correlation id */
-        source_reference: nullable(string()),
+        source_reference: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /** filter by authority */
-        authority_id: nullable(string()),
+        authority_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /** only mail triggered by this user */
-        user_id: nullable(string()),
+        user_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /** include mail past its expiry (default false) */
-        include_expired: boolean(),
+        include_expired: /* @__PURE__ */ boolean(),
         /** include mail that has been rejected (default false) */
-        include_rejected: boolean(),
+        include_rejected: /* @__PURE__ */ boolean(),
         /** only mail that is neither sent nor rejected (default false) */
-        unsent_only: boolean(),
+        unsent_only: /* @__PURE__ */ boolean(),
         /**
          * mail sent at or after this time (also matches rejected time when include_rejected=true)
          */
-        sent_after: nullable(string()),
+        sent_after: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /**
          * mail sent at or before this time (also matches rejected time when include_rejected=true)
          */
-        sent_before: nullable(string()),
+        sent_before: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /** mail scheduled to send at or after this time */
-        send_at_after: nullable(string()),
+        send_at_after: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /**
          * filters results by the given text: a record matches when any word matches its searchable
          * fields as a whole word, and the last word also matches as a prefix (search as you type)
          */
-        q: string(),
+        q: /* @__PURE__ */ string(),
         /** the maximum number of results to return */
-        limit: integer('UInt32'),
+        limit: /* @__PURE__ */ integer('UInt32'),
         /** the starting offset of the result set, used to implement pagination */
-        offset: integer('UInt32'),
+        offset: /* @__PURE__ */ integer('UInt32'),
         /** deprecated, ignored — pagination follows the `Link` header's offset */
-        ref: nullable(string()),
+        ref: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /** deprecated, ignored — search covers the resource's indexed fields */
-        fields: array(string()),
+        fields: /* @__PURE__ */ array(/* @__PURE__ */ string()),
     }),
     body: null,
-    response: array(PendingMail),
+    response: /* @__PURE__ */ array(PendingMail),
 });
 
 /**
@@ -139,15 +139,15 @@ export function reject(
     return call(REJECT, input, options);
 }
 
-const REJECT = operation({
+const REJECT = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/emails/{id}/reject',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
             /** human readable reason the mail was rejected */
-            rejected_reason: nullable(string()),
+            rejected_reason: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         },
         ['id'],
     ),
@@ -167,15 +167,15 @@ export function sent(
     return call(SENT, input, options);
 }
 
-const SENT = operation({
+const SENT = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/emails/{id}/sent',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
             /** the worker / service that sent the mail */
-            sent_by: nullable(string()),
+            sent_by: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         },
         ['id'],
     ),
@@ -195,13 +195,13 @@ export function show(
     return call(SHOW, input, options);
 }
 
-const SHOW = operation({
+const SHOW = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/emails/{id}',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),

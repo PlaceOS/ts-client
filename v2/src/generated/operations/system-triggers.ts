@@ -26,14 +26,14 @@ export function create(
     return call(CREATE, input, options);
 }
 
-const CREATE = operation({
+const CREATE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/systems/{sys_id}/triggers',
     pathKeys: ['sys_id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
             /** the id of the system */
-            sys_id: string(),
+            sys_id: /* @__PURE__ */ string(),
         },
         ['sys_id'],
     ),
@@ -53,15 +53,15 @@ export function destroy(
     return call(DESTROY, input, options);
 }
 
-const DESTROY = operation({
+const DESTROY = /* @__PURE__ */ operation({
     method: 'DELETE',
     path: '/api/engine/v2/systems/{sys_id}/triggers/{trig_id}',
     pathKeys: ['sys_id', 'trig_id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            sys_id: string(),
+            sys_id: /* @__PURE__ */ string(),
             /** the id of the trigger */
-            trig_id: string(),
+            trig_id: /* @__PURE__ */ string(),
         },
         ['sys_id', 'trig_id'],
     ),
@@ -81,44 +81,44 @@ export function index(
     return call(INDEX, input, options);
 }
 
-const INDEX = operation({
+const INDEX = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/systems/{sys_id}/triggers',
     pathKeys: ['sys_id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
             /** the system to filter on */
-            sys_id: string(),
+            sys_id: /* @__PURE__ */ string(),
             /** provide the control system details? */
-            complete: boolean(),
+            complete: /* @__PURE__ */ boolean(),
             /** only return triggers marked as important? */
-            important: boolean(),
+            important: /* @__PURE__ */ boolean(),
             /** only return triggers that have recently been triggered? */
-            triggered: boolean(),
+            triggered: /* @__PURE__ */ boolean(),
             /** filter by a particular trigger type */
-            trigger_id: nullable(string()),
+            trigger_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
             /** return triggers updated before the time specified, unix epoch */
-            as_of: nullable(integer()),
+            as_of: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
             /**
              * filters results by the given text: a record matches when any word matches its
              * searchable
              * fields as a whole word, and the last word also matches as a prefix (search as you
              * type)
              */
-            q: string(),
+            q: /* @__PURE__ */ string(),
             /** the maximum number of results to return */
-            limit: integer('UInt32'),
+            limit: /* @__PURE__ */ integer('UInt32'),
             /** the starting offset of the result set, used to implement pagination */
-            offset: integer('UInt32'),
+            offset: /* @__PURE__ */ integer('UInt32'),
             /** deprecated, ignored — pagination follows the `Link` header's offset */
-            ref: nullable(string()),
+            ref: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
             /** deprecated, ignored — search covers the resource's indexed fields */
-            fields: array(string()),
+            fields: /* @__PURE__ */ array(/* @__PURE__ */ string()),
         },
         ['sys_id'],
     ),
     body: null,
-    response: array(TriggerInstance),
+    response: /* @__PURE__ */ array(TriggerInstance),
 });
 
 /**
@@ -133,16 +133,16 @@ export function show(
     return call(SHOW, input, options);
 }
 
-const SHOW = operation({
+const SHOW = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/systems/{sys_id}/triggers/{trig_id}',
     pathKeys: ['sys_id', 'trig_id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            sys_id: string(),
+            sys_id: /* @__PURE__ */ string(),
             /** the id of the trigger */
-            trig_id: string(),
-            complete: boolean(),
+            trig_id: /* @__PURE__ */ string(),
+            complete: /* @__PURE__ */ boolean(),
         },
         ['sys_id', 'trig_id'],
     ),
@@ -162,15 +162,15 @@ export function update(
     return call(UPDATE, input, options);
 }
 
-const UPDATE = operation({
+const UPDATE = /* @__PURE__ */ operation({
     method: 'PATCH',
     path: '/api/engine/v2/systems/{sys_id}/triggers/{trig_id}',
     pathKeys: ['sys_id', 'trig_id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            sys_id: string(),
+            sys_id: /* @__PURE__ */ string(),
             /** the id of the trigger */
-            trig_id: string(),
+            trig_id: /* @__PURE__ */ string(),
         },
         ['sys_id', 'trig_id'],
     ),

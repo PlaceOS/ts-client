@@ -22,11 +22,11 @@ export function create(
     return call(CREATE, input, options);
 }
 
-const CREATE = operation({
+const CREATE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/group_zones',
     pathKeys: [],
-    params: parameters({}),
+    params: /* @__PURE__ */ parameters({}),
     body: GroupZone,
     response: GroupZone,
 });
@@ -39,14 +39,14 @@ export function destroy(
     return call(DESTROY, input, options);
 }
 
-const DESTROY = operation({
+const DESTROY = /* @__PURE__ */ operation({
     method: 'DELETE',
     path: '/api/engine/v2/group_zones/{group_id}/{zone_id}',
     pathKeys: ['group_id', 'zone_id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            group_id: string(),
-            zone_id: string(),
+            group_id: /* @__PURE__ */ string(),
+            zone_id: /* @__PURE__ */ string(),
         },
         ['group_id', 'zone_id'],
     ),
@@ -66,27 +66,27 @@ export function index(
     return call(INDEX, input, options);
 }
 
-const INDEX = operation({
+const INDEX = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/group_zones',
     pathKeys: [],
-    params: parameters({
-        group_id: nullable(string()),
-        zone_id: nullable(string()),
-        limit: integer('Int32'),
-        offset: integer('Int32'),
+    params: /* @__PURE__ */ parameters({
+        group_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        zone_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        limit: /* @__PURE__ */ integer('Int32'),
+        offset: /* @__PURE__ */ integer('Int32'),
         /**
          * filters results by the given text: a record matches when any word matches its searchable
          * fields as a whole word, and the last word also matches as a prefix (search as you type)
          */
-        q: string(),
+        q: /* @__PURE__ */ string(),
         /** deprecated, ignored — pagination follows the `Link` header's offset */
-        ref: nullable(string()),
+        ref: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /** deprecated, ignored — search covers the resource's indexed fields */
-        fields: array(string()),
+        fields: /* @__PURE__ */ array(/* @__PURE__ */ string()),
     }),
     body: null,
-    response: array(GroupZone),
+    response: /* @__PURE__ */ array(GroupZone),
 });
 
 /** `GET /api/engine/v2/group_zones/{group_id}/{zone_id}` */
@@ -97,14 +97,14 @@ export function show(
     return call(SHOW, input, options);
 }
 
-const SHOW = operation({
+const SHOW = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/group_zones/{group_id}/{zone_id}',
     pathKeys: ['group_id', 'zone_id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            group_id: string(),
-            zone_id: string(),
+            group_id: /* @__PURE__ */ string(),
+            zone_id: /* @__PURE__ */ string(),
         },
         ['group_id', 'zone_id'],
     ),
@@ -120,14 +120,14 @@ export function update(
     return call(UPDATE, input, options);
 }
 
-const UPDATE = operation({
+const UPDATE = /* @__PURE__ */ operation({
     method: 'PATCH',
     path: '/api/engine/v2/group_zones/{group_id}/{zone_id}',
     pathKeys: ['group_id', 'zone_id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            group_id: string(),
-            zone_id: string(),
+            group_id: /* @__PURE__ */ string(),
+            zone_id: /* @__PURE__ */ string(),
         },
         ['group_id', 'zone_id'],
     ),

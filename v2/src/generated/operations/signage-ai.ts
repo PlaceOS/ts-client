@@ -33,13 +33,13 @@ export function cancel(
     return call(CANCEL, input, options);
 }
 
-const CANCEL = operation({
+const CANCEL = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/signage/ai/jobs/{id}/cancel',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
@@ -59,11 +59,11 @@ export function capabilities(
     return call(CAPABILITIES, input, options);
 }
 
-const CAPABILITIES = operation({
+const CAPABILITIES = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/signage/ai/capabilities',
     pathKeys: [],
-    params: parameters({}),
+    params: /* @__PURE__ */ parameters({}),
     body: null,
     response: SignageAiCapabilities,
 });
@@ -80,13 +80,13 @@ export function claim(
     return call(CLAIM, input, options);
 }
 
-const CLAIM = operation({
+const CLAIM = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/signage/ai/jobs/{id}/claim',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
@@ -106,11 +106,11 @@ export function edit(
     return call(EDIT, input, options);
 }
 
-const EDIT = operation({
+const EDIT = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/signage/ai/edit',
     pathKeys: [],
-    params: parameters({}),
+    params: /* @__PURE__ */ parameters({}),
     body: SignageAiEditParams,
     response: SignageAiJobResponse,
 });
@@ -127,11 +127,11 @@ export function generate(
     return call(GENERATE, input, options);
 }
 
-const GENERATE = operation({
+const GENERATE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/signage/ai/generate',
     pathKeys: [],
-    params: parameters({}),
+    params: /* @__PURE__ */ parameters({}),
     body: SignageAiGenerateParams,
     response: SignageAiJobResponse,
 });
@@ -148,19 +148,19 @@ export function indexJobs(
     return call(INDEX_JOBS, input, options);
 }
 
-const INDEX_JOBS = operation({
+const INDEX_JOBS = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/signage/ai/jobs',
     pathKeys: [],
-    params: parameters({
+    params: /* @__PURE__ */ parameters({
         /** only the caller's own jobs */
-        mine: boolean(),
-        limit: integer('Int32'),
+        mine: /* @__PURE__ */ boolean(),
+        limit: /* @__PURE__ */ integer('Int32'),
         /** generate, edit or map_edit; the image kinds when left out */
-        kind: nullable(string()),
+        kind: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     }),
     body: null,
-    response: array(SignageAiJobResponse),
+    response: /* @__PURE__ */ array(SignageAiJobResponse),
 });
 
 /**
@@ -175,17 +175,17 @@ export function showJob(
     return call(SHOW_JOB, input, options);
 }
 
-const SHOW_JOB = operation({
+const SHOW_JOB = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/signage/ai/jobs/{id}',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
             /** seconds to hold the request open, 0 to answer immediately */
-            wait: integer('Int32'),
+            wait: /* @__PURE__ */ integer('Int32'),
             /** the version the caller already has */
-            since: nullable(integer('Int32')),
+            since: /* @__PURE__ */ nullable(/* @__PURE__ */ integer('Int32')),
         },
         ['id'],
     ),
@@ -205,16 +205,16 @@ export function usage(
     return call(USAGE, input, options);
 }
 
-const USAGE = operation({
+const USAGE = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/signage/ai/usage',
     pathKeys: [],
-    params: parameters({
+    params: /* @__PURE__ */ parameters({
         /** unix seconds, defaults to 30 days ago */
-        from: nullable(integer()),
+        from: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
         /** unix seconds, defaults to now */
-        to: nullable(integer()),
+        to: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     }),
     body: null,
-    response: array(SignageAiJobUsageRow),
+    response: /* @__PURE__ */ array(SignageAiJobUsageRow),
 });

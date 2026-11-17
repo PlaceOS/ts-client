@@ -41,13 +41,13 @@ export function approve(
     return call(APPROVE, input, options);
 }
 
-const APPROVE = operation({
+const APPROVE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/signage/templates/{id}/approve',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
@@ -70,19 +70,19 @@ export function approvers(
     return call(APPROVERS, input, options);
 }
 
-const APPROVERS = operation({
+const APPROVERS = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/signage/templates/approvers',
     pathKeys: [],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
             /** group to find approvers for */
-            group_id: string(),
+            group_id: /* @__PURE__ */ string(),
         },
         ['group_id'],
     ),
     body: null,
-    response: array(SignageTemplatesApprover),
+    response: /* @__PURE__ */ array(SignageTemplatesApprover),
 });
 
 /**
@@ -102,13 +102,13 @@ export function create(
     return call(CREATE, input, options);
 }
 
-const CREATE = operation({
+const CREATE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/signage/templates',
     pathKeys: [],
-    params: parameters({
+    params: /* @__PURE__ */ parameters({
         /** group id to auto-link the new template to (required for non-admin callers) */
-        group_id: nullable(string()),
+        group_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     }),
     body: SignageTemplate,
     response: SignageTemplate,
@@ -131,19 +131,19 @@ export function destroy(
     return call(DESTROY, input, options);
 }
 
-const DESTROY = operation({
+const DESTROY = /* @__PURE__ */ operation({
     method: 'DELETE',
     path: '/api/engine/v2/signage/templates/{id}',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
             /**
              * remove the template from this group instead of deleting it outright (caller needs
              * Delete or
              * Manage on the group); the template is deleted if no group links remain
              */
-            group_id: nullable(string()),
+            group_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         },
         ['id'],
     ),
@@ -163,13 +163,13 @@ export function destroyDraft(
     return call(DESTROY_DRAFT, input, options);
 }
 
-const DESTROY_DRAFT = operation({
+const DESTROY_DRAFT = /* @__PURE__ */ operation({
     method: 'DELETE',
     path: '/api/engine/v2/signage/templates/{id}/draft',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
@@ -197,26 +197,26 @@ export function index(
     return call(INDEX, input, options);
 }
 
-const INDEX = operation({
+const INDEX = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/signage/templates',
     pathKeys: [],
-    params: parameters({
+    params: /* @__PURE__ */ parameters({
         /** filter to templates linked to this group (caller must have Read on the group) */
-        group_id: nullable(string()),
+        group_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /** case-insensitive substring search on name and description (SQL ILIKE) */
-        q: nullable(string()),
+        q: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /** return the approved (live) versions even when pending drafts exist */
-        approved: boolean(),
-        limit: integer('Int32'),
-        offset: integer('Int32'),
+        approved: /* @__PURE__ */ boolean(),
+        limit: /* @__PURE__ */ integer('Int32'),
+        offset: /* @__PURE__ */ integer('Int32'),
         /** deprecated, ignored — pagination follows the `Link` header's offset */
-        ref: nullable(string()),
+        ref: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /** deprecated, ignored — search covers the resource's indexed fields */
-        fields: array(string()),
+        fields: /* @__PURE__ */ array(/* @__PURE__ */ string()),
     }),
     body: null,
-    response: array(SignageTemplate),
+    response: /* @__PURE__ */ array(SignageTemplate),
 });
 
 /**
@@ -235,17 +235,17 @@ export function requestApproval(
     return call(REQUEST_APPROVAL, input, options);
 }
 
-const REQUEST_APPROVAL = operation({
+const REQUEST_APPROVAL = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/signage/templates/{id}/request_approval',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
             /** group whose approvers should be notified */
-            group_id: string(),
+            group_id: /* @__PURE__ */ string(),
             /** notify only this approver (must have approve or manage permission in the group) */
-            approver_id: nullable(string()),
+            approver_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         },
         ['id', 'group_id'],
     ),
@@ -275,24 +275,24 @@ export function share(
     return call(SHARE, input, options);
 }
 
-const SHARE = operation({
+const SHARE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/signage/templates/share',
     pathKeys: [],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
             /** comma-separated template ids to share into the target group */
-            items: array(string()),
+            items: /* @__PURE__ */ array(/* @__PURE__ */ string()),
             /** target group id (must participate in the 'signage' subsystem) */
-            to: string(),
+            to: /* @__PURE__ */ string(),
         },
         ['items', 'to'],
     ),
     body: null,
-    response: object(
+    response: /* @__PURE__ */ object(
         {
-            linked: array(string()),
-            already_present: array(string()),
+            linked: /* @__PURE__ */ array(/* @__PURE__ */ string()),
+            already_present: /* @__PURE__ */ array(/* @__PURE__ */ string()),
         },
         ['linked', 'already_present'],
     ),
@@ -314,15 +314,15 @@ export function show(
     return call(SHOW, input, options);
 }
 
-const SHOW = operation({
+const SHOW = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/signage/templates/{id}',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
             /** return the approved (live) version even when a pending draft exists */
-            approved: boolean(),
+            approved: /* @__PURE__ */ boolean(),
         },
         ['id'],
     ),
@@ -347,13 +347,13 @@ export function update(
     return call(UPDATE, input, options);
 }
 
-const UPDATE = operation({
+const UPDATE = /* @__PURE__ */ operation({
     method: 'PATCH',
     path: '/api/engine/v2/signage/templates/{id}',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),

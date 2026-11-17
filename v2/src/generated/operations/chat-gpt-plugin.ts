@@ -28,29 +28,32 @@ export function callFunction(
     return call(CALL_FUNCTION, input, options);
 }
 
-const CALL_FUNCTION = operation({
+const CALL_FUNCTION = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/chatgpt/plugin/{system_id}/call_function/{capability_id}/{function_name}',
     pathKeys: ['system_id', 'capability_id', 'function_name'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            system_id: string(),
+            system_id: /* @__PURE__ */ string(),
             /** The ID of the capability, exactly as provided in the capability list */
-            capability_id: string(),
+            capability_id: /* @__PURE__ */ string(),
             /** The name of the function to call */
-            function_name: string(),
+            function_name: /* @__PURE__ */ string(),
         },
         ['system_id', 'capability_id', 'function_name'],
     ),
-    body: object(
+    body: /* @__PURE__ */ object(
         {
-            function_params: union([record(json()), string()]),
+            function_params: /* @__PURE__ */ union([
+                /* @__PURE__ */ record(/* @__PURE__ */ json()),
+                /* @__PURE__ */ string(),
+            ]),
         },
         ['function_params'],
     ),
-    response: object(
+    response: /* @__PURE__ */ object(
         {
-            response: string(),
+            response: /* @__PURE__ */ string(),
         },
         ['response'],
     ),
@@ -70,13 +73,13 @@ export function capabilities(
     return call(CAPABILITIES, input, options);
 }
 
-const CAPABILITIES = operation({
+const CAPABILITIES = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/chatgpt/plugin/{system_id}/capabilities',
     pathKeys: ['system_id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            system_id: string(),
+            system_id: /* @__PURE__ */ string(),
         },
         ['system_id'],
     ),
@@ -97,25 +100,25 @@ export function functionSchema(
     return call(FUNCTION_SCHEMA, input, options);
 }
 
-const FUNCTION_SCHEMA = operation({
+const FUNCTION_SCHEMA = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/chatgpt/plugin/{system_id}/function_schema/{capability_id}',
     pathKeys: ['system_id', 'capability_id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            system_id: string(),
+            system_id: /* @__PURE__ */ string(),
             /** The ID of the capability, exactly as provided in the capability list */
-            capability_id: string(),
+            capability_id: /* @__PURE__ */ string(),
         },
         ['system_id', 'capability_id'],
     ),
     body: null,
-    response: array(
-        object(
+    response: /* @__PURE__ */ array(
+        /* @__PURE__ */ object(
             {
-                function: string(),
-                description: string(),
-                parameters: record(json()),
+                function: /* @__PURE__ */ string(),
+                description: /* @__PURE__ */ string(),
+                parameters: /* @__PURE__ */ record(/* @__PURE__ */ json()),
             },
             ['function', 'description', 'parameters'],
         ),

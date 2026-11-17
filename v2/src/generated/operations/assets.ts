@@ -26,13 +26,13 @@ export function bulkCreate(
     return call(BULK_CREATE, input, options);
 }
 
-const BULK_CREATE = operation({
+const BULK_CREATE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/assets/bulk',
     pathKeys: [],
-    params: parameters({}),
-    body: array(Asset),
-    response: array(Asset),
+    params: /* @__PURE__ */ parameters({}),
+    body: /* @__PURE__ */ array(Asset),
+    response: /* @__PURE__ */ array(Asset),
 });
 
 /**
@@ -47,12 +47,12 @@ export function bulkDestroy(
     return call(BULK_DESTROY, input, options);
 }
 
-const BULK_DESTROY = operation({
+const BULK_DESTROY = /* @__PURE__ */ operation({
     method: 'DELETE',
     path: '/api/engine/v2/assets/bulk',
     pathKeys: [],
-    params: parameters({}),
-    body: array(string()),
+    params: /* @__PURE__ */ parameters({}),
+    body: /* @__PURE__ */ array(/* @__PURE__ */ string()),
     response: null,
 });
 
@@ -68,13 +68,13 @@ export function bulkUpdate(
     return call(BULK_UPDATE, input, options);
 }
 
-const BULK_UPDATE = operation({
+const BULK_UPDATE = /* @__PURE__ */ operation({
     method: 'PATCH',
     path: '/api/engine/v2/assets/bulk',
     pathKeys: [],
-    params: parameters({}),
-    body: array(Asset),
-    response: array(Asset),
+    params: /* @__PURE__ */ parameters({}),
+    body: /* @__PURE__ */ array(Asset),
+    response: /* @__PURE__ */ array(Asset),
 });
 
 /**
@@ -89,11 +89,11 @@ export function create(
     return call(CREATE, input, options);
 }
 
-const CREATE = operation({
+const CREATE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/assets',
     pathKeys: [],
-    params: parameters({}),
+    params: /* @__PURE__ */ parameters({}),
     body: Asset,
     response: Asset,
 });
@@ -110,13 +110,13 @@ export function destroy(
     return call(DESTROY, input, options);
 }
 
-const DESTROY = operation({
+const DESTROY = /* @__PURE__ */ operation({
     method: 'DELETE',
     path: '/api/engine/v2/assets/{id}',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
@@ -136,47 +136,47 @@ export function index(
     return call(INDEX, input, options);
 }
 
-const INDEX = operation({
+const INDEX = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/assets',
     pathKeys: [],
-    params: parameters({
+    params: /* @__PURE__ */ parameters({
         /** only return assets whose zone_id field is this zone id */
-        zone_id: nullable(string()),
+        zone_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /**
          * comma separated zone ids; only return assets whose zones list contains every one of them
          */
-        zones: nullable(array(string())),
+        zones: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
         /** only return assets of this asset type id */
-        type_id: nullable(string()),
+        type_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /** only return assets acquired on this asset purchase order id */
-        order_id: nullable(string()),
+        order_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /** only return assets with exactly this barcode */
-        barcode: nullable(string()),
+        barcode: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /** only return assets with exactly this serial number */
-        serial_number: nullable(string()),
+        serial_number: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /** true returns only bookable assets, false only non-bookable assets; omit for both */
-        bookable: nullable(boolean()),
+        bookable: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
         /** true returns only accessible assets, false only non-accessible assets; omit for both */
-        accessible: nullable(boolean()),
+        accessible: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
         /** comma separated features; returns assets that have any of these features */
-        features: nullable(array(string())),
+        features: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
         /**
          * filters results by the given text: a record matches when any word matches its searchable
          * fields as a whole word, and the last word also matches as a prefix (search as you type)
          */
-        q: string(),
+        q: /* @__PURE__ */ string(),
         /** the maximum number of results to return */
-        limit: integer('UInt32'),
+        limit: /* @__PURE__ */ integer('UInt32'),
         /** the starting offset of the result set, used to implement pagination */
-        offset: integer('UInt32'),
+        offset: /* @__PURE__ */ integer('UInt32'),
         /** deprecated, ignored — pagination follows the `Link` header's offset */
-        ref: nullable(string()),
+        ref: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /** deprecated, ignored — search covers the resource's indexed fields */
-        fields: array(string()),
+        fields: /* @__PURE__ */ array(/* @__PURE__ */ string()),
     }),
     body: null,
-    response: array(Asset),
+    response: /* @__PURE__ */ array(Asset),
 });
 
 /**
@@ -191,13 +191,13 @@ export function show(
     return call(SHOW, input, options);
 }
 
-const SHOW = operation({
+const SHOW = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/assets/{id}',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
@@ -217,13 +217,13 @@ export function update(
     return call(UPDATE, input, options);
 }
 
-const UPDATE = operation({
+const UPDATE = /* @__PURE__ */ operation({
     method: 'PATCH',
     path: '/api/engine/v2/assets/{id}',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),

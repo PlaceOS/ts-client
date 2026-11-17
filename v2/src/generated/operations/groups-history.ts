@@ -29,29 +29,29 @@ export function index(
     return call(INDEX, input, options);
 }
 
-const INDEX = operation({
+const INDEX = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/group_history',
     pathKeys: [],
-    params: parameters({
+    params: /* @__PURE__ */ parameters({
         /** only return changes to this group and its memberships */
-        group_id: nullable(string()),
+        group_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /** the maximum number of results to return */
-        limit: integer('Int32'),
+        limit: /* @__PURE__ */ integer('Int32'),
         /** the starting offset of the result set, used to implement pagination */
-        offset: integer('Int32'),
+        offset: /* @__PURE__ */ integer('Int32'),
         /**
          * filters results by the given text: a record matches when any word matches its searchable
          * fields as a whole word, and the last word also matches as a prefix (search as you type)
          */
-        q: string(),
+        q: /* @__PURE__ */ string(),
         /** deprecated, ignored — pagination follows the `Link` header's offset */
-        ref: nullable(string()),
+        ref: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /** deprecated, ignored — search covers the resource's indexed fields */
-        fields: array(string()),
+        fields: /* @__PURE__ */ array(/* @__PURE__ */ string()),
     }),
     body: null,
-    response: array(History),
+    response: /* @__PURE__ */ array(History),
 });
 
 /** `GET /api/engine/v2/group_history/{id}` */
@@ -62,13 +62,13 @@ export function show(
     return call(SHOW, input, options);
 }
 
-const SHOW = operation({
+const SHOW = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/group_history/{id}',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),

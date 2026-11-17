@@ -26,16 +26,16 @@ export function destroy(
     return call(DESTROY, input, options);
 }
 
-const DESTROY = operation({
+const DESTROY = /* @__PURE__ */ operation({
     method: 'DELETE',
     path: '/api/engine/v2/cluster/{id}',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
             /** specifies the core node we want to send the request to */
-            id: string(),
+            id: /* @__PURE__ */ string(),
             /** the name of the driver to terminate */
-            driver: string(),
+            driver: /* @__PURE__ */ string(),
         },
         ['id', 'driver'],
     ),
@@ -55,16 +55,16 @@ export function nodes(
     return call(NODES, input, options);
 }
 
-const NODES = operation({
+const NODES = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/cluster',
     pathKeys: [],
-    params: parameters({
+    params: /* @__PURE__ */ parameters({
         /** return the detailed status of the node including memory and CPU usage? */
-        include_status: boolean(),
+        include_status: /* @__PURE__ */ boolean(),
     }),
     body: null,
-    response: array(ClusterNodeStatus),
+    response: /* @__PURE__ */ array(ClusterNodeStatus),
 });
 
 /**
@@ -82,11 +82,11 @@ export function rebalance(
     return call(REBALANCE, input, options);
 }
 
-const REBALANCE = operation({
+const REBALANCE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/cluster/rebalance',
     pathKeys: [],
-    params: parameters({}),
+    params: /* @__PURE__ */ parameters({}),
     body: null,
     response: ClusterVersions,
 });
@@ -103,19 +103,19 @@ export function show(
     return call(SHOW, input, options);
 }
 
-const SHOW = operation({
+const SHOW = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/cluster/{id}',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
             /** specifies the core node we want to send the request to */
-            id: string(),
+            id: /* @__PURE__ */ string(),
             /** return the detailed status of the drivers running on the node? */
-            include_status: boolean(),
+            include_status: /* @__PURE__ */ boolean(),
         },
         ['id'],
     ),
     body: null,
-    response: array(ClusterDriverStatus),
+    response: /* @__PURE__ */ array(ClusterDriverStatus),
 });

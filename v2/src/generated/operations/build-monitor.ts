@@ -22,14 +22,14 @@ export function cancel(
     return call(CANCEL, input, options);
 }
 
-const CANCEL = operation({
+const CANCEL = /* @__PURE__ */ operation({
     method: 'DELETE',
     path: '/api/engine/v2/build/cancel/{job}',
     pathKeys: ['job'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
             /** ID of previously submitted compilation job */
-            job: string(),
+            job: /* @__PURE__ */ string(),
         },
         ['job'],
     ),
@@ -45,11 +45,11 @@ export function monitor(
     return call(MONITOR, input, options);
 }
 
-const MONITOR = operation({
+const MONITOR = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/build/monitor',
     pathKeys: [],
-    params: parameters({
+    params: /* @__PURE__ */ parameters({
         /**
          * state of job to return. One of [pending,running,cancelled error,done]. Defaults to
          * 'pending'
@@ -57,5 +57,8 @@ const MONITOR = operation({
         state: State,
     }),
     body: null,
-    response: union([array(BuildMonitorTaskStatus), string()]),
+    response: /* @__PURE__ */ union([
+        /* @__PURE__ */ array(BuildMonitorTaskStatus),
+        /* @__PURE__ */ string(),
+    ]),
 });

@@ -26,43 +26,45 @@ export function index(
     return call(INDEX, input, options);
 }
 
-const INDEX = operation({
+const INDEX = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/history',
     pathKeys: [],
-    params: parameters({
+    params: /* @__PURE__ */ parameters({
         /** only return changes to these resource types (table names) */
-        resource_types: nullable(array(string())),
+        resource_types: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
         /** exclude changes to these resource types (table names) */
-        exclude_resource_types: nullable(array(string())),
+        exclude_resource_types: /* @__PURE__ */ nullable(
+            /* @__PURE__ */ array(/* @__PURE__ */ string()),
+        ),
         /** only return changes to this resource, usually combined with `resource_types` */
-        resource_id: nullable(string()),
+        resource_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /** only return changes related to this parent, such as a group, playlist or booking */
-        correlation_id: nullable(string()),
+        correlation_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /** only return changes made by this user */
-        user_id: nullable(string()),
+        user_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /** only return these kinds of change: create, update, delete, approve or restore */
-        actions: nullable(array(string())),
+        actions: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
         /** only return changes made at or after this time, as a unix epoch */
-        period_start: nullable(integer()),
+        period_start: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
         /** only return changes made before this time, as a unix epoch */
-        period_end: nullable(integer()),
+        period_end: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
         /** the maximum number of results to return */
-        limit: integer('Int32'),
+        limit: /* @__PURE__ */ integer('Int32'),
         /** the starting offset of the result set, used to implement pagination */
-        offset: integer('Int32'),
+        offset: /* @__PURE__ */ integer('Int32'),
         /**
          * filters results by the given text: a record matches when any word matches its searchable
          * fields as a whole word, and the last word also matches as a prefix (search as you type)
          */
-        q: string(),
+        q: /* @__PURE__ */ string(),
         /** deprecated, ignored — pagination follows the `Link` header's offset */
-        ref: nullable(string()),
+        ref: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /** deprecated, ignored — search covers the resource's indexed fields */
-        fields: array(string()),
+        fields: /* @__PURE__ */ array(/* @__PURE__ */ string()),
     }),
     body: null,
-    response: array(History),
+    response: /* @__PURE__ */ array(History),
 });
 
 /** `GET /api/engine/v2/history/{id}` */
@@ -73,13 +75,13 @@ export function show(
     return call(SHOW, input, options);
 }
 
-const SHOW = operation({
+const SHOW = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/history/{id}',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
@@ -102,16 +104,16 @@ export function undelete(
     return call(UNDELETE, input, options);
 }
 
-const UNDELETE = operation({
+const UNDELETE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/history/undelete',
     pathKeys: [],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
             /** the type (table name) of the deleted resource */
-            resource_type: string(),
+            resource_type: /* @__PURE__ */ string(),
             /** the id of the deleted resource */
-            resource_id: string(),
+            resource_id: /* @__PURE__ */ string(),
         },
         ['resource_type', 'resource_id'],
     ),

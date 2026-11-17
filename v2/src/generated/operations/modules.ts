@@ -35,13 +35,13 @@ export function create(
     return call(CREATE, input, options);
 }
 
-const CREATE = operation({
+const CREATE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/modules',
     pathKeys: [],
-    params: parameters({
+    params: /* @__PURE__ */ parameters({
         /** add the new module to this control system */
-        system_id: nullable(string()),
+        system_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     }),
     body: Module,
     response: Module,
@@ -59,13 +59,13 @@ export function destroy(
     return call(DESTROY, input, options);
 }
 
-const DESTROY = operation({
+const DESTROY = /* @__PURE__ */ operation({
     method: 'DELETE',
     path: '/api/engine/v2/modules/{id}',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
@@ -88,20 +88,20 @@ export function execute(
     return call(EXECUTE, input, options);
 }
 
-const EXECUTE = operation({
+const EXECUTE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/modules/{id}/exec/{method}',
     pathKeys: ['id', 'method'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
             /** the name of the methodm we want to execute */
-            method: string(),
+            method: /* @__PURE__ */ string(),
         },
         ['id', 'method'],
     ),
-    body: array(json()),
-    response: json(),
+    body: /* @__PURE__ */ array(/* @__PURE__ */ json()),
+    response: /* @__PURE__ */ json(),
 });
 
 /**
@@ -116,39 +116,39 @@ export function index(
     return call(INDEX, input, options);
 }
 
-const INDEX = operation({
+const INDEX = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/modules',
     pathKeys: [],
-    params: parameters({
+    params: /* @__PURE__ */ parameters({
         /** only return modules updated before this time (unix epoch) */
-        as_of: nullable(integer()),
+        as_of: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
         /**
          * only return modules running in this system (query params are ignored if this is provided)
          */
-        control_system_id: nullable(string()),
+        control_system_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /** only return instances of this driver */
-        driver_id: nullable(string()),
+        driver_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /** do not return logic modules (return only modules that can exist in multiple systems) */
-        no_logic: boolean(),
+        no_logic: /* @__PURE__ */ boolean(),
         /** return only running modules */
-        running: nullable(boolean()),
+        running: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
         /**
          * filters results by the given text: a record matches when any word matches its searchable
          * fields as a whole word, and the last word also matches as a prefix (search as you type)
          */
-        q: string(),
+        q: /* @__PURE__ */ string(),
         /** the maximum number of results to return */
-        limit: integer('UInt32'),
+        limit: /* @__PURE__ */ integer('UInt32'),
         /** the starting offset of the result set, used to implement pagination */
-        offset: integer('UInt32'),
+        offset: /* @__PURE__ */ integer('UInt32'),
         /** deprecated, ignored — pagination follows the `Link` header's offset */
-        ref: nullable(string()),
+        ref: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /** deprecated, ignored — search covers the resource's indexed fields */
-        fields: array(string()),
+        fields: /* @__PURE__ */ array(/* @__PURE__ */ string()),
     }),
     body: null,
-    response: array(Module),
+    response: /* @__PURE__ */ array(Module),
 });
 
 /**
@@ -166,18 +166,18 @@ export function load(
     return call(LOAD, input, options);
 }
 
-const LOAD = operation({
+const LOAD = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/modules/{id}/load',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
     body: null,
-    response: boolean(),
+    response: /* @__PURE__ */ boolean(),
 });
 
 /**
@@ -197,20 +197,20 @@ export function logs(
     return call(LOGS, input, options);
 }
 
-const LOGS = operation({
+const LOGS = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/modules/{id}/logs',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
             /** how long to capture logs for, in seconds, up to 129600 (36 hours) */
-            seconds: integer('Int32'),
+            seconds: /* @__PURE__ */ integer('Int32'),
             /**
              * the minimum level of the lines captured: trace, debug, info, notice, warn, error or
              * fatal
              */
-            level: string(),
+            level: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
@@ -230,13 +230,13 @@ export function ping(
     return call(PING, input, options);
 }
 
-const PING = operation({
+const PING = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/modules/{id}/ping',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
@@ -256,18 +256,18 @@ export function settings(
     return call(SETTINGS, input, options);
 }
 
-const SETTINGS = operation({
+const SETTINGS = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/modules/{id}/settings',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
     body: null,
-    response: array(Settings),
+    response: /* @__PURE__ */ array(Settings),
 });
 
 /**
@@ -282,15 +282,15 @@ export function show(
     return call(SHOW, input, options);
 }
 
-const SHOW = operation({
+const SHOW = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/modules/{id}',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
             /** return the driver details along with the module? */
-            complete: boolean(),
+            complete: /* @__PURE__ */ boolean(),
         },
         ['id'],
     ),
@@ -310,18 +310,18 @@ export function showError(
     return call(SHOW_ERROR, input, options);
 }
 
-const SHOW_ERROR = operation({
+const SHOW_ERROR = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/modules/{id}/error',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
     body: null,
-    response: array(string()),
+    response: /* @__PURE__ */ array(/* @__PURE__ */ string()),
 });
 
 /**
@@ -336,13 +336,13 @@ export function start(
     return call(START, input, options);
 }
 
-const START = operation({
+const START = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/modules/{id}/start',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
@@ -362,18 +362,18 @@ export function state(
     return call(STATE, input, options);
 }
 
-const STATE = operation({
+const STATE = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/modules/{id}/state',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
     body: null,
-    response: record(string()),
+    response: /* @__PURE__ */ record(/* @__PURE__ */ string()),
 });
 
 /**
@@ -388,20 +388,20 @@ export function stateLookup(
     return call(STATE_LOOKUP, input, options);
 }
 
-const STATE_LOOKUP = operation({
+const STATE_LOOKUP = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/modules/{id}/state/{key}',
     pathKeys: ['id', 'key'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
             /** that name of the status we are after */
-            key: string(),
+            key: /* @__PURE__ */ string(),
         },
         ['id', 'key'],
     ),
     body: null,
-    response: string(),
+    response: /* @__PURE__ */ string(),
 });
 
 /**
@@ -419,20 +419,20 @@ export function stateValue(
     return call(STATE_VALUE, input, options);
 }
 
-const STATE_VALUE = operation({
+const STATE_VALUE = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/modules/{id}/state/{key}/value',
     pathKeys: ['id', 'key'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
             /** the name of the status variable */
-            key: string(),
+            key: /* @__PURE__ */ string(),
         },
         ['id', 'key'],
     ),
     body: null,
-    response: json(),
+    response: /* @__PURE__ */ json(),
 });
 
 /**
@@ -447,13 +447,13 @@ export function stop(
     return call(STOP, input, options);
 }
 
-const STOP = operation({
+const STOP = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/modules/{id}/stop',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
@@ -473,13 +473,13 @@ export function update(
     return call(UPDATE, input, options);
 }
 
-const UPDATE = operation({
+const UPDATE = /* @__PURE__ */ operation({
     method: 'PATCH',
     path: '/api/engine/v2/modules/{id}',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),

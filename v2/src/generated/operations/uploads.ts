@@ -37,44 +37,44 @@ export function create(
     return call(CREATE, input, options);
 }
 
-const CREATE = operation({
+const CREATE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/uploads',
     pathKeys: [],
-    params: parameters({}),
+    params: /* @__PURE__ */ parameters({}),
     body: UploadsUploadInfo,
-    response: union([
-        object(
+    response: /* @__PURE__ */ union([
+        /* @__PURE__ */ object(
             {
-                type: string(),
-                signature: object(
+                type: /* @__PURE__ */ string(),
+                signature: /* @__PURE__ */ object(
                     {
-                        verb: string(),
-                        url: string(),
-                        headers: record(string()),
+                        verb: /* @__PURE__ */ string(),
+                        url: /* @__PURE__ */ string(),
+                        headers: /* @__PURE__ */ record(/* @__PURE__ */ string()),
                     },
                     ['verb', 'url', 'headers'],
                 ),
-                part_list: array(integer('Int32')),
-                part_data: record(json()),
-                upload_id: nullable(string()),
-                residence: string(),
+                part_list: /* @__PURE__ */ array(/* @__PURE__ */ integer('Int32')),
+                part_data: /* @__PURE__ */ record(/* @__PURE__ */ json()),
+                upload_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+                residence: /* @__PURE__ */ string(),
             },
             ['type', 'signature', 'part_list', 'part_data', 'residence'],
         ),
-        object(
+        /* @__PURE__ */ object(
             {
-                type: string(),
-                signature: object(
+                type: /* @__PURE__ */ string(),
+                signature: /* @__PURE__ */ object(
                     {
-                        verb: string(),
-                        url: string(),
-                        headers: record(string()),
+                        verb: /* @__PURE__ */ string(),
+                        url: /* @__PURE__ */ string(),
+                        headers: /* @__PURE__ */ record(/* @__PURE__ */ string()),
                     },
                     ['verb', 'url', 'headers'],
                 ),
-                upload_id: nullable(string()),
-                residence: string(),
+                upload_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+                residence: /* @__PURE__ */ string(),
             },
             ['type', 'signature', 'residence'],
         ),
@@ -93,14 +93,14 @@ export function destroy(
     return call(DESTROY, input, options);
 }
 
-const DESTROY = operation({
+const DESTROY = /* @__PURE__ */ operation({
     method: 'DELETE',
     path: '/api/engine/v2/uploads/{id}',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
             /** upload id of the upload */
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
@@ -124,14 +124,14 @@ export function downloadProxyFileContents(
     return call(DOWNLOAD_PROXY_FILE_CONTENTS, input, options);
 }
 
-const DOWNLOAD_PROXY_FILE_CONTENTS = operation({
+const DOWNLOAD_PROXY_FILE_CONTENTS = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/uploads/{id}/download',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
             /** upload id of the upload */
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
@@ -155,17 +155,17 @@ export function downloadSimpleRoute(
     return call(DOWNLOAD_SIMPLE_ROUTE, input, options);
 }
 
-const DOWNLOAD_SIMPLE_ROUTE = operation({
+const DOWNLOAD_SIMPLE_ROUTE = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/uploads/{id}/download/{api_key}/{inline}/{file_name}',
     pathKeys: ['id', 'api_key', 'inline', 'file_name'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
             /** upload id of the upload */
-            id: string(),
-            api_key: string(),
-            inline: boolean(),
-            file_name: string(),
+            id: /* @__PURE__ */ string(),
+            api_key: /* @__PURE__ */ string(),
+            inline: /* @__PURE__ */ boolean(),
+            file_name: /* @__PURE__ */ string(),
         },
         ['id', 'api_key', 'inline', 'file_name'],
     ),
@@ -189,16 +189,16 @@ export function downloadSimpleRouteWithoutFileName(
     return call(DOWNLOAD_SIMPLE_ROUTE_WITHOUT_FILE_NAME, input, options);
 }
 
-const DOWNLOAD_SIMPLE_ROUTE_WITHOUT_FILE_NAME = operation({
+const DOWNLOAD_SIMPLE_ROUTE_WITHOUT_FILE_NAME = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/uploads/{id}/download/{api_key}/{inline}',
     pathKeys: ['id', 'api_key', 'inline'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
             /** upload id of the upload */
-            id: string(),
-            api_key: string(),
-            inline: boolean(),
+            id: /* @__PURE__ */ string(),
+            api_key: /* @__PURE__ */ string(),
+            inline: /* @__PURE__ */ boolean(),
         },
         ['id', 'api_key', 'inline'],
     ),
@@ -223,35 +223,35 @@ export function edit(
     return call(EDIT, input, options);
 }
 
-const EDIT = operation({
+const EDIT = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/uploads/{id}/edit',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
             /** upload id of the upload */
-            id: string(),
+            id: /* @__PURE__ */ string(),
             /** file part which will be uploaded to cloud storage */
-            part: string(),
+            part: /* @__PURE__ */ string(),
             /** MD5 of the part which will be uploaded to cloud storage */
-            file_id: nullable(string()),
+            file_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         },
         ['id', 'part'],
     ),
     body: null,
-    response: object(
+    response: /* @__PURE__ */ object(
         {
-            type: string(),
-            signature: object(
+            type: /* @__PURE__ */ string(),
+            signature: /* @__PURE__ */ object(
                 {
-                    verb: string(),
-                    url: string(),
-                    headers: record(string()),
+                    verb: /* @__PURE__ */ string(),
+                    url: /* @__PURE__ */ string(),
+                    headers: /* @__PURE__ */ record(/* @__PURE__ */ string()),
                 },
                 ['verb', 'url', 'headers'],
             ),
-            upload_id: nullable(string()),
-            body: nullable(string()),
+            upload_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+            body: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         },
         ['type', 'signature'],
     ),
@@ -269,21 +269,21 @@ export function finished(
     return call(FINISHED, input, options);
 }
 
-const FINISHED = operation({
+const FINISHED = /* @__PURE__ */ operation({
     method: 'PUT',
     path: '/api/engine/v2/uploads/{id}',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
             /** upload id of the upload */
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
     body: null,
-    response: object(
+    response: /* @__PURE__ */ object(
         {
-            ok: boolean(),
+            ok: /* @__PURE__ */ boolean(),
         },
         ['ok'],
     ),
@@ -301,16 +301,16 @@ export function getLink(
     return call(GET_LINK, input, options);
 }
 
-const GET_LINK = operation({
+const GET_LINK = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/uploads/{id}/url',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
             /** upload id of the upload */
-            id: string(),
+            id: /* @__PURE__ */ string(),
             /** Link expiry period in minutes. */
-            expiry: integer('Int32'),
+            expiry: /* @__PURE__ */ integer('Int32'),
         },
         ['id'],
     ),
@@ -330,33 +330,33 @@ export function index(
     return call(INDEX, input, options);
 }
 
-const INDEX = operation({
+const INDEX = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/uploads',
     pathKeys: [],
-    params: parameters({
+    params: /* @__PURE__ */ parameters({
         /** filters results to returns ones where file_name contains this search string */
-        file_search: nullable(string()),
+        file_search: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /** the maximum number of results to return */
-        limit: integer('Int32'),
+        limit: /* @__PURE__ */ integer('Int32'),
         /** the starting offset of the result set. Used to implement pagination */
-        offset: integer('Int32'),
+        offset: /* @__PURE__ */ integer('Int32'),
         /** return uploads with particular tags */
-        tags: nullable(array(string())),
+        tags: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
         /** storage id to list uploads from (defaults to authority's default storage) */
-        storage_id: nullable(string()),
+        storage_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /**
          * filters results by the given text: a record matches when any word matches its searchable
          * fields as a whole word, and the last word also matches as a prefix (search as you type)
          */
-        q: string(),
+        q: /* @__PURE__ */ string(),
         /** deprecated, ignored — pagination follows the `Link` header's offset */
-        ref: nullable(string()),
+        ref: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /** deprecated, ignored — search covers the resource's indexed fields */
-        fields: array(string()),
+        fields: /* @__PURE__ */ array(/* @__PURE__ */ string()),
     }),
     body: null,
-    response: array(Upload),
+    response: /* @__PURE__ */ array(Upload),
 });
 
 /**
@@ -377,11 +377,11 @@ export function screenshot(
     return call(SCREENSHOT, input, options);
 }
 
-const SCREENSHOT = operation({
+const SCREENSHOT = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/uploads/screenshot',
     pathKeys: [],
-    params: parameters({}),
+    params: /* @__PURE__ */ parameters({}),
     body: UploadsScreenshotInfo,
     response: Upload,
 });
@@ -398,25 +398,25 @@ export function storageName(
     return call(STORAGE_NAME, input, options);
 }
 
-const STORAGE_NAME = operation({
+const STORAGE_NAME = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/uploads/new',
     pathKeys: [],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
             /** Name of file which will be uploaded to cloud storage */
-            file_name: string(),
+            file_name: /* @__PURE__ */ string(),
             /** Size of file which will be uploaded to cloud storage */
-            file_size: integer(),
+            file_size: /* @__PURE__ */ integer(),
             /** Mime-Type of file which will be uploaded to cloud storage */
-            file_mime: nullable(string()),
+            file_mime: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         },
         ['file_name', 'file_size'],
     ),
     body: null,
-    response: object(
+    response: /* @__PURE__ */ object(
         {
-            residence: string(),
+            residence: /* @__PURE__ */ string(),
         },
         ['residence'],
     ),
@@ -434,42 +434,42 @@ export function update(
     return call(UPDATE, input, options);
 }
 
-const UPDATE = operation({
+const UPDATE = /* @__PURE__ */ operation({
     method: 'PATCH',
     path: '/api/engine/v2/uploads/{id}',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
             /** upload id of the upload */
-            id: string(),
+            id: /* @__PURE__ */ string(),
             /** the next file part which we need a signed URL for */
-            part: nullable(string()),
+            part: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
             /** MD5 of the next part */
-            file_id: nullable(string()),
+            file_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         },
         ['id'],
     ),
     body: UploadsUpdateInfo,
-    response: union([
-        object(
+    response: /* @__PURE__ */ union([
+        /* @__PURE__ */ object(
             {
-                ok: boolean(),
+                ok: /* @__PURE__ */ boolean(),
             },
             ['ok'],
         ),
-        object(
+        /* @__PURE__ */ object(
             {
-                type: string(),
-                signature: object(
+                type: /* @__PURE__ */ string(),
+                signature: /* @__PURE__ */ object(
                     {
-                        verb: string(),
-                        url: string(),
-                        headers: record(string()),
+                        verb: /* @__PURE__ */ string(),
+                        url: /* @__PURE__ */ string(),
+                        headers: /* @__PURE__ */ record(/* @__PURE__ */ string()),
                     },
                     ['verb', 'url', 'headers'],
                 ),
-                upload_id: nullable(string()),
-                body: nullable(string()),
+                upload_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+                body: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
             },
             ['type', 'signature'],
         ),

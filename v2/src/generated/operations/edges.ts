@@ -44,16 +44,16 @@ export function cleanupErrors(
     return call(CLEANUP_ERRORS, input, options);
 }
 
-const CLEANUP_ERRORS = operation({
+const CLEANUP_ERRORS = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/edges/monitoring/cleanup',
     pathKeys: [],
-    params: parameters({
+    params: /* @__PURE__ */ parameters({
         /** Hours of error history to retain */
-        hours: integer('Int32'),
+        hours: /* @__PURE__ */ integer('Int32'),
     }),
     body: null,
-    response: record(record(json())),
+    response: /* @__PURE__ */ record(/* @__PURE__ */ record(/* @__PURE__ */ json())),
 });
 
 /**
@@ -68,11 +68,11 @@ export function create(
     return call(CREATE, input, options);
 }
 
-const CREATE = operation({
+const CREATE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/edges',
     pathKeys: [],
-    params: parameters({}),
+    params: /* @__PURE__ */ parameters({}),
     body: EdgeCreateBody,
     response: EdgeKeyResponse,
 });
@@ -89,13 +89,13 @@ export function destroy(
     return call(DESTROY, input, options);
 }
 
-const DESTROY = operation({
+const DESTROY = /* @__PURE__ */ operation({
     method: 'DELETE',
     path: '/api/engine/v2/edges/{id}',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
@@ -115,18 +115,18 @@ export function edgeConnections(
     return call(EDGE_CONNECTIONS, input, options);
 }
 
-const EDGE_CONNECTIONS = operation({
+const EDGE_CONNECTIONS = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/edges/{id}/connections',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
     body: null,
-    response: nullable(ConnectionMetrics),
+    response: /* @__PURE__ */ nullable(ConnectionMetrics),
 });
 
 /**
@@ -141,22 +141,22 @@ export function edgeErrors(
     return call(EDGE_ERRORS, input, options);
 }
 
-const EDGE_ERRORS = operation({
+const EDGE_ERRORS = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/edges/{id}/errors',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
             /** Number of recent errors to return */
-            limit: integer('Int32'),
+            limit: /* @__PURE__ */ integer('Int32'),
             /** Error type filter */
-            type: nullable(string()),
+            type: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         },
         ['id'],
     ),
     body: null,
-    response: array(EdgeError),
+    response: /* @__PURE__ */ array(EdgeError),
 });
 
 /**
@@ -171,18 +171,18 @@ export function edgeHealth(
     return call(EDGE_HEALTH, input, options);
 }
 
-const EDGE_HEALTH = operation({
+const EDGE_HEALTH = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/edges/{id}/health',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
     body: null,
-    response: nullable(EdgeHealth),
+    response: /* @__PURE__ */ nullable(EdgeHealth),
 });
 
 /**
@@ -197,13 +197,13 @@ export function edgeModuleStatus(
     return call(EDGE_MODULE_STATUS, input, options);
 }
 
-const EDGE_MODULE_STATUS = operation({
+const EDGE_MODULE_STATUS = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/edges/{id}/modules/status',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
@@ -223,13 +223,13 @@ export function edgesConnections(
     return call(EDGES_CONNECTIONS, input, options);
 }
 
-const EDGES_CONNECTIONS = operation({
+const EDGES_CONNECTIONS = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/edges/connections',
     pathKeys: [],
-    params: parameters({}),
+    params: /* @__PURE__ */ parameters({}),
     body: null,
-    response: record(ConnectionMetrics),
+    response: /* @__PURE__ */ record(ConnectionMetrics),
 });
 
 /**
@@ -244,18 +244,18 @@ export function edgesErrors(
     return call(EDGES_ERRORS, input, options);
 }
 
-const EDGES_ERRORS = operation({
+const EDGES_ERRORS = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/edges/errors',
     pathKeys: [],
-    params: parameters({
+    params: /* @__PURE__ */ parameters({
         /** Number of recent errors to return */
-        limit: integer('Int32'),
+        limit: /* @__PURE__ */ integer('Int32'),
         /** Error type filter */
-        type: nullable(string()),
+        type: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     }),
     body: null,
-    response: record(array(EdgeError)),
+    response: /* @__PURE__ */ record(/* @__PURE__ */ array(EdgeError)),
 });
 
 /**
@@ -270,13 +270,13 @@ export function edgesHealth(
     return call(EDGES_HEALTH, input, options);
 }
 
-const EDGES_HEALTH = operation({
+const EDGES_HEALTH = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/edges/health',
     pathKeys: [],
-    params: parameters({}),
+    params: /* @__PURE__ */ parameters({}),
     body: null,
-    response: record(EdgeHealth),
+    response: /* @__PURE__ */ record(EdgeHealth),
 });
 
 /**
@@ -291,13 +291,15 @@ export function edgesModuleFailures(
     return call(EDGES_MODULE_FAILURES, input, options);
 }
 
-const EDGES_MODULE_FAILURES = operation({
+const EDGES_MODULE_FAILURES = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/edges/modules/failures',
     pathKeys: [],
-    params: parameters({}),
+    params: /* @__PURE__ */ parameters({}),
     body: null,
-    response: record(array(record(json()))),
+    response: /* @__PURE__ */ record(
+        /* @__PURE__ */ array(/* @__PURE__ */ record(/* @__PURE__ */ json())),
+    ),
 });
 
 /**
@@ -312,11 +314,11 @@ export function edgesStatistics(
     return call(EDGES_STATISTICS, input, options);
 }
 
-const EDGES_STATISTICS = operation({
+const EDGES_STATISTICS = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/edges/statistics',
     pathKeys: [],
-    params: parameters({}),
+    params: /* @__PURE__ */ parameters({}),
     body: null,
     response: EdgeStatistics,
 });
@@ -336,27 +338,27 @@ export function index(
     return call(INDEX, input, options);
 }
 
-const INDEX = operation({
+const INDEX = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/edges',
     pathKeys: [],
-    params: parameters({
+    params: /* @__PURE__ */ parameters({
         /**
          * filters results by the given text: a record matches when any word matches its searchable
          * fields as a whole word, and the last word also matches as a prefix (search as you type)
          */
-        q: string(),
+        q: /* @__PURE__ */ string(),
         /** the maximum number of results to return */
-        limit: integer('UInt32'),
+        limit: /* @__PURE__ */ integer('UInt32'),
         /** the starting offset of the result set, used to implement pagination */
-        offset: integer('UInt32'),
+        offset: /* @__PURE__ */ integer('UInt32'),
         /** deprecated, ignored — pagination follows the `Link` header's offset */
-        ref: nullable(string()),
+        ref: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /** deprecated, ignored — search covers the resource's indexed fields */
-        fields: array(string()),
+        fields: /* @__PURE__ */ array(/* @__PURE__ */ string()),
     }),
     body: null,
-    response: array(Edge),
+    response: /* @__PURE__ */ array(Edge),
 });
 
 /**
@@ -371,13 +373,13 @@ export function monitoringSummary(
     return call(MONITORING_SUMMARY, input, options);
 }
 
-const MONITORING_SUMMARY = operation({
+const MONITORING_SUMMARY = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/edges/monitoring/summary',
     pathKeys: [],
-    params: parameters({}),
+    params: /* @__PURE__ */ parameters({}),
     body: null,
-    response: record(record(json())),
+    response: /* @__PURE__ */ record(/* @__PURE__ */ record(/* @__PURE__ */ json())),
 });
 
 /**
@@ -392,13 +394,13 @@ export function show(
     return call(SHOW, input, options);
 }
 
-const SHOW = operation({
+const SHOW = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/edges/{id}',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
@@ -418,20 +420,20 @@ export function token(
     return call(TOKEN, input, options);
 }
 
-const TOKEN = operation({
+const TOKEN = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/edges/{id}/token',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
     body: null,
-    response: object(
+    response: /* @__PURE__ */ object(
         {
-            token: string(),
+            token: /* @__PURE__ */ string(),
         },
         ['token'],
     ),
@@ -449,13 +451,13 @@ export function update(
     return call(UPDATE, input, options);
 }
 
-const UPDATE = operation({
+const UPDATE = /* @__PURE__ */ operation({
     method: 'PATCH',
     path: '/api/engine/v2/edges/{id}',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),

@@ -38,11 +38,11 @@ export function create(
     return call(CREATE, input, options);
 }
 
-const CREATE = operation({
+const CREATE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/groups',
     pathKeys: [],
-    params: parameters({}),
+    params: /* @__PURE__ */ parameters({}),
     body: Group,
     response: Group,
 });
@@ -55,16 +55,16 @@ export function current(
     return call(CURRENT, input, options);
 }
 
-const CURRENT = operation({
+const CURRENT = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/groups/current',
     pathKeys: [],
-    params: parameters({
+    params: /* @__PURE__ */ parameters({
         /** filter to groups participating in this subsystem (e.g. 'signage') */
-        subsystem: nullable(string()),
+        subsystem: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     }),
     body: null,
-    response: array(GroupsCurrentGroup),
+    response: /* @__PURE__ */ array(GroupsCurrentGroup),
 });
 
 /**
@@ -79,13 +79,13 @@ export function destroy(
     return call(DESTROY, input, options);
 }
 
-const DESTROY = operation({
+const DESTROY = /* @__PURE__ */ operation({
     method: 'DELETE',
     path: '/api/engine/v2/groups/{id}',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
@@ -108,20 +108,20 @@ export function features(
     return call(FEATURES, input, options);
 }
 
-const FEATURES = operation({
+const FEATURES = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/groups/{id}/features',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
             /** only return this subsystem's features */
-            subsystem: nullable(string()),
+            subsystem: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         },
         ['id'],
     ),
     body: null,
-    response: record(record(json())),
+    response: /* @__PURE__ */ record(/* @__PURE__ */ record(/* @__PURE__ */ json())),
 });
 
 /**
@@ -141,26 +141,26 @@ export function index(
     return call(INDEX, input, options);
 }
 
-const INDEX = operation({
+const INDEX = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/groups',
     pathKeys: [],
-    params: parameters({
+    params: /* @__PURE__ */ parameters({
         /** filter by parent group id; pass 'root' for root-level groups */
-        parent_id: nullable(string()),
+        parent_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /** case-insensitive substring search on name (SQL ILIKE) */
-        q: nullable(string()),
+        q: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /** include children_count for each group (useful for tree views) */
-        include_children_count: boolean(),
-        limit: integer('Int32'),
-        offset: integer('Int32'),
+        include_children_count: /* @__PURE__ */ boolean(),
+        limit: /* @__PURE__ */ integer('Int32'),
+        offset: /* @__PURE__ */ integer('Int32'),
         /** deprecated, ignored — pagination follows the `Link` header's offset */
-        ref: nullable(string()),
+        ref: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /** deprecated, ignored — search covers the resource's indexed fields */
-        fields: array(string()),
+        fields: /* @__PURE__ */ array(/* @__PURE__ */ string()),
     }),
     body: null,
-    response: array(Group),
+    response: /* @__PURE__ */ array(Group),
 });
 
 /**
@@ -175,13 +175,13 @@ export function show(
     return call(SHOW, input, options);
 }
 
-const SHOW = operation({
+const SHOW = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/groups/{id}',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
@@ -206,13 +206,13 @@ export function syncAdGroups(
     return call(SYNC_AD_GROUPS, input, options);
 }
 
-const SYNC_AD_GROUPS = operation({
+const SYNC_AD_GROUPS = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/groups/ad_groups/sync',
     pathKeys: [],
-    params: parameters({}),
+    params: /* @__PURE__ */ parameters({}),
     body: GroupsAdGroupSync,
-    response: array(GroupUser),
+    response: /* @__PURE__ */ array(GroupUser),
 });
 
 /**
@@ -230,13 +230,13 @@ export function update(
     return call(UPDATE, input, options);
 }
 
-const UPDATE = operation({
+const UPDATE = /* @__PURE__ */ operation({
     method: 'PATCH',
     path: '/api/engine/v2/groups/{id}',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),

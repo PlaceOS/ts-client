@@ -32,13 +32,13 @@ export function cancel(
     return call(CANCEL, input, options);
 }
 
-const CANCEL = operation({
+const CANCEL = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/maps/ai/jobs/{id}/cancel',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
@@ -58,11 +58,11 @@ export function capabilities(
     return call(CAPABILITIES, input, options);
 }
 
-const CAPABILITIES = operation({
+const CAPABILITIES = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/maps/ai/capabilities',
     pathKeys: [],
-    params: parameters({}),
+    params: /* @__PURE__ */ parameters({}),
     body: null,
     response: MapAiCapabilities,
 });
@@ -79,11 +79,11 @@ export function edit(
     return call(EDIT, input, options);
 }
 
-const EDIT = operation({
+const EDIT = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/maps/ai/edit',
     pathKeys: [],
-    params: parameters({}),
+    params: /* @__PURE__ */ parameters({}),
     body: MapAiEditParams,
     response: MapAiJobResponse,
 });
@@ -100,21 +100,21 @@ export function indexJobs(
     return call(INDEX_JOBS, input, options);
 }
 
-const INDEX_JOBS = operation({
+const INDEX_JOBS = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/maps/ai/jobs',
     pathKeys: [],
-    params: parameters({
+    params: /* @__PURE__ */ parameters({
         /** only the caller's own jobs */
-        mine: boolean(),
+        mine: /* @__PURE__ */ boolean(),
         /** only jobs against this zone */
-        zone_id: nullable(string()),
+        zone_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /** map_edit; another kind lists that kind instead */
-        kind: string(),
-        limit: integer('Int32'),
+        kind: /* @__PURE__ */ string(),
+        limit: /* @__PURE__ */ integer('Int32'),
     }),
     body: null,
-    response: array(MapAiJobResponse),
+    response: /* @__PURE__ */ array(MapAiJobResponse),
 });
 
 /**
@@ -132,13 +132,13 @@ export function resolve(
     return call(RESOLVE, input, options);
 }
 
-const RESOLVE = operation({
+const RESOLVE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/maps/ai/jobs/{id}/resolve',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
@@ -158,17 +158,17 @@ export function showJob(
     return call(SHOW_JOB, input, options);
 }
 
-const SHOW_JOB = operation({
+const SHOW_JOB = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/maps/ai/jobs/{id}',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
             /** seconds to hold the request open, 0 to answer immediately */
-            wait: integer('Int32'),
+            wait: /* @__PURE__ */ integer('Int32'),
             /** the version the caller already has */
-            since: nullable(integer('Int32')),
+            since: /* @__PURE__ */ nullable(/* @__PURE__ */ integer('Int32')),
         },
         ['id'],
     ),
@@ -188,16 +188,16 @@ export function usage(
     return call(USAGE, input, options);
 }
 
-const USAGE = operation({
+const USAGE = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/maps/ai/usage',
     pathKeys: [],
-    params: parameters({
+    params: /* @__PURE__ */ parameters({
         /** unix seconds, defaults to 30 days ago */
-        from: nullable(integer()),
+        from: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
         /** unix seconds, defaults to now */
-        to: nullable(integer()),
+        to: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     }),
     body: null,
-    response: array(SignageAiJobUsageRow),
+    response: /* @__PURE__ */ array(SignageAiJobUsageRow),
 });

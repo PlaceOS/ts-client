@@ -26,13 +26,13 @@ export function compiled(
     return call(COMPILED, input, options);
 }
 
-const COMPILED = operation({
+const COMPILED = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/drivers/{id}/compiled',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
@@ -52,11 +52,11 @@ export function create(
     return call(CREATE, input, options);
 }
 
-const CREATE = operation({
+const CREATE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/drivers',
     pathKeys: [],
-    params: parameters({}),
+    params: /* @__PURE__ */ parameters({}),
     body: Driver,
     response: Driver,
 });
@@ -73,13 +73,13 @@ export function destroy(
     return call(DESTROY, input, options);
 }
 
-const DESTROY = operation({
+const DESTROY = /* @__PURE__ */ operation({
     method: 'DELETE',
     path: '/api/engine/v2/drivers/{id}',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
@@ -99,31 +99,31 @@ export function index(
     return call(INDEX, input, options);
 }
 
-const INDEX = operation({
+const INDEX = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/drivers',
     pathKeys: [],
-    params: parameters({
+    params: /* @__PURE__ */ parameters({
         /** filter by the type of driver */
-        role: nullable(DriverRole),
+        role: /* @__PURE__ */ nullable(DriverRole),
         /** list only drivers for which update is available */
-        update_available: nullable(boolean()),
+        update_available: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
         /**
          * filters results by the given text: a record matches when any word matches its searchable
          * fields as a whole word, and the last word also matches as a prefix (search as you type)
          */
-        q: string(),
+        q: /* @__PURE__ */ string(),
         /** the maximum number of results to return */
-        limit: integer('UInt32'),
+        limit: /* @__PURE__ */ integer('UInt32'),
         /** the starting offset of the result set, used to implement pagination */
-        offset: integer('UInt32'),
+        offset: /* @__PURE__ */ integer('UInt32'),
         /** deprecated, ignored — pagination follows the `Link` header's offset */
-        ref: nullable(string()),
+        ref: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /** deprecated, ignored — search covers the resource's indexed fields */
-        fields: array(string()),
+        fields: /* @__PURE__ */ array(/* @__PURE__ */ string()),
     }),
     body: null,
-    response: array(Driver),
+    response: /* @__PURE__ */ array(Driver),
 });
 
 /**
@@ -138,18 +138,18 @@ export function readme(
     return call(README, input, options);
 }
 
-const README = operation({
+const README = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/drivers/{id}/readme',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
     body: null,
-    response: string(),
+    response: /* @__PURE__ */ string(),
 });
 
 /**
@@ -164,18 +164,18 @@ export function recompile(
     return call(RECOMPILE, input, options);
 }
 
-const RECOMPILE = operation({
+const RECOMPILE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/drivers/{id}/recompile',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
     body: null,
-    response: string(),
+    response: /* @__PURE__ */ string(),
 });
 
 /**
@@ -190,18 +190,18 @@ export function reload(
     return call(RELOAD, input, options);
 }
 
-const RELOAD = operation({
+const RELOAD = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/drivers/{id}/reload',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
     body: null,
-    response: string(),
+    response: /* @__PURE__ */ string(),
 });
 
 /**
@@ -216,15 +216,15 @@ export function show(
     return call(SHOW, input, options);
 }
 
-const SHOW = operation({
+const SHOW = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/drivers/{id}',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
             /** check if the driver is compiled? */
-            compilation_status: boolean(),
+            compilation_status: /* @__PURE__ */ boolean(),
         },
         ['id'],
     ),
@@ -244,13 +244,13 @@ export function update(
     return call(UPDATE, input, options);
 }
 
-const UPDATE = operation({
+const UPDATE = /* @__PURE__ */ operation({
     method: 'PATCH',
     path: '/api/engine/v2/drivers/{id}',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),

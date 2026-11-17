@@ -31,28 +31,28 @@ export function create(
     return call(CREATE, input, options);
 }
 
-const CREATE = operation({
+const CREATE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/signage/ai/providers',
     pathKeys: [],
-    params: parameters({}),
+    params: /* @__PURE__ */ parameters({}),
     body: SignageAiProvidersProviderParams,
-    response: object(
+    response: /* @__PURE__ */ object(
         {
-            id: string(),
-            name: string(),
-            provider: string(),
-            authority_id: nullable(string()),
-            endpoint: nullable(string()),
-            location: nullable(string()),
-            default_model: nullable(string()),
-            text_model: nullable(string()),
-            allowed_models: array(string()),
-            enabled: boolean(),
-            is_default: boolean(),
-            quotas: json(),
-            created_at: integer(),
-            updated_at: integer(),
+            id: /* @__PURE__ */ string(),
+            name: /* @__PURE__ */ string(),
+            provider: /* @__PURE__ */ string(),
+            authority_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+            endpoint: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+            location: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+            default_model: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+            text_model: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+            allowed_models: /* @__PURE__ */ array(/* @__PURE__ */ string()),
+            enabled: /* @__PURE__ */ boolean(),
+            is_default: /* @__PURE__ */ boolean(),
+            quotas: /* @__PURE__ */ json(),
+            created_at: /* @__PURE__ */ integer(),
+            updated_at: /* @__PURE__ */ integer(),
         },
         [
             'id',
@@ -76,13 +76,13 @@ export function destroy(
     return call(DESTROY, input, options);
 }
 
-const DESTROY = operation({
+const DESTROY = /* @__PURE__ */ operation({
     method: 'DELETE',
     path: '/api/engine/v2/signage/ai/providers/{id}',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
@@ -108,45 +108,45 @@ export function index(
     return call(INDEX, input, options);
 }
 
-const INDEX = operation({
+const INDEX = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/signage/ai/providers',
     pathKeys: [],
-    params: parameters({
+    params: /* @__PURE__ */ parameters({
         /** include the shared fallback row */
-        include_shared: boolean(),
+        include_shared: /* @__PURE__ */ boolean(),
         /**
          * filters results by the given text: a record matches when any word matches its searchable
          * fields as a whole word, and the last word also matches as a prefix (search as you type)
          */
-        q: string(),
+        q: /* @__PURE__ */ string(),
         /** the maximum number of results to return */
-        limit: integer('UInt32'),
+        limit: /* @__PURE__ */ integer('UInt32'),
         /** the starting offset of the result set, used to implement pagination */
-        offset: integer('UInt32'),
+        offset: /* @__PURE__ */ integer('UInt32'),
         /** deprecated, ignored — pagination follows the `Link` header's offset */
-        ref: nullable(string()),
+        ref: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /** deprecated, ignored — search covers the resource's indexed fields */
-        fields: array(string()),
+        fields: /* @__PURE__ */ array(/* @__PURE__ */ string()),
     }),
     body: null,
-    response: array(
-        object(
+    response: /* @__PURE__ */ array(
+        /* @__PURE__ */ object(
             {
-                id: string(),
-                name: string(),
-                provider: string(),
-                authority_id: nullable(string()),
-                endpoint: nullable(string()),
-                location: nullable(string()),
-                default_model: nullable(string()),
-                text_model: nullable(string()),
-                allowed_models: array(string()),
-                enabled: boolean(),
-                is_default: boolean(),
-                quotas: json(),
-                created_at: integer(),
-                updated_at: integer(),
+                id: /* @__PURE__ */ string(),
+                name: /* @__PURE__ */ string(),
+                provider: /* @__PURE__ */ string(),
+                authority_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+                endpoint: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+                location: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+                default_model: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+                text_model: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+                allowed_models: /* @__PURE__ */ array(/* @__PURE__ */ string()),
+                enabled: /* @__PURE__ */ boolean(),
+                is_default: /* @__PURE__ */ boolean(),
+                quotas: /* @__PURE__ */ json(),
+                created_at: /* @__PURE__ */ integer(),
+                updated_at: /* @__PURE__ */ integer(),
             },
             [
                 'id',
@@ -171,33 +171,33 @@ export function show(
     return call(SHOW, input, options);
 }
 
-const SHOW = operation({
+const SHOW = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/signage/ai/providers/{id}',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
     body: null,
-    response: object(
+    response: /* @__PURE__ */ object(
         {
-            id: string(),
-            name: string(),
-            provider: string(),
-            authority_id: nullable(string()),
-            endpoint: nullable(string()),
-            location: nullable(string()),
-            default_model: nullable(string()),
-            text_model: nullable(string()),
-            allowed_models: array(string()),
-            enabled: boolean(),
-            is_default: boolean(),
-            quotas: json(),
-            created_at: integer(),
-            updated_at: integer(),
+            id: /* @__PURE__ */ string(),
+            name: /* @__PURE__ */ string(),
+            provider: /* @__PURE__ */ string(),
+            authority_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+            endpoint: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+            location: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+            default_model: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+            text_model: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+            allowed_models: /* @__PURE__ */ array(/* @__PURE__ */ string()),
+            enabled: /* @__PURE__ */ boolean(),
+            is_default: /* @__PURE__ */ boolean(),
+            quotas: /* @__PURE__ */ json(),
+            created_at: /* @__PURE__ */ integer(),
+            updated_at: /* @__PURE__ */ integer(),
         },
         [
             'id',
@@ -228,15 +228,15 @@ export function test(
     return call(TEST, input, options);
 }
 
-const TEST = operation({
+const TEST = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/signage/ai/providers/{id}/test',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
             /** image (the default) or text */
-            kind: string(),
+            kind: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
@@ -252,33 +252,33 @@ export function update(
     return call(UPDATE, input, options);
 }
 
-const UPDATE = operation({
+const UPDATE = /* @__PURE__ */ operation({
     method: 'PATCH',
     path: '/api/engine/v2/signage/ai/providers/{id}',
     pathKeys: ['id'],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
-            id: string(),
+            id: /* @__PURE__ */ string(),
         },
         ['id'],
     ),
     body: SignageAiProvidersProviderParams,
-    response: object(
+    response: /* @__PURE__ */ object(
         {
-            id: string(),
-            name: string(),
-            provider: string(),
-            authority_id: nullable(string()),
-            endpoint: nullable(string()),
-            location: nullable(string()),
-            default_model: nullable(string()),
-            text_model: nullable(string()),
-            allowed_models: array(string()),
-            enabled: boolean(),
-            is_default: boolean(),
-            quotas: json(),
-            created_at: integer(),
-            updated_at: integer(),
+            id: /* @__PURE__ */ string(),
+            name: /* @__PURE__ */ string(),
+            provider: /* @__PURE__ */ string(),
+            authority_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+            endpoint: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+            location: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+            default_model: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+            text_model: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+            allowed_models: /* @__PURE__ */ array(/* @__PURE__ */ string()),
+            enabled: /* @__PURE__ */ boolean(),
+            is_default: /* @__PURE__ */ boolean(),
+            quotas: /* @__PURE__ */ json(),
+            created_at: /* @__PURE__ */ integer(),
+            updated_at: /* @__PURE__ */ integer(),
         },
         [
             'id',

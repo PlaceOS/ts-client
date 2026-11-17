@@ -28,14 +28,14 @@ export function proxy(
     return call(PROXY, input, options);
 }
 
-const PROXY = operation({
+const PROXY = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/proxy',
     pathKeys: [],
-    params: parameters(
+    params: /* @__PURE__ */ parameters(
         {
             /** the fully qualified URL to be proxied */
-            url: string(),
+            url: /* @__PURE__ */ string(),
         },
         ['url'],
     ),
