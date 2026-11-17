@@ -15,8 +15,12 @@
             "default": "./dist/index.js"
         },
         "./compat": {
-            "types": "./dist/compat.d.ts",
-            "default": "./dist/compat.js"
+            "types": "./dist/compat/index.d.ts",
+            "default": "./dist/compat/index.js"
+        },
+        "./mock": {
+            "types": "./dist/mock/index.d.ts",
+            "default": "./dist/mock/index.js"
         }
     },
     "bin": {

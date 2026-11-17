@@ -45,6 +45,7 @@ const CREATE = /* @__PURE__ */ operation({
     }),
     body: Module,
     response: Module,
+    name: 'modules.create',
 });
 
 /**
@@ -71,6 +72,7 @@ const DESTROY = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'modules.destroy',
 });
 
 /**
@@ -102,6 +104,7 @@ const EXECUTE = /* @__PURE__ */ operation({
     ),
     body: /* @__PURE__ */ array(/* @__PURE__ */ json()),
     response: /* @__PURE__ */ json(),
+    name: 'modules.execute',
 });
 
 /**
@@ -149,6 +152,7 @@ const INDEX = /* @__PURE__ */ operation({
     }),
     body: null,
     response: /* @__PURE__ */ array(Module),
+    name: 'modules.index',
 });
 
 /**
@@ -178,6 +182,7 @@ const LOAD = /* @__PURE__ */ operation({
     ),
     body: null,
     response: /* @__PURE__ */ boolean(),
+    name: 'modules.load',
 });
 
 /**
@@ -216,6 +221,7 @@ const LOGS = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'modules.logs',
 });
 
 /**
@@ -242,6 +248,7 @@ const PING = /* @__PURE__ */ operation({
     ),
     body: null,
     response: ModulesPingResult,
+    name: 'modules.ping',
 });
 
 /**
@@ -268,6 +275,7 @@ const SETTINGS = /* @__PURE__ */ operation({
     ),
     body: null,
     response: /* @__PURE__ */ array(Settings),
+    name: 'modules.settings',
 });
 
 /**
@@ -296,6 +304,7 @@ const SHOW = /* @__PURE__ */ operation({
     ),
     body: null,
     response: Module,
+    name: 'modules.show',
 });
 
 /**
@@ -322,6 +331,7 @@ const SHOW_ERROR = /* @__PURE__ */ operation({
     ),
     body: null,
     response: /* @__PURE__ */ array(/* @__PURE__ */ string()),
+    name: 'modules.showError',
 });
 
 /**
@@ -348,6 +358,7 @@ const START = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'modules.start',
 });
 
 /**
@@ -374,6 +385,7 @@ const STATE = /* @__PURE__ */ operation({
     ),
     body: null,
     response: /* @__PURE__ */ record(/* @__PURE__ */ string()),
+    name: 'modules.state',
 });
 
 /**
@@ -402,6 +414,7 @@ const STATE_LOOKUP = /* @__PURE__ */ operation({
     ),
     body: null,
     response: /* @__PURE__ */ string(),
+    name: 'modules.stateLookup',
 });
 
 /**
@@ -433,6 +446,7 @@ const STATE_VALUE = /* @__PURE__ */ operation({
     ),
     body: null,
     response: /* @__PURE__ */ json(),
+    name: 'modules.stateValue',
 });
 
 /**
@@ -459,6 +473,7 @@ const STOP = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'modules.stop',
 });
 
 /**
@@ -485,4 +500,5 @@ const UPDATE = /* @__PURE__ */ operation({
     ),
     body: Module,
     response: Module,
+    name: 'modules.update',
 });

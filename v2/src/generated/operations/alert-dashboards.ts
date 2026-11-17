@@ -38,6 +38,7 @@ const ALERTS = /* @__PURE__ */ operation({
     ),
     body: null,
     response: /* @__PURE__ */ array(Alert),
+    name: 'alertDashboards.alerts',
 });
 
 /**
@@ -59,6 +60,7 @@ const CREATE = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({}),
     body: AlertDashboard,
     response: AlertDashboard,
+    name: 'alertDashboards.create',
 });
 
 /**
@@ -85,6 +87,7 @@ const DESTROY = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'alertDashboards.destroy',
 });
 
 /**
@@ -122,6 +125,7 @@ const INDEX = /* @__PURE__ */ operation({
     }),
     body: null,
     response: /* @__PURE__ */ array(AlertDashboard),
+    name: 'alertDashboards.index',
 });
 
 /**
@@ -148,6 +152,7 @@ const SHOW = /* @__PURE__ */ operation({
     ),
     body: null,
     response: AlertDashboard,
+    name: 'alertDashboards.show',
 });
 
 /**
@@ -174,4 +179,5 @@ const UPDATE = /* @__PURE__ */ operation({
     ),
     body: AlertDashboard,
     response: AlertDashboard,
+    name: 'alertDashboards.update',
 });

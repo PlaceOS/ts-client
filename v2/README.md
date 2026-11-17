@@ -112,6 +112,75 @@ const client = createClient({
 const result = await zones.show({ id: 'zone-1' }, { client });
 ```
 
+### Typed mocks
+
+`@placeos/ts-client/mock` answers the calls of an endpoint without a request. The compiler checks
+the name of the endpoint, the input that the handler gets, and the data that it gives:
+
+```ts
+import { endpointMocks, httpError, mockEndpoint, respond } from '@placeos/ts-client/mock';
+
+configure({ baseUrl: '', auth: { kind: 'none' }, mock: endpointMocks });
+
+mockEndpoint('zones.show', (input) => ({ id: input.id, name: 'Level 1' }));
+mockEndpoint('zones.index', () => respond([{ id: 'zone-1' }], { total: 1 }));
+mockEndpoint('systems.update', (input) => ({ id: input.sys_id, ...input.body }), { delayMs: 300 });
+mockEndpoint('zones.destroy', () => {
+    throw httpError(403);
+});
+```
+
+- The client checks the input first, as for a request. Then it parses the data of the handler with
+  the response schema of the endpoint, as it parses a response. The data can leave out fields: a
+  missing required field gets its empty value, such as `''`, `0` or `[]`. A field with the wrong
+  type is a `response_invalid` error.
+- `respond(data, { status, headers, total })` sets the status and the headers. `total` is the
+  `X-Total-Count` that `pageInfo` and `orThrowPage` read.
+- `mockEndpoint` returns the function that removes the mock. `clearEndpointMocks()` removes all.
+- A call to an endpoint without a mock goes to the `fetch` of the client. Give `mockFetch` of
+  `@placeos/ts-client/compat` to answer it from the v1 mock endpoints.
+- `mock` of the client is a function. A test can give its own, which gets the name of the endpoint
+  (such as `zones.show`) and the input, and returns an answer or `null`.
+
+A test double of a v2 call gives a `Result`. `mockReply` and `mockPage` of
+`@placeos/ts-client/compat` make one:
+
+```ts
+vi.mock('@placeos/ts-client', { spy: true });
+vi.mocked(zones.show).mockResolvedValue(mockReply(zone));
+vi.mocked(zones.index).mockResolvedValue(mockPage({ data: [zone], total: 1 }));
+```
+
+### Mock mode
+
+For new mocks, use [typed mocks](#typed-mocks). The v1 mock endpoints and mock systems are in
+`@placeos/ts-client/compat`, with the same names.
+Give `mockFetch` to the client, and `mockRealtimeEnvironment()` to the realtime client:
+
+```ts
+registerMockEndpoint({
+    path: '/api/engine/v2/zones/:id',
+    method: 'GET',
+    callback: (request) => ({ id: request.route_params['id'], name: 'Level 1' }),
+});
+registerSystem('sys-1', { Display: [{ power: false, $power: (on: boolean) => on }] });
+
+configure({ baseUrl: '', auth: { kind: 'none' }, fetch: mockFetch, missingFields: 'zero' });
+const realtime = createRealtime({
+    baseUrl: '',
+    auth: { kind: 'none' },
+    environment: mockRealtimeEnvironment(),
+});
+```
+
+- v2 parses each mock response with the schema of the operation. Mock data often has only some
+  fields. `missingFields: 'zero'` gives each missing required field its empty value, such as `''`,
+  `0` or `[]`, as the v1 classes did. A field with the wrong type is still an error, because the
+  real server does not send it.
+- A mock endpoint that throws an error with a `status`, such as `404`, gives that HTTP status.
+- A change to a variable of a mock module, such as `mockSystem('sys-1')['Display'][0]['power']
+= true`, notifies its bindings.
+
 ## Log in
 
 `createAuthSession` does the OAuth login of PlaceOS and gives the client its credential:
@@ -183,8 +252,9 @@ Other parts of the session:
   login with `authorization_denied`. v1 sent the user to the authorize page again.
 - `/auth/authority` gets `AUTHORITY_ATTEMPTS_MAX` attempts, not an unlimited number. Then
   `start` gives `authority_unavailable`. Call `start` again to try again.
-- Not ported: `revokeToken`, the mock mode (give a `fetch` to the client), the state of the
-  application in `authorise(state)`, and the ACA Engine API path.
+- Not ported: `revokeToken`, the state of the application in `authorise(state)`, and the ACA
+  Engine API path. The mock mode is in `@placeos/ts-client/compat` (see [Mock mode](#mock-mode)).
+  It does not need a login: give `auth: { kind: 'none' }`.
 
 ## Realtime
 
@@ -229,8 +299,8 @@ release();
 - Server errors have the correct code name. v1 read the HTTP style status as the error code.
 - `iface: true` addresses an interface, such as `Interface::Sensor`.
 - After 40 failed attempts, the status is `failed`. v1 reloaded the page.
-- Not ported: the mock systems (give an `environment` with a fake socket), the
-  `connectionState` signal, and the `/control/websocket` path of ACA Engine.
+- Not ported: the `connectionState` signal and the `/control/websocket` path of ACA Engine. The
+  mock systems are in `@placeos/ts-client/compat` (see [Mock mode](#mock-mode)).
 
 ## Types
 
@@ -243,6 +313,21 @@ Each schema of the API document has a value and two types with the same base nam
 
 The parser removes the fields that the schema does not have. A request that has a field that the
 schema does not have stops with an error, because a typing error in a field name is a bug.
+
+Some schemas have a name from the server code that does not say what they are. These have a
+short name too. The short name is the same value and type:
+
+| Short name               | Name in the API document        |
+| ------------------------ | ------------------------------- |
+| `User`                   | `UserAdminMetadataResponse`     |
+| `System`                 | `ControlSystem`                 |
+| `Application`            | `DoorkeeperApplication`         |
+| `Domain`                 | `Authority`                     |
+| `Metadata`               | `MetadataInterface`             |
+| `ShortUrl`               | `Shortener`                     |
+| `SignageTemplateMapping` | `SignageTemplateSystemTemplate` |
+
+`TYPE_ALIASES` in `scripts/generate.ts` has the list.
 
 ## Differences from the API document
 
@@ -329,19 +414,43 @@ The tool makes these changes:
 - A new import gets another name when the file has the name. For example, a file with a
   `zones` variable gets `zones as zonesV2`.
 
+The tool also changes the test doubles, so that the tests of the app still work:
+
+- `vi.mocked(showZone)`, `expect(showZone)`, `vi.spyOn(client, 'showZone')` and, in a spec file,
+  each other use of `showZone` become `zones.show`.
+- A value of `mockResolvedValue` gets `mockReply` or `mockPage`. The arguments of
+  `toHaveBeenCalledWith` become the v2 input.
+- A v1 implementation, such as the value of `mockImplementation`, gets `fromV1Mock`. It gives the
+  implementation the v1 arguments, and makes a v2 result of its value.
+- The v1 functions of a `vi.mock('@placeos/ts-client', () => ({ ... }))` factory become v2
+  namespaces: `showZone: vi.fn(impl)` becomes `zones: { show: vi.fn(fromV1Mock(impl, ['id',
+'...'])) }`. The factory runs before the imports, so the tool adds `fromV1Mock` with
+  `vi.hoisted`.
+- The imports of the mock endpoints and mock systems move to `@placeos/ts-client/compat`. See
+  [Mock mode](#mock-mode).
+
 The tool does not change a use that it cannot rewrite safely. It shows each one with a hint, and
 it keeps its v1 import, so the compiler also shows it. These uses are:
 
 - the login and the realtime functions, such as `setup`, `token` and `getModule`;
-- `get`, `post` and the other HTTP functions, and the mock endpoints of tests;
-- `new` on a v1 class, because v2 has plain objects;
-- a function that is not called, such as a test double of `showZone`;
+- `get`, `post` and the other HTTP functions;
+- `new` and `instanceof` on a v1 class, because v2 has plain objects;
+- the `next` function of a v1 page. v2 gives `nextOffset`;
+- a function that is not called, out of a test;
+- a `vi.mock` without a factory or `{ spy: true }`: its v2 functions give `undefined`, and
+  `.then(orThrow)` fails;
+- a `jest.mock` factory with v1 functions;
 - an argument that has no place in v2, and an argument with side effects that v2 uses two times.
+
+On a copy of backoffice, 329 of the 399 tests pass after the tool. v1 passes 394. The other tests
+use v1 classes, the v1 `next` function or the v1 `createSignal`, or wait for one microtask only.
+These are the uses that the tool shows.
 
 After the tool:
 
 1. Run Prettier, or your formatter. The tool writes long imports on one line.
-2. Install v2, and call `configure` once before the first call (see [Log in](#log-in)).
+2. Install v2, and call `configure` once before the first call (see [Log in](#log-in)). For a
+   mock mode, give `fetch: mockFetch` (see [Mock mode](#mock-mode)).
 3. Run the compiler. It shows the differences of the data. For example, a field that can be
    `null`, an array that is `readonly`, or a query parameter that has a different type in v2.
 4. Change the uses that the tool showed.
@@ -354,13 +463,15 @@ arguments, and it finds the v2 operation with the same method and path.
 
 ## What v1 has that v2 does not have
 
-- The mock systems. Give `createClient` a `fetch` function.
 - Classes with methods for each model. v2 has plain data and functions.
 
 ## Where v2 does not follow TigerStyle
 
 - `orThrow` and `orThrowPage` of `@placeos/ts-client/compat` throw. They are for code that moves
   from v1.
+- The v1 mock types of `@placeos/ts-client/compat` (`MockHttpRequest.body`, `metadata` and
+  `MockModule`) keep `any`, so that the mocks of an app still compile.
+- `missingFields: 'zero'` accepts data without its required fields. It is for mock data only.
 - `parseResponse`, `checkRequest` and `call` each have one `as` cast. The compiler cannot prove
   that the parser output has the type of the schema. The tests check the parser.
 - `configure` keeps one client in module state, so a call does not need a client argument. A

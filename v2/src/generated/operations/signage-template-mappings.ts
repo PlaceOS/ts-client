@@ -38,6 +38,7 @@ const CREATE = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({}),
     body: SignageTemplateSystemTemplate,
     response: SignageTemplateSystemTemplate,
+    name: 'signageTemplateMappings.create',
 });
 
 /**
@@ -64,6 +65,7 @@ const DESTROY = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'signageTemplateMappings.destroy',
 });
 
 /**
@@ -112,6 +114,7 @@ const INDEX = /* @__PURE__ */ operation({
     }),
     body: null,
     response: /* @__PURE__ */ array(SignageTemplateSystemTemplate),
+    name: 'signageTemplateMappings.index',
 });
 
 /**
@@ -140,6 +143,7 @@ const SHOW = /* @__PURE__ */ operation({
     ),
     body: null,
     response: SignageTemplateSystemTemplate,
+    name: 'signageTemplateMappings.show',
 });
 
 /**
@@ -170,4 +174,5 @@ const UPDATE = /* @__PURE__ */ operation({
     ),
     body: SignageTemplateSystemTemplate,
     response: SignageTemplateSystemTemplate,
+    name: 'signageTemplateMappings.update',
 });

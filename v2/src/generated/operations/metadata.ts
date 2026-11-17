@@ -53,6 +53,7 @@ const BULK_FETCH = /* @__PURE__ */ operation({
     ),
     body: null,
     response: /* @__PURE__ */ record(/* @__PURE__ */ nullable(MetadataInterface)),
+    name: 'metadata.bulkFetch',
 });
 
 /**
@@ -89,6 +90,7 @@ const CHILDREN_METADATA = /* @__PURE__ */ operation({
     ),
     body: null,
     response: /* @__PURE__ */ array(MetadataChildren),
+    name: 'metadata.childrenMetadata',
 });
 
 /**
@@ -118,6 +120,7 @@ const DESTROY = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'metadata.destroy',
 });
 
 /**
@@ -151,6 +154,7 @@ const HISTORY = /* @__PURE__ */ operation({
     ),
     body: null,
     response: /* @__PURE__ */ record(/* @__PURE__ */ array(MetadataInterface)),
+    name: 'metadata.history',
 });
 
 /**
@@ -181,6 +185,7 @@ const MERGE = /* @__PURE__ */ operation({
     ),
     body: MetadataInterface,
     response: MetadataInterface,
+    name: 'metadata.merge',
 });
 
 /**
@@ -210,6 +215,7 @@ const RENAME = /* @__PURE__ */ operation({
     ),
     body: MetadataRename,
     response: MetadataInterface,
+    name: 'metadata.rename',
 });
 
 /**
@@ -243,6 +249,7 @@ const SHOW = /* @__PURE__ */ operation({
     ),
     body: null,
     response: /* @__PURE__ */ record(MetadataInterface),
+    name: 'metadata.show',
 });
 
 /**
@@ -273,4 +280,5 @@ const UPDATE = /* @__PURE__ */ operation({
     ),
     body: MetadataInterface,
     response: MetadataInterface,
+    name: 'metadata.update',
 });

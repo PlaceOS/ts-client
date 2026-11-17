@@ -45,6 +45,7 @@ const CANCEL = /* @__PURE__ */ operation({
     ),
     body: null,
     response: SignageAiJobResponse,
+    name: 'signageAi.cancel',
 });
 
 /**
@@ -66,6 +67,7 @@ const CAPABILITIES = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({}),
     body: null,
     response: SignageAiCapabilities,
+    name: 'signageAi.capabilities',
 });
 
 /**
@@ -92,6 +94,7 @@ const CLAIM = /* @__PURE__ */ operation({
     ),
     body: SignageAiClaimParams,
     response: SignageAiJobResponse,
+    name: 'signageAi.claim',
 });
 
 /**
@@ -113,6 +116,7 @@ const EDIT = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({}),
     body: SignageAiEditParams,
     response: SignageAiJobResponse,
+    name: 'signageAi.edit',
 });
 
 /**
@@ -134,6 +138,7 @@ const GENERATE = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({}),
     body: SignageAiGenerateParams,
     response: SignageAiJobResponse,
+    name: 'signageAi.generate',
 });
 
 /**
@@ -161,6 +166,7 @@ const INDEX_JOBS = /* @__PURE__ */ operation({
     }),
     body: null,
     response: /* @__PURE__ */ array(SignageAiJobResponse),
+    name: 'signageAi.indexJobs',
 });
 
 /**
@@ -191,6 +197,7 @@ const SHOW_JOB = /* @__PURE__ */ operation({
     ),
     body: null,
     response: SignageAiJobResponse,
+    name: 'signageAi.showJob',
 });
 
 /**
@@ -217,4 +224,5 @@ const USAGE = /* @__PURE__ */ operation({
     }),
     body: null,
     response: /* @__PURE__ */ array(SignageAiJobUsageRow),
+    name: 'signageAi.usage',
 });

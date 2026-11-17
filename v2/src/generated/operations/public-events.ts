@@ -47,6 +47,7 @@ const GUEST_TOKEN = /* @__PURE__ */ operation({
     ),
     body: PublicEventsTokenRequest,
     response: /* @__PURE__ */ string(),
+    name: 'publicEvents.guestToken',
 });
 
 /**
@@ -96,6 +97,7 @@ const INDEX = /* @__PURE__ */ operation({
     ),
     body: null,
     response: /* @__PURE__ */ array(/* @__PURE__ */ json()),
+    name: 'publicEvents.index',
 });
 
 /**
@@ -129,4 +131,5 @@ const REGISTER = /* @__PURE__ */ operation({
     ),
     body: PublicEventsRegistrationRequest,
     response: null,
+    name: 'publicEvents.register',
 });

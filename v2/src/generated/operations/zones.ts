@@ -42,6 +42,7 @@ const CREATE = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({}),
     body: Zone,
     response: Zone,
+    name: 'zones.create',
 });
 
 /**
@@ -68,6 +69,7 @@ const DESTROY = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'zones.destroy',
 });
 
 /**
@@ -121,6 +123,7 @@ const INDEX = /* @__PURE__ */ operation({
     }),
     body: null,
     response: /* @__PURE__ */ array(Zone),
+    name: 'zones.index',
 });
 
 /**
@@ -149,6 +152,7 @@ const METADATA = /* @__PURE__ */ operation({
     ),
     body: null,
     response: /* @__PURE__ */ record(MetadataInterface),
+    name: 'zones.metadata',
 });
 
 /**
@@ -177,6 +181,7 @@ const SHOW = /* @__PURE__ */ operation({
     ),
     body: null,
     response: Zone,
+    name: 'zones.show',
 });
 
 /**
@@ -198,6 +203,7 @@ const TAGS = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({}),
     body: null,
     response: /* @__PURE__ */ array(/* @__PURE__ */ string()),
+    name: 'zones.tags',
 });
 
 /**
@@ -224,6 +230,7 @@ const TRIGGER_INSTANCES = /* @__PURE__ */ operation({
     ),
     body: null,
     response: /* @__PURE__ */ array(Trigger),
+    name: 'zones.triggerInstances',
 });
 
 /**
@@ -250,6 +257,7 @@ const UPDATE = /* @__PURE__ */ operation({
     ),
     body: Zone,
     response: Zone,
+    name: 'zones.update',
 });
 
 /**
@@ -280,4 +288,5 @@ const ZONE_EXECUTE = /* @__PURE__ */ operation({
     ),
     body: /* @__PURE__ */ array(/* @__PURE__ */ json()),
     response: ZonesZoneExecResponse,
+    name: 'zones.zoneExecute',
 });

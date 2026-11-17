@@ -53,6 +53,7 @@ const APPROVE_MEDIA = /* @__PURE__ */ operation({
     ),
     body: null,
     response: /* @__PURE__ */ boolean(),
+    name: 'playlist.approveMedia',
 });
 
 /**
@@ -83,6 +84,7 @@ const APPROVERS = /* @__PURE__ */ operation({
     ),
     body: null,
     response: /* @__PURE__ */ array(PlaylistApprover),
+    name: 'playlist.approvers',
 });
 
 /**
@@ -112,6 +114,7 @@ const CREATE = /* @__PURE__ */ operation({
     }),
     body: Playlist,
     response: Playlist,
+    name: 'playlist.create',
 });
 
 /**
@@ -148,6 +151,7 @@ const DESTROY = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'playlist.destroy',
 });
 
 /**
@@ -202,6 +206,7 @@ const HISTORY = /* @__PURE__ */ operation({
     ),
     body: null,
     response: /* @__PURE__ */ array(History),
+    name: 'playlist.history',
 });
 
 /**
@@ -240,6 +245,7 @@ const INDEX = /* @__PURE__ */ operation({
     }),
     body: null,
     response: /* @__PURE__ */ array(Playlist),
+    name: 'playlist.index',
 });
 
 /**
@@ -266,6 +272,7 @@ const MEDIA = /* @__PURE__ */ operation({
     ),
     body: null,
     response: PlaylistRevision,
+    name: 'playlist.media',
 });
 
 /**
@@ -293,6 +300,7 @@ const MEDIA_REVISIONS = /* @__PURE__ */ operation({
     ),
     body: null,
     response: /* @__PURE__ */ array(PlaylistRevision),
+    name: 'playlist.mediaRevisions',
 });
 
 /**
@@ -327,6 +335,7 @@ const REQUEST_APPROVAL = /* @__PURE__ */ operation({
     ),
     body: PlaylistApprovalMessage,
     response: null,
+    name: 'playlist.requestApproval',
 });
 
 /**
@@ -353,6 +362,7 @@ const SCHEDULE_MEDIA = /* @__PURE__ */ operation({
     ),
     body: PlaylistItemSchedule,
     response: PlaylistRevision,
+    name: 'playlist.scheduleMedia',
 });
 
 /**
@@ -398,6 +408,7 @@ const SHARE = /* @__PURE__ */ operation({
         },
         ['linked', 'already_present'],
     ),
+    name: 'playlist.share',
 });
 
 /**
@@ -426,6 +437,7 @@ const SHOW = /* @__PURE__ */ operation({
     ),
     body: null,
     response: Playlist,
+    name: 'playlist.show',
 });
 
 /**
@@ -452,6 +464,7 @@ const UPDATE = /* @__PURE__ */ operation({
     ),
     body: Playlist,
     response: Playlist,
+    name: 'playlist.update',
 });
 
 /**
@@ -478,6 +491,7 @@ const UPDATE_MEDIA = /* @__PURE__ */ operation({
     ),
     body: /* @__PURE__ */ array(/* @__PURE__ */ string()),
     response: PlaylistRevision,
+    name: 'playlist.updateMedia',
 });
 
 /** `PATCH /api/engine/v2/signage/playlists/{id}/media/schedule/{item_id}` */
@@ -501,4 +515,5 @@ const UPDATE_SCHEDULE = /* @__PURE__ */ operation({
     ),
     body: PlaylistItemSchedule,
     response: PlaylistItemSchedule,
+    name: 'playlist.updateSchedule',
 });

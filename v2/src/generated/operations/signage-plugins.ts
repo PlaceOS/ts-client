@@ -33,6 +33,7 @@ const CREATE = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({}),
     body: SignagePlugin,
     response: SignagePlugin,
+    name: 'signagePlugins.create',
 });
 
 /**
@@ -59,6 +60,7 @@ const DESTROY = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'signagePlugins.destroy',
 });
 
 /**
@@ -98,6 +100,7 @@ const INDEX = /* @__PURE__ */ operation({
     }),
     body: null,
     response: /* @__PURE__ */ array(SignagePlugin),
+    name: 'signagePlugins.index',
 });
 
 /**
@@ -124,6 +127,7 @@ const SHOW = /* @__PURE__ */ operation({
     ),
     body: null,
     response: SignagePlugin,
+    name: 'signagePlugins.show',
 });
 
 /**
@@ -150,4 +154,5 @@ const UPDATE = /* @__PURE__ */ operation({
     ),
     body: SignagePlugin,
     response: SignagePlugin,
+    name: 'signagePlugins.update',
 });

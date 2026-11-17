@@ -41,6 +41,7 @@ const DESTROY = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'cluster.destroy',
 });
 
 /**
@@ -65,6 +66,7 @@ const NODES = /* @__PURE__ */ operation({
     }),
     body: null,
     response: /* @__PURE__ */ array(ClusterNodeStatus),
+    name: 'cluster.nodes',
 });
 
 /**
@@ -89,6 +91,7 @@ const REBALANCE = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({}),
     body: null,
     response: ClusterVersions,
+    name: 'cluster.rebalance',
 });
 
 /**
@@ -118,4 +121,5 @@ const SHOW = /* @__PURE__ */ operation({
     ),
     body: null,
     response: /* @__PURE__ */ array(ClusterDriverStatus),
+    name: 'cluster.show',
 });

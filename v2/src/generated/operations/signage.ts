@@ -42,6 +42,7 @@ const DISPLAY = /* @__PURE__ */ operation({
     ),
     body: null,
     response: /* @__PURE__ */ nullable(ControlSystem),
+    name: 'signage.display',
 });
 
 /**
@@ -76,6 +77,7 @@ const FETCH_STATIC_MEDIA = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'signage.fetchStaticMedia',
 });
 
 /**
@@ -110,6 +112,7 @@ const SAMSUNG_EINK_MANIFEST = /* @__PURE__ */ operation({
     ),
     body: null,
     response: SignageSamsungEinkManifest,
+    name: 'signage.samsungEinkManifest',
 });
 
 /**
@@ -142,6 +145,7 @@ const SAMSUNG_EINK_MANIFEST_WITHOUT_EXPIRES_AFTER = /* @__PURE__ */ operation({
     ),
     body: null,
     response: SignageSamsungEinkManifest,
+    name: 'signage.samsungEinkManifestWithoutExpiresAfter',
 });
 
 /**
@@ -168,4 +172,5 @@ const UPDATE_METRICS = /* @__PURE__ */ operation({
     ),
     body: SignageMetrics,
     response: null,
+    name: 'signage.updateMetrics',
 });

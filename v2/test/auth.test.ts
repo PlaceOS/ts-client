@@ -522,6 +522,7 @@ describe('the session with the client', () => {
         params: parameters({ id: string() }, ['id']),
         body: null,
         response: object({ id: string() }, ['id']),
+        name: 'zones.show',
     });
 
     test('a 401 renews the token one time, and parallel requests share the renewal', async () => {

@@ -227,9 +227,14 @@ export function union<const V extends readonly AnySchema[]>(
  * The output is a new value. It has each field of the schema, in the order of the schema, and no
  * other fields.
  */
-export function parseResponse<O, I>(schema: Schema<O, I>, value: unknown): Result<O, SchemaError> {
+export function parseResponse<O, I>(
+    schema: Schema<O, I>,
+    value: unknown,
+    options: ParseOptions = {},
+): Result<O, SchemaError> {
     const failure: Failure = { expected: '', segments: [] };
-    const parsed = walk(schema.node, value, 'response', failure, 0);
+    const direction = options.missingFields === 'zero' ? 'response_zero' : 'response';
+    const parsed = walk(schema.node, value, direction, failure, 0);
     if (parsed === FAIL) return { ok: false, error: describeFailure(failure) };
     // The walk built `parsed` from the same nodes that give `O` its shape. This is one of the two
     // places where the compiler must trust the parser. The tests check the parser.
@@ -255,7 +260,17 @@ export function isRecord(value: unknown): value is Readonly<Record<string, unkno
     return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
-type Direction = 'response' | 'request';
+export interface ParseOptions {
+    /**
+     * `error` (the default): a missing required field is an error. `zero`: it gets the empty value
+     * of its type, such as `''`, `0` or `[]`, as the v1 classes did. Only for mock data, which
+     * often has only some of the fields.
+     */
+    readonly missingFields?: 'error' | 'zero';
+}
+
+/** `response_zero` is a `response` that fills the missing required fields. */
+type Direction = 'response' | 'response_zero' | 'request';
 
 /** The parser records a failure here. Each level adds its path segment as the failure returns. */
 interface Failure {
@@ -364,16 +379,20 @@ function walk(
                 const fieldValue = Object.hasOwn(value, field.key) ? value[field.key] : undefined;
                 if (fieldValue === undefined) {
                     const required =
-                        direction === 'response'
-                            ? field.requiredInResponse
-                            : field.requiredInRequest;
+                        direction === 'request'
+                            ? field.requiredInRequest
+                            : field.requiredInResponse;
+                    if (required && direction === 'response_zero') {
+                        output[field.key] = zeroValue(field.node, depth + 1);
+                        continue;
+                    }
                     if (required) {
                         failure.segments.push(`.${field.key}`);
                         return fail(failure, 'a value for the required field');
                     }
                     // A response has each field. A request leaves an optional field missing,
                     // because the server reads a missing field and `null` differently.
-                    if (direction === 'response') output[field.key] = null;
+                    if (direction !== 'request') output[field.key] = null;
                     continue;
                 }
                 const parsed = walk(field.node, fieldValue, direction, failure, depth + 1);
@@ -406,6 +425,45 @@ function walk(
 }
 
 /** True if `JSON.stringify` writes `value` as it is. The walk has its own bounded stack. */
+/** The empty value of a schema, for a missing required field of mock data. */
+function zeroValue(node: SchemaNode, depth: number): unknown {
+    assert(depth < SCHEMA_DEPTH_MAX, 'the schema depth is less than SCHEMA_DEPTH_MAX');
+    switch (node.kind) {
+        case 'string':
+            return '';
+        case 'literal':
+            return [...node.values][0] ?? null;
+        case 'integer':
+            return Math.min(Math.max(0, node.min), node.max);
+        case 'number':
+            return 0;
+        case 'boolean':
+            return false;
+        case 'json':
+        case 'nullable':
+            return null;
+        case 'array':
+            return [];
+        case 'tuple':
+            return node.items.map((item) => zeroValue(item, depth + 1));
+        case 'record':
+            return {};
+        case 'object': {
+            const output: Record<string, unknown> = {};
+            for (const field of node.fields) {
+                output[field.key] = field.requiredInResponse
+                    ? zeroValue(field.node, depth + 1)
+                    : null;
+            }
+            return output;
+        }
+        case 'union': {
+            const [first] = node.variants;
+            return first === undefined ? null : zeroValue(first, depth + 1);
+        }
+    }
+}
+
 function isJsonValue(value: unknown): boolean {
     const stack: { readonly value: unknown; readonly depth: number }[] = [{ value, depth: 0 }];
     for (let visited = 0; visited < JSON_NODES_MAX; visited += 1) {

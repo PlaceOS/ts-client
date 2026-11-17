@@ -33,6 +33,7 @@ const BULK_CREATE = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({}),
     body: /* @__PURE__ */ array(Asset),
     response: /* @__PURE__ */ array(Asset),
+    name: 'assets.bulkCreate',
 });
 
 /**
@@ -54,6 +55,7 @@ const BULK_DESTROY = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({}),
     body: /* @__PURE__ */ array(/* @__PURE__ */ string()),
     response: null,
+    name: 'assets.bulkDestroy',
 });
 
 /**
@@ -75,6 +77,7 @@ const BULK_UPDATE = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({}),
     body: /* @__PURE__ */ array(Asset),
     response: /* @__PURE__ */ array(Asset),
+    name: 'assets.bulkUpdate',
 });
 
 /**
@@ -96,6 +99,7 @@ const CREATE = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({}),
     body: Asset,
     response: Asset,
+    name: 'assets.create',
 });
 
 /**
@@ -122,6 +126,7 @@ const DESTROY = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'assets.destroy',
 });
 
 /**
@@ -177,6 +182,7 @@ const INDEX = /* @__PURE__ */ operation({
     }),
     body: null,
     response: /* @__PURE__ */ array(Asset),
+    name: 'assets.index',
 });
 
 /**
@@ -203,6 +209,7 @@ const SHOW = /* @__PURE__ */ operation({
     ),
     body: null,
     response: Asset,
+    name: 'assets.show',
 });
 
 /**
@@ -229,4 +236,5 @@ const UPDATE = /* @__PURE__ */ operation({
     ),
     body: Asset,
     response: Asset,
+    name: 'assets.update',
 });

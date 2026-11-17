@@ -33,6 +33,7 @@ const CREATE = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({}),
     body: Alert,
     response: Alert,
+    name: 'alerts.create',
 });
 
 /**
@@ -59,6 +60,7 @@ const DESTROY = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'alerts.destroy',
 });
 
 /**
@@ -102,6 +104,7 @@ const INDEX = /* @__PURE__ */ operation({
     }),
     body: null,
     response: /* @__PURE__ */ array(Alert),
+    name: 'alerts.index',
 });
 
 /**
@@ -130,6 +133,7 @@ const SHOW = /* @__PURE__ */ operation({
     ),
     body: null,
     response: Alert,
+    name: 'alerts.show',
 });
 
 /**
@@ -156,4 +160,5 @@ const UPDATE = /* @__PURE__ */ operation({
     ),
     body: Alert,
     response: Alert,
+    name: 'alerts.update',
 });

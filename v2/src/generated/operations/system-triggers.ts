@@ -39,6 +39,7 @@ const CREATE = /* @__PURE__ */ operation({
     ),
     body: TriggerInstance,
     response: TriggerInstance,
+    name: 'systemTriggers.create',
 });
 
 /**
@@ -67,6 +68,7 @@ const DESTROY = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'systemTriggers.destroy',
 });
 
 /**
@@ -119,6 +121,7 @@ const INDEX = /* @__PURE__ */ operation({
     ),
     body: null,
     response: /* @__PURE__ */ array(TriggerInstance),
+    name: 'systemTriggers.index',
 });
 
 /**
@@ -148,6 +151,7 @@ const SHOW = /* @__PURE__ */ operation({
     ),
     body: null,
     response: TriggerInstance,
+    name: 'systemTriggers.show',
 });
 
 /**
@@ -176,4 +180,5 @@ const UPDATE = /* @__PURE__ */ operation({
     ),
     body: SystemTriggersUpdateParams,
     response: TriggerInstance,
+    name: 'systemTriggers.update',
 });

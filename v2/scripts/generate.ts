@@ -162,6 +162,20 @@ const JSON_RESPONSE_OPERATIONS: ReadonlySet<string> = new Set([
     'PlaceOS::Api::Systems_execute',
 ]);
 
+/**
+ * Short names for schemas with a name from the server code that does not say what they are. The
+ * app name is an alias: `User` and `UserAdminMetadataResponse` are the same value and type.
+ */
+const TYPE_ALIASES: ReadonlyMap<string, string> = new Map([
+    ['UserAdminMetadataResponse', 'User'],
+    ['ControlSystem', 'System'],
+    ['DoorkeeperApplication', 'Application'],
+    ['Authority', 'Domain'],
+    ['MetadataInterface', 'Metadata'],
+    ['Shortener', 'ShortUrl'],
+    ['SignageTemplateSystemTemplate', 'SignageTemplateMapping'],
+]);
+
 /** Names that the core modules export. A generated name must not hide one. */
 const CORE_NAMES: ReadonlySet<string> = new Set([
     'AnyOperation',
@@ -902,7 +916,25 @@ function writeSchemasFile(named: ReadonlyMap<string, { code: string; imports: Im
         for (const combinator of entry.imports.combinators) combinators.add(combinator);
     }
     const body = order.map((name) => named.get(name)?.code ?? '').join('\n');
-    return `${HEADER}${importLine([...combinators], '../core/schema.ts')}\n${body}`;
+    return `${HEADER}${importLine([...combinators], '../core/schema.ts')}\n${body}\n${aliasExports(named)}`;
+}
+
+/** The exports of `TYPE_ALIASES`, for the value, the type and the input type. */
+function aliasExports(named: ReadonlyMap<string, unknown>): string {
+    const taken = new Set<string>();
+    for (const name of named.keys())
+        for (const suffix of ['', 'Input', 'Schema']) taken.add(name + suffix);
+    const lines = ['/** Short names. Each one is the same value and type as the long name. */'];
+    for (const [name, alias] of TYPE_ALIASES) {
+        assert(named.has(name), `the alias ${alias} has the schema ${name}`);
+        for (const generated of [alias, `${alias}Input`]) {
+            assert(!taken.has(generated), `the alias ${generated} is not a schema name`);
+            assert(!CORE_NAMES.has(generated), `the alias ${generated} is not a core name`);
+            taken.add(generated);
+        }
+        lines.push(`export { ${name} as ${alias}, type ${name}Input as ${alias}Input };`);
+    }
+    return `${lines.join('\n')}\n`;
 }
 
 function writeOperationsFile(controller: string, plans: readonly OperationPlan[]): string {
@@ -936,6 +968,7 @@ function writeOperationsFile(controller: string, plans: readonly OperationPlan[]
                 `params: ${plan.params},\n` +
                 `body: ${plan.body ?? 'null'},\n` +
                 `response: ${plan.response ?? 'null'},\n` +
+                `name: '${camelCase(controllerWords(controller))}.${functionName}',\n` +
                 `});\n`,
         );
     }

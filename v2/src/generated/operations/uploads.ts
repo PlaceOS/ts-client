@@ -79,6 +79,7 @@ const CREATE = /* @__PURE__ */ operation({
             ['type', 'signature', 'residence'],
         ),
     ]),
+    name: 'uploads.create',
 });
 
 /**
@@ -106,6 +107,7 @@ const DESTROY = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'uploads.destroy',
 });
 
 /**
@@ -137,6 +139,7 @@ const DOWNLOAD_PROXY_FILE_CONTENTS = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'uploads.downloadProxyFileContents',
 });
 
 /**
@@ -171,6 +174,7 @@ const DOWNLOAD_SIMPLE_ROUTE = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'uploads.downloadSimpleRoute',
 });
 
 /**
@@ -204,6 +208,7 @@ const DOWNLOAD_SIMPLE_ROUTE_WITHOUT_FILE_NAME = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'uploads.downloadSimpleRouteWithoutFileName',
 });
 
 /**
@@ -255,6 +260,7 @@ const EDIT = /* @__PURE__ */ operation({
         },
         ['type', 'signature'],
     ),
+    name: 'uploads.edit',
 });
 
 /**
@@ -287,6 +293,7 @@ const FINISHED = /* @__PURE__ */ operation({
         },
         ['ok'],
     ),
+    name: 'uploads.finished',
 });
 
 /**
@@ -316,6 +323,7 @@ const GET_LINK = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'uploads.getLink',
 });
 
 /**
@@ -357,6 +365,7 @@ const INDEX = /* @__PURE__ */ operation({
     }),
     body: null,
     response: /* @__PURE__ */ array(Upload),
+    name: 'uploads.index',
 });
 
 /**
@@ -384,6 +393,7 @@ const SCREENSHOT = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({}),
     body: UploadsScreenshotInfo,
     response: Upload,
+    name: 'uploads.screenshot',
 });
 
 /**
@@ -420,6 +430,7 @@ const STORAGE_NAME = /* @__PURE__ */ operation({
         },
         ['residence'],
     ),
+    name: 'uploads.storageName',
 });
 
 /**
@@ -474,4 +485,5 @@ const UPDATE = /* @__PURE__ */ operation({
             ['type', 'signature'],
         ),
     ]),
+    name: 'uploads.update',
 });

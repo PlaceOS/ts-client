@@ -64,6 +64,33 @@ export interface ClientConfig {
     /** The maximum size of a response body. A larger body gives a `response_too_large` error. */
     readonly responseBytesMax?: number;
     readonly fetch?: FetchFunction;
+    /**
+     * `zero` fills a missing required field of a response with its empty value, such as `''`.
+     * Only for mock data, such as the mock endpoints of `@placeos/ts-client/compat`.
+     */
+    readonly missingFields?: 'error' | 'zero';
+    /**
+     * Answers calls without a request, for tests and a mock mode. `@placeos/ts-client/mock` has
+     * one with a typed handler for each endpoint.
+     */
+    readonly mock?: CallMock;
+}
+
+/**
+ * Gives the answer to a call, or `null` to send the request. The client parses the data with the
+ * response schema of the operation, as it parses a response of the server. A missing required
+ * field gets its empty value.
+ */
+export type CallMock = (call: {
+    readonly name: string;
+    readonly input: Readonly<Record<string, unknown>>;
+}) => Promise<MockAnswer> | null;
+
+export interface MockAnswer {
+    readonly status: number;
+    readonly headers: Headers;
+    /** The JSON data, or the bytes for an operation without a response schema. */
+    readonly data: unknown;
 }
 
 /** The settings that each request uses. Make one with `createClient`. */
@@ -74,6 +101,8 @@ export interface Client {
     readonly timeoutMs: number;
     readonly responseBytesMax: number;
     readonly fetch: FetchFunction;
+    readonly missingFields: 'error' | 'zero';
+    readonly mock: CallMock | null;
 }
 
 export interface CallOptions {
@@ -130,6 +159,8 @@ export interface Operation<
     readonly params: P;
     readonly body: B;
     readonly response: R;
+    /** The namespace and the function, for example `zones.show`. */
+    readonly name: string;
 }
 
 export type AnyOperation = Operation<AnySchema, AnySchema | null, AnySchema | null>;
@@ -187,6 +218,8 @@ export function createClient(config: ClientConfig): Client {
         timeoutMs,
         responseBytesMax,
         fetch: fetchFunction,
+        missingFields: config.missingFields ?? 'error',
+        mock: config.mock ?? null,
     });
 }
 
@@ -217,6 +250,7 @@ export function operation<
     R extends AnySchema | null,
 >(definition: Operation<P, B, R>): Operation<P, B, R> {
     assert(definition.path.startsWith('/'), 'the path starts with a slash');
+    assert(/^\w+\.\w+$/.test(definition.name), 'the name is <namespace>.<function>');
     assert(definition.params.node.kind === 'object', 'the params schema is an object');
     // `[^{}]` cannot match a brace, so the match is linear also for a path with many braces.
     const templateKeys = [...definition.path.matchAll(/\{([^{}]+)\}/g)].map((match) => match[1]);
@@ -269,6 +303,10 @@ async function send(
         assertValid(bodyChecked, `the body of ${operation.method} ${operation.path}`);
         bodyText = JSON.stringify(bodyChecked.value);
     }
+
+    // A mock gets the input after the checks, so a test finds the same errors as the server.
+    const answer = client.mock?.({ name: operation.name, input }) ?? null;
+    if (answer !== null) return mockResult(operation, await answer);
 
     const timeoutMs = options.timeoutMs ?? client.timeoutMs;
     assertPositiveInteger(timeoutMs, 'timeoutMs');
@@ -337,7 +375,54 @@ async function send(
             error: { kind: 'response_invalid', status: reply.status, path: '$', expected: 'JSON' },
         };
     }
-    const data = parseResponse(operation.response, parsed.value);
+    const data = parseResponse(operation.response, parsed.value, {
+        missingFields: client.missingFields,
+    });
+    if (!data.ok) {
+        return {
+            ok: false,
+            error: { kind: 'response_invalid', status: reply.status, ...data.error },
+        };
+    }
+    return { ok: true, value: { ...reply, data: data.value } };
+}
+
+/** The result of a mock answer. The data goes through JSON, as the data of a response does. */
+function mockResult(
+    operation: AnyOperation,
+    answer: MockAnswer,
+): Result<Reply<unknown>, CallError> {
+    const reply = { status: answer.status, headers: answer.headers };
+    const bytes =
+        answer.data instanceof Uint8Array
+            ? answer.data
+            : new TextEncoder().encode(
+                  typeof answer.data === 'string' && operation.response === null
+                      ? answer.data
+                      : (JSON.stringify(answer.data) ?? 'null'),
+              );
+    if (answer.status < 200 || answer.status > 299) {
+        const parsed = decodeJson(bytes);
+        const body = parsed.ok ? parseResponse(json(), parsed.value) : null;
+        const errorBody = body !== null && body.ok ? body.value : null;
+        const message =
+            isRecord(errorBody) && typeof errorBody['error'] === 'string'
+                ? errorBody['error']
+                : null;
+        return {
+            ok: false,
+            error: { kind: 'http', status: answer.status, message, body: errorBody },
+        };
+    }
+    if (operation.response === null) return { ok: true, value: { ...reply, data: bytes } };
+    const parsed = decodeJson(bytes);
+    if (!parsed.ok) {
+        return {
+            ok: false,
+            error: { kind: 'response_invalid', status: reply.status, path: '$', expected: 'JSON' },
+        };
+    }
+    const data = parseResponse(operation.response, parsed.value, { missingFields: 'zero' });
     if (!data.ok) {
         return {
             ok: false,

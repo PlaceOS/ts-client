@@ -72,6 +72,7 @@ const UPDATE = operation({
     ),
     body: Item,
     response: Item,
+    name: 'items.update',
 });
 
 const DOWNLOAD = operation({
@@ -81,6 +82,7 @@ const DOWNLOAD = operation({
     params: parameters({}),
     body: null,
     response: null,
+    name: 'items.download',
 });
 
 describe('call', () => {

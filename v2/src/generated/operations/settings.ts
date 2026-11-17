@@ -33,6 +33,7 @@ const CREATE = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({}),
     body: Settings,
     response: Settings,
+    name: 'settings.create',
 });
 
 /**
@@ -59,6 +60,7 @@ const DESTROY = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'settings.destroy',
 });
 
 /**
@@ -89,6 +91,7 @@ const HISTORY = /* @__PURE__ */ operation({
     ),
     body: null,
     response: /* @__PURE__ */ array(Settings),
+    name: 'settings.history',
 });
 
 /**
@@ -125,6 +128,7 @@ const INDEX = /* @__PURE__ */ operation({
     }),
     body: null,
     response: /* @__PURE__ */ array(Settings),
+    name: 'settings.index',
 });
 
 /**
@@ -151,6 +155,7 @@ const SHOW = /* @__PURE__ */ operation({
     ),
     body: null,
     response: Settings,
+    name: 'settings.show',
 });
 
 /**
@@ -177,4 +182,5 @@ const UPDATE = /* @__PURE__ */ operation({
     ),
     body: Settings,
     response: Settings,
+    name: 'settings.update',
 });

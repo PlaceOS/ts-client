@@ -29,6 +29,7 @@ const CREATE = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({}),
     body: GroupZone,
     response: GroupZone,
+    name: 'groupsZones.create',
 });
 
 /** `DELETE /api/engine/v2/group_zones/{group_id}/{zone_id}` */
@@ -52,6 +53,7 @@ const DESTROY = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'groupsZones.destroy',
 });
 
 /**
@@ -87,6 +89,7 @@ const INDEX = /* @__PURE__ */ operation({
     }),
     body: null,
     response: /* @__PURE__ */ array(GroupZone),
+    name: 'groupsZones.index',
 });
 
 /** `GET /api/engine/v2/group_zones/{group_id}/{zone_id}` */
@@ -110,6 +113,7 @@ const SHOW = /* @__PURE__ */ operation({
     ),
     body: null,
     response: GroupZone,
+    name: 'groupsZones.show',
 });
 
 /** `PATCH /api/engine/v2/group_zones/{group_id}/{zone_id}` */
@@ -133,4 +137,5 @@ const UPDATE = /* @__PURE__ */ operation({
     ),
     body: GroupZone,
     response: GroupZone,
+    name: 'groupsZones.update',
 });

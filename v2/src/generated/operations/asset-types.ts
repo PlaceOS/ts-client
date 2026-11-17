@@ -33,6 +33,7 @@ const CREATE = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({}),
     body: AssetType,
     response: AssetType,
+    name: 'assetTypes.create',
 });
 
 /**
@@ -59,6 +60,7 @@ const DESTROY = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'assetTypes.destroy',
 });
 
 /**
@@ -106,6 +108,7 @@ const INDEX = /* @__PURE__ */ operation({
     }),
     body: null,
     response: /* @__PURE__ */ array(AssetType),
+    name: 'assetTypes.index',
 });
 
 /**
@@ -132,6 +135,7 @@ const SHOW = /* @__PURE__ */ operation({
     ),
     body: null,
     response: AssetType,
+    name: 'assetTypes.show',
 });
 
 /**
@@ -158,4 +162,5 @@ const UPDATE = /* @__PURE__ */ operation({
     ),
     body: AssetType,
     response: AssetType,
+    name: 'assetTypes.update',
 });

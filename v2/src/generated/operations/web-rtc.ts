@@ -43,6 +43,7 @@ const GUEST_ENTRY = /* @__PURE__ */ operation({
     ),
     body: GuestParticipant,
     response: null,
+    name: 'webRtc.guestEntry',
 });
 
 /**
@@ -67,6 +68,7 @@ const GUEST_EXIT = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({}),
     body: null,
     response: null,
+    name: 'webRtc.guestExit',
 });
 
 /**
@@ -102,6 +104,7 @@ const INDEX = /* @__PURE__ */ operation({
     }),
     body: null,
     response: /* @__PURE__ */ array(ControlSystem),
+    name: 'webRtc.index',
 });
 
 /**
@@ -132,6 +135,7 @@ const KICK_USER = /* @__PURE__ */ operation({
     ),
     body: KickReason,
     response: null,
+    name: 'webRtc.kickUser',
 });
 
 /**
@@ -158,6 +162,7 @@ const MEMBERS = /* @__PURE__ */ operation({
     ),
     body: null,
     response: /* @__PURE__ */ array(/* @__PURE__ */ string()),
+    name: 'webRtc.members',
 });
 
 /**
@@ -188,6 +193,7 @@ const PUBLIC_ROOM = /* @__PURE__ */ operation({
     ),
     body: null,
     response: WebRtcRoomDetails,
+    name: 'webRtc.publicRoom',
 });
 
 /**
@@ -218,6 +224,7 @@ const TRANSFER_GUEST = /* @__PURE__ */ operation({
     ),
     body: /* @__PURE__ */ nullable(/* @__PURE__ */ json()),
     response: null,
+    name: 'webRtc.transferGuest',
 });
 
 /**
@@ -247,4 +254,5 @@ const TRANSFER_GUEST_WITHOUT_SESSION_ID = /* @__PURE__ */ operation({
     ),
     body: /* @__PURE__ */ nullable(/* @__PURE__ */ json()),
     response: null,
+    name: 'webRtc.transferGuestWithoutSessionId',
 });

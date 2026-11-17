@@ -38,6 +38,7 @@ const COMPILED = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'drivers.compiled',
 });
 
 /**
@@ -59,6 +60,7 @@ const CREATE = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({}),
     body: Driver,
     response: Driver,
+    name: 'drivers.create',
 });
 
 /**
@@ -85,6 +87,7 @@ const DESTROY = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'drivers.destroy',
 });
 
 /**
@@ -124,6 +127,7 @@ const INDEX = /* @__PURE__ */ operation({
     }),
     body: null,
     response: /* @__PURE__ */ array(Driver),
+    name: 'drivers.index',
 });
 
 /**
@@ -150,6 +154,7 @@ const README = /* @__PURE__ */ operation({
     ),
     body: null,
     response: /* @__PURE__ */ string(),
+    name: 'drivers.readme',
 });
 
 /**
@@ -176,6 +181,7 @@ const RECOMPILE = /* @__PURE__ */ operation({
     ),
     body: null,
     response: /* @__PURE__ */ string(),
+    name: 'drivers.recompile',
 });
 
 /**
@@ -202,6 +208,7 @@ const RELOAD = /* @__PURE__ */ operation({
     ),
     body: null,
     response: /* @__PURE__ */ string(),
+    name: 'drivers.reload',
 });
 
 /**
@@ -230,6 +237,7 @@ const SHOW = /* @__PURE__ */ operation({
     ),
     body: null,
     response: Driver,
+    name: 'drivers.show',
 });
 
 /**
@@ -256,4 +264,5 @@ const UPDATE = /* @__PURE__ */ operation({
     ),
     body: Driver,
     response: Driver,
+    name: 'drivers.update',
 });

@@ -52,6 +52,7 @@ const INDEX = /* @__PURE__ */ operation({
     }),
     body: null,
     response: /* @__PURE__ */ array(History),
+    name: 'groupsHistory.index',
 });
 
 /** `GET /api/engine/v2/group_history/{id}` */
@@ -74,4 +75,5 @@ const SHOW = /* @__PURE__ */ operation({
     ),
     body: null,
     response: History,
+    name: 'groupsHistory.show',
 });

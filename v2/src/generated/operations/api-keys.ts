@@ -33,6 +33,7 @@ const CREATE = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({}),
     body: ApiKey,
     response: ApiKeysResponse,
+    name: 'apiKeys.create',
 });
 
 /**
@@ -59,6 +60,7 @@ const DESTROY = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'apiKeys.destroy',
 });
 
 /**
@@ -96,6 +98,7 @@ const INDEX = /* @__PURE__ */ operation({
     }),
     body: null,
     response: /* @__PURE__ */ array(ApiKeysResponse),
+    name: 'apiKeys.index',
 });
 
 /**
@@ -117,6 +120,7 @@ const INSPECT_KEY = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({}),
     body: null,
     response: UserJwt,
+    name: 'apiKeys.inspectKey',
 });
 
 /**
@@ -143,6 +147,7 @@ const SHOW = /* @__PURE__ */ operation({
     ),
     body: null,
     response: ApiKeysResponse,
+    name: 'apiKeys.show',
 });
 
 /**
@@ -169,4 +174,5 @@ const UPDATE = /* @__PURE__ */ operation({
     ),
     body: ApiKey,
     response: ApiKeysResponse,
+    name: 'apiKeys.update',
 });

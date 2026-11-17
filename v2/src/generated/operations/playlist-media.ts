@@ -49,6 +49,7 @@ const CREATE = /* @__PURE__ */ operation({
     }),
     body: PlaylistItem,
     response: PlaylistItem,
+    name: 'playlistMedia.create',
 });
 
 /**
@@ -85,6 +86,7 @@ const DESTROY = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'playlistMedia.destroy',
 });
 
 /**
@@ -125,6 +127,7 @@ const INDEX = /* @__PURE__ */ operation({
     }),
     body: null,
     response: /* @__PURE__ */ array(PlaylistItem),
+    name: 'playlistMedia.index',
 });
 
 /**
@@ -166,6 +169,7 @@ const REMOVE_TAG = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'playlistMedia.removeTag',
 });
 
 /**
@@ -203,6 +207,7 @@ const RENAME_TAG = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'playlistMedia.renameTag',
 });
 
 /**
@@ -248,6 +253,7 @@ const SHARE = /* @__PURE__ */ operation({
         },
         ['linked', 'already_present'],
     ),
+    name: 'playlistMedia.share',
 });
 
 /**
@@ -277,6 +283,7 @@ const SHOW = /* @__PURE__ */ operation({
     ),
     body: null,
     response: PlaylistItem,
+    name: 'playlistMedia.show',
 });
 
 /**
@@ -306,6 +313,7 @@ const TAG_COUNTS = /* @__PURE__ */ operation({
     }),
     body: null,
     response: /* @__PURE__ */ record(/* @__PURE__ */ integer('Int32')),
+    name: 'playlistMedia.tagCounts',
 });
 
 /**
@@ -335,6 +343,7 @@ const TAGS = /* @__PURE__ */ operation({
     }),
     body: null,
     response: /* @__PURE__ */ array(/* @__PURE__ */ string()),
+    name: 'playlistMedia.tags',
 });
 
 /**
@@ -361,6 +370,7 @@ const THUMBNAIL = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'playlistMedia.thumbnail',
 });
 
 /**
@@ -387,4 +397,5 @@ const UPDATE = /* @__PURE__ */ operation({
     ),
     body: PlaylistItem,
     response: PlaylistItem,
+    name: 'playlistMedia.update',
 });

@@ -45,6 +45,7 @@ const MQTT_ACCESS = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'mqtt.mqttAccess',
 });
 
 /**
@@ -69,4 +70,5 @@ const MQTT_USER = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({}),
     body: null,
     response: null,
+    name: 'mqtt.mqttUser',
 });

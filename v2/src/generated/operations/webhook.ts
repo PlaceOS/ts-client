@@ -39,4 +39,5 @@ const SHOW = /* @__PURE__ */ operation({
     ),
     body: null,
     response: Trigger,
+    name: 'webhook.show',
 });

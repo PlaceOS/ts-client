@@ -29,6 +29,7 @@ const GOOGLE = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({}),
     body: null,
     response: null,
+    name: 'pushNotifications.google',
 });
 
 /** `POST /api/engine/v2/notifications/office365` */
@@ -46,4 +47,5 @@ const MICROSOFT = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({}),
     body: MicrosoftNotification,
     response: null,
+    name: 'pushNotifications.microsoft',
 });

@@ -46,6 +46,7 @@ const ACCEPT = /* @__PURE__ */ operation({
     ),
     body: null,
     response: GroupUser,
+    name: 'groupsInvitations.accept',
 });
 
 /**
@@ -70,6 +71,7 @@ const CREATE = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({}),
     body: GroupsInvitationsInvitationCreatePayload,
     response: GroupsInvitationsInvitationCreatedResponse,
+    name: 'groupsInvitations.create',
 });
 
 /** `DELETE /api/engine/v2/group_invitations/{id}` */
@@ -92,6 +94,7 @@ const DESTROY = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'groupsInvitations.destroy',
 });
 
 /**
@@ -129,6 +132,7 @@ const INDEX = /* @__PURE__ */ operation({
     }),
     body: null,
     response: /* @__PURE__ */ array(GroupInvitation),
+    name: 'groupsInvitations.index',
 });
 
 /** `GET /api/engine/v2/group_invitations/{id}` */
@@ -151,4 +155,5 @@ const SHOW = /* @__PURE__ */ operation({
     ),
     body: null,
     response: GroupInvitation,
+    name: 'groupsInvitations.show',
 });

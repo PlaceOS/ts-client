@@ -33,6 +33,7 @@ const CREATE = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({}),
     body: Trigger,
     response: Trigger,
+    name: 'triggers.create',
 });
 
 /**
@@ -59,6 +60,7 @@ const DESTROY = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'triggers.destroy',
 });
 
 /**
@@ -94,6 +96,7 @@ const INDEX = /* @__PURE__ */ operation({
     }),
     body: null,
     response: /* @__PURE__ */ array(Trigger),
+    name: 'triggers.index',
 });
 
 /**
@@ -120,6 +123,7 @@ const INSTANCES = /* @__PURE__ */ operation({
     ),
     body: null,
     response: /* @__PURE__ */ array(TriggerInstance),
+    name: 'triggers.instances',
 });
 
 /**
@@ -148,6 +152,7 @@ const SHOW = /* @__PURE__ */ operation({
     ),
     body: null,
     response: Trigger,
+    name: 'triggers.show',
 });
 
 /**
@@ -174,4 +179,5 @@ const UPDATE = /* @__PURE__ */ operation({
     ),
     body: Trigger,
     response: Trigger,
+    name: 'triggers.update',
 });

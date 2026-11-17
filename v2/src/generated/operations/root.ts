@@ -33,6 +33,7 @@ const CLUSTER_VERSION = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({}),
     body: null,
     response: /* @__PURE__ */ array(Version),
+    name: 'root.clusterVersion',
 });
 
 /**
@@ -54,6 +55,7 @@ const PLATFORM_INFO = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({}),
     body: null,
     response: RootPlatformInfo,
+    name: 'root.platformInfo',
 });
 
 /**
@@ -75,6 +77,7 @@ const ROOT = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({}),
     body: null,
     response: null,
+    name: 'root.root',
 });
 
 /**
@@ -96,6 +99,7 @@ const SCOPES = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({}),
     body: null,
     response: /* @__PURE__ */ array(/* @__PURE__ */ string()),
+    name: 'root.scopes',
 });
 
 /**
@@ -126,6 +130,7 @@ const SIGNAL = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'root.signal',
 });
 
 /**
@@ -155,6 +160,7 @@ const SOURCE_RESYNC = /* @__PURE__ */ operation({
     }),
     body: null,
     response: RootSourceResyncStatus,
+    name: 'root.sourceResync',
 });
 
 /**
@@ -176,6 +182,7 @@ const SOURCE_RESYNC_STATUS = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({}),
     body: null,
     response: RootSourceResyncStatus,
+    name: 'root.sourceResyncStatus',
 });
 
 /**
@@ -197,4 +204,5 @@ const VERSION = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({}),
     body: null,
     response: Version,
+    name: 'root.version',
 });

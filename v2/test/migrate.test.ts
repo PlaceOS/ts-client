@@ -15,8 +15,8 @@ const TABLES: MigrateTables = {
     unmapped: V1_UNMAPPED,
 };
 
-function migrate(text: string) {
-    return migrateSource(ts, 'file.ts', text, TABLES);
+function migrate(text: string, fileName = 'file.ts') {
+    return migrateSource(ts, fileName, text, TABLES);
 }
 
 test('rewrites calls, types and imports', () => {
@@ -93,22 +93,41 @@ test('gives a new import another name when the file has the name', () => {
     );
 });
 
-test('rewrites calls on a namespace import, and finds test doubles', () => {
+test('rewrites calls and spies on a namespace import', () => {
     const result = migrate(
         [
             "import * as client from '@placeos/ts-client';",
             'client.showZone(id);',
             "vi.spyOn(client, 'showZone');",
+            "jest.fn().mockName('showZone');",
         ].join('\n'),
     );
     expect(result.text.split('\n')).toEqual([
         "import * as client from '@placeos/ts-client';",
         "import { orThrow } from '@placeos/ts-client/compat';",
         'client.zones.show({ id }).then(orThrow);',
-        "vi.spyOn(client, 'showZone');",
+        "vi.spyOn(client.zones, 'show');",
+        "jest.fn().mockName('showZone');",
     ]);
+    // Another string with a v1 name can be a test double that the tool does not know.
     expect(result.findings.map((finding) => finding.message)).toEqual([
         'a test double of v1: make it for the v2 call (zones.show)',
+    ]);
+});
+
+test('a namespace import reads the v1 enums and types from the compat module', () => {
+    const result = migrate(
+        [
+            "import * as client from '@placeos/ts-client';",
+            'const role = client.PlaceDriverRole.Logic;',
+            'let page: client.QueryResponse<string>;',
+        ].join('\n'),
+    );
+    expect(result.text.split('\n')).toEqual([
+        "import * as client from '@placeos/ts-client';",
+        "import { PlaceDriverRole, type QueryResponse } from '@placeos/ts-client/compat';",
+        'const role = PlaceDriverRole.Logic;',
+        'let page: QueryResponse<string>;',
     ]);
 });
 
@@ -139,4 +158,95 @@ test('a second run changes nothing', () => {
     expect(second.changes).toBe(0);
     // The v2 names of the first run are not findings.
     expect(second.findings.map((finding) => finding.name)).toEqual(['getModule']);
+});
+
+test('rewrites test doubles: the function, the mock values and the argument checks', () => {
+    const result = migrate(
+        [
+            "import { queryZones, showMetadata, showZone, updateSystem } from '@placeos/ts-client';",
+            "vi.mock('@placeos/ts-client', { spy: true });",
+            "vi.mocked(showZone).mockResolvedValue({ id: 'zone-1' } as any);",
+            'vi.mocked(queryZones).mockResolvedValueOnce({ data: [], total: 0 });',
+            "vi.mocked(showZone).mockRejectedValue(new Error('403'));",
+            "expect(showZone).toHaveBeenCalledWith('zone-1');",
+            'expect(showZone).not.toHaveBeenCalled();',
+            '(showZone as Mock).mockImplementation((id) => Promise.resolve({ id }));',
+            'vi.mocked(showMetadata).mockResolvedValue({ details: {} });',
+            "expect(updateSystem).toHaveBeenCalledWith('sys-1', expect.objectContaining({ name: 'A' }));",
+        ].join('\n'),
+        'zone.spec.ts',
+    );
+    expect(result.text.split('\n')).toEqual([
+        "import { metadata, systems, zones } from '@placeos/ts-client';",
+        "import { fromV1Mock, mockPage, mockReply } from '@placeos/ts-client/compat';",
+        "vi.mock('@placeos/ts-client', { spy: true });",
+        "vi.mocked(zones.show).mockResolvedValue(mockReply({ id: 'zone-1' } as any));",
+        'vi.mocked(zones.index).mockResolvedValueOnce(mockPage({ data: [], total: 0 }));',
+        "vi.mocked(zones.show).mockRejectedValue(new Error('403'));",
+        "expect(zones.show).toHaveBeenCalledWith({ id: 'zone-1' });",
+        'expect(zones.show).not.toHaveBeenCalled();',
+        // An implementation gets the v1 arguments, and its value becomes a v2 result.
+        "(zones.show as Mock).mockImplementation(fromV1Mock((id) => Promise.resolve({ id }), ['id', '...']));",
+        // The v2 call gives the data by key, so the value goes under the key.
+        "vi.mocked(metadata.show).mockImplementation(fromV1Mock(() => ({ details: {} }), ['id', 'name'], 'data', 'name'));",
+        // The check leaves out the `version` that v2 reads from the data.
+        "expect(systems.update).toHaveBeenCalledWith(expect.objectContaining({ sys_id: 'sys-1', body: expect.objectContaining({ name: 'A' }) }));",
+    ]);
+    expect(result.findings).toEqual([]);
+});
+
+test('rewrites a spy on a namespace import, and finds an automock', () => {
+    const result = migrate(
+        [
+            "import * as client from '@placeos/ts-client';",
+            "vi.mock('@placeos/ts-client');",
+            "vi.spyOn(client, 'showZone').mockResolvedValue(zone);",
+        ].join('\n'),
+    );
+    expect(result.text.split('\n').at(-1)).toBe(
+        "vi.spyOn(client.zones, 'show').mockResolvedValue(mockReply(zone));",
+    );
+    expect(result.findings.map((finding) => finding.name)).toEqual(['@placeos/ts-client']);
+});
+
+test('rewrites the v1 functions of a vi.mock factory to v2 namespaces', () => {
+    const result = migrate(
+        [
+            "import { authority, queryZones, showMetadata, showZone } from '@placeos/ts-client';",
+            "vi.mock('@placeos/ts-client', () => ({",
+            '    authority: vi.fn(() => null),',
+            '    showZone: vi.fn((id: string) => Promise.resolve({ id })),',
+            '    queryZones: vi.fn(),',
+            '    showMetadata: vi.fn(() => ({ details: {} })),',
+            '}));',
+        ].join('\n'),
+    );
+    expect(result.text.split('\n')).toEqual([
+        "import { authority } from '@placeos/ts-client';",
+        "const { fromV1Mock } = await vi.hoisted(() => import('@placeos/ts-client/compat'));",
+        "vi.mock('@placeos/ts-client', () => ({ authority: vi.fn(() => null), " +
+            "zones: { show: vi.fn(fromV1Mock((id: string) => Promise.resolve({ id }), ['id', '...'])), " +
+            "index: vi.fn(fromV1Mock(undefined, ['...'], 'page')) }, " +
+            "metadata: { show: vi.fn(fromV1Mock(() => ({ details: {} }), ['id', 'name'], 'data', 'name')) } }));",
+    ]);
+});
+
+test('fromV1Mock gives the v1 arguments and a v2 result', async () => {
+    const { fromV1Mock, orThrow, orThrowPage } = await import('../src/compat/index.ts');
+    const calls: unknown[][] = [];
+    const record = (...args: unknown[]) => {
+        calls.push(args);
+        return { id: 'zone-1' };
+    };
+    const show = fromV1Mock(record, ['id', '...']);
+    expect(orThrow(await show({ id: 'zone-1' }))).toEqual({ id: 'zone-1' });
+    await show({ id: 'zone-1', complete: true });
+    // An empty last argument is left out, as the v1 call left it out.
+    expect(calls).toEqual([['zone-1'], ['zone-1', { complete: true }]]);
+    const index = fromV1Mock(() => ({ data: [1], total: 9 }), ['...'], 'page');
+    expect(orThrowPage(await index({})).total).toBe(9);
+    const meta = fromV1Mock(() => ({ details: 1 }), ['id', 'name'], 'data', 'name');
+    expect(orThrow(await meta({ id: 'z', name: 'settings' }))).toEqual({
+        settings: { details: 1 },
+    });
 });

@@ -56,6 +56,7 @@ const CREATE = /* @__PURE__ */ operation({
         UserPublicMetadataResponse,
         UserPublicResponse,
     ]),
+    name: 'users.create',
 });
 
 /**
@@ -77,6 +78,7 @@ const CURRENT = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({}),
     body: null,
     response: UserAdminMetadataResponse,
+    name: 'users.current',
 });
 
 /**
@@ -106,6 +108,7 @@ const DELETE_RESOURCE_TOKEN = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'users.deleteResourceToken',
 });
 
 /**
@@ -134,6 +137,7 @@ const DESTROY = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'users.destroy',
 });
 
 /**
@@ -161,6 +165,7 @@ const GROUPS = /* @__PURE__ */ operation({
     ),
     body: null,
     response: /* @__PURE__ */ array(UserGroupResponse),
+    name: 'users.groups',
 });
 
 /**
@@ -209,6 +214,7 @@ const INDEX = /* @__PURE__ */ operation({
             UserPublicResponse,
         ]),
     ),
+    name: 'users.index',
 });
 
 /**
@@ -238,6 +244,7 @@ const METADATA = /* @__PURE__ */ operation({
     ),
     body: null,
     response: /* @__PURE__ */ record(MetadataInterface),
+    name: 'users.metadata',
 });
 
 /**
@@ -263,6 +270,7 @@ const RESOURCE_TOKEN = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({}),
     body: null,
     response: UserResourceToken,
+    name: 'users.resourceToken',
 });
 
 /**
@@ -290,6 +298,7 @@ const REVIVE = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'users.revive',
 });
 
 /**
@@ -331,6 +340,7 @@ const SEARCH = /* @__PURE__ */ operation({
             UserPublicResponse,
         ]),
     ),
+    name: 'users.search',
 });
 
 /**
@@ -365,6 +375,7 @@ const SHOW = /* @__PURE__ */ operation({
         UserPublicMetadataResponse,
         UserPublicResponse,
     ]),
+    name: 'users.show',
 });
 
 /**
@@ -397,6 +408,7 @@ const UPDATE = /* @__PURE__ */ operation({
         UserPublicMetadataResponse,
         UserPublicResponse,
     ]),
+    name: 'users.update',
 });
 
 /**
@@ -427,4 +439,5 @@ const USER_RESOURCE_TOKEN = /* @__PURE__ */ operation({
     ),
     body: null,
     response: UserResourceToken,
+    name: 'users.userResourceToken',
 });

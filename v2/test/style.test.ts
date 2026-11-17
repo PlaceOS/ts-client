@@ -9,6 +9,13 @@ import { join } from 'node:path';
 
 const SOURCE_DIR = join(import.meta.dir, '..', 'src');
 const ALLOWED_CASTS = ['parsed as O', 'checked as I', 'result as CallResult<O>'];
+/** The v1 mock types of the compat module keep `any`, so that the mocks of an app still compile. */
+const ALLOWED_ANY = [
+    'compat/http-mock.ts: readonly metadata: any;',
+    'compat/http-mock.ts: readonly body: any;',
+    'compat/http-mock.ts: metadata?: any;',
+    'compat/realtime-mock.ts: export type MockModule = Record<string, any>;',
+];
 
 test('the source has no escape from the type checks', async () => {
     const problems: string[] = [];
@@ -18,13 +25,16 @@ test('the source has no escape from the type checks', async () => {
             // Comments and strings are text, not code.
             const code = line.replace(/\/\*.*?\*\/|\/\/.*$|^\s*\/?\*.*$|'[^']*'|`[^`]*`/g, '');
             const where = `${file}:${index + 1}: ${line.trim()}`;
-            if (/(?<!\.)\bany\b/.test(code)) problems.push(`any in ${where}`);
+            const allowedAny = ALLOWED_ANY.includes(`${file}: ${line.trim()}`);
+            if (/(?<!\.)\bany\b/.test(code) && !allowedAny) problems.push(`any in ${where}`);
             if (/@ts-(ignore|expect-error|nocheck)/.test(line)) {
                 problems.push(`ts comment in ${where}`);
             }
             if (/[\w)\]]!(?:[.[(,;)]|$)/.test(code)) {
                 problems.push(`non-null assertion in ${where}`);
             }
+            // `export { A as B }` is a name, not a cast. Long lists put each name on a line.
+            if (/^\s*export \{.* as /.test(code) || /^\s*(type )?\w+ as \w+,$/.test(code)) continue;
             // `K in keyof F as ...` is a key remap of a mapped type, not a cast.
             const cast = /(?<!keyof )\b(\w+) as (?!const\b)([\w<>]+)/.exec(code);
             if (cast !== null && !ALLOWED_CASTS.includes(cast[0])) {

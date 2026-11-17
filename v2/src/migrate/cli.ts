@@ -111,7 +111,8 @@ async function main(argv: readonly string[]): Promise<void> {
         console.log(
             `\nNext:\n` +
                 `  1. Install v2: npm install @placeos/ts-client@2\n` +
-                `  2. Call configure() once, before the first call (README: Log in).\n` +
+                `  2. Call configure() once, before the first call (README: Log in). For a mock mode,\n` +
+                `     give fetch: mockFetch and missingFields: 'zero' (README: Mock mode).\n` +
                 `  3. Run the compiler. It shows the changes to the data, such as a field that can be null.\n` +
                 `  4. orThrow from ${COMPAT_MODULE} keeps the v1 errors. Check the Result in new code.`,
         );

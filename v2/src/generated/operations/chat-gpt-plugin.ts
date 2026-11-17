@@ -57,6 +57,7 @@ const CALL_FUNCTION = /* @__PURE__ */ operation({
         },
         ['response'],
     ),
+    name: 'chatGptPlugin.callFunction',
 });
 
 /**
@@ -85,6 +86,7 @@ const CAPABILITIES = /* @__PURE__ */ operation({
     ),
     body: null,
     response: ChatGptPluginDetails,
+    name: 'chatGptPlugin.capabilities',
 });
 
 /**
@@ -123,4 +125,5 @@ const FUNCTION_SCHEMA = /* @__PURE__ */ operation({
             ['function', 'description', 'parameters'],
         ),
     ),
+    name: 'chatGptPlugin.functionSchema',
 });

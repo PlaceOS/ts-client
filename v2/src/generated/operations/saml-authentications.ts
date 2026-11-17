@@ -34,6 +34,7 @@ const CREATE = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({}),
     body: SamlAuthentication,
     response: SamlAuthentication,
+    name: 'samlAuthentications.create',
 });
 
 /**
@@ -60,6 +61,7 @@ const DESTROY = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'samlAuthentications.destroy',
 });
 
 /**
@@ -97,6 +99,7 @@ const INDEX = /* @__PURE__ */ operation({
     }),
     body: null,
     response: /* @__PURE__ */ array(SamlAuthentication),
+    name: 'samlAuthentications.index',
 });
 
 /**
@@ -123,6 +126,7 @@ const SHOW = /* @__PURE__ */ operation({
     ),
     body: null,
     response: SamlAuthentication,
+    name: 'samlAuthentications.show',
 });
 
 /**
@@ -149,4 +153,5 @@ const UPDATE = /* @__PURE__ */ operation({
     ),
     body: SamlAuthentication,
     response: SamlAuthentication,
+    name: 'samlAuthentications.update',
 });

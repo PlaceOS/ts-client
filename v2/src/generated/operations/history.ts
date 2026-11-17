@@ -65,6 +65,7 @@ const INDEX = /* @__PURE__ */ operation({
     }),
     body: null,
     response: /* @__PURE__ */ array(History),
+    name: 'history.index',
 });
 
 /** `GET /api/engine/v2/history/{id}` */
@@ -87,6 +88,7 @@ const SHOW = /* @__PURE__ */ operation({
     ),
     body: null,
     response: History,
+    name: 'history.show',
 });
 
 /**
@@ -119,4 +121,5 @@ const UNDELETE = /* @__PURE__ */ operation({
     ),
     body: null,
     response: PgOrmBase,
+    name: 'history.undelete',
 });

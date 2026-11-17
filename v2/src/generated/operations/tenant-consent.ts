@@ -48,6 +48,7 @@ const AZURE_ADMIN_CONSENT_CALLBACK = /* @__PURE__ */ operation({
     }),
     body: null,
     response: null,
+    name: 'tenantConsent.azureAdminConsentCallback',
 });
 
 /**
@@ -78,6 +79,7 @@ const FLOW_STATUS = /* @__PURE__ */ operation({
     ),
     body: null,
     response: AdminConsentFlow,
+    name: 'tenantConsent.flowStatus',
 });
 
 /** `GET /api/engine/v2/admin_consent/{id}` */
@@ -120,4 +122,5 @@ const INDEX = /* @__PURE__ */ operation({
         },
         ['url'],
     ),
+    name: 'tenantConsent.index',
 });

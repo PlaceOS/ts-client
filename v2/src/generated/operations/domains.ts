@@ -33,6 +33,7 @@ const CREATE = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({}),
     body: Authority,
     response: Authority,
+    name: 'domains.create',
 });
 
 /**
@@ -59,6 +60,7 @@ const DESTROY = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'domains.destroy',
 });
 
 /**
@@ -94,6 +96,7 @@ const INDEX = /* @__PURE__ */ operation({
     }),
     body: null,
     response: /* @__PURE__ */ array(Authority),
+    name: 'domains.index',
 });
 
 /**
@@ -121,6 +124,7 @@ const LOOKUP = /* @__PURE__ */ operation({
     ),
     body: null,
     response: /* @__PURE__ */ string(),
+    name: 'domains.lookup',
 });
 
 /**
@@ -147,6 +151,7 @@ const SHOW = /* @__PURE__ */ operation({
     ),
     body: null,
     response: Authority,
+    name: 'domains.show',
 });
 
 /**
@@ -173,4 +178,5 @@ const UPDATE = /* @__PURE__ */ operation({
     ),
     body: Authority,
     response: Authority,
+    name: 'domains.update',
 });

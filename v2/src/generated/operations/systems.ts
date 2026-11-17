@@ -54,6 +54,7 @@ const ADD_MODULE = /* @__PURE__ */ operation({
     ),
     body: null,
     response: ControlSystem,
+    name: 'systems.addModule',
 });
 
 /**
@@ -75,6 +76,7 @@ const CREATE = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({}),
     body: ControlSystem,
     response: ControlSystem,
+    name: 'systems.create',
 });
 
 /**
@@ -101,6 +103,7 @@ const DESTROY = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'systems.destroy',
 });
 
 /**
@@ -131,6 +134,7 @@ const EXECUTE = /* @__PURE__ */ operation({
     ),
     body: /* @__PURE__ */ array(/* @__PURE__ */ json()),
     response: /* @__PURE__ */ json(),
+    name: 'systems.execute',
 });
 
 /**
@@ -158,6 +162,7 @@ const FIND_BY_EMAIL = /* @__PURE__ */ operation({
     ),
     body: null,
     response: /* @__PURE__ */ array(ControlSystem),
+    name: 'systems.findByEmail',
 });
 
 /**
@@ -188,6 +193,7 @@ const FUNCTIONS = /* @__PURE__ */ operation({
     ),
     body: null,
     response: /* @__PURE__ */ record(SystemsFunctionDetails),
+    name: 'systems.functions',
 });
 
 /**
@@ -252,6 +258,7 @@ const INDEX = /* @__PURE__ */ operation({
     }),
     body: null,
     response: /* @__PURE__ */ array(ControlSystem),
+    name: 'systems.index',
 });
 
 /**
@@ -279,6 +286,7 @@ const METADATA = /* @__PURE__ */ operation({
     ),
     body: null,
     response: /* @__PURE__ */ record(MetadataInterface),
+    name: 'systems.metadata',
 });
 
 /**
@@ -306,6 +314,7 @@ const REMOVE_MODULE = /* @__PURE__ */ operation({
     ),
     body: null,
     response: ControlSystem,
+    name: 'systems.removeModule',
 });
 
 /**
@@ -332,6 +341,7 @@ const SETTINGS = /* @__PURE__ */ operation({
     ),
     body: null,
     response: /* @__PURE__ */ array(Settings),
+    name: 'systems.settings',
 });
 
 /**
@@ -360,6 +370,7 @@ const SHOW = /* @__PURE__ */ operation({
     ),
     body: null,
     response: ControlSystem,
+    name: 'systems.show',
 });
 
 /**
@@ -388,6 +399,7 @@ const START = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'systems.start',
 });
 
 /**
@@ -416,6 +428,7 @@ const STATE = /* @__PURE__ */ operation({
     ),
     body: null,
     response: /* @__PURE__ */ record(/* @__PURE__ */ string()),
+    name: 'systems.state',
 });
 
 /**
@@ -449,6 +462,7 @@ const STATE_LOOKUP = /* @__PURE__ */ operation({
     ),
     body: null,
     response: /* @__PURE__ */ json(),
+    name: 'systems.stateLookup',
 });
 
 /**
@@ -477,6 +491,7 @@ const STOP = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'systems.stop',
 });
 
 /**
@@ -503,6 +518,7 @@ const SYS_ZONES = /* @__PURE__ */ operation({
     ),
     body: null,
     response: /* @__PURE__ */ array(Zone),
+    name: 'systems.sysZones',
 });
 
 /**
@@ -529,6 +545,7 @@ const TYPES = /* @__PURE__ */ operation({
     ),
     body: null,
     response: /* @__PURE__ */ record(/* @__PURE__ */ integer('Int32')),
+    name: 'systems.types',
 });
 
 /**
@@ -561,4 +578,5 @@ const UPDATE = /* @__PURE__ */ operation({
     ),
     body: ControlSystem,
     response: ControlSystem,
+    name: 'systems.update',
 });

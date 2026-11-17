@@ -34,6 +34,7 @@ const CREATE = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({}),
     body: LdapAuthentication,
     response: LdapAuthentication,
+    name: 'ldapAuthentications.create',
 });
 
 /**
@@ -60,6 +61,7 @@ const DESTROY = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'ldapAuthentications.destroy',
 });
 
 /**
@@ -97,6 +99,7 @@ const INDEX = /* @__PURE__ */ operation({
     }),
     body: null,
     response: /* @__PURE__ */ array(LdapAuthentication),
+    name: 'ldapAuthentications.index',
 });
 
 /**
@@ -123,6 +126,7 @@ const SHOW = /* @__PURE__ */ operation({
     ),
     body: null,
     response: LdapAuthentication,
+    name: 'ldapAuthentications.show',
 });
 
 /**
@@ -149,4 +153,5 @@ const UPDATE = /* @__PURE__ */ operation({
     ),
     body: LdapAuthentication,
     response: LdapAuthentication,
+    name: 'ldapAuthentications.update',
 });

@@ -34,6 +34,7 @@ const CREATE = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({}),
     body: AssetPurchaseOrder,
     response: AssetPurchaseOrder,
+    name: 'assetPurchaseOrders.create',
 });
 
 /**
@@ -60,6 +61,7 @@ const DESTROY = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'assetPurchaseOrders.destroy',
 });
 
 /**
@@ -95,6 +97,7 @@ const INDEX = /* @__PURE__ */ operation({
     }),
     body: null,
     response: /* @__PURE__ */ array(AssetPurchaseOrder),
+    name: 'assetPurchaseOrders.index',
 });
 
 /**
@@ -121,6 +124,7 @@ const SHOW = /* @__PURE__ */ operation({
     ),
     body: null,
     response: AssetPurchaseOrder,
+    name: 'assetPurchaseOrders.show',
 });
 
 /**
@@ -148,4 +152,5 @@ const UPDATE = /* @__PURE__ */ operation({
     ),
     body: AssetPurchaseOrder,
     response: AssetPurchaseOrder,
+    name: 'assetPurchaseOrders.update',
 });

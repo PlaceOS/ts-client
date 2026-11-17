@@ -3133,3 +3133,18 @@ export interface ZonesZoneExecResponse extends Output<typeof ZonesZoneExecRespon
 export interface ZonesZoneExecResponseInput extends Input<typeof ZonesZoneExecResponseSchema> {}
 export const ZonesZoneExecResponse: Schema<ZonesZoneExecResponse, ZonesZoneExecResponseInput> =
     ZonesZoneExecResponseSchema;
+
+/** Short names. Each one is the same value and type as the long name. */
+export { UserAdminMetadataResponse as User, type UserAdminMetadataResponseInput as UserInput };
+export { ControlSystem as System, type ControlSystemInput as SystemInput };
+export {
+    DoorkeeperApplication as Application,
+    type DoorkeeperApplicationInput as ApplicationInput,
+};
+export { Authority as Domain, type AuthorityInput as DomainInput };
+export { MetadataInterface as Metadata, type MetadataInterfaceInput as MetadataInput };
+export { Shortener as ShortUrl, type ShortenerInput as ShortUrlInput };
+export {
+    SignageTemplateSystemTemplate as SignageTemplateMapping,
+    type SignageTemplateSystemTemplateInput as SignageTemplateMappingInput,
+};

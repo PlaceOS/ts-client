@@ -33,6 +33,7 @@ const CREATE = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({}),
     body: Storage,
     response: Storage,
+    name: 'storages.create',
 });
 
 /**
@@ -59,6 +60,7 @@ const DESTROY = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'storages.destroy',
 });
 
 /**
@@ -96,6 +98,7 @@ const INDEX = /* @__PURE__ */ operation({
     }),
     body: null,
     response: /* @__PURE__ */ array(Storage),
+    name: 'storages.index',
 });
 
 /**
@@ -122,6 +125,7 @@ const SHOW = /* @__PURE__ */ operation({
     ),
     body: null,
     response: Storage,
+    name: 'storages.show',
 });
 
 /**
@@ -148,4 +152,5 @@ const UPDATE = /* @__PURE__ */ operation({
     ),
     body: Storage,
     response: Storage,
+    name: 'storages.update',
 });

@@ -35,6 +35,7 @@ const CANCEL = /* @__PURE__ */ operation({
     ),
     body: null,
     response: BuildMonitorCancelStatus,
+    name: 'buildMonitor.cancel',
 });
 
 /** `GET /api/engine/v2/build/monitor` */
@@ -61,4 +62,5 @@ const MONITOR = /* @__PURE__ */ operation({
         /* @__PURE__ */ array(BuildMonitorTaskStatus),
         /* @__PURE__ */ string(),
     ]),
+    name: 'buildMonitor.monitor',
 });

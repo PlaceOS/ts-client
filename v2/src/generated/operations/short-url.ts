@@ -33,6 +33,7 @@ const CREATE = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({}),
     body: Shortener,
     response: Shortener,
+    name: 'shortUrl.create',
 });
 
 /**
@@ -59,6 +60,7 @@ const DESTROY = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'shortUrl.destroy',
 });
 
 /**
@@ -91,6 +93,7 @@ const GENERATE_QR_CODE = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'shortUrl.generateQrCode',
 });
 
 /**
@@ -126,6 +129,7 @@ const INDEX = /* @__PURE__ */ operation({
     }),
     body: null,
     response: /* @__PURE__ */ array(Shortener),
+    name: 'shortUrl.index',
 });
 
 /**
@@ -154,6 +158,7 @@ const PNG_QR = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'shortUrl.pngQr',
 });
 
 /**
@@ -180,6 +185,7 @@ const REDIRECT = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'shortUrl.redirect',
 });
 
 /**
@@ -206,6 +212,7 @@ const SHOW = /* @__PURE__ */ operation({
     ),
     body: null,
     response: Shortener,
+    name: 'shortUrl.show',
 });
 
 /**
@@ -232,6 +239,7 @@ const SVG_QR = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'shortUrl.svgQr',
 });
 
 /**
@@ -258,4 +266,5 @@ const UPDATE = /* @__PURE__ */ operation({
     ),
     body: Shortener,
     response: Shortener,
+    name: 'shortUrl.update',
 });

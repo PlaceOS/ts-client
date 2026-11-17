@@ -54,6 +54,7 @@ const CLEANUP_ERRORS = /* @__PURE__ */ operation({
     }),
     body: null,
     response: /* @__PURE__ */ record(/* @__PURE__ */ record(/* @__PURE__ */ json())),
+    name: 'edges.cleanupErrors',
 });
 
 /**
@@ -75,6 +76,7 @@ const CREATE = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({}),
     body: EdgeCreateBody,
     response: EdgeKeyResponse,
+    name: 'edges.create',
 });
 
 /**
@@ -101,6 +103,7 @@ const DESTROY = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'edges.destroy',
 });
 
 /**
@@ -127,6 +130,7 @@ const EDGE_CONNECTIONS = /* @__PURE__ */ operation({
     ),
     body: null,
     response: /* @__PURE__ */ nullable(ConnectionMetrics),
+    name: 'edges.edgeConnections',
 });
 
 /**
@@ -157,6 +161,7 @@ const EDGE_ERRORS = /* @__PURE__ */ operation({
     ),
     body: null,
     response: /* @__PURE__ */ array(EdgeError),
+    name: 'edges.edgeErrors',
 });
 
 /**
@@ -183,6 +188,7 @@ const EDGE_HEALTH = /* @__PURE__ */ operation({
     ),
     body: null,
     response: /* @__PURE__ */ nullable(EdgeHealth),
+    name: 'edges.edgeHealth',
 });
 
 /**
@@ -209,6 +215,7 @@ const EDGE_MODULE_STATUS = /* @__PURE__ */ operation({
     ),
     body: null,
     response: EdgeModuleStatus,
+    name: 'edges.edgeModuleStatus',
 });
 
 /**
@@ -230,6 +237,7 @@ const EDGES_CONNECTIONS = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({}),
     body: null,
     response: /* @__PURE__ */ record(ConnectionMetrics),
+    name: 'edges.edgesConnections',
 });
 
 /**
@@ -256,6 +264,7 @@ const EDGES_ERRORS = /* @__PURE__ */ operation({
     }),
     body: null,
     response: /* @__PURE__ */ record(/* @__PURE__ */ array(EdgeError)),
+    name: 'edges.edgesErrors',
 });
 
 /**
@@ -277,6 +286,7 @@ const EDGES_HEALTH = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({}),
     body: null,
     response: /* @__PURE__ */ record(EdgeHealth),
+    name: 'edges.edgesHealth',
 });
 
 /**
@@ -300,6 +310,7 @@ const EDGES_MODULE_FAILURES = /* @__PURE__ */ operation({
     response: /* @__PURE__ */ record(
         /* @__PURE__ */ array(/* @__PURE__ */ record(/* @__PURE__ */ json())),
     ),
+    name: 'edges.edgesModuleFailures',
 });
 
 /**
@@ -321,6 +332,7 @@ const EDGES_STATISTICS = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({}),
     body: null,
     response: EdgeStatistics,
+    name: 'edges.edgesStatistics',
 });
 
 /**
@@ -359,6 +371,7 @@ const INDEX = /* @__PURE__ */ operation({
     }),
     body: null,
     response: /* @__PURE__ */ array(Edge),
+    name: 'edges.index',
 });
 
 /**
@@ -380,6 +393,7 @@ const MONITORING_SUMMARY = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({}),
     body: null,
     response: /* @__PURE__ */ record(/* @__PURE__ */ record(/* @__PURE__ */ json())),
+    name: 'edges.monitoringSummary',
 });
 
 /**
@@ -406,6 +420,7 @@ const SHOW = /* @__PURE__ */ operation({
     ),
     body: null,
     response: Edge,
+    name: 'edges.show',
 });
 
 /**
@@ -437,6 +452,7 @@ const TOKEN = /* @__PURE__ */ operation({
         },
         ['token'],
     ),
+    name: 'edges.token',
 });
 
 /**
@@ -463,4 +479,5 @@ const UPDATE = /* @__PURE__ */ operation({
     ),
     body: Edge,
     response: Edge,
+    name: 'edges.update',
 });

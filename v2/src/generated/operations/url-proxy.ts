@@ -41,4 +41,5 @@ const PROXY = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'urlProxy.proxy',
 });

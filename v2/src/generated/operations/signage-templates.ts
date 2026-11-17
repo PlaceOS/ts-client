@@ -53,6 +53,7 @@ const APPROVE = /* @__PURE__ */ operation({
     ),
     body: null,
     response: SignageTemplate,
+    name: 'signageTemplates.approve',
 });
 
 /**
@@ -83,6 +84,7 @@ const APPROVERS = /* @__PURE__ */ operation({
     ),
     body: null,
     response: /* @__PURE__ */ array(SignageTemplatesApprover),
+    name: 'signageTemplates.approvers',
 });
 
 /**
@@ -112,6 +114,7 @@ const CREATE = /* @__PURE__ */ operation({
     }),
     body: SignageTemplate,
     response: SignageTemplate,
+    name: 'signageTemplates.create',
 });
 
 /**
@@ -149,6 +152,7 @@ const DESTROY = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'signageTemplates.destroy',
 });
 
 /**
@@ -175,6 +179,7 @@ const DESTROY_DRAFT = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'signageTemplates.destroyDraft',
 });
 
 /**
@@ -217,6 +222,7 @@ const INDEX = /* @__PURE__ */ operation({
     }),
     body: null,
     response: /* @__PURE__ */ array(SignageTemplate),
+    name: 'signageTemplates.index',
 });
 
 /**
@@ -251,6 +257,7 @@ const REQUEST_APPROVAL = /* @__PURE__ */ operation({
     ),
     body: SignageTemplatesApprovalMessage,
     response: null,
+    name: 'signageTemplates.requestApproval',
 });
 
 /**
@@ -296,6 +303,7 @@ const SHARE = /* @__PURE__ */ operation({
         },
         ['linked', 'already_present'],
     ),
+    name: 'signageTemplates.share',
 });
 
 /**
@@ -328,6 +336,7 @@ const SHOW = /* @__PURE__ */ operation({
     ),
     body: null,
     response: SignageTemplate,
+    name: 'signageTemplates.show',
 });
 
 /**
@@ -359,4 +368,5 @@ const UPDATE = /* @__PURE__ */ operation({
     ),
     body: SignageTemplate,
     response: SignageTemplate,
+    name: 'signageTemplates.update',
 });

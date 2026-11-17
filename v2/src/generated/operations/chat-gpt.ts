@@ -39,6 +39,7 @@ const DESTROY = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'chatGpt.destroy',
 });
 
 /**
@@ -74,6 +75,7 @@ const INDEX = /* @__PURE__ */ operation({
     }),
     body: null,
     response: /* @__PURE__ */ array(Chat),
+    name: 'chatGpt.index',
 });
 
 /**
@@ -110,4 +112,5 @@ const SHOW = /* @__PURE__ */ operation({
             ['role', 'timestamp'],
         ),
     ),
+    name: 'chatGpt.show',
 });

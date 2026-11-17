@@ -36,6 +36,7 @@ const CLEANUP = /* @__PURE__ */ operation({
     }),
     body: null,
     response: null,
+    name: 'pendingMails.cleanup',
 });
 
 /**
@@ -62,6 +63,7 @@ const DESTROY = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'pendingMails.destroy',
 });
 
 /**
@@ -125,6 +127,7 @@ const INDEX = /* @__PURE__ */ operation({
     }),
     body: null,
     response: /* @__PURE__ */ array(PendingMail),
+    name: 'pendingMails.index',
 });
 
 /**
@@ -153,6 +156,7 @@ const REJECT = /* @__PURE__ */ operation({
     ),
     body: null,
     response: PendingMail,
+    name: 'pendingMails.reject',
 });
 
 /**
@@ -181,6 +185,7 @@ const SENT = /* @__PURE__ */ operation({
     ),
     body: null,
     response: PendingMail,
+    name: 'pendingMails.sent',
 });
 
 /**
@@ -207,4 +212,5 @@ const SHOW = /* @__PURE__ */ operation({
     ),
     body: null,
     response: PendingMail,
+    name: 'pendingMails.show',
 });

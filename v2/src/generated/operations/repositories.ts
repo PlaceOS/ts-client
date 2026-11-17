@@ -47,6 +47,7 @@ const BRANCHES = /* @__PURE__ */ operation({
     ),
     body: null,
     response: /* @__PURE__ */ array(/* @__PURE__ */ string()),
+    name: 'repositories.branches',
 });
 
 /**
@@ -79,6 +80,7 @@ const COMMITS = /* @__PURE__ */ operation({
     ),
     body: null,
     response: /* @__PURE__ */ array(GitRepositoryCommit),
+    name: 'repositories.commits',
 });
 
 /**
@@ -100,6 +102,7 @@ const CREATE = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({}),
     body: Repository,
     response: Repository,
+    name: 'repositories.create',
 });
 
 /**
@@ -126,6 +129,7 @@ const DEFAULT_BRANCH = /* @__PURE__ */ operation({
     ),
     body: null,
     response: /* @__PURE__ */ string(),
+    name: 'repositories.defaultBranch',
 });
 
 /**
@@ -152,6 +156,7 @@ const DESTROY = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'repositories.destroy',
 });
 
 /**
@@ -186,6 +191,7 @@ const DETAILS = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'repositories.details',
 });
 
 /**
@@ -212,6 +218,7 @@ const DRIVERS = /* @__PURE__ */ operation({
     ),
     body: null,
     response: /* @__PURE__ */ array(/* @__PURE__ */ string()),
+    name: 'repositories.drivers',
 });
 
 /**
@@ -247,6 +254,7 @@ const FILES = /* @__PURE__ */ operation({
     ),
     body: null,
     response: /* @__PURE__ */ array(/* @__PURE__ */ string()),
+    name: 'repositories.files',
 });
 
 /**
@@ -275,6 +283,7 @@ const FOLDERS = /* @__PURE__ */ operation({
     ),
     body: null,
     response: /* @__PURE__ */ array(/* @__PURE__ */ string()),
+    name: 'repositories.folders',
 });
 
 /**
@@ -310,6 +319,7 @@ const INDEX = /* @__PURE__ */ operation({
     }),
     body: null,
     response: /* @__PURE__ */ array(Repository),
+    name: 'repositories.index',
 });
 
 /**
@@ -335,6 +345,7 @@ const LOADED_INTERFACES = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({}),
     body: null,
     response: /* @__PURE__ */ record(/* @__PURE__ */ string()),
+    name: 'repositories.loadedInterfaces',
 });
 
 /**
@@ -366,6 +377,7 @@ const PULL = /* @__PURE__ */ operation({
         },
         ['commit_hash'],
     ),
+    name: 'repositories.pull',
 });
 
 /**
@@ -392,6 +404,7 @@ const RELEASES = /* @__PURE__ */ operation({
     ),
     body: null,
     response: /* @__PURE__ */ array(/* @__PURE__ */ string()),
+    name: 'repositories.releases',
 });
 
 /**
@@ -423,6 +436,7 @@ const REMOTE_BRANCHES = /* @__PURE__ */ operation({
     ),
     body: null,
     response: /* @__PURE__ */ array(/* @__PURE__ */ string()),
+    name: 'repositories.remoteBranches',
 });
 
 /**
@@ -458,6 +472,7 @@ const REMOTE_COMMITS = /* @__PURE__ */ operation({
     ),
     body: null,
     response: /* @__PURE__ */ array(GitRepositoryCommit),
+    name: 'repositories.remoteCommits',
 });
 
 /**
@@ -489,6 +504,7 @@ const REMOTE_DEFAULT_BRANCH = /* @__PURE__ */ operation({
     ),
     body: null,
     response: /* @__PURE__ */ string(),
+    name: 'repositories.remoteDefaultBranch',
 });
 
 /**
@@ -520,6 +536,7 @@ const REMOTE_TAGS = /* @__PURE__ */ operation({
     ),
     body: null,
     response: /* @__PURE__ */ array(/* @__PURE__ */ string()),
+    name: 'repositories.remoteTags',
 });
 
 /**
@@ -546,6 +563,7 @@ const SHOW = /* @__PURE__ */ operation({
     ),
     body: null,
     response: Repository,
+    name: 'repositories.show',
 });
 
 /**
@@ -572,6 +590,7 @@ const TAGS = /* @__PURE__ */ operation({
     ),
     body: null,
     response: /* @__PURE__ */ array(/* @__PURE__ */ string()),
+    name: 'repositories.tags',
 });
 
 /**
@@ -598,4 +617,5 @@ const UPDATE = /* @__PURE__ */ operation({
     ),
     body: Repository,
     response: Repository,
+    name: 'repositories.update',
 });

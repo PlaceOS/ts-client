@@ -45,6 +45,7 @@ const CREATE = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({}),
     body: Group,
     response: Group,
+    name: 'groups.create',
 });
 
 /** `GET /api/engine/v2/groups/current` */
@@ -65,6 +66,7 @@ const CURRENT = /* @__PURE__ */ operation({
     }),
     body: null,
     response: /* @__PURE__ */ array(GroupsCurrentGroup),
+    name: 'groups.current',
 });
 
 /**
@@ -91,6 +93,7 @@ const DESTROY = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'groups.destroy',
 });
 
 /**
@@ -122,6 +125,7 @@ const FEATURES = /* @__PURE__ */ operation({
     ),
     body: null,
     response: /* @__PURE__ */ record(/* @__PURE__ */ record(/* @__PURE__ */ json())),
+    name: 'groups.features',
 });
 
 /**
@@ -161,6 +165,7 @@ const INDEX = /* @__PURE__ */ operation({
     }),
     body: null,
     response: /* @__PURE__ */ array(Group),
+    name: 'groups.index',
 });
 
 /**
@@ -187,6 +192,7 @@ const SHOW = /* @__PURE__ */ operation({
     ),
     body: null,
     response: Group,
+    name: 'groups.show',
 });
 
 /**
@@ -213,6 +219,7 @@ const SYNC_AD_GROUPS = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({}),
     body: GroupsAdGroupSync,
     response: /* @__PURE__ */ array(GroupUser),
+    name: 'groups.syncAdGroups',
 });
 
 /**
@@ -242,4 +249,5 @@ const UPDATE = /* @__PURE__ */ operation({
     ),
     body: Group,
     response: Group,
+    name: 'groups.update',
 });

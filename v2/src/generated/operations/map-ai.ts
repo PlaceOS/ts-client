@@ -44,6 +44,7 @@ const CANCEL = /* @__PURE__ */ operation({
     ),
     body: null,
     response: MapAiJobResponse,
+    name: 'mapAi.cancel',
 });
 
 /**
@@ -65,6 +66,7 @@ const CAPABILITIES = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({}),
     body: null,
     response: MapAiCapabilities,
+    name: 'mapAi.capabilities',
 });
 
 /**
@@ -86,6 +88,7 @@ const EDIT = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({}),
     body: MapAiEditParams,
     response: MapAiJobResponse,
+    name: 'mapAi.edit',
 });
 
 /**
@@ -115,6 +118,7 @@ const INDEX_JOBS = /* @__PURE__ */ operation({
     }),
     body: null,
     response: /* @__PURE__ */ array(MapAiJobResponse),
+    name: 'mapAi.indexJobs',
 });
 
 /**
@@ -144,6 +148,7 @@ const RESOLVE = /* @__PURE__ */ operation({
     ),
     body: MapAiResolveParams,
     response: MapAiJobResponse,
+    name: 'mapAi.resolve',
 });
 
 /**
@@ -174,6 +179,7 @@ const SHOW_JOB = /* @__PURE__ */ operation({
     ),
     body: null,
     response: MapAiJobResponse,
+    name: 'mapAi.showJob',
 });
 
 /**
@@ -200,4 +206,5 @@ const USAGE = /* @__PURE__ */ operation({
     }),
     body: null,
     response: /* @__PURE__ */ array(SignageAiJobUsageRow),
+    name: 'mapAi.usage',
 });

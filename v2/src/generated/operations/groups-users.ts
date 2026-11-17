@@ -29,6 +29,7 @@ const CREATE = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({}),
     body: GroupUser,
     response: GroupUser,
+    name: 'groupsUsers.create',
 });
 
 /** `DELETE /api/engine/v2/group_users/{user_id}/{group_id}` */
@@ -52,6 +53,7 @@ const DESTROY = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'groupsUsers.destroy',
 });
 
 /**
@@ -90,6 +92,7 @@ const INDEX = /* @__PURE__ */ operation({
     }),
     body: null,
     response: /* @__PURE__ */ array(GroupUser),
+    name: 'groupsUsers.index',
 });
 
 /** `GET /api/engine/v2/group_users/{user_id}/{group_id}` */
@@ -113,6 +116,7 @@ const SHOW = /* @__PURE__ */ operation({
     ),
     body: null,
     response: GroupUser,
+    name: 'groupsUsers.show',
 });
 
 /** `PATCH /api/engine/v2/group_users/{user_id}/{group_id}` */
@@ -136,4 +140,5 @@ const UPDATE = /* @__PURE__ */ operation({
     ),
     body: GroupUser,
     response: GroupUser,
+    name: 'groupsUsers.update',
 });

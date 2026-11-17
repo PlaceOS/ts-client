@@ -33,6 +33,7 @@ const COLLECTION = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({}),
     body: null,
     response: /* @__PURE__ */ array(Broker),
+    name: 'brokers.collection',
 });
 
 /**
@@ -54,6 +55,7 @@ const CREATE = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({}),
     body: Broker,
     response: Broker,
+    name: 'brokers.create',
 });
 
 /**
@@ -80,6 +82,7 @@ const DESTROY = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'brokers.destroy',
 });
 
 /**
@@ -106,6 +109,7 @@ const SHOW = /* @__PURE__ */ operation({
     ),
     body: null,
     response: Broker,
+    name: 'brokers.show',
 });
 
 /**
@@ -132,4 +136,5 @@ const UPDATE = /* @__PURE__ */ operation({
     ),
     body: Broker,
     response: Broker,
+    name: 'brokers.update',
 });

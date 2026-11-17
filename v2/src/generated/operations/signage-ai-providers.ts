@@ -66,6 +66,7 @@ const CREATE = /* @__PURE__ */ operation({
             'updated_at',
         ],
     ),
+    name: 'signageAiProviders.create',
 });
 
 /** `DELETE /api/engine/v2/signage/ai/providers/{id}` */
@@ -88,6 +89,7 @@ const DESTROY = /* @__PURE__ */ operation({
     ),
     body: null,
     response: null,
+    name: 'signageAiProviders.destroy',
 });
 
 /**
@@ -161,6 +163,7 @@ const INDEX = /* @__PURE__ */ operation({
             ],
         ),
     ),
+    name: 'signageAiProviders.index',
 });
 
 /** `GET /api/engine/v2/signage/ai/providers/{id}` */
@@ -211,6 +214,7 @@ const SHOW = /* @__PURE__ */ operation({
             'updated_at',
         ],
     ),
+    name: 'signageAiProviders.show',
 });
 
 /**
@@ -242,6 +246,7 @@ const TEST = /* @__PURE__ */ operation({
     ),
     body: null,
     response: SignageAiProvidersTestResult,
+    name: 'signageAiProviders.test',
 });
 
 /** `PATCH /api/engine/v2/signage/ai/providers/{id}` */
@@ -292,4 +297,5 @@ const UPDATE = /* @__PURE__ */ operation({
             'updated_at',
         ],
     ),
+    name: 'signageAiProviders.update',
 });
