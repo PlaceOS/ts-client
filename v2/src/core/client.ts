@@ -17,9 +17,19 @@ export const TIMEOUT_MS_DEFAULT = 30_000;
 export const RESPONSE_BYTES_MAX_DEFAULT = 64 * 1024 * 1024;
 /** A stream can send empty chunks. This stops a read loop that does not get closer to the end. */
 export const RESPONSE_READS_MAX = 1 << 20;
+/** A `credential` auth can renew after a 401 or a 511. The request then goes again one time. */
+export const AUTH_ATTEMPTS_MAX = 2;
 
 /** Sends the requests. It has the signature of the global `fetch`, so a test can replace it. */
 export type FetchFunction = (url: string, init: RequestInit) => Promise<Response>;
+
+/** What one request sends to tell the server who it is. */
+export type Credential =
+    | { readonly kind: 'none' }
+    /** Sends `Authorization: Bearer <token>`. */
+    | { readonly kind: 'bearer'; readonly token: string }
+    /** Sends `X-API-Key: <key>`. */
+    | { readonly kind: 'api_key'; readonly key: string };
 
 /** How the client tells the server who it is. */
 export type Auth =
@@ -30,7 +40,18 @@ export type Auth =
      */
     | { readonly kind: 'bearer'; readonly token: () => string | null | Promise<string | null> }
     /** Sends `X-API-Key: <key>`. */
-    | { readonly kind: 'api_key'; readonly key: string };
+    | { readonly kind: 'api_key'; readonly key: string }
+    /**
+     * Asks `credential` before each request. `null` means that no credential is available. After a
+     * 401 or a 511, the client calls `rejected` with the status and the credential that the server
+     * rejected. If it returns `true`, the client sends the request again, one time.
+     * `createAuthSession` makes this auth.
+     */
+    | {
+          readonly kind: 'credential';
+          readonly credential: () => Promise<Credential | null>;
+          readonly rejected: (status: 401 | 511, credential: Credential) => Promise<boolean>;
+      };
 
 export interface ClientConfig {
     /** The origin of the server, for example `https://placeos.example.com`. `''` is this origin. */
@@ -66,7 +87,7 @@ export interface CallOptions {
 
 /** A request that failed for an expected reason. Each kind is a different action for the caller. */
 export type CallError =
-    /** The `bearer` auth had no token. */
+    /** The auth had no token or credential. */
     | { readonly kind: 'auth_missing' }
     /** The `signal` of the caller cancelled the request. */
     | { readonly kind: 'aborted' }
@@ -239,60 +260,37 @@ async function send(
         bodyText = JSON.stringify(bodyChecked.value);
     }
 
-    const headers = new Headers(client.headers);
-    headers.set('Accept', 'application/json');
-    if (bodyText !== null) headers.set('Content-Type', 'application/json');
-    switch (client.auth.kind) {
-        case 'none':
-            break;
-        case 'bearer': {
-            const token = await client.auth.token();
-            if (token === null) return { ok: false, error: { kind: 'auth_missing' } };
-            headers.set('Authorization', `Bearer ${token}`);
-            break;
-        }
-        case 'api_key':
-            headers.set('X-API-Key', client.auth.key);
-            break;
-        default:
-            return unreachable(client.auth);
-    }
+    const limits = {
+        timeoutMs: options.timeoutMs ?? client.timeoutMs,
+        bytesMax: client.responseBytesMax,
+        ...(options.signal === undefined ? {} : { signal: options.signal }),
+    };
+    // Each attempt gets the credential again, because a `rejected` auth can renew it. The time
+    // limit is for each attempt.
+    let response: Fetched | null = null;
+    for (let attempt = 0; attempt < AUTH_ATTEMPTS_MAX; attempt += 1) {
+        const credential = await resolveCredential(client.auth);
+        if (credential === null) return { ok: false, error: { kind: 'auth_missing' } };
+        const headers = new Headers(client.headers);
+        headers.set('Accept', 'application/json');
+        if (bodyText !== null) headers.set('Content-Type', 'application/json');
+        setCredentialHeader(headers, credential);
+        const init = { method: operation.method, headers, body: bodyText };
+        const fetched = await fetchBody(client.fetch, url, init, limits);
+        if (!fetched.ok) return fetched;
+        response = fetched.value;
 
-    const timeoutMs = options.timeoutMs ?? client.timeoutMs;
-    assertPositiveInteger(timeoutMs, 'timeoutMs');
-    const timeoutSignal = AbortSignal.timeout(timeoutMs);
-    const signal =
-        options.signal === undefined
-            ? timeoutSignal
-            : AbortSignal.any([options.signal, timeoutSignal]);
-
-    // `fetch` and the body stream throw for operating errors. Convert them to values here.
-    let response: Response;
-    let bytes: Result<Uint8Array, 'too_large'>;
-    try {
-        const fetchFunction = client.fetch;
-        response = await fetchFunction(url, {
-            method: operation.method,
-            headers,
-            body: bodyText,
-            signal,
-        });
-        bytes = await readBody(response, client.responseBytesMax);
-    } catch (error) {
-        if (options.signal?.aborted === true) return { ok: false, error: { kind: 'aborted' } };
-        if (timeoutSignal.aborted) return { ok: false, error: { kind: 'timeout', timeoutMs } };
-        const message = error instanceof Error ? error.message : String(error);
-        return { ok: false, error: { kind: 'network', message } };
+        const status = response.status;
+        if (client.auth.kind !== 'credential') break;
+        if (status !== 401 && status !== 511) break;
+        if (attempt + 1 >= AUTH_ATTEMPTS_MAX) break;
+        const renewed = await client.auth.rejected(status, credential);
+        if (!renewed) break;
     }
-    if (!bytes.ok) {
-        return {
-            ok: false,
-            error: { kind: 'response_too_large', bytesMax: client.responseBytesMax },
-        };
-    }
+    assert(response !== null, 'the request was sent');
 
     if (!response.ok) {
-        const parsed = parseJson(bytes.value);
+        const parsed = decodeJson(response.bytes);
         let errorBody: JsonValue | null = null;
         if (parsed.ok) {
             const body = parseResponse(json(), parsed.value);
@@ -309,8 +307,8 @@ async function send(
     }
 
     const reply = { status: response.status, headers: response.headers };
-    if (operation.response === null) return { ok: true, value: { ...reply, data: bytes.value } };
-    const parsed = parseJson(bytes.value);
+    if (operation.response === null) return { ok: true, value: { ...reply, data: response.bytes } };
+    const parsed = decodeJson(response.bytes);
     if (!parsed.ok) {
         return {
             ok: false,
@@ -374,6 +372,114 @@ function queryScalar(value: unknown): string {
     return String(value);
 }
 
+/** The response of `fetchBody`, with the whole body. */
+export interface Fetched {
+    readonly status: number;
+    readonly ok: boolean;
+    readonly headers: Headers;
+    readonly bytes: Uint8Array;
+}
+
+/** The errors of `fetchBody`. These are the errors of the transport, not of the server. */
+export type FetchError = Extract<
+    CallError,
+    { readonly kind: 'aborted' | 'timeout' | 'network' | 'response_too_large' }
+>;
+
+export interface FetchLimits {
+    readonly timeoutMs: number;
+    readonly bytesMax: number;
+    readonly signal?: AbortSignal;
+}
+
+/**
+ * Sends one request and reads the whole body, in the time and size limits. `fetch` and the body
+ * stream throw for operating errors, and this converts them to values.
+ *
+ * The client and the auth session use it. The generated functions use `call`.
+ */
+export async function fetchBody(
+    fetchFunction: FetchFunction,
+    url: string,
+    init: Omit<RequestInit, 'signal'>,
+    limits: FetchLimits,
+): Promise<Result<Fetched, FetchError>> {
+    assertPositiveInteger(limits.timeoutMs, 'timeoutMs');
+    assertPositiveInteger(limits.bytesMax, 'bytesMax');
+    // The caller can cancel while an earlier step waits, such as the credential of the auth.
+    if (isAborted(limits.signal)) return { ok: false, error: { kind: 'aborted' } };
+    const timeoutSignal = AbortSignal.timeout(limits.timeoutMs);
+    const signal =
+        limits.signal === undefined
+            ? timeoutSignal
+            : AbortSignal.any([limits.signal, timeoutSignal]);
+    let response: Response;
+    let bytes: Result<Uint8Array, 'too_large'>;
+    try {
+        response = await fetchFunction(url, { ...init, signal });
+        bytes = await readBody(response, limits.bytesMax);
+    } catch (error) {
+        if (isAborted(limits.signal)) return { ok: false, error: { kind: 'aborted' } };
+        if (timeoutSignal.aborted) {
+            return { ok: false, error: { kind: 'timeout', timeoutMs: limits.timeoutMs } };
+        }
+        const message = error instanceof Error ? error.message : String(error);
+        return { ok: false, error: { kind: 'network', message } };
+    }
+    if (!bytes.ok) {
+        return { ok: false, error: { kind: 'response_too_large', bytesMax: limits.bytesMax } };
+    }
+    return {
+        ok: true,
+        value: {
+            status: response.status,
+            ok: response.ok,
+            headers: response.headers,
+            bytes: bytes.value,
+        },
+    };
+}
+
+/**
+ * Reads the state of the signal now. The compiler keeps a narrowed `signal.aborted` across an
+ * `await`, but the value can change while the code waits.
+ */
+function isAborted(signal: AbortSignal | undefined): boolean {
+    return signal?.aborted === true;
+}
+
+async function resolveCredential(auth: Auth): Promise<Credential | null> {
+    switch (auth.kind) {
+        case 'none':
+            return { kind: 'none' };
+        case 'bearer': {
+            const token = await auth.token();
+            return token === null ? null : { kind: 'bearer', token };
+        }
+        case 'api_key':
+            return { kind: 'api_key', key: auth.key };
+        case 'credential':
+            return auth.credential();
+        default:
+            return unreachable(auth);
+    }
+}
+
+function setCredentialHeader(headers: Headers, credential: Credential): void {
+    switch (credential.kind) {
+        case 'none':
+            return;
+        case 'bearer':
+            headers.set('Authorization', `Bearer ${credential.token}`);
+            return;
+        case 'api_key':
+            headers.set('X-API-Key', credential.key);
+            return;
+        default:
+            unreachable(credential);
+    }
+}
+
 /** Reads the body, but stops at `bytesMax` bytes. The caller converts a throw to a value. */
 async function readBody(
     response: Response,
@@ -416,7 +522,7 @@ async function readBody(
 }
 
 /** `JSON.parse` throws on bad input. This converts the exception to a value. */
-function parseJson(bytes: Uint8Array): Result<unknown, 'json_invalid'> {
+export function decodeJson(bytes: Uint8Array): Result<unknown, 'json_invalid'> {
     try {
         return { ok: true, value: JSON.parse(new TextDecoder().decode(bytes)) };
     } catch {

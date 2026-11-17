@@ -54,7 +54,7 @@ A function does not throw for an expected failure. It returns a `Result`. Examin
 | `network`            | The request got no response. For example, the network is down.             |
 | `timeout`            | The request took more than `timeoutMs`.                                    |
 | `aborted`            | The `signal` of the caller cancelled the request.                          |
-| `auth_missing`       | The `token` function of the `bearer` auth gave `null`.                     |
+| `auth_missing`       | The auth had no token or credential.                                       |
 | `response_too_large` | The body was more than `responseBytesMax`.                                 |
 | `response_invalid`   | The body does not match the API document. See `path` and `expected`.       |
 
@@ -108,6 +108,72 @@ const client = createClient({
 });
 const result = await zones.show({ id: 'zone-1' }, { client });
 ```
+
+## Log in
+
+`createAuthSession` does the OAuth login of PlaceOS and gives the client its credential:
+
+```ts
+import { configure, createAuthSession } from '@placeos/ts-client';
+
+const session = createAuthSession({
+    baseUrl: '',
+    redirectUri: `${location.origin}/oauth-resp.html`,
+    scope: 'public',
+    grant: { kind: 'code' },
+});
+configure({ baseUrl: '', auth: session.clientAuth, headers: { 'X-App-Id': session.clientId } });
+
+const result = await session.start();
+if (!result.ok && result.error.kind === 'redirecting') {
+    // The page goes to the login page now.
+}
+```
+
+Copy `oauth-resp.html` from the package to your application, and use its URL as `redirectUri`. The
+client ID is the MD5 of `redirectUri`, as in v1.
+
+`session.start()` loads `/auth/authority`, and gets a credential in this order:
+
+1. An API key from the URL or the storage (a fixed device), or an access token that is valid.
+2. A code or a token from the redirect. The `state` must be the nonce of this client.
+3. The refresh token.
+4. The `password` or `entra` grant.
+5. If the user has a session: the authorize page, with a redirect or, with `useFrame`, in a
+   hidden frame.
+6. Else the login page of the authority. With `handleLogin: false`, the result is a
+   `login_required` error, and the application shows its own login.
+
+The grants are `code` (with PKCE), `implicit`, `password` and `entra`. A trusted application
+(`?trust=true`) keeps its tokens in the storage. Other applications keep them in memory only.
+
+After a 401, the client asks the session for a new token and sends the request again, one time.
+Parallel requests share one renewal. After a 511, the session sends the user to the login page.
+
+Other parts of the session:
+
+- `session.status()` and `session.subscribe(listener)` give the state: `loading`, `signed_in`,
+  `redirecting` or `signed_out` with the error.
+- `session.handleRedirect(url)` completes a login from a deep link, in a native wrapper.
+- When the application comes back to the foreground without a session, the session loads the
+  authority again. The user can have logged in from a different tab.
+- `session.useToken`, `session.useApiKey`, `session.invalidateToken` and `session.logout`.
+- `createAuthSession({ ..., environment })` replaces the browser parts, for tests or a native
+  wrapper. See `AuthEnvironment`.
+
+### Changes from v1
+
+- The session keeps the storage keys of v1, so a user stays logged in after the change.
+- The token requests send their parameters in the body, not in the URL. A password is not in the
+  URL.
+- A trusted application with the `implicit` grant uses the code with PKCE.
+- The frame login checks the `state`. It needs the `oauth-resp.html` of v2.
+- The session removes `x-api-key` from the URL after it reads it.
+- After a refused refresh token, the login continues immediately.
+- `/auth/authority` gets `AUTHORITY_ATTEMPTS_MAX` attempts, not an unlimited number. Then
+  `start` gives `authority_unavailable`. Call `start` again to try again.
+- Not ported: `revokeToken`, the mock mode (give a `fetch` to the client), the state of the
+  application in `authorise(state)`, and the ACA Engine API path.
 
 ## Types
 
@@ -172,7 +238,6 @@ bun run build   # Writes dist/.
 
 ## What v1 has that v2 does not have
 
-- The OAuth login flow and the token storage. Give the `bearer` auth a `token` function.
 - The realtime WebSocket bindings.
 - The mock systems. Give `createClient` a `fetch` function.
 - Classes with methods for each model. v2 has plain data and functions.
@@ -181,5 +246,9 @@ bun run build   # Writes dist/.
 
 - `parseResponse`, `checkRequest` and `call` each have one `as` cast. The compiler cannot prove
   that the parser output has the type of the schema. The tests check the parser.
+- `configure` keeps one client in module state, so a call does not need a client argument. A
+  call before `configure` is a run-time assertion, not a compile error.
+- `createAuthSession` keeps its state in a closure. The login is a state machine with I/O, and
+  one object with one owner is the clearest model of it.
 - Records from the server are plain objects, not `Map`s. A `Map` does not go through
   `JSON.stringify`, and the API sends these objects back and forth.

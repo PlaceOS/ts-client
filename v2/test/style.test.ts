@@ -19,14 +19,17 @@ test('the source has no escape from the type checks', async () => {
             const code = line.replace(/\/\*.*?\*\/|\/\/.*$|^\s*\/?\*.*$|'[^']*'|`[^`]*`/g, '');
             const where = `${file}:${index + 1}: ${line.trim()}`;
             if (/(?<!\.)\bany\b/.test(code)) problems.push(`any in ${where}`);
-            if (/@ts-(ignore|expect-error|nocheck)/.test(line))
+            if (/@ts-(ignore|expect-error|nocheck)/.test(line)) {
                 problems.push(`ts comment in ${where}`);
-            if (/[\w)\]]!(?:[.[(,;)]|$)/.test(code))
+            }
+            if (/[\w)\]]!(?:[.[(,;)]|$)/.test(code)) {
                 problems.push(`non-null assertion in ${where}`);
+            }
             // `K in keyof F as ...` is a key remap of a mapped type, not a cast.
             const cast = /(?<!keyof )\b(\w+) as (?!const\b)([\w<>]+)/.exec(code);
-            if (cast !== null && !ALLOWED_CASTS.includes(cast[0]))
+            if (cast !== null && !ALLOWED_CASTS.includes(cast[0])) {
                 problems.push(`cast in ${where}`);
+            }
         }
     }
     expect(problems).toEqual([]);

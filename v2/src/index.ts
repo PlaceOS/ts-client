@@ -11,6 +11,24 @@
  *
  * @module
  */
+export {
+    browserEnvironment,
+    FRAME_MESSAGE_TYPE,
+    memoryStore,
+    type AuthEnvironment,
+    type FrameError,
+    type KeyValueStore,
+} from './auth/environment.ts';
+export {
+    createAuthSession,
+    DomainAuthority,
+    type AuthError,
+    type DomainAuthorityInput,
+    type AuthSession,
+    type AuthSessionConfig,
+    type AuthStatus,
+    type Grant,
+} from './auth/session.ts';
 export { assert, unreachable } from './core/assert.ts';
 export {
     call,
@@ -26,6 +44,7 @@ export {
     type CallResult,
     type Client,
     type ClientConfig,
+    type Credential,
     type FetchFunction,
     type HttpMethod,
     type Operation,
