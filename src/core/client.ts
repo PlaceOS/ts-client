@@ -1,4 +1,5 @@
 import { assert, unreachable } from './assert.ts';
+import { scopedLog, type LogFunction } from './log.ts';
 import { pageInfo } from './pagination.ts';
 import type { Result } from './result.ts';
 import {
@@ -75,6 +76,8 @@ export interface ClientConfig {
      * one with a typed handler for each endpoint.
      */
     readonly mock?: CallMock;
+    /** Gets a debug log entry for each call. See `LogFunction`. */
+    readonly log?: LogFunction;
 }
 
 /**
@@ -104,6 +107,7 @@ export interface Client {
     readonly fetch: FetchFunction;
     readonly missing_fields: 'error' | 'zero';
     readonly mock: CallMock | null;
+    readonly log: LogFunction | null;
 }
 
 export interface CallOptions {
@@ -253,6 +257,7 @@ export function createClient(config: ClientConfig): Client {
         fetch: fetchFunction,
         missing_fields: config.missing_fields ?? 'error',
         mock: config.mock ?? null,
+        log: config.log ?? null,
     });
 }
 
@@ -329,12 +334,37 @@ async function request(
     input: unknown,
     options: CallOptions,
 ): Promise<RawResult> {
+    const started_ms = Date.now();
     const sent = await send(client, operation, input, options);
+    logOutcome(client, operation, sent, Date.now() - started_ms);
     if (!sent.ok || !paged(operation)) return sent;
     const reply = sent.value;
     const next = (next_options: CallOptions = {}) =>
         nextPage(client, operation, input, reply.headers, { ...options, ...next_options });
     return { ok: true, value: { ...reply, next } };
+}
+
+/** The status or the error of a call, without its input or data. */
+function logOutcome(
+    client: Client,
+    operation: AnyOperation,
+    result: Result<Reply<unknown>, CallError>,
+    duration_ms: number,
+): void {
+    if (client.log === null) return;
+    const log = scopedLog('http', { sink: client.log });
+    const call_data = { name: operation.name, method: operation.method, duration_ms };
+    if (result.ok) {
+        const status = result.value.status;
+        log.debug(`${operation.name}: ${status} in ${duration_ms} ms`, { ...call_data, status });
+        return;
+    }
+    const error = result.error;
+    const status = error.kind === 'http' ? ` ${error.status}` : '';
+    const message = `${operation.name}: ${error.kind}${status} in ${duration_ms} ms`;
+    // The server answered: a warning. No answer, such as a timeout: an error.
+    if (error.kind === 'http') log.warn(message, { ...call_data, error });
+    else log.error(message, { ...call_data, error });
 }
 
 /** `true` when the operation has an `offset` parameter, so that its reply is a page. */
@@ -403,6 +433,9 @@ async function send(
         if (!answered.ok) return limitError(answered.error, timeout_ms);
         // `null`: the mock does not answer this call, so the request goes to the server.
         if (answered.value !== null) {
+            scopedLog('http', { sink: client.log }).debug(
+                `${operation.name}: answered by the mock`,
+            );
             return mockResult(operation, answered.value, client.response_bytes_max);
         }
     }
@@ -435,6 +468,8 @@ async function send(
         if (attempt + 1 >= AUTH_ATTEMPTS_MAX) break;
         const rejected = client.auth.rejected;
         const used = credential.value;
+        const log = scopedLog('http', { sink: client.log });
+        log.info(`${operation.name}: ${status}, renewing the credential`);
         const renewed = await waitWithin(() => rejected(status, used), deadline_ms, signal);
         if (!renewed.ok) return limitError(renewed.error, timeout_ms);
         if (!renewed.value) break;

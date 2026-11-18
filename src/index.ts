@@ -73,6 +73,7 @@ export {
     type PageReply,
     type Reply,
 } from './core/client.ts';
+export { type LogEntry, type LogFunction, type LogLevel, type LogScope } from './core/log.ts';
 export { pageInfo, type PageInfo } from './core/pagination.ts';
 export type { Result } from './core/result.ts';
 export {

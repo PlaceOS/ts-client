@@ -2,6 +2,7 @@
  * Goal: `call` sends what the server expects, and converts each failure to the correct error.
  * Method: replace `fetch` with a function that records the request and returns a fixed response.
  */
+import type { LogEntry } from '../src/core/log.ts';
 import { describe, expect, test } from 'bun:test';
 import {
     call,
@@ -177,6 +178,30 @@ function pageResponse(ids: readonly string[], next: number | null): Response {
     if (next !== null) response.headers.set('link', `</api/items?offset=${next}>; rel="next"`);
     return response;
 }
+
+describe('log', () => {
+    test('gives the name and the status or error of each call, and no token or body', async () => {
+        const entries: LogEntry[] = [];
+        const { fetch } = fakeFetch((init) =>
+            init.method === 'PATCH' ? jsonResponse({ id: 'item-1' }) : jsonResponse({}, 404),
+        );
+        const client = clientWith(fetch, {
+            auth: { kind: 'bearer', token: () => 'secret-token' },
+            log: (entry) => entries.push(entry),
+        });
+        await call(UPDATE, { id: 'item-1', body: { name: 'Lobby' } }, { client });
+        await call(DOWNLOAD, {}, { client });
+        const lines = entries.map((entry) => `${entry.level} ${entry.args[0]}`);
+        expect(lines.map((line) => line.replace(/\d+ ms/, 'N ms'))).toEqual([
+            'debug items.update: 200 in N ms',
+            'warn items.download: http 404 in N ms',
+        ]);
+        expect(entries[0]?.args[1]).toMatchObject({ name: 'items.update', method: 'PATCH' });
+        const text = JSON.stringify(entries);
+        expect(text).not.toContain('secret-token');
+        expect(text).not.toContain('Lobby');
+    });
+});
 
 describe('pages', () => {
     test('next() asks for the next offset with the same input and client, to the last page', async () => {

@@ -32,6 +32,7 @@ import {
     type Credential,
     type FetchError,
 } from '../core/client.ts';
+import { scopedLog, type LogFunction } from '../core/log.ts';
 import type { Result } from '../core/result.ts';
 import {
     array,
@@ -150,6 +151,8 @@ export interface AuthSessionConfig {
     /** Headers for each request of the session. The session adds `X-App-Id`. */
     readonly headers?: Readonly<Record<string, string>>;
     readonly environment?: AuthEnvironment;
+    /** Gets the debug log entries of the login. See `LogFunction`. */
+    readonly log?: LogFunction;
 }
 
 const DomainAuthoritySchema = object(
@@ -290,6 +293,7 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
     const headers: Readonly<Record<string, string>> = { ...config.headers, 'X-App-Id': client_id };
     const limits = { timeout_ms: AUTH_TIMEOUT_MS, bytes_max: AUTH_RESPONSE_BYTES_MAX };
     const storageKey = (name: string) => `${client_id}_${name}`;
+    const log = scopedLog('auth', { sink: config.log ?? null });
 
     let authority: DomainAuthority | null = null;
     let status: AuthStatus = { kind: 'stopped' };
@@ -342,6 +346,7 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
             removeForegroundListener = environment.onForeground(onForeground);
         }
         if (status.kind === 'stopped') setStatus({ kind: 'loading' });
+        log.info('start', { fixed_device: isFixedDevice(), trusted: isTrusted() });
         // `start` is the explicit retry of a login that was refused.
         halted = null;
         return authorize();
@@ -387,6 +392,7 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
         const grant = config.grant;
         switch (grant.kind) {
             case 'password': {
+                log.debug('logging in with the password grant');
                 const result = await requestTokens(attempt_epoch, {
                     grant_type: 'password',
                     client_id,
@@ -402,6 +408,7 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
                 return result.ok ? signedIn(result.value) : failed(result.error);
             }
             case 'entra': {
+                log.debug('exchanging the Entra token');
                 const subject_token = await grant.entraToken();
                 if (epoch !== attempt_epoch) return failed({ kind: 'logged_out' });
                 if (subject_token === null) return failed({ kind: 'entra_token_missing' });
@@ -431,6 +438,7 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
             return failed(late.error);
         }
         if (late.kind === 'applied') {
+            log.debug('using the parameters of a deep link');
             const from_link = await tokenFromKnownCredentials(attempt_epoch);
             if (epoch !== attempt_epoch) return failed({ kind: 'logged_out' });
             if (from_link !== null) return from_link;
@@ -444,6 +452,7 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
         if (current.session) {
             const url = createAuthorizeUrl();
             if (config.use_frame !== true) return redirect(url);
+            log.debug('authorizing in a hidden frame');
             const framed = await environment.authorizeInFrame(url, FRAME_TIMEOUT_MS);
             if (epoch !== attempt_epoch) return failed({ kind: 'logged_out' });
             if (!framed.ok) return failed({ kind: 'frame_failed', reason: framed.error });
@@ -468,7 +477,10 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
             if (from_frame !== null) return from_frame;
             return failed({ kind: 'frame_failed', reason: 'message_invalid' });
         }
-        if (!handle_login) return failed({ kind: 'login_required' });
+        if (!handle_login) {
+            log.info('no session: the application shows its login');
+            return failed({ kind: 'login_required' });
+        }
         return redirect(loginUrl(current));
     }
 
@@ -480,9 +492,13 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
         attempt_epoch: number,
     ): Promise<Result<Credential, AuthError> | null> {
         const current = currentCredential();
-        if (current !== null) return signedIn(current);
+        if (current !== null) {
+            log.debug('a valid credential is found', { credential: current.kind });
+            return signedIn(current);
+        }
 
         if (pending_code !== null) {
+            log.debug('exchanging the code of the redirect');
             const code = pending_code;
             pending_code = null;
             const verifier = environment.session_storage.get(storageKey('code_verifier'));
@@ -502,6 +518,7 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
 
         const refresh_token = readTokens().refresh_token;
         if (refresh_token !== null) {
+            log.debug('refreshing the access token');
             const result = await requestTokens(attempt_epoch, {
                 grant_type: 'refresh_token',
                 client_id,
@@ -511,6 +528,7 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
             if (result.ok) return signedIn(result.value);
             if (!isRefusal(result.error)) return failed(result.error);
             // Keep a refresh token after a network error, but not after the server refused it.
+            log.warn('the server refused the refresh token');
             writeTokens({ ...readTokens(), refresh_token: null });
         }
         return null;
@@ -537,7 +555,9 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
         );
         // A logout ran while the request waited. Its tokens must not log the user in again.
         if (epoch !== attempt_epoch) return { ok: false, error: { kind: 'logged_out' } };
+        const grant = params['grant_type'] ?? '';
         if (!fetched.ok) {
+            log.error('the token request failed', { grant, error: fetched.error.kind });
             return { ok: false, error: { kind: 'token_unavailable', error: fetched.error } };
         }
         const decoded = decodeJson(fetched.value.bytes);
@@ -548,6 +568,11 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
                 status: fetched.value.status,
                 message,
             } as const;
+            log.warn('the server refused the token request', {
+                grant,
+                status: error.status,
+                message,
+            });
             return { ok: false, error };
         }
         if (!decoded.ok) {
@@ -559,6 +584,7 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
         const expires_in =
             tokens.expires_in === null ? null : parseSeconds(String(tokens.expires_in));
         storeTokens(tokens.access_token, tokens.refresh_token, expires_in);
+        log.info('got new tokens', { grant, expires_in_seconds: expires_in });
         return { ok: true, value: { kind: 'bearer', token: tokens.access_token } };
     }
 
@@ -618,6 +644,7 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
     async function renew(status: 401 | 511, used: Credential): Promise<boolean> {
         // The server does not accept an API key, and a new attempt cannot change that.
         if (used.kind === 'api_key') return false;
+        log.warn('the server refused the credential', { status });
         invalidateToken();
         if (status === 511) {
             // 511: the session on the server ended. The user must log in again.
@@ -645,9 +672,13 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
 
     async function runLoadAuthority(): Promise<Result<DomainAuthority, AuthError>> {
         if (authority === null && status.kind !== 'redirecting') setStatus({ kind: 'loading' });
+        log.debug('loading the authority');
         let reason = '';
         for (let attempt = 0; attempt < AUTHORITY_ATTEMPTS_MAX; attempt += 1) {
-            if (attempt > 0) await environment.wait(AUTHORITY_RETRY_MS * attempt);
+            if (attempt > 0) {
+                log.warn('the authority did not load: trying again', { attempt, reason });
+                await environment.wait(AUTHORITY_RETRY_MS * attempt);
+            }
             const fetched = await fetchBody(
                 environment.fetch,
                 serverUrl(AUTHORITY_PATH),
@@ -674,8 +705,17 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
             const parsed = parseResponse(DomainAuthority, decoded.value);
             if (!parsed.ok) return failed({ kind: 'authority_invalid', ...parsed.error });
             authority = parsed.value;
+            const { id, name, version, domain, session, production } = parsed.value;
+            log.group('the authority is loaded', { id });
+            log.print(`name: ${name}`);
+            log.print(`version: ${version ?? 'unknown'}`);
+            log.print(`domain: ${domain}`);
+            log.print(`session: ${session}`);
+            log.print(`production: ${production ?? 'unknown'}`);
+            log.groupEnd();
             return { ok: true, value: parsed.value };
         }
+        log.error('the authority is unavailable', { attempts: AUTHORITY_ATTEMPTS_MAX, reason });
         return failed({ kind: 'authority_unavailable', reason });
     }
 
@@ -716,13 +756,17 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
         // The state is `<nonce>` or `<nonce>;<application state>`.
         const nonce = (params.get('state') ?? '').split(';')[0] ?? '';
         const saved = storage.get(storageKey('nonce'));
-        if (saved === null || saved !== nonce) return { kind: 'state_mismatch' };
+        if (saved === null || saved !== nonce) {
+            log.warn('the state of the login parameters is not the nonce of this client');
+            return { kind: 'state_mismatch' };
+        }
         // Only a login that this client started gives credentials, and only one time.
         storage.remove(storageKey('nonce'));
         const denial = params.get('error');
         if (denial !== undefined) {
             // RFC 6749 §4.1.2.1: the server refused. A new redirect shows the same refusal.
             const description = params.get('error_description') ?? null;
+            log.warn('the server refused the login', { error: denial, description });
             return {
                 kind: 'denied',
                 error: { kind: 'authorization_denied', error: denial, description },
@@ -732,6 +776,10 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
         if (code !== undefined) pending_code = code;
         const access_token = params.get('access_token');
         const refresh_token = params.get('refresh_token') ?? null;
+        log.debug('got the login parameters', {
+            code: code !== undefined,
+            access_token: access_token !== undefined,
+        });
         if (access_token !== undefined) {
             storeTokens(
                 access_token,
@@ -784,6 +832,8 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
     }
 
     function redirect(url: string): Result<Credential, AuthError> {
+        // The path only: the query has the state of the login.
+        log.info('redirecting', { path: new URL(url, 'http://base.invalid').pathname });
         setStatus({ kind: 'redirecting', url });
         environment.navigate(url);
         return { ok: false, error: { kind: 'redirecting', url } };
@@ -791,11 +841,13 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
 
     function signedIn(credential: Credential): Result<Credential, AuthError> {
         assert(credential.kind !== 'none', 'a session credential is a token or a key');
+        if (status.kind !== 'signed_in') log.info('signed in', { credential: credential.kind });
         setStatus({ kind: 'signed_in', credential: credential.kind });
         return { ok: true, value: credential };
     }
 
     function failed<T>(error: AuthError): Result<T, AuthError> {
+        log.warn('not signed in', { error });
         if (status.kind !== 'redirecting') setStatus({ kind: 'signed_out', error });
         return { ok: false, error };
     }
@@ -803,6 +855,7 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
     async function handleRedirect(url: string): Promise<Result<Credential, AuthError>> {
         const params = urlParams(url);
         if (!hasLoginParams(params)) return { ok: false, error: { kind: 'redirect_invalid' } };
+        log.debug('got a deep link');
         environment.session_storage.set(DEEP_LINK_KEY, JSON.stringify(Object.fromEntries(params)));
         // An attempt that runs now reads the deep link before it redirects. Then its result is the
         // result of the link, and a second attempt would redirect after a denial.
@@ -838,6 +891,7 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
         if (authority === null) return;
         if (authority.session) return;
         if (currentCredential() !== null) return;
+        log.debug('the application is in the foreground without a session');
         if (status.kind === 'redirecting') setStatus({ kind: 'loading' });
         const has_new_credentials =
             environment.session_storage.get(DEEP_LINK_KEY) !== null ||
@@ -859,6 +913,7 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
             expires_at_ms ?? environment.now() + TOKEN_LIFETIME_DEFAULT_SECONDS * 1000;
         writeTokens({ ...readTokens(), access_token: token, expires_at_ms: expires_at });
         halted = null;
+        log.info('using a token of the application');
         setStatus({ kind: 'signed_in', credential: 'bearer' });
     }
 
@@ -867,16 +922,19 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
         storage.set(storageKey('x-api-key'), key);
         storage.set(storageKey('trusted'), String(options.trusted ?? true));
         halted = null;
+        log.info('using an API key of the application');
         setStatus({ kind: 'signed_in', credential: 'api_key' });
     }
 
     function invalidateToken(): void {
+        log.debug('invalidating the access token');
         writeTokens({ ...readTokens(), access_token: null, expires_at_ms: 0 });
     }
 
     async function logout(): Promise<void> {
         const url =
             authority === null ? serverUrl(LOGOUT_PATH_DEFAULT) : serverUrl(authority.logout_url);
+        log.info('logging out');
         epoch += 1;
         const request_headers: Record<string, string> = { ...headers };
         // Send the token also after its local expiry. That has a margin, so the server can still

@@ -6,11 +6,14 @@
  * - `mockReply` and `mockPage` make 7.x results for the test doubles of 7.x calls.
  * - `registerMockEndpoint` and `mockFetch` are the 6.x mock endpoints, for the 7.x client.
  * - `registerSystem` and `mockRealtimeEnvironment` are the 6.x mock systems, for `createRealtime`.
+ * - `consoleLog` and `createConsoleLog` write the debug logs in the console format of 6.x, when
+ *   `window.debug` is set.
  * - The 6.x enums, with the values of 7.x.
  *
  * @module
  */
 export * from './enums.ts';
 export * from './http-mock.ts';
+export { consoleLog, createConsoleLog } from './log.ts';
 export * from './realtime-mock.ts';
 export * from './result.ts';

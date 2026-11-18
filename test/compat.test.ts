@@ -3,9 +3,11 @@
  * client, so that a mock mode and the tests of an app still work after the migration.
  * Method: register 6.x style endpoints and systems, and use them through 7.x calls.
  */
-import { afterEach, expect, test } from 'bun:test';
+import { afterEach, expect, spyOn, test } from 'bun:test';
 import {
     clearMockEndpoints,
+    consoleLog,
+    createConsoleLog,
     deregisterSystem,
     fromV1Mock,
     mockFetch,
@@ -120,6 +122,38 @@ test('fromV1Mock fits the mockImplementation of an operation, with and without a
     const page = await query();
     expect(orThrowPage(page).total).toBe(1);
     expect(page.ok && page.value.next()).toBeNull();
+});
+
+test('consoleLog writes the 6.x format with the console method of the level', () => {
+    const written: string[] = [];
+    const spies = (['debug', 'warn', 'log', 'group', 'groupEnd'] as const).map((method) =>
+        spyOn(console, method).mockImplementation((...args: unknown[]) => {
+            written.push(`${method} ${args.map(String).join(' | ')}`);
+        }),
+    );
+    const plain = createConsoleLog({ colors: false });
+    try {
+        consoleLog({ scope: 'auth', level: 'debug', args: ['off'] });
+        Reflect.set(globalThis, 'debug', true);
+        consoleLog({ scope: 'auth', level: 'debug', args: ['loading 50%', { id: 1 }] });
+        plain({ scope: 'realtime', level: 'warn', args: ['the socket closed'] });
+        plain({ scope: 'auth', level: 'group', args: ['the authority'] });
+        plain({ scope: 'auth', level: 'print', args: ['name:', 'PlaceOS', 2] });
+        plain({ scope: 'auth', level: 'group_end', args: [] });
+        plain({ scope: 'http', level: 'print', args: [{ id: 2 }] });
+    } finally {
+        Reflect.deleteProperty(globalThis, 'debug');
+        for (const spy of spies) spy.mockRestore();
+    }
+    expect(written).toEqual([
+        // A `%` in the message goes in with `%s`, so the console does not read it as a format.
+        'debug %c[PlaceOS]%c[Auth]%c %s | color: #0288D1 | color: #009688 | color: default | loading 50% | [object Object]',
+        'warn [PlaceOS][WS] the socket closed',
+        'group [PlaceOS][Auth] the authority',
+        'log [PlaceOS][Auth] name: | PlaceOS | 2',
+        'groupEnd ',
+        'log [PlaceOS][HTTP] | [object Object]',
+    ]);
 });
 
 test('mockReply and mockPage make the results of test doubles', () => {

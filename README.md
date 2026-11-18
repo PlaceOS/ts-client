@@ -295,6 +295,9 @@ Other parts of the session:
   login with `authorization_denied`. 6.x sent the user to the authorize page again.
 - `/auth/authority` gets `AUTHORITY_ATTEMPTS_MAX` attempts, not an unlimited number. Then
   `start` gives `authority_unavailable`. Call `start` again to try again.
+- The debug logs need a `log` function, such as `consoleLog` (see [Debug logs](#debug-logs)).
+  `window.debug` alone does not turn them on. The logs do not have the cookie of the socket, which
+  6.x logged with the token in it.
 - Not ported: `revokeToken`, the state of the application in `authorise(state)`, and the ACA
   Engine API path. The mock mode is in `@placeos/ts-client/compat` (see [Mock mode](#mock-mode)).
   It does not need a login: give `auth: { kind: 'none' }`.
@@ -344,6 +347,57 @@ release();
 - After 40 failed attempts, the status is `failed`. 6.x reloaded the page.
 - Not ported: the `connectionState` signal and the `/control/websocket` path of ACA Engine. The
   mock systems are in `@placeos/ts-client/compat` (see [Mock mode](#mock-mode)).
+
+## Debug logs
+
+The client, the login and the realtime client log nothing by default. Give each one a `log`
+function to get an entry for each step: `{ scope, level, args }`. `args` are the arguments of the
+call, as a console method gets them: a message, then values such as a status. `consoleLog` of
+`@placeos/ts-client/compat` writes the entries in the console format of 6.x, and only when
+`window.debug` is set:
+
+```ts
+import { consoleLog } from '@placeos/ts-client/compat';
+
+const session = createAuthSession({ ..., log: consoleLog });
+configure({ base_url: '', auth: session.client_auth, log: consoleLog });
+const realtime = createRealtime({ base_url: '', auth: session.client_auth, log: consoleLog });
+// In the console of the browser:
+window.debug = true;
+// [PlaceOS][Auth] the authority is loaded {id: 'authority-1'}
+//     [PlaceOS][Auth] name: PlaceOS
+//     [PlaceOS][Auth] domain: placeos.example.com
+// [PlaceOS][HTTP] zones.query: 200 in 41 ms {name: 'zones.query', method: 'GET', ...}
+// [PlaceOS][WS] sys-1 Display_1 power changed {sys: 'sys-1', ..., value: true}
+```
+
+| `scope`    | Entries                                                                         |
+| ---------- | ------------------------------------------------------------------------------- |
+| `auth`     | The steps of the login: the authority, each grant, redirects, renewals, logout. |
+| `http`     | Each call: the name, the status or the error, and the time.                     |
+| `realtime` | The socket: connect, close and reconnect, value changes, server errors, logs.   |
+| `mock`     | The 6.x mock endpoints of `compat`: added, matched and not found.               |
+
+| `level`     | Use                                                       | Console method     |
+| ----------- | --------------------------------------------------------- | ------------------ |
+| `error`     | A failure without an answer, such as a timeout.           | `console.error`    |
+| `warn`      | A refusal or a drop, such as a 404 or a closed socket.    | `console.warn`     |
+| `info`      | A step, such as a new token or a connected socket.        | `console.info`     |
+| `debug`     | A detail, such as each call or each value change.         | `console.debug`    |
+| `print`     | A line without a level, such as a field of the authority. | `console.log`      |
+| `group`     | Starts a group of the entries that follow.                | `console.group`    |
+| `group_end` | Ends the group.                                           | `console.groupEnd` |
+
+- `createConsoleLog({ colors: false })` writes the same text without the `%c` colors.
+- An entry has no tokens, API keys, cookies, request bodies or input values. A redirect gives its
+  path only, because the query has the state of the login.
+- A log function that throws does not change the call, the login or the socket.
+- The `mock` entries of the 6.x mock endpoints always go to `consoleLog`, as in 6.x.
+- In the library, each part logs through a scoped logger, as `std.log.scoped` does in Zig:
+  `const log = scopedLog('auth', { sink: config.log ?? null })`. Its methods have the arguments
+  of the console methods: `log.error(...data)`, `log.warn(...data)`, `log.info(...data)`,
+  `log.debug(...data)`, `log.print(...data)` (`console.log`), `log.group(...label)` and
+  `log.groupEnd()`. The `log` function of the application is the sink, as `logFn` is in Zig.
 
 ## Types
 

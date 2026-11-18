@@ -3,6 +3,7 @@
  * and settles each request. Method: give it fake sockets and a manual clock, play the server's
  * frames, then check the frames that the client sent and the results.
  */
+import type { LogEntry } from '../src/core/log.ts';
 import { describe, expect, test } from 'bun:test';
 import type { Auth } from '../src/core/client.ts';
 import type { RealtimeEnvironment, SocketHandlers } from '../src/realtime/environment.ts';
@@ -125,6 +126,33 @@ describe('connection', () => {
         expect(platform.latest().url).toBe(
             'wss://placeos.test/api/engine/v2/systems/control?fixed_device=true&bearer_token=abc',
         );
+    });
+
+    test('logs the connection, a change and a reconnect, and not the token', async () => {
+        const platform = fakePlatform('cookie');
+        const entries: LogEntry[] = [];
+        const client = realtime(platform, {
+            base_url: '',
+            log: (entry) => entries.push(entry),
+        });
+        client.bind(POWER, () => {});
+        await platform.open();
+        await platform.receive({ id: 0, type: 'notify', value: true, meta: META });
+        platform.latest().handlers.close();
+        await platform.advance(5_000);
+        expect(entries.map((entry) => entry.args[0])).toEqual([
+            'connecting',
+            'the token goes in a cookie of the socket path',
+            'connected',
+            'sys-1 Display_1 power changed',
+            'the socket closed',
+            'connecting again after a wait',
+            'connecting',
+            'the token goes in a cookie of the socket path',
+        ]);
+        expect(entries[3]?.args[1]).toEqual({ ...META, value: true });
+        expect(JSON.stringify(entries)).not.toContain('abc');
+        client.stop();
     });
 
     test('puts the token in a cookie on the socket path, not in the URL', async () => {

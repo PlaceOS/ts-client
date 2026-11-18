@@ -19,6 +19,8 @@
  */
 import { assert } from '../core/assert.ts';
 import type { FetchFunction } from '../core/client.ts';
+import { scopedLog } from '../core/log.ts';
+import { consoleLog } from './log.ts';
 
 /** More endpoints is a leak, such as a test that registers in a loop and never removes them. */
 export const MOCK_ENDPOINTS_MAX = 10_000;
@@ -78,6 +80,8 @@ export interface MockHttpResponse {
 type NotFoundHandler = (method: HttpVerb, url: string) => Promise<never> | null;
 
 const handlers = new Map<string, MockHttpRequestHandler>();
+/** The logs of the mock endpoints. As in 6.x, they go to the console when `window.debug` is set. */
+const log = scopedLog('mock', { sink: consoleLog });
 
 let notFound: NotFoundHandler = (method, url) =>
     Promise.reject(
@@ -93,10 +97,11 @@ export function registerMockEndpoint<T>(options: MockHttpRequestHandlerOptions<T
     // The map holds handlers of each response type. The callback result is only sent as JSON.
     const handler: MockHttpRequestHandler = { ...options, path_parts, path_structure };
     handlers.set(key, handler);
+    log.debug(`+ ${options.method} ${options.path}`);
 }
 
 export function deregisterMockEndpoint(method: string, path: string): void {
-    handlers.delete(handlerKey(method, path));
+    if (handlers.delete(handlerKey(method, path))) log.debug(`- ${method} ${path}`);
 }
 
 export function clearMockEndpoints(): void {
@@ -121,6 +126,7 @@ export const mockFetch: FetchFunction = async (url, init) => {
     const method = verb(init.method);
     const handler = findHandler(method, url);
     if (handler === null) {
+        log.warn(`404 ${method} ${url}`);
         const fallback = notFound(method, url);
         if (fallback === null) return fetch(url, init);
         return fallback.then(
@@ -129,6 +135,7 @@ export const mockFetch: FetchFunction = async (url, init) => {
         );
     }
     const request = makeRequest(url, handler, method, init.body);
+    log.debug(`MATCHED ${method} ${handler.path}`, { url });
     let body: unknown;
     let headers: Record<string, string>;
     try {

@@ -18,6 +18,7 @@
  */
 import { assert, unreachable } from '../core/assert.ts';
 import { resolveCredential, type Auth, type Credential } from '../core/client.ts';
+import { scopedLog, type LogFunction } from '../core/log.ts';
 import type { Result } from '../core/result.ts';
 import {
     integer,
@@ -142,6 +143,8 @@ export interface RealtimeConfig {
     /** Tells the server that this is a device in a fixed location. */
     readonly fixed_device?: boolean;
     readonly environment?: RealtimeEnvironment;
+    /** Gets the debug log entries of the socket. See `LogFunction`. */
+    readonly log?: LogFunction;
 }
 
 export interface Realtime {
@@ -234,6 +237,7 @@ interface Debugger {
 export function createRealtime(config: RealtimeConfig): Realtime {
     assert(!config.base_url.endsWith('/'), 'the base_url has no trailing slash');
     const environment = config.environment ?? browserRealtimeEnvironment();
+    const log = scopedLog('realtime', { sink: config.log ?? null });
 
     let status: RealtimeStatus = { kind: 'idle' };
     let socket: RealtimeSocket | null = null;
@@ -283,6 +287,7 @@ export function createRealtime(config: RealtimeConfig): Realtime {
     }
 
     function stop(): void {
+        log.info('stopped');
         connect_attempt += 1;
         setStatus({ kind: 'stopped' });
         cancelTimers();
@@ -465,7 +470,9 @@ export function createRealtime(config: RealtimeConfig): Realtime {
         const this_attempt = connect_attempt;
         attempt += 1;
         setStatus({ kind: 'connecting', attempt });
+        log.debug('connecting', { attempt });
         if (renew_before_connect && config.auth.kind === 'credential' && last_credential !== null) {
+            log.info('asking the auth for a new credential, after failures to connect');
             renew_before_connect = false;
             await config.auth.rejected(401, last_credential);
             if (this_attempt !== connect_attempt) return;
@@ -475,6 +482,7 @@ export function createRealtime(config: RealtimeConfig): Realtime {
         if (this_attempt !== connect_attempt) return;
         if (status.kind !== 'connecting') return;
         if (credential === null) {
+            log.warn('no credential to connect with');
             scheduleReconnect();
             return;
         }
@@ -496,7 +504,9 @@ export function createRealtime(config: RealtimeConfig): Realtime {
         });
         cancelConnectTimer = environment.setTimer(CONNECT_TIMEOUT_MS, () => {
             cancelConnectTimer = null;
-            if (current() && status.kind === 'connecting') dropSocket();
+            if (!current() || status.kind !== 'connecting') return;
+            log.warn('the socket did not open in time', { timeout_ms: CONNECT_TIMEOUT_MS });
+            dropSocket();
         });
     }
 
@@ -510,6 +520,7 @@ export function createRealtime(config: RealtimeConfig): Realtime {
         const opened = socket;
         assert(opened !== null, 'an open socket exists');
         opened.send('ping');
+        log.info('connected', { bindings: bindings.size, debuggers: debuggers.size });
         // The server forgets the bindings of a closed socket. Bind each one again.
         for (const binding of bindings.values()) sendBind(binding);
         for (const entry of debuggers.values()) sendDebug(entry, 'debug');
@@ -526,6 +537,7 @@ export function createRealtime(config: RealtimeConfig): Realtime {
         last_message_at_ms = environment.now();
         if (inbox.length >= INBOX_MAX) {
             // The listeners are slower than the server. A new socket resyncs each binding.
+            log.warn('the inbox is full: connecting again', { inbox_max: INBOX_MAX });
             dropSocket();
             return;
         }
@@ -552,11 +564,22 @@ export function createRealtime(config: RealtimeConfig): Realtime {
                 case 'success':
                     settle(message.id, { ok: true, value: message.value });
                     break;
-                case 'error':
-                    settle(message.id, failure(serverError(message)));
+                case 'error': {
+                    const error = serverError(message);
+                    log.warn('the server refused a request', { id: message.id, error });
+                    settle(message.id, failure(error));
                     break;
+                }
                 case 'notify':
                     if (message.meta !== null) {
+                        const { sys, mod, index, name } = message.meta;
+                        log.debug(`${sys} ${mod}_${index} ${name} changed`, {
+                            sys,
+                            mod,
+                            index,
+                            name,
+                            value: message.value,
+                        });
                         changed.set(variableKey(message.meta), message.value);
                     }
                     break;
@@ -565,6 +588,8 @@ export function createRealtime(config: RealtimeConfig): Realtime {
                     const entry = debuggers.get(debugKey(message.meta.sys, message.meta.mod));
                     if (entry === undefined) break;
                     const text = message.msg ?? '';
+                    const { sys, mod } = message.meta;
+                    log.debug(`log of ${mod}`, { sys, mod, level: message.level, message: text });
                     logs.push([entry, { level: message.level, message: text, received_at_ms }]);
                     break;
                 }
@@ -587,6 +612,7 @@ export function createRealtime(config: RealtimeConfig): Realtime {
     function onDisconnect(): void {
         // A response can wait in the inbox. Handle it before the requests fail as disconnected.
         if (inbox.length > 0) drain();
+        log.warn('the socket closed', { was_open: status.kind === 'open' });
         cancelTimers();
         socket = null;
         if (status.kind !== 'open') failures_before_open += 1;
@@ -600,6 +626,7 @@ export function createRealtime(config: RealtimeConfig): Realtime {
 
     function scheduleReconnect(): void {
         if (attempt >= RECONNECT_ATTEMPTS_MAX) {
+            log.error('stopped after the maximum number of attempts', { attempts: attempt });
             setStatus({ kind: 'failed' });
             for (const id of [...pending.keys()]) settle(id, failure({ kind: 'unavailable' }));
             queue.length = 0;
@@ -615,6 +642,7 @@ export function createRealtime(config: RealtimeConfig): Realtime {
             Math.max(1, attempt) * RECONNECT_DELAY_STEP_MS,
         );
         setStatus({ kind: 'waiting', attempt, delay_ms });
+        log.info('connecting again after a wait', { attempt, delay_ms });
         cancelReconnect = environment.setTimer(delay_ms, () => {
             cancelReconnect = null;
             void connect();
@@ -626,6 +654,7 @@ export function createRealtime(config: RealtimeConfig): Realtime {
             cancelKeepAlive = null;
             if (status.kind !== 'open' || socket === null) return;
             if (environment.now() - last_message_at_ms > STALE_MS) {
+                log.warn('no message from the server: connecting again', { stale_ms: STALE_MS });
                 dropSocket();
                 return;
             }
@@ -681,11 +710,13 @@ export function createRealtime(config: RealtimeConfig): Realtime {
             // in the query.
             const page_host = new URL(environment.currentUrl()).hostname;
             if (environment.token_transport === 'query' || url.hostname !== page_host) {
+                log.debug('the token goes in the query of the socket');
                 url.searchParams.set(name, token_value);
             } else {
                 // The server reads the cookie value as it is, so the value must be cookie safe.
                 assert(/^[^;\s]+$/.test(token_value), 'the token has no semicolons or spaces');
                 const secure_flag = secure ? '; secure' : '';
+                log.debug('the token goes in a cookie of the socket path');
                 environment.setCookie(
                     `${name}=${token_value}; max-age=${COOKIE_MAX_AGE_SECONDS}; ` +
                         `path=${CONTROL_PATH}; samesite=strict${secure_flag}`,

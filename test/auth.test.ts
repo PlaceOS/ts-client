@@ -3,6 +3,7 @@
  * for. Method: run the session against a fake environment and a fake PlaceOS server, then check
  * the requests, the navigations, the storage and the result.
  */
+import type { LogEntry } from '../src/core/log.ts';
 import { describe, expect, test } from 'bun:test';
 import { memoryStore, webStorageStore, type AuthEnvironment } from '../src/auth/environment.ts';
 import {
@@ -177,6 +178,34 @@ describe('authorization code with PKCE', () => {
         expect(world.url()).toBe('http://localhost:4200/rooms?level=2#/map');
         // An application that is not trusted keeps its tokens in memory only.
         expect(world.storage.get(`${CLIENT_ID}_access_token`)).toBeNull();
+    });
+
+    test('logs each step of the login, and no token, code or state', async () => {
+        const world = fake();
+        const state = (await startLogin(world)).get('state') ?? '';
+        const verifier = world.session_storage.get(`${CLIENT_ID}_code_verifier`) ?? '';
+        world.setUrl(`http://localhost:4200/rooms?code=abc&state=${state}`);
+        const entries: LogEntry[] = [];
+        await session(world, { log: (entry) => entries.push(entry) }).start();
+        expect(entries.map((entry) => `${entry.level} ${entry.args[0] ?? ''}`)).toEqual([
+            'info start',
+            'debug got the login parameters',
+            'debug loading the authority',
+            'group the authority is loaded',
+            'print name: PlaceOS',
+            'print version: 2.0.0',
+            'print domain: placeos.test',
+            'print session: true',
+            'print production: false',
+            'group_end ',
+            'debug exchanging the code of the redirect',
+            'info got new tokens',
+            'info signed in',
+        ]);
+        expect(entries.every((entry) => entry.scope === 'auth')).toBe(true);
+        const text = JSON.stringify(entries);
+        for (const secret of ['token-1', 'abc', state, verifier])
+            expect(text).not.toContain(secret);
     });
 
     test('refuses a code with a state that this client did not send', async () => {
