@@ -47,7 +47,7 @@ function jsonResponse(value: unknown, status = 200): Response {
 
 function clientWith(fetch: FetchFunction, config: Partial<ClientConfig> = {}) {
     return createClient({
-        baseUrl: 'https://placeos.test',
+        base_url: 'https://placeos.test',
         auth: { kind: 'none' },
         fetch,
         ...config,
@@ -59,7 +59,7 @@ const Item = object({ id: string(), name: nullable(string()) }, ['id']);
 const UPDATE = operation({
     method: 'PATCH',
     path: '/api/items/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: parameters(
         {
             id: string(),
@@ -78,7 +78,7 @@ const UPDATE = operation({
 const DOWNLOAD = operation({
     method: 'GET',
     path: '/api/download',
-    pathKeys: [],
+    path_keys: [],
     params: parameters({}),
     body: null,
     response: null,
@@ -151,10 +151,10 @@ describe('call', () => {
         const client = clientWith(fetch);
         // A variable with an extra field passes the type check. Only the run time check sees it.
         const typo = { id: 'item-1', limt: 5, body: {} };
-        await expect(call(UPDATE, typo, { client: client })).rejects.toThrow(
+        await expect(call(UPDATE, typo, { client })).rejects.toThrow(
             'At $.limt: no field with this name',
         );
-        await expect(call(UPDATE, { id: '', body: {} }, { client: client })).rejects.toThrow(
+        await expect(call(UPDATE, { id: '', body: {} }, { client })).rejects.toThrow(
             'the path parameter "id" is not empty',
         );
         expect(sent).toHaveLength(0);
@@ -210,16 +210,16 @@ describe('call errors', () => {
             new Promise((_resolve, reject) => {
                 init.signal?.addEventListener('abort', () => reject(init.signal?.reason));
             });
-        const client = clientWith(hang, { timeoutMs: 20 });
-        expect(await call(DOWNLOAD, {}, { client: client })).toEqual({
+        const client = clientWith(hang, { timeout_ms: 20 });
+        expect(await call(DOWNLOAD, {}, { client })).toEqual({
             ok: false,
-            error: { kind: 'timeout', timeoutMs: 20 },
+            error: { kind: 'timeout', timeout_ms: 20 },
         });
         const controller = new AbortController();
         const pending = call(
             DOWNLOAD,
             {},
-            { client: client, signal: controller.signal, timeoutMs: 5_000 },
+            { client, signal: controller.signal, timeout_ms: 5_000 },
         );
         controller.abort();
         expect(await pending).toEqual({ ok: false, error: { kind: 'aborted' } });
@@ -230,12 +230,16 @@ describe('call errors', () => {
         // A credential that is slow, such as a login that renews the token.
         const slow = new Promise<string>((resolve) => setTimeout(() => resolve('abc'), 200));
         const client = clientWith(fetch, { auth: { kind: 'bearer', token: () => slow } });
-        expect(await call(DOWNLOAD, {}, { client, timeoutMs: 20 })).toEqual({
+        expect(await call(DOWNLOAD, {}, { client, timeout_ms: 20 })).toEqual({
             ok: false,
-            error: { kind: 'timeout', timeoutMs: 20 },
+            error: { kind: 'timeout', timeout_ms: 20 },
         });
         const controller = new AbortController();
-        const pending = call(DOWNLOAD, {}, { client, signal: controller.signal, timeoutMs: 5_000 });
+        const pending = call(
+            DOWNLOAD,
+            {},
+            { client, signal: controller.signal, timeout_ms: 5_000 },
+        );
         controller.abort();
         expect(await pending).toEqual({ ok: false, error: { kind: 'aborted' } });
         expect(sent).toHaveLength(0);
@@ -259,16 +263,19 @@ describe('call errors', () => {
         expect(started).toBe(false);
     });
 
-    test('stops at responseBytesMax, with or without a content-length', async () => {
-        const tooLarge = { ok: false, error: { kind: 'response_too_large', bytesMax: 8 } } as const;
+    test('stops at response_bytes_max, with or without a content-length', async () => {
+        const too_large = {
+            ok: false,
+            error: { kind: 'response_too_large', bytes_max: 8 },
+        } as const;
         const declared = fakeFetch(() => new Response('0123456789'));
         expect(
             await call(
                 DOWNLOAD,
                 {},
-                { client: clientWith(declared.fetch, { responseBytesMax: 8 }) },
+                { client: clientWith(declared.fetch, { response_bytes_max: 8 }) },
             ),
-        ).toEqual(tooLarge);
+        ).toEqual(too_large);
         // A stream has no content-length, so the reader must count the bytes.
         const streamed = fakeFetch(() => {
             const stream = new ReadableStream<Uint8Array>({
@@ -282,9 +289,9 @@ describe('call errors', () => {
             await call(
                 DOWNLOAD,
                 {},
-                { client: clientWith(streamed.fetch, { responseBytesMax: 8 }) },
+                { client: clientWith(streamed.fetch, { response_bytes_max: 8 }) },
             ),
-        ).toEqual(tooLarge);
+        ).toEqual(too_large);
     });
 });
 
@@ -315,7 +322,7 @@ describe('configure', () => {
     test('gives the client to each call without a client in its options', async () => {
         const configured = fakeFetch(() => jsonResponse({ id: 'zone-1', update_systems: false }));
         configure({
-            baseUrl: 'https://configured.test',
+            base_url: 'https://configured.test',
             auth: { kind: 'none' },
             fetch: configured.fetch,
         });

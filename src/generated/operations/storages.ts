@@ -29,7 +29,7 @@ export function create(
 const CREATE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/storages',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({}),
     body: Storage,
     response: Storage,
@@ -51,7 +51,7 @@ export function destroy(
 const DESTROY = /* @__PURE__ */ operation({
     method: 'DELETE',
     path: '/api/engine/v2/storages/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -78,7 +78,7 @@ export function query(
 const QUERY = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/storages',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({
         /** return storages which are in the authority provided */
         auth_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -116,7 +116,7 @@ export function show(
 const SHOW = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/storages/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -143,7 +143,7 @@ export function update(
 const UPDATE = /* @__PURE__ */ operation({
     method: 'PATCH',
     path: '/api/engine/v2/storages/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),

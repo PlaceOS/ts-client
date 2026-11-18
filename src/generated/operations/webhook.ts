@@ -29,7 +29,7 @@ export function show(
 const SHOW = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/webhook/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),

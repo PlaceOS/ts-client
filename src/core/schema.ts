@@ -54,9 +54,9 @@ export interface ObjectField {
     readonly key: string;
     readonly node: SchemaNode;
     /** The parser fails on a response without this field. */
-    readonly requiredInResponse: boolean;
+    readonly required_in_response: boolean;
     /** The check fails on a request without this field. */
-    readonly requiredInRequest: boolean;
+    readonly required_in_request: boolean;
 }
 
 /**
@@ -184,14 +184,14 @@ export function parameters<F extends Fields, const R extends keyof F & string = 
     fields: F,
     required: readonly R[] = [],
 ): Schema<ObjectOutput<F, R>, ObjectInput<F, R>> {
-    const requiredKeys = new Set<string>(required);
-    return { node: objectNode(fields, requiredKeys, requiredKeys) };
+    const required_keys = new Set<string>(required);
+    return { node: objectNode(fields, required_keys, required_keys) };
 }
 
 function objectNode(
     fields: Fields,
-    requiredInResponse: ReadonlySet<string>,
-    requiredInRequest: ReadonlySet<string>,
+    required_in_response: ReadonlySet<string>,
+    required_in_request: ReadonlySet<string>,
 ): SchemaNode {
     const list: ObjectField[] = [];
     for (const [key, schema] of Object.entries(fields)) {
@@ -200,11 +200,11 @@ function objectNode(
         list.push({
             key,
             node: schema.node,
-            requiredInResponse: requiredInResponse.has(key),
-            requiredInRequest: requiredInRequest.has(key),
+            required_in_response: required_in_response.has(key),
+            required_in_request: required_in_request.has(key),
         });
     }
-    for (const key of [...requiredInResponse, ...requiredInRequest]) {
+    for (const key of [...required_in_response, ...required_in_request]) {
         assert(Object.hasOwn(fields, key), `the required key "${key}" is a field`);
     }
     return { kind: 'object', fields: list, keys: new Set(Object.keys(fields)) };
@@ -233,7 +233,7 @@ export function parseResponse<O, I>(
     options: ParseOptions = {},
 ): Result<O, SchemaError> {
     const failure: Failure = { expected: '', segments: [] };
-    const direction = options.missingFields === 'zero' ? 'response_zero' : 'response';
+    const direction = options.missing_fields === 'zero' ? 'response_zero' : 'response';
     const parsed = walk(schema.node, value, direction, failure, 0);
     if (parsed === FAIL) return { ok: false, error: describeFailure(failure) };
     // The walk built `parsed` from the same nodes that give `O` its shape. This is one of the two
@@ -266,7 +266,7 @@ export interface ParseOptions {
      * of its type, such as `''`, `0` or `[]`, as the 6.x classes did. Only for mock data, which
      * often has only some of the fields.
      */
-    readonly missingFields?: 'error' | 'zero';
+    readonly missing_fields?: 'error' | 'zero';
 }
 
 /** `response_zero` is a `response` that fills the missing required fields. */
@@ -342,9 +342,9 @@ function walk(
             }
             const output: unknown[] = [];
             for (let index = 0; index < node.items.length; index += 1) {
-                const itemNode = node.items[index];
-                assert(itemNode !== undefined, 'the index is in the tuple');
-                const item = walk(itemNode, items[index], direction, failure, depth + 1);
+                const item_node = node.items[index];
+                assert(item_node !== undefined, 'the index is in the tuple');
+                const item = walk(item_node, items[index], direction, failure, depth + 1);
                 if (item === FAIL) {
                     failure.segments.push(`[${index}]`);
                     return FAIL;
@@ -357,12 +357,12 @@ function walk(
             if (!isRecord(value)) return fail(failure, 'object');
             const entries: [string, unknown][] = [];
             for (const key of Object.keys(value)) {
-                const entryValue = value[key];
-                if (entryValue === undefined) {
+                const entry_value = value[key];
+                if (entry_value === undefined) {
                     assert(direction === 'request', 'JSON has no undefined values');
                     continue;
                 }
-                const entry = walk(node.values, entryValue, direction, failure, depth + 1);
+                const entry = walk(node.values, entry_value, direction, failure, depth + 1);
                 if (entry === FAIL) {
                     failure.segments.push(`.${key}`);
                     return FAIL;
@@ -376,12 +376,12 @@ function walk(
             if (!isRecord(value)) return fail(failure, 'object');
             const output: Record<string, unknown> = {};
             for (const field of node.fields) {
-                const fieldValue = Object.hasOwn(value, field.key) ? value[field.key] : undefined;
-                if (fieldValue === undefined) {
+                const field_value = Object.hasOwn(value, field.key) ? value[field.key] : undefined;
+                if (field_value === undefined) {
                     const required =
                         direction === 'request'
-                            ? field.requiredInRequest
-                            : field.requiredInResponse;
+                            ? field.required_in_request
+                            : field.required_in_response;
                     if (required && direction === 'response_zero') {
                         output[field.key] = zeroValue(field.node, depth + 1);
                         continue;
@@ -395,7 +395,7 @@ function walk(
                     if (direction !== 'request') output[field.key] = null;
                     continue;
                 }
-                const parsed = walk(field.node, fieldValue, direction, failure, depth + 1);
+                const parsed = walk(field.node, field_value, direction, failure, depth + 1);
                 if (parsed === FAIL) {
                     failure.segments.push(`.${field.key}`);
                     return FAIL;
@@ -425,7 +425,7 @@ function walk(
             // fields wins, so that the fill does not drop them. In a tie, a variant that matches
             // without the fill wins, then the first.
             let best: unknown = FAIL;
-            let bestScore = -1;
+            let best_score = -1;
             for (const variant of node.variants) {
                 const parsed = walk(variant, value, direction, failure, depth + 1);
                 failure.segments.length = 0;
@@ -433,9 +433,9 @@ function walk(
                 const strict = walk(variant, value, 'response', failure, depth + 1) !== FAIL;
                 failure.segments.length = 0;
                 const score = knownKeys(variant, value) * 2 + (strict ? 1 : 0);
-                if (score > bestScore) {
+                if (score > best_score) {
                     best = parsed;
-                    bestScore = score;
+                    best_score = score;
                 }
             }
             if (best !== FAIL) return best;
@@ -478,7 +478,7 @@ function zeroValue(node: SchemaNode, depth: number): unknown {
         case 'object': {
             const output: Record<string, unknown> = {};
             for (const field of node.fields) {
-                output[field.key] = field.requiredInResponse
+                output[field.key] = field.required_in_response
                     ? zeroValue(field.node, depth + 1)
                     : null;
             }

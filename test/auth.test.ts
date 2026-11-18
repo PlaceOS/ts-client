@@ -39,13 +39,13 @@ interface FakeOptions {
 
 /** A fake browser and server. The returned object records what the session did. */
 function fake(options: FakeOptions = {}) {
-    let currentUrl = options.url ?? 'http://localhost:4200/rooms?level=2#/map';
-    let tokenCount = 0;
+    let current_url = options.url ?? 'http://localhost:4200/rooms?level=2#/map';
+    let token_count = 0;
     let foreground: (() => void) | null = null;
     const sent: Sent[] = [];
     const navigations: string[] = [];
     const storage = memoryStore();
-    const sessionStorage = memoryStore();
+    const session_storage = memoryStore();
     const authority = {
         id: 'authority-1',
         name: 'PlaceOS',
@@ -76,10 +76,10 @@ function fake(options: FakeOptions = {}) {
                 const answer = await options.token?.(form);
                 if (answer === 'network_error') throw new TypeError('Failed to fetch');
                 if (answer !== undefined) return answer;
-                tokenCount += 1;
+                token_count += 1;
                 return Response.json({
-                    access_token: `token-${tokenCount}`,
-                    refresh_token: `refresh-${tokenCount}`,
+                    access_token: `token-${token_count}`,
+                    refresh_token: `refresh-${token_count}`,
                     expires_in: 3600,
                 });
             }
@@ -87,10 +87,10 @@ function fake(options: FakeOptions = {}) {
             return options.api?.(record) ?? new Response('{}');
         },
         storage,
-        sessionStorage,
-        currentUrl: () => currentUrl,
+        session_storage,
+        currentUrl: () => current_url,
         replaceUrl: (url) => {
-            currentUrl = url;
+            current_url = url;
         },
         navigate: (url) => {
             navigations.push(url);
@@ -113,11 +113,11 @@ function fake(options: FakeOptions = {}) {
         sent,
         navigations,
         storage,
-        sessionStorage,
+        session_storage,
         authority,
-        url: () => currentUrl,
+        url: () => current_url,
         setUrl: (url: string) => {
-            currentUrl = url;
+            current_url = url;
         },
         foreground: () => foreground?.(),
         tokenRequests: () => sent.filter((request) => request.url.endsWith('/auth/oauth/token')),
@@ -126,8 +126,8 @@ function fake(options: FakeOptions = {}) {
 
 function session(world: ReturnType<typeof fake>, config: Partial<AuthSessionConfig> = {}) {
     return createAuthSession({
-        baseUrl: '',
-        redirectUri: REDIRECT_URI,
+        base_url: '',
+        redirect_uri: REDIRECT_URI,
         scope: 'public',
         grant: { kind: 'code' },
         environment: world.environment,
@@ -144,7 +144,7 @@ async function startLogin(world: ReturnType<typeof fake>, config: Partial<AuthSe
 
 describe('authorization code with PKCE', () => {
     test('the client ID is the MD5 of the redirect URI, as in 6.x', () => {
-        expect(session(fake()).clientId).toBe(CLIENT_ID);
+        expect(session(fake()).client_id).toBe(CLIENT_ID);
     });
 
     test('sends a user with a session to authorize, with a nonce and a challenge', async () => {
@@ -157,7 +157,7 @@ describe('authorization code with PKCE', () => {
         expect(target.searchParams.get('response_type')).toBe('code');
         expect(target.searchParams.get('client_id')).toBe(CLIENT_ID);
         expect(target.searchParams.get('state')).toBe(world.storage.get(`${CLIENT_ID}_nonce`));
-        const verifier = world.sessionStorage.get(`${CLIENT_ID}_code_verifier`) ?? '';
+        const verifier = world.session_storage.get(`${CLIENT_ID}_code_verifier`) ?? '';
         const challenge = base64Url(sha256(new TextEncoder().encode(verifier)));
         expect(target.searchParams.get('code_challenge')).toBe(challenge);
         expect(target.searchParams.get('code_challenge_method')).toBe('S256');
@@ -166,7 +166,7 @@ describe('authorization code with PKCE', () => {
     test('exchanges the code of the redirect, then removes it from the URL', async () => {
         const world = fake();
         const state = (await startLogin(world)).get('state') ?? '';
-        const verifier = world.sessionStorage.get(`${CLIENT_ID}_code_verifier`);
+        const verifier = world.session_storage.get(`${CLIENT_ID}_code_verifier`);
         world.setUrl(`http://localhost:4200/rooms?level=2&code=abc&state=${state}#/map`);
         const result = await session(world).start();
         expect(result).toEqual({ ok: true, value: { kind: 'bearer', token: 'token-1' } });
@@ -301,9 +301,9 @@ describe('login page', () => {
         expect(world.navigations).toEqual([`/login?continue=${back}`]);
     });
 
-    test('gives login_required and does not navigate when handleLogin is false', async () => {
+    test('gives login_required and does not navigate when handle_login is false', async () => {
         const world = fake({ session: false });
-        const auth = session(world, { handleLogin: false });
+        const auth = session(world, { handle_login: false });
         expect(await auth.start()).toEqual({ ok: false, error: { kind: 'login_required' } });
         expect(world.navigations).toEqual([]);
         expect(auth.status()).toEqual({ kind: 'signed_out', error: { kind: 'login_required' } });
@@ -356,8 +356,8 @@ describe('trusted applications and refresh tokens', () => {
         await session(world).start();
         expect(world.storage.get(`${CLIENT_ID}_access_token`)).toBe('token-1');
         expect(world.storage.get(`${CLIENT_ID}_refresh_token`)).toBe('refresh-1');
-        const lifetimeMs = (3600 - 300) * 1000;
-        expect(world.storage.get(`${CLIENT_ID}_expires_at`)).toBe(String(NOW_MS + lifetimeMs));
+        const lifetime_ms = (3600 - 300) * 1000;
+        expect(world.storage.get(`${CLIENT_ID}_expires_at`)).toBe(String(NOW_MS + lifetime_ms));
         // A new page load uses the stored token without a token request.
         world.setUrl('http://localhost:4200/');
         expect(await session(world).start()).toEqual({
@@ -447,7 +447,7 @@ describe('frames, deep links and fixed devices', () => {
                 };
             },
         });
-        const result = await session(world, { useFrame: true }).start();
+        const result = await session(world, { use_frame: true }).start();
         expect(result).toEqual({ ok: true, value: { kind: 'bearer', token: 'token-1' } });
         expect(world.navigations).toHaveLength(0);
     });
@@ -459,7 +459,7 @@ describe('frames, deep links and fixed devices', () => {
                 value: { type: 'place-os', params: { code: 'abc', state: 'x' } },
             }),
         });
-        const result = await session(world, { useFrame: true }).start();
+        const result = await session(world, { use_frame: true }).start();
         expect(result).toEqual({
             ok: false,
             error: { kind: 'frame_failed', reason: 'state_mismatch' },
@@ -485,12 +485,12 @@ describe('frames, deep links and fixed devices', () => {
         expect(await auth.start()).toEqual({ ok: true, value: { kind: 'api_key', key: 'key-1' } });
         expect(auth.isFixedDevice()).toBe(true);
         expect(world.url()).toBe('http://localhost:4200/?fixed_device=true');
-        const ignoring = session(world, { ignoreApiKey: true });
+        const ignoring = session(world, { ignore_api_key: true });
         expect(ignoring.credential()).toBeNull();
     });
 
     test('the foreground loads the authority again when there was no session', async () => {
-        let hasSession = false;
+        let has_session = false;
         const world = fake({
             authority: () =>
                 Response.json({
@@ -499,14 +499,14 @@ describe('frames, deep links and fixed devices', () => {
                     domain: 'placeos.test',
                     login_url: '/login',
                     logout_url: '/logout',
-                    session: hasSession,
+                    session: has_session,
                 }),
         });
         const auth = session(world);
         await auth.start();
         expect(world.navigations).toEqual(['/login']);
         // The user logs in with a different tab, then this one comes back.
-        hasSession = true;
+        has_session = true;
         world.foreground();
         await Bun.sleep(0);
         expect(world.navigations.at(-1)).toStartWith('/auth/oauth/authorize?');
@@ -518,7 +518,7 @@ describe('the session with the client', () => {
     const SHOW = operation({
         method: 'GET',
         path: '/api/engine/v2/zones/{id}',
-        pathKeys: ['id'],
+        path_keys: ['id'],
         params: parameters({ id: string() }, ['id']),
         body: null,
         response: object({ id: string() }, ['id']),
@@ -538,8 +538,8 @@ describe('the session with the client', () => {
         world.storage.set(`${CLIENT_ID}_expires_at`, String(NOW_MS + 60_000));
         const auth = session(world);
         const client = createClient({
-            baseUrl: '',
-            auth: auth.clientAuth,
+            base_url: '',
+            auth: auth.client_auth,
             fetch: world.environment.fetch,
         });
         const results = await Promise.all([
@@ -648,9 +648,9 @@ describe('the session with the client', () => {
         world.storage.set(`${CLIENT_ID}_expires_at`, String(NOW_MS + 60_000));
         const auth = session(world);
         await auth.start();
-        if (auth.clientAuth.kind !== 'credential') throw new Error('a credential auth');
+        if (auth.client_auth.kind !== 'credential') throw new Error('a credential auth');
         slow = true;
-        const renewing = auth.clientAuth.rejected(401, { kind: 'bearer', token: 'stale' });
+        const renewing = auth.client_auth.rejected(401, { kind: 'bearer', token: 'stale' });
         await Bun.sleep(0);
         await auth.logout();
         release();
@@ -708,17 +708,17 @@ describe('web storage', () => {
     }
 
     test('a removal in a different tab is seen here, so a logout there logs out here', () => {
-        const fakeWeb = fakeStorage();
-        const store = webStorageStore(() => fakeWeb.storage);
+        const fake_web = fakeStorage();
+        const store = webStorageStore(() => fake_web.storage);
         store.set('token', 'abc');
-        fakeWeb.values.delete('token');
+        fake_web.values.delete('token');
         expect(store.get('token')).toBeNull();
     });
 
     test('a value that the storage refuses stays in memory', () => {
-        const fakeWeb = fakeStorage();
-        const store = webStorageStore(() => fakeWeb.storage);
-        fakeWeb.fill();
+        const fake_web = fakeStorage();
+        const store = webStorageStore(() => fake_web.storage);
+        fake_web.fill();
         store.set('token', 'abc');
         expect(store.get('token')).toBe('abc');
         expect(store.keys()).toEqual(['token']);

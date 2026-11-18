@@ -17,7 +17,7 @@ import {
 
 // No `fetch` can answer: a call that a mock does not answer fails as a network error.
 const client = createClient({
-    baseUrl: 'http://mock.invalid',
+    base_url: 'http://mock.invalid',
     auth: { kind: 'none' },
     mock: endpointMocks,
     fetch: () => Promise.reject(new Error('no server')),
@@ -44,7 +44,7 @@ test('a mock gets the typed input and gives the parsed data', async () => {
 test('respond sets the status and the page total, and the body reaches the mock', async () => {
     mockEndpoint('zones.query', () => respond([{ id: 'zone-1' }], { total: 25 }));
     mockEndpoint('systems.update', (input) => ({ id: input.sys_id, ...input.body }), {
-        delayMs: 1,
+        delay_ms: 1,
     });
     const page = await zones.query({ limit: 1 }, options);
     expect(page.ok && pageInfo(page.value.headers).total).toBe(25);
@@ -107,7 +107,7 @@ test('a staff API endpoint has a typed mock too', async () => {
 
 test('a mock answer has the deadline, the signal and the size limit of a response', async () => {
     mockEndpoint('zones.show', () => new Promise<never>(() => {}));
-    const late = await zones.show({ id: 'zone-1' }, { client, timeoutMs: 5 });
+    const late = await zones.show({ id: 'zone-1' }, { client, timeout_ms: 5 });
     expect(late.ok === false && late.error.kind).toBe('timeout');
     const controller = new AbortController();
     const pending = zones.show({ id: 'zone-1' }, { client, signal: controller.signal });
@@ -115,10 +115,10 @@ test('a mock answer has the deadline, the signal and the size limit of a respons
     const aborted = await pending;
     expect(aborted.ok === false && aborted.error.kind).toBe('aborted');
     const small = createClient({
-        baseUrl: 'http://mock.invalid',
+        base_url: 'http://mock.invalid',
         auth: { kind: 'none' },
         mock: endpointMocks,
-        responseBytesMax: 16,
+        response_bytes_max: 16,
     });
     mockEndpoint('zones.show', () => ({ id: 'zone-1', name: 'a name longer than the limit' }));
     const large = await zones.show({ id: 'zone-1' }, { client: small });
@@ -130,12 +130,12 @@ test('zero-fill keeps the union variant that knows the given fields', async () =
     const input = { id: 'event-1', body: { email: 'a@example.com' } } as never;
     // `PlaceCalendarEventAttendee` is first, and has no `id`.
     mockEndpoint('staff.events.addAttendee', () => ({ id: 7 }) as never);
-    const byId = await events.addAttendee(input, options);
-    expect(byId.ok && Reflect.get(Object(byId.value.data), 'id')).toBe(7);
+    const by_id = await events.addAttendee(input, options);
+    expect(by_id.ok && Reflect.get(Object(by_id.value.data), 'id')).toBe(7);
     // `Attendee` matches without the fill, and has no `resource`.
     mockEndpoint('staff.events.addAttendee', () => ({ resource: true }) as never);
-    const byResource = await events.addAttendee(input, options);
-    expect(byResource.ok && Reflect.get(Object(byResource.value.data), 'resource')).toBe(true);
+    const by_resource = await events.addAttendee(input, options);
+    expect(by_resource.ok && Reflect.get(Object(by_resource.value.data), 'resource')).toBe(true);
 });
 
 test('an aborted call does not leave the promise of a mock without a handler', async () => {
@@ -163,7 +163,7 @@ test('a mock that aborts its own call gives aborted, not timeout', async () => {
     });
     const result = await zones.show(
         { id: 'zone-1' },
-        { client, signal: controller.signal, timeoutMs: 50 },
+        { client, signal: controller.signal, timeout_ms: 50 },
     );
     expect(result.ok === false && result.error.kind).toBe('aborted');
 });

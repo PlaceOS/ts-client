@@ -29,7 +29,7 @@ export function features(
 const FEATURES = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/staff/v1/spaces/features',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({
         /** comma separated zone ids, only features of spaces in every zone */
         zone_ids: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
@@ -54,7 +54,7 @@ export function free(
 const FREE = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/staff/v1/spaces/free',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters(
         {
             /** meeting start as a unix epoch in seconds */
@@ -88,7 +88,7 @@ export function image(
 const IMAGE = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/staff/v1/spaces/{id}/images/{index}',
-    pathKeys: ['id', 'index'],
+    path_keys: ['id', 'index'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -117,7 +117,7 @@ export function map(
 const MAP = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/staff/v1/spaces/{id}/map',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -144,7 +144,7 @@ export function query(
 const QUERY = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/staff/v1/spaces',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({
         /** comma separated zone ids, spaces must be in every zone, i.e. a building and a level */
         zone_ids: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
@@ -186,7 +186,7 @@ export function show(
 const SHOW = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/staff/v1/spaces/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -223,7 +223,7 @@ export function zones(
 const ZONES = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/staff/v1/spaces/zones',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({
         /** comma separated tags, zones must have every tag, i.e. building or level */
         tags: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),

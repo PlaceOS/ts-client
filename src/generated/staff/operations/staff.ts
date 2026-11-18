@@ -34,7 +34,7 @@ export function calendars(
 const CALENDARS = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/staff/v1/people/{id}/calendars',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             /** the user's email address */
@@ -62,7 +62,7 @@ export function freeBusy(
 const FREE_BUSY = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/staff/v1/people/{id}/free_busy',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             /** the person's email address */
@@ -94,7 +94,7 @@ export function groups(
 const GROUPS = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/staff/v1/people/{id}/groups',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             /** a user id OR user email address */
@@ -122,7 +122,7 @@ export function manager(
 const MANAGER = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/staff/v1/people/{id}/manager',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             /** a user id OR user email address */
@@ -150,7 +150,7 @@ export function photo(
 const PHOTO = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/staff/v1/people/{id}/photo',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             /** a user id OR user email address */
@@ -178,7 +178,7 @@ export function query(
 const QUERY = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/staff/v1/people',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({
         /**
          * An optional search query to filter users by name or email. If both 'q' and 'filter'
@@ -223,7 +223,7 @@ export function show(
 const SHOW = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/staff/v1/people/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             /** a user id OR user email address */

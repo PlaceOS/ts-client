@@ -76,7 +76,7 @@ async function main(argv: readonly string[]): Promise<void> {
     const files = await sourceFiles(paths.map((path) => resolve(path)));
     const findings: { file: string; finding: Finding }[] = [];
     const migrated = new Set<string>();
-    let changedFiles = 0;
+    let changed_files = 0;
     let changes = 0;
     for (const file of files) {
         const text = await readFile(file, 'utf8');
@@ -85,7 +85,7 @@ async function main(argv: readonly string[]): Promise<void> {
         for (const finding of result.findings) findings.push({ file: name, finding });
         for (const fn of result.migrated) migrated.add(fn);
         if (result.text === text) continue;
-        changedFiles += 1;
+        changed_files += 1;
         changes += result.changes;
         console.log(`${write ? 'changed' : 'would change'} ${name} (${result.changes})`);
         if (write) await writeFile(file, result.text);
@@ -105,16 +105,16 @@ async function main(argv: readonly string[]): Promise<void> {
     if (notes.length > 0) console.log(`\nDifferences of the changed calls:\n${notes.join('\n')}`);
 
     console.log(
-        `\n${files.length} files read. ${changedFiles} files ${write ? 'changed' : 'to change'}, ` +
+        `\n${files.length} files read. ${changed_files} files ${write ? 'changed' : 'to change'}, ` +
             `${changes} changes, ${findings.length} uses to change by hand.`,
     );
-    if (!write && changedFiles > 0) console.log('Run again with --write to write the changes.');
-    if (write && changedFiles > 0) {
+    if (!write && changed_files > 0) console.log('Run again with --write to write the changes.');
+    if (write && changed_files > 0) {
         console.log(
             `\nNext:\n` +
                 `  1. Install 7.x: npm install @placeos/ts-client@7\n` +
                 `  2. Call configure() once, before the first call (README: Log in). For a mock mode,\n` +
-                `     give fetch: mockFetch and missingFields: 'zero' (README: Mock mode).\n` +
+                `     give fetch: mockFetch and missing_fields: 'zero' (README: Mock mode).\n` +
                 `  3. Run the compiler. It shows the changes to the data, such as a field that can be null.\n` +
                 `  4. orThrow from ${COMPAT_MODULE} keeps the 6.x errors. Check the Result in new code.`,
         );

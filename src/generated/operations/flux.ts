@@ -28,7 +28,7 @@ export function query(
 const QUERY = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/v2/query',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({}),
     body: /* @__PURE__ */ string(),
     response: null,

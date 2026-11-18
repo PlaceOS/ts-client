@@ -29,7 +29,7 @@ export function create(
 const CREATE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/staff/v1/surveys',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({}),
     body: Survey,
     response: Survey,
@@ -51,7 +51,7 @@ export function destroy(
 const DESTROY = /* @__PURE__ */ operation({
     method: 'DELETE',
     path: '/api/staff/v1/surveys/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ integer(),
@@ -78,7 +78,7 @@ export function query(
 const QUERY = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/staff/v1/surveys',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({
         /** only return surveys whose zone_id matches this zone id exactly */
         zone_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -105,7 +105,7 @@ export function show(
 const SHOW = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/staff/v1/surveys/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             /** the numeric id of the survey */
@@ -133,7 +133,7 @@ export function update(
 const UPDATE = /* @__PURE__ */ operation({
     method: 'PATCH',
     path: '/api/staff/v1/surveys/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ integer(),

@@ -25,8 +25,8 @@ test('the source has no escape from the type checks', async () => {
             // Comments and strings are text, not code.
             const code = line.replace(/\/\*.*?\*\/|\/\/.*$|^\s*\/?\*.*$|'[^']*'|`[^`]*`/g, '');
             const where = `${file}:${index + 1}: ${line.trim()}`;
-            const allowedAny = ALLOWED_ANY.includes(`${file}: ${line.trim()}`);
-            if (/(?<!\.)\bany\b/.test(code) && !allowedAny) problems.push(`any in ${where}`);
+            const allowed_any = ALLOWED_ANY.includes(`${file}: ${line.trim()}`);
+            if (/(?<!\.)\bany\b/.test(code) && !allowed_any) problems.push(`any in ${where}`);
             if (/@ts-(ignore|expect-error|nocheck)/.test(line)) {
                 problems.push(`ts comment in ${where}`);
             }

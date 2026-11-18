@@ -38,7 +38,7 @@ export function create(
 const CREATE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/modules',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({
         /** add the new module to this control system */
         system_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -63,7 +63,7 @@ export function destroy(
 const DESTROY = /* @__PURE__ */ operation({
     method: 'DELETE',
     path: '/api/engine/v2/modules/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -93,7 +93,7 @@ export function execute(
 const EXECUTE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/modules/{id}/exec/{method}',
-    pathKeys: ['id', 'method'],
+    path_keys: ['id', 'method'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -125,7 +125,7 @@ export function load(
 const LOAD = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/modules/{id}/load',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -157,7 +157,7 @@ export function logs(
 const LOGS = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/modules/{id}/logs',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -191,7 +191,7 @@ export function ping(
 const PING = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/modules/{id}/ping',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -218,7 +218,7 @@ export function query(
 const QUERY = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/modules',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({
         /** only return modules updated before this time (unix epoch) */
         as_of: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
@@ -266,7 +266,7 @@ export function settings(
 const SETTINGS = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/modules/{id}/settings',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -293,7 +293,7 @@ export function show(
 const SHOW = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/modules/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -322,7 +322,7 @@ export function showError(
 const SHOW_ERROR = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/modules/{id}/error',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -349,7 +349,7 @@ export function start(
 const START = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/modules/{id}/start',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -376,7 +376,7 @@ export function state(
 const STATE = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/modules/{id}/state',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -403,7 +403,7 @@ export function stateLookup(
 const STATE_LOOKUP = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/modules/{id}/state/{key}',
-    pathKeys: ['id', 'key'],
+    path_keys: ['id', 'key'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -435,7 +435,7 @@ export function stateValue(
 const STATE_VALUE = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/modules/{id}/state/{key}/value',
-    pathKeys: ['id', 'key'],
+    path_keys: ['id', 'key'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -464,7 +464,7 @@ export function stop(
 const STOP = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/modules/{id}/stop',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -491,7 +491,7 @@ export function update(
 const UPDATE = /* @__PURE__ */ operation({
     method: 'PATCH',
     path: '/api/engine/v2/modules/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),

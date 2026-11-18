@@ -38,7 +38,7 @@ export function branches(
 const BRANCHES = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/repositories/{id}/branches',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -65,7 +65,7 @@ export function commits(
 const COMMITS = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/repositories/{id}/commits',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -98,7 +98,7 @@ export function create(
 const CREATE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/repositories',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({}),
     body: Repository,
     response: Repository,
@@ -120,7 +120,7 @@ export function defaultBranch(
 const DEFAULT_BRANCH = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/repositories/{id}/default_branch',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -147,7 +147,7 @@ export function destroy(
 const DESTROY = /* @__PURE__ */ operation({
     method: 'DELETE',
     path: '/api/engine/v2/repositories/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -178,7 +178,7 @@ export function details(
 const DETAILS = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/repositories/{id}/details',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -209,7 +209,7 @@ export function drivers(
 const DRIVERS = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/repositories/{id}/drivers',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -239,7 +239,7 @@ export function files(
 const FILES = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/repositories/{id}/files',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -272,7 +272,7 @@ export function folders(
 const FOLDERS = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/repositories/{id}/folders',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -305,7 +305,7 @@ export function loadedInterfaces(
 const LOADED_INTERFACES = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/repositories/interfaces',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({}),
     body: null,
     response: /* @__PURE__ */ record(/* @__PURE__ */ string()),
@@ -327,7 +327,7 @@ export function pull(
 const PULL = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/repositories/{id}/pull',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -359,7 +359,7 @@ export function query(
 const QUERY = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/repositories',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({
         /**
          * filters results by the given text: a record matches when any word matches its searchable
@@ -395,7 +395,7 @@ export function releases(
 const RELEASES = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/repositories/{id}/releases',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -422,7 +422,7 @@ export function remoteBranches(
 const REMOTE_BRANCHES = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/repositories/remote_branches',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters(
         {
             /** the git url that represents the repository */
@@ -454,7 +454,7 @@ export function remoteCommits(
 const REMOTE_COMMITS = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/repositories/remote_commits',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters(
         {
             /** the branch to grab commits from */
@@ -490,7 +490,7 @@ export function remoteDefaultBranch(
 const REMOTE_DEFAULT_BRANCH = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/repositories/remote_default_branch',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters(
         {
             /** the git url that represents the repository */
@@ -522,7 +522,7 @@ export function remoteTags(
 const REMOTE_TAGS = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/repositories/remote_tags',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters(
         {
             /** the git url that represents the repository */
@@ -554,7 +554,7 @@ export function show(
 const SHOW = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/repositories/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -581,7 +581,7 @@ export function tags(
 const TAGS = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/repositories/{id}/tags',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -608,7 +608,7 @@ export function update(
 const UPDATE = /* @__PURE__ */ operation({
     method: 'PATCH',
     path: '/api/engine/v2/repositories/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),

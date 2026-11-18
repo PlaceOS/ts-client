@@ -22,13 +22,13 @@ import { createClient } from '../src/core/client.ts';
 import { createRealtime, type BindingState } from '../src/realtime/realtime.ts';
 import { zones } from '../src/generated/operations/index.ts';
 
-// An app gives `baseUrl: ''`. Outside a browser, a URL needs an origin. 6.x mock data often has
-// only some fields. `missingFields: 'zero'` fills the others, as the 6.x classes did.
+// An app gives `base_url: ''`. Outside a browser, a URL needs an origin. 6.x mock data often has
+// only some fields. `missing_fields: 'zero'` fills the others, as the 6.x classes did.
 const client = createClient({
-    baseUrl: 'http://mock.invalid',
+    base_url: 'http://mock.invalid',
     auth: { kind: 'none' },
     fetch: mockFetch,
-    missingFields: 'zero',
+    missing_fields: 'zero',
 });
 const options = { client };
 
@@ -94,14 +94,14 @@ test('a missing endpoint is a 404, and a thrown status is that status', async ()
     expect(refused.ok === false && refused.error.kind === 'http' && refused.error.status).toBe(403);
 });
 
-test('without missingFields: zero, partial mock data is not valid', async () => {
+test('without missing_fields: zero, partial mock data is not valid', async () => {
     registerMockEndpoint({
         path: '/api/engine/v2/zones/:id',
         method: 'GET',
         metadata: { id: 'z' },
     });
     const strict = createClient({
-        baseUrl: 'http://mock.invalid',
+        base_url: 'http://mock.invalid',
         auth: { kind: 'none' },
         fetch: mockFetch,
     });
@@ -115,7 +115,7 @@ test('mockReply and mockPage make the results of test doubles', () => {
     expect(orThrowPage(mockPage({ data: [zone], total: 3 }))).toEqual({
         data: [zone],
         total: 3,
-        nextOffset: null,
+        next_offset: null,
     });
 });
 
@@ -132,7 +132,7 @@ test('a 7.x binding and call use a 6.x mock system', async () => {
         ],
     });
     const realtime = createRealtime({
-        baseUrl: 'http://mock.invalid',
+        base_url: 'http://mock.invalid',
         auth: { kind: 'none' },
         environment: mockRealtimeEnvironment(),
     });

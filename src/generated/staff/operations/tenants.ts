@@ -29,7 +29,7 @@ export function create(
 const CREATE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/staff/v1/tenants',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({}),
     body: TenantResponder,
     response: TenantResponder,
@@ -51,7 +51,7 @@ export function currentEarlyCheckin(
 const CURRENT_EARLY_CHECKIN = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/staff/v1/tenants/current_early_checkin',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({}),
     body: null,
     response: Int64,
@@ -73,7 +73,7 @@ export function currentLimits(
 const CURRENT_LIMITS = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/staff/v1/tenants/current_limits',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({}),
     body: null,
     response: /* @__PURE__ */ record(/* @__PURE__ */ integer('Int32')),
@@ -95,7 +95,7 @@ export function destroy(
 const DESTROY = /* @__PURE__ */ operation({
     method: 'DELETE',
     path: '/api/staff/v1/tenants/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ integer(),
@@ -122,7 +122,7 @@ export function query(
 const QUERY = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/staff/v1/tenants',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({}),
     body: null,
     response: /* @__PURE__ */ array(TenantResponder),
@@ -144,7 +144,7 @@ export function showEarlyCheckin(
 const SHOW_EARLY_CHECKIN = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/staff/v1/tenants/{id}/early_checkin',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ integer(),
@@ -171,7 +171,7 @@ export function showLimits(
 const SHOW_LIMITS = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/staff/v1/tenants/{id}/limits',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ integer(),
@@ -198,7 +198,7 @@ export function update(
 const UPDATE = /* @__PURE__ */ operation({
     method: 'PATCH',
     path: '/api/staff/v1/tenants/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ integer(),
@@ -225,7 +225,7 @@ export function updateEarlyCheckin(
 const UPDATE_EARLY_CHECKIN = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/staff/v1/tenants/{id}/early_checkin',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ integer(),
@@ -252,7 +252,7 @@ export function updateLimits(
 const UPDATE_LIMITS = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/staff/v1/tenants/{id}/limits',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ integer(),

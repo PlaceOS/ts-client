@@ -29,7 +29,7 @@ export function destroy(
 const DESTROY = /* @__PURE__ */ operation({
     method: 'DELETE',
     path: '/api/engine/v2/cluster/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             /** specifies the core node we want to send the request to */
@@ -59,7 +59,7 @@ export function nodes(
 const NODES = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/cluster',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({
         /** return the detailed status of the node including memory and CPU usage? */
         include_status: /* @__PURE__ */ boolean(),
@@ -87,7 +87,7 @@ export function rebalance(
 const REBALANCE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/cluster/rebalance',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({}),
     body: null,
     response: ClusterVersions,
@@ -109,7 +109,7 @@ export function show(
 const SHOW = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/cluster/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             /** specifies the core node we want to send the request to */

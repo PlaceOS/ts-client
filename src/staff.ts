@@ -6,7 +6,7 @@
  * import { configure } from '@placeos/ts-client';
  * import { bookings } from '@placeos/ts-client/staff';
  *
- * configure({ baseUrl: '', auth: session.clientAuth });
+ * configure({ base_url: '', auth: session.client_auth });
  * const result = await bookings.query({ period_start, period_end, type: 'desk' });
  * ```
  *

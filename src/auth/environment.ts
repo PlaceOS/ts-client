@@ -22,7 +22,7 @@ export interface AuthEnvironment {
     /** Keeps the tokens of a trusted application, the nonce and the device settings. */
     readonly storage: KeyValueStore;
     /** Keeps values for one tab only: the PKCE verifier and the parameters of a deep link. */
-    readonly sessionStorage: KeyValueStore;
+    readonly session_storage: KeyValueStore;
     /** The URL of the page now. */
     readonly currentUrl: () => string;
     /** Changes the URL of the page without a navigation, to remove the parameters of a login. */
@@ -41,7 +41,7 @@ export interface AuthEnvironment {
      */
     readonly authorizeInFrame: (
         url: string,
-        timeoutMs: number,
+        timeout_ms: number,
     ) => Promise<Result<unknown, FrameError>>;
     /** Calls `listener` when the application comes back to the foreground. Returns the remover. */
     readonly onForeground: (listener: () => void) => () => void;
@@ -58,11 +58,11 @@ export const FRAME_MESSAGE_TYPE = 'place-os';
  */
 export function browserEnvironment(storage: 'local' | 'session' = 'local'): AuthEnvironment {
     assert(typeof window !== 'undefined', 'browserEnvironment runs in a browser');
-    const sessionStore = webStorageStore(() => window.sessionStorage);
+    const session_store = webStorageStore(() => window.sessionStorage);
     return {
         fetch: (url, init) => globalThis.fetch(url, init),
-        storage: storage === 'session' ? sessionStore : webStorageStore(() => window.localStorage),
-        sessionStorage: sessionStore,
+        storage: storage === 'session' ? session_store : webStorageStore(() => window.localStorage),
+        session_storage: session_store,
         currentUrl: () => window.location.href,
         replaceUrl: (url) => window.history.replaceState(window.history.state, '', url),
         navigate: (url) => window.location.assign(url),
@@ -175,7 +175,7 @@ function trySetItem(store: Storage, key: string, value: string): boolean {
  * Opens a hidden frame on `url` and waits for the message of `oauth-resp.html`. The frame, the
  * listener and the timer are removed on each path.
  */
-function authorizeInFrame(url: string, timeoutMs: number): Promise<Result<unknown, FrameError>> {
+function authorizeInFrame(url: string, timeout_ms: number): Promise<Result<unknown, FrameError>> {
     return new Promise((resolve) => {
         const frame = document.createElement('iframe');
         frame.id = 'place-authorize';
@@ -193,7 +193,7 @@ function authorizeInFrame(url: string, timeoutMs: number): Promise<Result<unknow
             if (event.source !== frame.contentWindow) return;
             finish({ ok: true, value: event.data });
         };
-        const timer = setTimeout(() => finish({ ok: false, error: 'timeout' }), timeoutMs);
+        const timer = setTimeout(() => finish({ ok: false, error: 'timeout' }), timeout_ms);
         frame.addEventListener('error', () => finish({ ok: false, error: 'frame_error' }));
         window.addEventListener('message', onMessage);
         frame.src = url;

@@ -29,7 +29,7 @@ export function query(
 const QUERY = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/staff/v1/place',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({
         /**
          * optional comma separated list of room properties to return (maps to the graph `$select`

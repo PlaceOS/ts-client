@@ -47,7 +47,7 @@ function fakePlatform(transport: 'query' | 'cookie' = 'query') {
             };
         },
         currentUrl: () => 'https://app.test/rooms',
-        tokenTransport: transport,
+        token_transport: transport,
         setCookie: (cookie) => cookies.push(cookie),
         now: () => now,
         setTimer: (milliseconds, callback) => {
@@ -105,7 +105,7 @@ function settled(): Promise<void> {
 function realtime(platform: ReturnType<typeof fakePlatform>, config: Partial<RealtimeConfig> = {}) {
     const auth: Auth = { kind: 'bearer', token: () => 'abc' };
     return createRealtime({
-        baseUrl: 'https://placeos.test',
+        base_url: 'https://placeos.test',
         auth,
         environment: platform.environment,
         ...config,
@@ -118,7 +118,7 @@ const META = { sys: 'sys-1', mod: 'Display', index: 1, name: 'power' };
 describe('connection', () => {
     test('connects on the first binding, with the token in the query', async () => {
         const platform = fakePlatform();
-        const client = realtime(platform, { fixedDevice: true });
+        const client = realtime(platform, { fixed_device: true });
         expect(client.status().kind).toBe('idle');
         client.bind(POWER, () => {});
         await settled();
@@ -130,7 +130,7 @@ describe('connection', () => {
     test('puts the token in a cookie on the socket path, not in the URL', async () => {
         const platform = fakePlatform('cookie');
         const auth: Auth = { kind: 'api_key', key: 'key-1' };
-        realtime(platform, { auth, baseUrl: '' }).start();
+        realtime(platform, { auth, base_url: '' }).start();
         await settled();
         expect(platform.latest().url).toBe('wss://app.test/api/engine/v2/systems/control');
         expect(platform.cookies).toEqual([
@@ -142,7 +142,7 @@ describe('connection', () => {
     test('a socket to a different host gets the token in the query, not a cookie', async () => {
         // A cookie set by the page reaches only the host of the page, app.test.
         const platform = fakePlatform('cookie');
-        realtime(platform, { baseUrl: 'https://placeos.test' }).start();
+        realtime(platform, { base_url: 'https://placeos.test' }).start();
         await settled();
         expect(platform.latest().url).toBe(
             'wss://placeos.test/api/engine/v2/systems/control?bearer_token=abc',
@@ -232,7 +232,7 @@ describe('connection', () => {
     test('gives up after RECONNECT_ATTEMPTS_MAX attempts, and start tries again', async () => {
         const platform = fakePlatform();
         const client = realtime(platform);
-        const result = client.exec(POWER, [true], { timeoutMs: 10 * 60_000 });
+        const result = client.exec(POWER, [true], { timeout_ms: 10 * 60_000 });
         for (let failure = 0; failure < RECONNECT_ATTEMPTS_MAX; failure += 1) {
             await settled();
             platform.latest().handlers.close();
@@ -401,7 +401,7 @@ describe('exec', () => {
         await platform.advance(REQUEST_TIMEOUT_MS);
         expect(await result).toEqual({
             ok: false,
-            error: { kind: 'timeout', timeoutMs: REQUEST_TIMEOUT_MS },
+            error: { kind: 'timeout', timeout_ms: REQUEST_TIMEOUT_MS },
         });
     });
 
@@ -435,7 +435,7 @@ describe('debug', () => {
         const platform = fakePlatform();
         const client = realtime(platform);
         const messages: string[] = [];
-        const release = client.debug({ sys: 'sys-1', moduleId: 'mod-1' }, (log) =>
+        const release = client.debug({ sys: 'sys-1', module_id: 'mod-1' }, (log) =>
             messages.push(`${log.level}: ${log.message}`),
         );
         await platform.open();

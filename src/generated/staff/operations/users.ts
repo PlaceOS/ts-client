@@ -29,7 +29,7 @@ export function current(
 const CURRENT = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/staff/v1/users/current',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({}),
     body: null,
     response: UserAdminResponse,

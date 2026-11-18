@@ -35,13 +35,13 @@ export function orThrow<T>(result: Result<Reply<T>, CallError>): T {
     return result.value.data;
 }
 
-/** The page of a 6.x query function. 6.x also gave `next`. 7.x gives `nextOffset`. */
+/** The page of a 6.x query function. 6.x also gave `next`. 7.x gives `next_offset`. */
 export interface Page<T> {
     readonly data: T;
     /** The `X-Total-Count` header, or `0` without it, as in 6.x. */
     readonly total: number;
     /** Give it as the `offset` of the next call. `null` on the last page. */
-    readonly nextOffset: number | null;
+    readonly next_offset: number | null;
 }
 
 /** The 6.x type of a query function, such as `QueryResponse<PlaceZone>`. */
@@ -51,7 +51,7 @@ export type QueryResponse<T> = Promise<Page<T[]>>;
 export function orThrowPage<T>(result: Result<Reply<T>, CallError>): Page<T> {
     if (!result.ok) throw new CallFailed(result.error);
     const page = pageInfo(result.value.headers);
-    return { data: result.value.data, total: page.total ?? 0, nextOffset: page.nextOffset };
+    return { data: result.value.data, total: page.total ?? 0, next_offset: page.next_offset };
 }
 
 /**
@@ -142,11 +142,11 @@ function describe(error: CallError): string {
         case 'response_invalid':
             return `the response is not valid at ${error.path}: expected ${error.expected}`;
         case 'timeout':
-            return `no response in ${error.timeoutMs} ms`;
+            return `no response in ${error.timeout_ms} ms`;
         case 'network':
             return `network error: ${error.message}`;
         case 'response_too_large':
-            return `the response is larger than ${error.bytesMax} bytes`;
+            return `the response is larger than ${error.bytes_max} bytes`;
         case 'auth_missing':
             return 'no token or credential';
         case 'aborted':

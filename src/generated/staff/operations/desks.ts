@@ -29,7 +29,7 @@ export function features(
 const FEATURES = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/staff/v1/desks/features',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({
         /** only desks in this zone, a building or level */
         zone_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -55,7 +55,7 @@ export function nearColleagues(
 const NEAR_COLLEAGUES = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/staff/v1/desks/near_colleagues',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({
         /** comma separated colleague emails, defaults to your saved contacts */
         emails: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
@@ -86,7 +86,7 @@ export function nearby(
 const NEARBY = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/staff/v1/desks/nearby',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({
         /** the desk (asset id) to search near, required unless email is provided */
         asset_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -127,7 +127,7 @@ export function query(
 const QUERY = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/staff/v1/desks',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters(
         {
             /** the level zone id */

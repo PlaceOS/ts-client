@@ -39,7 +39,7 @@ export function bookings(
 const BOOKINGS = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/staff/v1/guests/{id}/bookings',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             /** looks up a guest using either their id or email */
@@ -71,7 +71,7 @@ export function catering(
 const CATERING = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/staff/v1/guests/{id}/catering',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             /** looks up a guest using either their id or email */
@@ -105,7 +105,7 @@ export function cateringDestroy(
 const CATERING_DESTROY = /* @__PURE__ */ operation({
     method: 'DELETE',
     path: '/api/staff/v1/guests/{id}/catering',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             /** looks up a guest using either their id or email */
@@ -139,7 +139,7 @@ export function cateringMenu(
 const CATERING_MENU = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/staff/v1/guests/{id}/catering/menu',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             /** looks up a guest using either their id or email */
@@ -173,7 +173,7 @@ export function cateringUpdate(
 const CATERING_UPDATE = /* @__PURE__ */ operation({
     method: 'PATCH',
     path: '/api/staff/v1/guests/{id}/catering',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             /** looks up a guest using either their id or email */
@@ -207,7 +207,7 @@ export function create(
 const CREATE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/staff/v1/guests',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({}),
     body: Guest,
     response: Guest,
@@ -229,7 +229,7 @@ export function destroy(
 const DESTROY = /* @__PURE__ */ operation({
     method: 'DELETE',
     path: '/api/staff/v1/guests/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             /** looks up a guest using either their id or email */
@@ -257,7 +257,7 @@ export function meetings(
 const MEETINGS = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/staff/v1/guests/{id}/meetings',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             /** looks up a guest using either their id or email */
@@ -289,7 +289,7 @@ export function query(
 const QUERY = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/staff/v1/guests',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({
         /**
          * space separated search query matching guest name, email etc, ignored when a period is
@@ -336,7 +336,7 @@ export function show(
 const SHOW = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/staff/v1/guests/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             /** looks up a guest using either their id or email */
@@ -364,7 +364,7 @@ export function update(
 const UPDATE = /* @__PURE__ */ operation({
     method: 'PATCH',
     path: '/api/staff/v1/guests/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             /** looks up a guest using either their id or email */

@@ -29,7 +29,7 @@ export function clusterVersion(
 const CLUSTER_VERSION = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/cluster/versions',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({}),
     body: null,
     response: /* @__PURE__ */ array(Version),
@@ -51,7 +51,7 @@ export function platformInfo(
 const PLATFORM_INFO = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/platform',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({}),
     body: null,
     response: RootPlatformInfo,
@@ -73,7 +73,7 @@ export function root(
 const ROOT = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({}),
     body: null,
     response: null,
@@ -95,7 +95,7 @@ export function scopes(
 const SCOPES = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/scopes',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({}),
     body: null,
     response: /* @__PURE__ */ array(/* @__PURE__ */ string()),
@@ -120,7 +120,7 @@ export function signal(
 const SIGNAL = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/signal',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters(
         {
             /** the path we would like to send data to */
@@ -153,7 +153,7 @@ export function sourceResync(
 const SOURCE_RESYNC = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/source/resync',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({
         /** remove everything source publishes from the brokers first */
         clear: /* @__PURE__ */ boolean(),
@@ -178,7 +178,7 @@ export function sourceResyncStatus(
 const SOURCE_RESYNC_STATUS = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/source/resync',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({}),
     body: null,
     response: RootSourceResyncStatus,
@@ -200,7 +200,7 @@ export function version(
 const VERSION = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/version',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({}),
     body: null,
     response: Version,

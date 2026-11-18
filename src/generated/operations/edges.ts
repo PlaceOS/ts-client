@@ -47,7 +47,7 @@ export function cleanupErrors(
 const CLEANUP_ERRORS = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/edges/monitoring/cleanup',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({
         /** Hours of error history to retain */
         hours: /* @__PURE__ */ integer('Int32'),
@@ -72,7 +72,7 @@ export function create(
 const CREATE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/edges',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({}),
     body: EdgeCreateBody,
     response: EdgeKeyResponse,
@@ -94,7 +94,7 @@ export function destroy(
 const DESTROY = /* @__PURE__ */ operation({
     method: 'DELETE',
     path: '/api/engine/v2/edges/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -121,7 +121,7 @@ export function edgeConnections(
 const EDGE_CONNECTIONS = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/edges/{id}/connections',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -148,7 +148,7 @@ export function edgeErrors(
 const EDGE_ERRORS = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/edges/{id}/errors',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -179,7 +179,7 @@ export function edgeHealth(
 const EDGE_HEALTH = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/edges/{id}/health',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -206,7 +206,7 @@ export function edgeModuleStatus(
 const EDGE_MODULE_STATUS = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/edges/{id}/modules/status',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -233,7 +233,7 @@ export function edgesConnections(
 const EDGES_CONNECTIONS = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/edges/connections',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({}),
     body: null,
     response: /* @__PURE__ */ record(ConnectionMetrics),
@@ -255,7 +255,7 @@ export function edgesErrors(
 const EDGES_ERRORS = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/edges/errors',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({
         /** Number of recent errors to return */
         limit: /* @__PURE__ */ integer('Int32'),
@@ -282,7 +282,7 @@ export function edgesHealth(
 const EDGES_HEALTH = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/edges/health',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({}),
     body: null,
     response: /* @__PURE__ */ record(EdgeHealth),
@@ -304,7 +304,7 @@ export function edgesModuleFailures(
 const EDGES_MODULE_FAILURES = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/edges/modules/failures',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({}),
     body: null,
     response: /* @__PURE__ */ record(
@@ -328,7 +328,7 @@ export function edgesStatistics(
 const EDGES_STATISTICS = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/edges/statistics',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({}),
     body: null,
     response: EdgeStatistics,
@@ -350,7 +350,7 @@ export function monitoringSummary(
 const MONITORING_SUMMARY = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/edges/monitoring/summary',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({}),
     body: null,
     response: /* @__PURE__ */ record(/* @__PURE__ */ record(/* @__PURE__ */ json())),
@@ -375,7 +375,7 @@ export function query(
 const QUERY = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/edges',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({
         /**
          * filters results by the given text: a record matches when any word matches its searchable
@@ -411,7 +411,7 @@ export function show(
 const SHOW = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/edges/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -438,7 +438,7 @@ export function token(
 const TOKEN = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/edges/{id}/token',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -470,7 +470,7 @@ export function update(
 const UPDATE = /* @__PURE__ */ operation({
     method: 'PATCH',
     path: '/api/engine/v2/edges/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),

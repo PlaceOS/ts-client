@@ -4,7 +4,7 @@
  * ```ts
  * import { configure, zones } from '@placeos/ts-client';
  *
- * configure({ baseUrl: '', auth: { kind: 'bearer', token: () => token } });
+ * configure({ base_url: '', auth: { kind: 'bearer', token: () => token } });
  * const result = await zones.show({ id: 'zone-1234' });
  * if (result.ok) console.log(result.value.data.name);
  * ```

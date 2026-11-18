@@ -41,7 +41,7 @@ export function bulkFetch(
 const BULK_FETCH = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/metadata/{name}/bulk',
-    pathKeys: ['name'],
+    path_keys: ['name'],
     params: /* @__PURE__ */ parameters(
         {
             /** the name of the metadata key to fetch */
@@ -76,7 +76,7 @@ export function childrenMetadata(
 const CHILDREN_METADATA = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/metadata/{id}/children',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             /** the parent id of the metadata to be returned */
@@ -108,7 +108,7 @@ export function destroy(
 const DESTROY = /* @__PURE__ */ operation({
     method: 'DELETE',
     path: '/api/engine/v2/metadata/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             /** the parent id of the metadata to be returned */
@@ -138,7 +138,7 @@ export function history(
 const HISTORY = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/metadata/{id}/history',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             /** the parent id of the metadata to be returned */
@@ -175,7 +175,7 @@ export function merge(
 const MERGE = /* @__PURE__ */ operation({
     method: 'PATCH',
     path: '/api/engine/v2/metadata/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             /** the parent id of the metadata to be updated */
@@ -205,7 +205,7 @@ export function rename(
 const RENAME = /* @__PURE__ */ operation({
     method: 'PATCH',
     path: '/api/engine/v2/metadata/{id}/name',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             /** the parent id of the metadata to be renamed */
@@ -237,7 +237,7 @@ export function show(
 const SHOW = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/metadata/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             /** the parent id of the metadata to be returned */
@@ -270,7 +270,7 @@ export function update(
 const UPDATE = /* @__PURE__ */ operation({
     method: 'PUT',
     path: '/api/engine/v2/metadata/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             /** the parent id of the metadata to be replaced */

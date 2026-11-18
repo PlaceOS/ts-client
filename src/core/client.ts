@@ -55,20 +55,20 @@ export type Auth =
 
 export interface ClientConfig {
     /** The origin of the server, for example `https://placeos.example.com`. `''` is this origin. */
-    readonly baseUrl: string;
+    readonly base_url: string;
     readonly auth: Auth;
     /** Headers to add to each request. */
     readonly headers?: Readonly<Record<string, string>>;
     /** The default time limit of a request, from the start to the end of the response body. */
-    readonly timeoutMs?: number;
+    readonly timeout_ms?: number;
     /** The maximum size of a response body. A larger body gives a `response_too_large` error. */
-    readonly responseBytesMax?: number;
+    readonly response_bytes_max?: number;
     readonly fetch?: FetchFunction;
     /**
      * `zero` fills a missing required field of a response with its empty value, such as `''`.
      * Only for mock data, such as the mock endpoints of `@placeos/ts-client/compat`.
      */
-    readonly missingFields?: 'error' | 'zero';
+    readonly missing_fields?: 'error' | 'zero';
     /**
      * Answers calls without a request, for tests and a mock mode. `@placeos/ts-client/mock` has
      * one with a typed handler for each endpoint.
@@ -95,13 +95,13 @@ export interface MockAnswer {
 
 /** The settings that each request uses. Make one with `createClient`. */
 export interface Client {
-    readonly baseUrl: string;
+    readonly base_url: string;
     readonly auth: Auth;
     readonly headers: Readonly<Record<string, string>>;
-    readonly timeoutMs: number;
-    readonly responseBytesMax: number;
+    readonly timeout_ms: number;
+    readonly response_bytes_max: number;
     readonly fetch: FetchFunction;
-    readonly missingFields: 'error' | 'zero';
+    readonly missing_fields: 'error' | 'zero';
     readonly mock: CallMock | null;
 }
 
@@ -110,8 +110,8 @@ export interface CallOptions {
     readonly client?: Client;
     /** Cancels the request. */
     readonly signal?: AbortSignal;
-    /** Replaces the `timeoutMs` of the client for this request. */
-    readonly timeoutMs?: number;
+    /** Replaces the `timeout_ms` of the client for this request. */
+    readonly timeout_ms?: number;
 }
 
 /** A request that failed for an expected reason. Each kind is a different action for the caller. */
@@ -120,10 +120,10 @@ export type CallError =
     | { readonly kind: 'auth_missing' }
     /** The `signal` of the caller cancelled the request. */
     | { readonly kind: 'aborted' }
-    | { readonly kind: 'timeout'; readonly timeoutMs: number }
+    | { readonly kind: 'timeout'; readonly timeout_ms: number }
     /** The request did not get a response, for example because the network is down. */
     | { readonly kind: 'network'; readonly message: string }
-    | { readonly kind: 'response_too_large'; readonly bytesMax: number }
+    | { readonly kind: 'response_too_large'; readonly bytes_max: number }
     /** The server sent a status that is not 2xx. `message` is the `error` field of the body. */
     | {
           readonly kind: 'http';
@@ -155,7 +155,7 @@ export interface Operation<
     readonly method: HttpMethod;
     /** The path template, for example `/api/engine/v2/zones/{id}`. */
     readonly path: string;
-    readonly pathKeys: readonly string[];
+    readonly path_keys: readonly string[];
     readonly params: P;
     readonly body: B;
     readonly response: R;
@@ -165,7 +165,7 @@ export interface Operation<
      * The query name of a parameter that has another key in the input. A query parameter named
      * `body` is an example, because `body` of the input is the request body.
      */
-    readonly wireNames?: Readonly<Record<string, string>>;
+    readonly wire_names?: Readonly<Record<string, string>>;
 }
 
 export type AnyOperation = Operation<AnySchema, AnySchema | null, AnySchema | null>;
@@ -205,11 +205,11 @@ export type CallResult<O> = Result<Reply<OperationData<O>>, CallError>;
 
 /** Checks the client settings once, so that each request can trust them. */
 export function createClient(config: ClientConfig): Client {
-    assert(!config.baseUrl.endsWith('/'), 'the baseUrl has no trailing slash');
-    const timeoutMs = config.timeoutMs ?? TIMEOUT_MS_DEFAULT;
-    assertPositiveInteger(timeoutMs, 'timeoutMs');
-    const responseBytesMax = config.responseBytesMax ?? RESPONSE_BYTES_MAX_DEFAULT;
-    assertPositiveInteger(responseBytesMax, 'responseBytesMax');
+    assert(!config.base_url.endsWith('/'), 'the base_url has no trailing slash');
+    const timeout_ms = config.timeout_ms ?? TIMEOUT_MS_DEFAULT;
+    assertPositiveInteger(timeout_ms, 'timeout_ms');
+    const response_bytes_max = config.response_bytes_max ?? RESPONSE_BYTES_MAX_DEFAULT;
+    assertPositiveInteger(response_bytes_max, 'response_bytes_max');
     if (config.auth.kind === 'api_key') {
         assert(config.auth.key.length > 0, 'the API key is not empty');
     }
@@ -217,13 +217,13 @@ export function createClient(config: ClientConfig): Client {
     const fetchFunction: FetchFunction =
         config.fetch ?? ((url, init) => globalThis.fetch(url, init));
     return Object.freeze({
-        baseUrl: config.baseUrl,
+        base_url: config.base_url,
         auth: config.auth,
         headers: Object.freeze({ ...config.headers }),
-        timeoutMs,
-        responseBytesMax,
+        timeout_ms,
+        response_bytes_max,
         fetch: fetchFunction,
-        missingFields: config.missingFields ?? 'error',
+        missing_fields: config.missing_fields ?? 'error',
         mock: config.mock ?? null,
     });
 }
@@ -232,20 +232,20 @@ export function createClient(config: ClientConfig): Client {
  * The client of `configure`, so that an application does not give its client to each call. It is
  * the one module state of the core. The mock registries of `compat` and `mock` are the others.
  */
-let configuredClient: Client | null = null;
+let configured_client: Client | null = null;
 
 /**
  * Makes the client that each call uses when its options have no `client`. Call it once, when the
  * application starts. A second call replaces the client.
  *
  * ```ts
- * configure({ baseUrl: '', auth: { kind: 'bearer', token: () => getToken() } });
+ * configure({ base_url: '', auth: { kind: 'bearer', token: () => getToken() } });
  * const result = await zones.show({ id: 'zone-1234' });
  * ```
  */
 export function configure(config: ClientConfig): Client {
-    configuredClient = createClient(config);
-    return configuredClient;
+    configured_client = createClient(config);
+    return configured_client;
 }
 
 /** Defines an operation. It checks the definition when the module loads. */
@@ -259,10 +259,10 @@ export function operation<
     assert(/^(staff\.)?\w+\.\w+$/.test(definition.name), 'the name is <namespace>.<function>');
     assert(definition.params.node.kind === 'object', 'the params schema is an object');
     // `[^{}]` cannot match a brace, so the match is linear also for a path with many braces.
-    const templateKeys = [...definition.path.matchAll(/\{([^{}]+)\}/g)].map((match) => match[1]);
+    const template_keys = [...definition.path.matchAll(/\{([^{}]+)\}/g)].map((match) => match[1]);
     assert(
-        templateKeys.join() === definition.pathKeys.join(),
-        `the path keys of ${definition.path} are in pathKeys`,
+        template_keys.join() === definition.path_keys.join(),
+        `the path keys of ${definition.path} are in path_keys`,
     );
     return definition;
 }
@@ -280,7 +280,7 @@ export async function call<O extends AnyOperation>(
     options: CallOptions = {},
 ): Promise<CallResult<O>> {
     // Read the client before the first `await`, so the whole request uses one client.
-    const client = options.client ?? configuredClient;
+    const client = options.client ?? configured_client;
     assert(client !== null, 'configure() ran before this call, or the options have a client');
     const result = await send(client, operation, input, options);
     // `send` parsed the data with `operation.response`, which gives `OperationData<O>` its type.
@@ -297,24 +297,24 @@ async function send(
     const { body, ...params } = input;
 
     // Check the data immediately before it leaves the program, as a pair to the response parse.
-    const paramsChecked = checkRequest(operation.params, params);
-    assertValid(paramsChecked, `the parameters of ${operation.method} ${operation.path}`);
-    assert(isRecord(paramsChecked.value), 'the checked parameters are an object');
-    const url = buildUrl(client.baseUrl, operation, paramsChecked.value);
-    let bodyText: string | null = null;
+    const params_checked = checkRequest(operation.params, params);
+    assertValid(params_checked, `the parameters of ${operation.method} ${operation.path}`);
+    assert(isRecord(params_checked.value), 'the checked parameters are an object');
+    const url = buildUrl(client.base_url, operation, params_checked.value);
+    let body_text: string | null = null;
     if (operation.body === null) {
         assert(body === undefined, `${operation.method} ${operation.path} has no body`);
     } else {
-        const bodyChecked = checkRequest(operation.body, body);
-        assertValid(bodyChecked, `the body of ${operation.method} ${operation.path}`);
-        bodyText = JSON.stringify(bodyChecked.value);
+        const body_checked = checkRequest(operation.body, body);
+        assertValid(body_checked, `the body of ${operation.method} ${operation.path}`);
+        body_text = JSON.stringify(body_checked.value);
     }
 
-    const timeoutMs = options.timeoutMs ?? client.timeoutMs;
-    assertPositiveInteger(timeoutMs, 'timeoutMs');
+    const timeout_ms = options.timeout_ms ?? client.timeout_ms;
+    assertPositiveInteger(timeout_ms, 'timeout_ms');
     // One deadline for the call. The credential, a renewal and each fetch share it, so a slow
-    // login cannot make the call take longer than `timeoutMs`.
-    const deadlineMs = Date.now() + timeoutMs;
+    // login cannot make the call take longer than `timeout_ms`.
+    const deadline_ms = Date.now() + timeout_ms;
     const signal = options.signal;
 
     // A mock gets the input after the checks, so a test finds the same errors as the server. Its
@@ -324,36 +324,36 @@ async function send(
     if (mock !== null) {
         const answered = await waitWithin(
             () => Promise.resolve(mock({ name: operation.name, input })),
-            deadlineMs,
+            deadline_ms,
             signal,
         );
-        if (!answered.ok) return limitError(answered.error, timeoutMs);
+        if (!answered.ok) return limitError(answered.error, timeout_ms);
         // `null`: the mock does not answer this call, so the request goes to the server.
         if (answered.value !== null) {
-            return mockResult(operation, answered.value, client.responseBytesMax);
+            return mockResult(operation, answered.value, client.response_bytes_max);
         }
     }
     // Each attempt gets the credential again, because a `rejected` auth can renew it.
     let response: Fetched | null = null;
     for (let attempt = 0; attempt < AUTH_ATTEMPTS_MAX; attempt += 1) {
         const auth = client.auth;
-        const credential = await waitWithin(() => resolveCredential(auth), deadlineMs, signal);
-        if (!credential.ok) return limitError(credential.error, timeoutMs);
+        const credential = await waitWithin(() => resolveCredential(auth), deadline_ms, signal);
+        if (!credential.ok) return limitError(credential.error, timeout_ms);
         if (credential.value === null) return { ok: false, error: { kind: 'auth_missing' } };
         const headers = new Headers(client.headers);
         headers.set('Accept', 'application/json');
-        if (bodyText !== null) headers.set('Content-Type', 'application/json');
+        if (body_text !== null) headers.set('Content-Type', 'application/json');
         setCredentialHeader(headers, credential.value);
-        const init = { method: operation.method, headers, body: bodyText };
-        const remainingMs = deadlineMs - Date.now();
-        if (remainingMs <= 0) return { ok: false, error: { kind: 'timeout', timeoutMs } };
+        const init = { method: operation.method, headers, body: body_text };
+        const remaining_ms = deadline_ms - Date.now();
+        if (remaining_ms <= 0) return { ok: false, error: { kind: 'timeout', timeout_ms } };
         const limits = {
-            timeoutMs: remainingMs,
-            bytesMax: client.responseBytesMax,
+            timeout_ms: remaining_ms,
+            bytes_max: client.response_bytes_max,
             ...(signal === undefined ? {} : { signal }),
         };
         const fetched = await fetchBody(client.fetch, url, init, limits);
-        if (!fetched.ok) return limitError(fetched.error, timeoutMs);
+        if (!fetched.ok) return limitError(fetched.error, timeout_ms);
         response = fetched.value;
 
         const status = response.status;
@@ -362,26 +362,26 @@ async function send(
         if (attempt + 1 >= AUTH_ATTEMPTS_MAX) break;
         const rejected = client.auth.rejected;
         const used = credential.value;
-        const renewed = await waitWithin(() => rejected(status, used), deadlineMs, signal);
-        if (!renewed.ok) return limitError(renewed.error, timeoutMs);
+        const renewed = await waitWithin(() => rejected(status, used), deadline_ms, signal);
+        if (!renewed.ok) return limitError(renewed.error, timeout_ms);
         if (!renewed.value) break;
     }
     assert(response !== null, 'the request was sent');
 
     if (!response.ok) {
         const parsed = decodeJson(response.bytes);
-        let errorBody: JsonValue | null = null;
+        let error_body: JsonValue | null = null;
         if (parsed.ok) {
             const body = parseResponse(json(), parsed.value);
-            if (body.ok) errorBody = body.value;
+            if (body.ok) error_body = body.value;
         }
         let message: string | null = null;
-        if (isRecord(errorBody) && typeof errorBody['error'] === 'string') {
-            message = errorBody['error'];
+        if (isRecord(error_body) && typeof error_body['error'] === 'string') {
+            message = error_body['error'];
         }
         return {
             ok: false,
-            error: { kind: 'http', status: response.status, message, body: errorBody },
+            error: { kind: 'http', status: response.status, message, body: error_body },
         };
     }
 
@@ -395,7 +395,7 @@ async function send(
         };
     }
     const data = parseResponse(operation.response, parsed.value, {
-        missingFields: client.missingFields,
+        missing_fields: client.missing_fields,
     });
     if (!data.ok) {
         return {
@@ -410,7 +410,7 @@ async function send(
 function mockResult(
     operation: AnyOperation,
     answer: MockAnswer,
-    bytesMax: number,
+    bytes_max: number,
 ): Result<Reply<unknown>, CallError> {
     const reply = { status: answer.status, headers: answer.headers };
     const bytes =
@@ -421,20 +421,20 @@ function mockResult(
                       ? answer.data
                       : (JSON.stringify(answer.data) ?? 'null'),
               );
-    if (bytes.length > bytesMax) {
-        return { ok: false, error: { kind: 'response_too_large', bytesMax } };
+    if (bytes.length > bytes_max) {
+        return { ok: false, error: { kind: 'response_too_large', bytes_max } };
     }
     if (answer.status < 200 || answer.status > 299) {
         const parsed = decodeJson(bytes);
         const body = parsed.ok ? parseResponse(json(), parsed.value) : null;
-        const errorBody = body !== null && body.ok ? body.value : null;
+        const error_body = body !== null && body.ok ? body.value : null;
         const message =
-            isRecord(errorBody) && typeof errorBody['error'] === 'string'
-                ? errorBody['error']
+            isRecord(error_body) && typeof error_body['error'] === 'string'
+                ? error_body['error']
                 : null;
         return {
             ok: false,
-            error: { kind: 'http', status: answer.status, message, body: errorBody },
+            error: { kind: 'http', status: answer.status, message, body: error_body },
         };
     }
     if (operation.response === null) return { ok: true, value: { ...reply, data: bytes } };
@@ -445,7 +445,7 @@ function mockResult(
             error: { kind: 'response_invalid', status: reply.status, path: '$', expected: 'JSON' },
         };
     }
-    const data = parseResponse(operation.response, parsed.value, { missingFields: 'zero' });
+    const data = parseResponse(operation.response, parsed.value, { missing_fields: 'zero' });
     if (!data.ok) {
         return {
             ok: false,
@@ -462,12 +462,12 @@ function mockResult(
  * commas.
  */
 function buildUrl(
-    baseUrl: string,
+    base_url: string,
     operation: AnyOperation,
     params: Readonly<Record<string, unknown>>,
 ): string {
     let path = operation.path;
-    for (const key of operation.pathKeys) {
+    for (const key of operation.path_keys) {
         const text = queryScalar(params[key]);
         // An empty segment sends the request to a different endpoint, such as the collection.
         assert(text.length > 0, `the path parameter "${key}" is not empty`);
@@ -478,10 +478,10 @@ function buildUrl(
     assert(node.kind === 'object', 'the params schema is an object');
     const query = new URLSearchParams();
     for (const field of node.fields) {
-        if (operation.pathKeys.includes(field.key)) continue;
+        if (operation.path_keys.includes(field.key)) continue;
         const value = params[field.key];
         if (value === undefined || value === null) continue;
-        const name = operation.wireNames?.[field.key] ?? field.key;
+        const name = operation.wire_names?.[field.key] ?? field.key;
         if (Array.isArray(value)) {
             const items: readonly unknown[] = value;
             query.append(name, items.map(queryScalar).join(','));
@@ -489,9 +489,9 @@ function buildUrl(
             query.append(name, queryScalar(value));
         }
     }
-    const queryText = query.toString();
-    if (queryText.length === 0) return `${baseUrl}${path}`;
-    return `${baseUrl}${path}?${queryText}`;
+    const query_text = query.toString();
+    if (query_text.length === 0) return `${base_url}${path}`;
+    return `${base_url}${path}?${query_text}`;
 }
 
 function queryScalar(value: unknown): string {
@@ -518,8 +518,8 @@ export type FetchError = Extract<
 >;
 
 export interface FetchLimits {
-    readonly timeoutMs: number;
-    readonly bytesMax: number;
+    readonly timeout_ms: number;
+    readonly bytes_max: number;
     readonly signal?: AbortSignal;
 }
 
@@ -535,30 +535,30 @@ export async function fetchBody(
     init: Omit<RequestInit, 'signal'>,
     limits: FetchLimits,
 ): Promise<Result<Fetched, FetchError>> {
-    assertPositiveInteger(limits.timeoutMs, 'timeoutMs');
-    assertPositiveInteger(limits.bytesMax, 'bytesMax');
+    assertPositiveInteger(limits.timeout_ms, 'timeout_ms');
+    assertPositiveInteger(limits.bytes_max, 'bytes_max');
     // The caller can cancel while an earlier step waits, such as the credential of the auth.
     if (isAborted(limits.signal)) return { ok: false, error: { kind: 'aborted' } };
-    const timeoutSignal = AbortSignal.timeout(limits.timeoutMs);
+    const timeout_signal = AbortSignal.timeout(limits.timeout_ms);
     const signal =
         limits.signal === undefined
-            ? timeoutSignal
-            : AbortSignal.any([limits.signal, timeoutSignal]);
+            ? timeout_signal
+            : AbortSignal.any([limits.signal, timeout_signal]);
     let response: Response;
     let bytes: Result<Uint8Array, 'too_large'>;
     try {
         response = await fetchFunction(url, { ...init, signal });
-        bytes = await readBody(response, limits.bytesMax);
+        bytes = await readBody(response, limits.bytes_max);
     } catch (error) {
         if (isAborted(limits.signal)) return { ok: false, error: { kind: 'aborted' } };
-        if (timeoutSignal.aborted) {
-            return { ok: false, error: { kind: 'timeout', timeoutMs: limits.timeoutMs } };
+        if (timeout_signal.aborted) {
+            return { ok: false, error: { kind: 'timeout', timeout_ms: limits.timeout_ms } };
         }
         const message = error instanceof Error ? error.message : String(error);
         return { ok: false, error: { kind: 'network', message } };
     }
     if (!bytes.ok) {
-        return { ok: false, error: { kind: 'response_too_large', bytesMax: limits.bytesMax } };
+        return { ok: false, error: { kind: 'response_too_large', bytes_max: limits.bytes_max } };
     }
     return {
         ok: true,
@@ -572,7 +572,7 @@ export async function fetchBody(
 }
 
 /**
- * Starts `work`, and waits for it until `deadlineMs` or until `signal` cancels. The work itself
+ * Starts `work`, and waits for it until `deadline_ms` or until `signal` cancels. The work itself
  * goes on, because it can be shared, such as one renewal of the auth for many calls.
  *
  * It starts the work only after the checks, so a cancelled call starts no work, and no promise is
@@ -580,17 +580,17 @@ export async function fetchBody(
  */
 async function waitWithin<T>(
     work: () => Promise<T>,
-    deadlineMs: number,
+    deadline_ms: number,
     signal: AbortSignal | undefined,
 ): Promise<Result<T, 'aborted' | 'timeout'>> {
     if (isAborted(signal)) return { ok: false, error: 'aborted' };
-    const remainingMs = deadlineMs - Date.now();
-    if (remainingMs <= 0) return { ok: false, error: 'timeout' };
+    const remaining_ms = deadline_ms - Date.now();
+    if (remaining_ms <= 0) return { ok: false, error: 'timeout' };
     const promise = work();
     let timer: ReturnType<typeof setTimeout> | undefined;
     let onAbort: (() => void) | undefined;
     const stopped = new Promise<Result<T, 'aborted' | 'timeout'>>((resolve) => {
-        timer = setTimeout(() => resolve({ ok: false, error: 'timeout' }), remainingMs);
+        timer = setTimeout(() => resolve({ ok: false, error: 'timeout' }), remaining_ms);
         onAbort = () => resolve({ ok: false, error: 'aborted' });
         signal?.addEventListener('abort', onAbort, { once: true });
         // `work` can abort the signal before the listener exists, such as a mock of a test.
@@ -611,11 +611,11 @@ async function waitWithin<T>(
 /** A limit of the whole call. The error gives the time limit of the call, not of one step. */
 function limitError(
     error: FetchError | 'aborted' | 'timeout',
-    timeoutMs: number,
+    timeout_ms: number,
 ): { readonly ok: false; readonly error: FetchError } {
     if (error === 'aborted') return { ok: false, error: { kind: 'aborted' } };
-    if (error === 'timeout') return { ok: false, error: { kind: 'timeout', timeoutMs } };
-    if (error.kind === 'timeout') return { ok: false, error: { kind: 'timeout', timeoutMs } };
+    if (error === 'timeout') return { ok: false, error: { kind: 'timeout', timeout_ms } };
+    if (error.kind === 'timeout') return { ok: false, error: { kind: 'timeout', timeout_ms } };
     return { ok: false, error };
 }
 
@@ -660,15 +660,15 @@ function setCredentialHeader(headers: Headers, credential: Credential): void {
     }
 }
 
-/** Reads the body, but stops at `bytesMax` bytes. The caller converts a throw to a value. */
+/** Reads the body, but stops at `bytes_max` bytes. The caller converts a throw to a value. */
 async function readBody(
     response: Response,
-    bytesMax: number,
+    bytes_max: number,
 ): Promise<Result<Uint8Array, 'too_large'>> {
-    const lengthText = response.headers.get('content-length');
-    if (lengthText !== null) {
-        const length = Number(lengthText);
-        if (Number.isSafeInteger(length) && length > bytesMax) {
+    const length_text = response.headers.get('content-length');
+    if (length_text !== null) {
+        const length = Number(length_text);
+        if (Number.isSafeInteger(length) && length > bytes_max) {
             await response.body?.cancel();
             return { ok: false, error: 'too_large' };
         }
@@ -691,7 +691,7 @@ async function readBody(
             return { ok: true, value: bytes };
         }
         size += chunk.value.byteLength;
-        if (size > bytesMax) {
+        if (size > bytes_max) {
             await reader.cancel();
             return { ok: false, error: 'too_large' };
         }

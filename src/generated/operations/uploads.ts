@@ -40,7 +40,7 @@ export function create(
 const CREATE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/uploads',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({}),
     body: UploadsUploadInfo,
     response: /* @__PURE__ */ union([
@@ -97,7 +97,7 @@ export function destroy(
 const DESTROY = /* @__PURE__ */ operation({
     method: 'DELETE',
     path: '/api/engine/v2/uploads/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             /** upload id of the upload */
@@ -129,7 +129,7 @@ export function downloadProxyFileContents(
 const DOWNLOAD_PROXY_FILE_CONTENTS = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/uploads/{id}/download',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             /** upload id of the upload */
@@ -161,7 +161,7 @@ export function downloadSimpleRoute(
 const DOWNLOAD_SIMPLE_ROUTE = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/uploads/{id}/download/{api_key}/{inline}/{file_name}',
-    pathKeys: ['id', 'api_key', 'inline', 'file_name'],
+    path_keys: ['id', 'api_key', 'inline', 'file_name'],
     params: /* @__PURE__ */ parameters(
         {
             /** upload id of the upload */
@@ -196,7 +196,7 @@ export function downloadSimpleRouteWithoutFileName(
 const DOWNLOAD_SIMPLE_ROUTE_WITHOUT_FILE_NAME = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/uploads/{id}/download/{api_key}/{inline}',
-    pathKeys: ['id', 'api_key', 'inline'],
+    path_keys: ['id', 'api_key', 'inline'],
     params: /* @__PURE__ */ parameters(
         {
             /** upload id of the upload */
@@ -231,7 +231,7 @@ export function edit(
 const EDIT = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/uploads/{id}/edit',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             /** upload id of the upload */
@@ -278,7 +278,7 @@ export function finished(
 const FINISHED = /* @__PURE__ */ operation({
     method: 'PUT',
     path: '/api/engine/v2/uploads/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             /** upload id of the upload */
@@ -311,7 +311,7 @@ export function getLink(
 const GET_LINK = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/uploads/{id}/url',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             /** upload id of the upload */
@@ -341,7 +341,7 @@ export function query(
 const QUERY = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/uploads',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({
         /** filters results to returns ones where file_name contains this search string */
         file_search: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -389,7 +389,7 @@ export function screenshot(
 const SCREENSHOT = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/uploads/screenshot',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({}),
     body: UploadsScreenshotInfo,
     response: Upload,
@@ -411,7 +411,7 @@ export function storageName(
 const STORAGE_NAME = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/uploads/new',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters(
         {
             /** Name of file which will be uploaded to cloud storage */
@@ -448,7 +448,7 @@ export function update(
 const UPDATE = /* @__PURE__ */ operation({
     method: 'PATCH',
     path: '/api/engine/v2/uploads/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             /** upload id of the upload */

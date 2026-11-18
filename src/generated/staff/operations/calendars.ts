@@ -37,7 +37,7 @@ export function availability(
 const AVAILABILITY = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/staff/v1/calendars/availability',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters(
         {
             /** search period start as a unix epoch in seconds */
@@ -89,7 +89,7 @@ export function checkPermission(
 const CHECK_PERMISSION = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/staff/v1/calendars/{user_email}/permission',
-    pathKeys: ['user_email'],
+    path_keys: ['user_email'],
     params: /* @__PURE__ */ parameters(
         {
             /** email or UPN of the calendar owner */
@@ -122,7 +122,7 @@ export function freeBusy(
 const FREE_BUSY = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/staff/v1/calendars/free_busy',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters(
         {
             /** search period start as a unix epoch in seconds */
@@ -177,7 +177,7 @@ export function query(
 const QUERY = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/staff/v1/calendars',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({}),
     body: null,
     response: /* @__PURE__ */ array(PlaceCalendarCalendar),

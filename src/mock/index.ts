@@ -7,7 +7,7 @@
  * import { configure, zones } from '@placeos/ts-client';
  * import { endpointMocks, mockEndpoint, respond } from '@placeos/ts-client/mock';
  *
- * configure({ baseUrl: '', auth: { kind: 'none' }, mock: endpointMocks });
+ * configure({ base_url: '', auth: { kind: 'none' }, mock: endpointMocks });
  * mockEndpoint('zones.show', (input) => ({ id: input.id, name: 'Level 1' }));
  * mockEndpoint('zones.query', (input) => respond([{ id: 'zone-1' }], { total: 1 }));
  *
@@ -97,7 +97,7 @@ type MockResult<K extends EndpointName> =
 
 export interface MockOptions {
     /** Milliseconds before the answer, to show the loading state of an app. The default is 0. */
-    readonly delayMs?: number;
+    readonly delay_ms?: number;
 }
 
 /** More mocks is a leak, such as a test that adds mocks in a loop and never removes them. */
@@ -105,7 +105,7 @@ export const ENDPOINT_MOCKS_MAX = 10_000;
 
 interface Entry {
     readonly handler: (input: Readonly<Record<string, unknown>>) => unknown;
-    readonly delayMs: number;
+    readonly delay_ms: number;
 }
 
 const mocks = new Map<string, Entry>();
@@ -120,12 +120,12 @@ export function mockEndpoint<K extends EndpointName>(
     options: MockOptions = {},
 ): () => void {
     assert(mocks.has(name) || mocks.size < ENDPOINT_MOCKS_MAX, 'fewer endpoint mocks');
-    const delayMs = options.delayMs ?? 0;
-    assert(Number.isSafeInteger(delayMs) && delayMs >= 0, 'delayMs is a whole number');
+    const delay_ms = options.delay_ms ?? 0;
+    assert(Number.isSafeInteger(delay_ms) && delay_ms >= 0, 'delay_ms is a whole number');
     // The client gives the input of this endpoint, which the type of `handler` describes.
     const entry: Entry = {
         handler: (input) => Reflect.apply(handler, undefined, [input]),
-        delayMs,
+        delay_ms,
     };
     mocks.set(name, entry);
     return () => {
@@ -167,7 +167,7 @@ export const endpointMocks: CallMock = ({ name, input }) => {
 };
 
 async function answer(entry: Entry, input: Readonly<Record<string, unknown>>): Promise<MockAnswer> {
-    if (entry.delayMs > 0) await new Promise((resolve) => setTimeout(resolve, entry.delayMs));
+    if (entry.delay_ms > 0) await new Promise((resolve) => setTimeout(resolve, entry.delay_ms));
     let value: unknown;
     try {
         value = await entry.handler(input);

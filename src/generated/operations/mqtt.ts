@@ -33,7 +33,7 @@ export function mqttAccess(
 const MQTT_ACCESS = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/mqtt/access',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters(
         {
             topic: /* @__PURE__ */ string(),
@@ -66,7 +66,7 @@ export function mqttUser(
 const MQTT_USER = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/mqtt/user',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({}),
     body: null,
     response: null,

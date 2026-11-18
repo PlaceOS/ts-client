@@ -102,12 +102,12 @@ interface Edit {
 /** Rewrites the 6.x calls of one file. The text is the same when the file does not import 6.x. */
 export function migrateSource(
     ts: typeof TS,
-    fileName: string,
+    file_name: string,
     text: string,
     tables: MigrateTables,
 ): MigrateResult {
-    const kind = /\.[cm]?tsx$/.test(fileName) ? ts.ScriptKind.TSX : ts.ScriptKind.TS;
-    const source = ts.createSourceFile(fileName, text, ts.ScriptTarget.Latest, true, kind);
+    const kind = /\.[cm]?tsx$/.test(file_name) ? ts.ScriptKind.TSX : ts.ScriptKind.TS;
+    const source = ts.createSourceFile(file_name, text, ts.ScriptTarget.Latest, true, kind);
 
     const imports = readImports(ts, source);
     if (imports.declarations.length === 0) {
@@ -129,13 +129,13 @@ export function migrateSource(
     /** The uses of each local name of a named import, and how many the tool changed. */
     const uses = new Map<string, { total: number; changed: number }>();
     /** The 7.x namespaces that the new imports give, by module and name, with the local name. */
-    const namespaceNames = new Map<
+    const namespace_names = new Map<
         string,
         { module: 'staff' | null; name: string; local: string }
     >();
     /** The 7.x types that the new imports give, by local name. */
-    const typeNames = new Map<string, { module: 'staff' | null; name: string }>();
-    const compatNames = new Set<string>();
+    const type_names = new Map<string, { module: 'staff' | null; name: string }>();
+    const compat_names = new Set<string>();
     /** The local names of the 6.x imports that move to the compat module. */
     const moved = new Set<string>();
     for (const [local, imported] of imports.named) {
@@ -143,13 +143,13 @@ export function migrateSource(
         if (kind === undefined) continue;
         moved.add(local);
         const name = local === imported ? imported : `${imported} as ${local}`;
-        compatNames.add(kind === 'type' ? `type ${name}` : name);
+        compat_names.add(kind === 'type' ? `type ${name}` : name);
     }
     let changes = 0;
     let deep = false;
 
     // The helpers that a file already imports from the compat module, by name.
-    const compatImported = new Map<string, string>();
+    const compat_imported = new Map<string, string>();
     for (const statement of source.statements) {
         if (!ts.isImportDeclaration(statement)) continue;
         const specifier = statement.moduleSpecifier;
@@ -160,10 +160,10 @@ export function migrateSource(
         if (bindings === undefined || !ts.isNamedImports(bindings)) continue;
         for (const element of bindings.elements) {
             if (element.isTypeOnly) continue;
-            compatImported.set((element.propertyName ?? element.name).text, element.name.text);
+            compat_imported.set((element.propertyName ?? element.name).text, element.name.text);
         }
     }
-    const helperLocals = new Map<string, string>();
+    const helper_locals = new Map<string, string>();
 
     /**
      * The local name of a compat helper, such as `orThrow`: the name of an import that the file
@@ -173,28 +173,28 @@ export function migrateSource(
         name: string,
         options: { readonly register: boolean } = { register: true },
     ): string {
-        const imported = compatImported.get(name);
+        const imported = compat_imported.get(name);
         if (imported !== undefined) return imported;
-        let local = helperLocals.get(name);
+        let local = helper_locals.get(name);
         if (local === undefined) {
             local = localName(name);
-            helperLocals.set(name, local);
+            helper_locals.set(name, local);
         }
-        if (options.register) compatNames.add(local === name ? name : `${name} as ${local}`);
+        if (options.register) compat_names.add(local === name ? name : `${name} as ${local}`);
         return local;
     }
 
     /** The name of `vi.hoisted` for `fromV1Mock`, when the file also imports `fromV1Mock`. */
-    let hoistedLocal: string | null = null;
+    let hoisted_local: string | null = null;
 
     /**
      * The local name of `fromV1Mock`. A `vi.mock` factory runs before the imports, so it uses the
      * name of `vi.hoisted`. That name is not the name of an import that the file has.
      */
-    function fromV1MockLocal(options: { readonly inFactory: boolean }): string {
-        if (options.inFactory && compatImported.has('fromV1Mock')) {
-            hoistedLocal ??= localName('fromV1Mock');
-            return hoistedLocal;
+    function fromV1MockLocal(options: { readonly in_factory: boolean }): string {
+        if (options.in_factory && compat_imported.has('fromV1Mock')) {
+            hoisted_local ??= localName('fromV1Mock');
+            return hoisted_local;
         }
         return helperLocal('fromV1Mock', { register: false });
     }
@@ -221,15 +221,15 @@ export function migrateSource(
 
     function namespaceLocal(namespace: string, module: 'staff' | null = null): string {
         const key = `${module ?? ''}|${namespace}`;
-        const known = namespaceNames.get(key);
+        const known = namespace_names.get(key);
         if (known !== undefined) return known.local;
         // A staff namespace, such as `assets`, can have the name of a REST API namespace.
-        const staffName = `staff${namespace.charAt(0).toUpperCase()}${namespace.slice(1)}`;
+        const staff_name = `staff${namespace.charAt(0).toUpperCase()}${namespace.slice(1)}`;
         const local =
-            module === 'staff' && taken.has(namespace) && !taken.has(staffName)
-                ? localName(staffName)
+            module === 'staff' && taken.has(namespace) && !taken.has(staff_name)
+                ? localName(staff_name)
                 : localName(namespace);
-        namespaceNames.set(key, { module, name: namespace, local });
+        namespace_names.set(key, { module, name: namespace, local });
         return local;
     }
 
@@ -242,24 +242,24 @@ export function migrateSource(
     }
 
     /** The local name of a compat export that a namespace import used, such as `PlaceDriverRole`. */
-    const compatLocals = new Map<string, string>();
+    const compat_locals = new Map<string, string>();
     function compatLocal(name: string): string {
-        const known = compatLocals.get(name);
+        const known = compat_locals.get(name);
         if (known !== undefined) return known;
         const local = localName(name);
-        compatLocals.set(name, local);
+        compat_locals.set(name, local);
         const specifier = local === name ? name : `${name} as ${local}`;
-        compatNames.add(tables.compat[name] === 'type' ? `type ${specifier}` : specifier);
+        compat_names.add(tables.compat[name] === 'type' ? `type ${specifier}` : specifier);
         return local;
     }
 
     function typeLocal(type: TypeMapping): string {
         const module = type.module ?? null;
-        for (const [local, known] of typeNames) {
+        for (const [local, known] of type_names) {
             if (known.name === type.name && known.module === module) return local;
         }
         const local = localName(type.name);
-        typeNames.set(local, { module, name: type.name });
+        type_names.set(local, { module, name: type.name });
         return local;
     }
 
@@ -300,7 +300,7 @@ export function migrateSource(
         const pick =
             rendered.pick === null
                 ? ''
-                : `.then((${rendered.pickParameter}) => ${rendered.pickParameter}[${rendered.pick}])`;
+                : `.then((${rendered.pick_parameter}) => ${rendered.pick_parameter}[${rendered.pick}])`;
         replace(
             call,
             `${namespace}.${mapping.operation}(${rendered.input}).then(${helper})${pick}`,
@@ -313,9 +313,9 @@ export function migrateSource(
     /** The test doubles that the tool changed, by the call that holds the 7.x function. */
     const doubles = new Map<TS.Node, { name: string; mapping: CallMapping }>();
     /** A spec file. There a reference to a 6.x function that is not a call is a test double. */
-    const testFile = /\.(spec|test)\.[cm]?[jt]sx?$/.test(fileName);
+    const test_file = /\.(spec|test)\.[cm]?[jt]sx?$/.test(file_name);
     /** `true` when a call on a test double uses `fromV1Mock`, out of a `vi.mock` factory. */
-    let importsFromV1Mock = false;
+    let imports_from_v1_mock = false;
 
     /**
      * Changes the function of a test double, such as `vi.mocked(showZone)` to
@@ -389,11 +389,11 @@ export function migrateSource(
             const v1 = method.startsWith('mockImplementation')
                 ? textOf(value)
                 : `() => (${textOf(value)})`;
-            importsFromV1Mock = true;
-            const fromV1Mock = fromV1MockLocal({ inFactory: false });
+            imports_from_v1_mock = true;
+            const from_v1_mock = fromV1MockLocal({ in_factory: false });
             replace(
                 call,
-                `${textOf(callee.expression)}.${implementation}(${fromV1Mock}(${v1}, ${fromV1MockArgs(mapping)}))`,
+                `${textOf(callee.expression)}.${implementation}(${from_v1_mock}(${v1}, ${fromV1MockArgs(mapping)}))`,
             );
             return;
         }
@@ -409,7 +409,7 @@ export function migrateSource(
     }
 
     /** `true` when a `vi.mock` factory uses `fromV1Mock`. The file then imports it. */
-    let usesFromV1Mock = false;
+    let uses_from_v1_mock = false;
 
     /**
      * Changes the 6.x functions of a `vi.mock` factory to 7.x namespaces. `fromV1Mock` keeps the
@@ -494,7 +494,7 @@ export function migrateSource(
             changes += 1;
         }
         if (groups.size === 0) return;
-        usesFromV1Mock = true;
+        uses_from_v1_mock = true;
         for (const [namespace, entries] of groups) {
             const base = spread === null ? '' : `...${spread}.${namespace}, `;
             kept.push(`${namespace}: { ${base}${entries.join(', ')} }`);
@@ -505,7 +505,7 @@ export function migrateSource(
     /** The 7.x value of one 6.x function of a factory. `null` is a shorthand property. */
     function mockValue(value: TS.Expression | null, name: string, mapping: CallMapping): string {
         const extra = fromV1MockArgs(mapping);
-        const fromV1Mock = fromV1MockLocal({ inFactory: true });
+        const from_v1_mock = fromV1MockLocal({ in_factory: true });
         if (
             value !== null &&
             ts.isCallExpression(value) &&
@@ -513,11 +513,11 @@ export function migrateSource(
         ) {
             const [implementation] = value.arguments;
             const text = implementation === undefined ? 'undefined' : textOf(implementation);
-            return `${textOf(value.expression)}(${fromV1Mock}(${text}, ${extra}))`;
+            return `${textOf(value.expression)}(${from_v1_mock}(${text}, ${extra}))`;
         }
         // Another value, such as `vi.fn().mockResolvedValue(zone)` or a hoisted mock, is the 6.x
         // implementation of a new mock, so the 7.x function is still a mock that tests can change.
-        return `vi.fn(${fromV1Mock}(${value === null ? name : textOf(value)}, ${extra}))`;
+        return `vi.fn(${from_v1_mock}(${value === null ? name : textOf(value)}, ${extra}))`;
     }
 
     /** `vi.mocked(f)`, `jest.mocked(f)` or `expect(f)`, with `f` as the first argument. */
@@ -526,12 +526,12 @@ export function migrateSource(
         if (!ts.isCallExpression(parent) || parent.arguments[0] !== node) return null;
         const callee = parent.expression;
         if (ts.isIdentifier(callee) && callee.text === 'expect') return parent;
-        const isMocked =
+        const is_mocked =
             ts.isPropertyAccessExpression(callee) &&
             ts.isIdentifier(callee.expression) &&
             TEST_GLOBALS.has(callee.expression.text) &&
             callee.name.text === 'mocked';
-        return isMocked ? parent : null;
+        return is_mocked ? parent : null;
     }
 
     function visit(node: TS.Node, depth: number): void {
@@ -615,31 +615,31 @@ export function migrateSource(
         }
 
         if (ts.isTypeReferenceNode(node)) {
-            const typeName = node.typeName;
-            if (ts.isIdentifier(typeName)) {
-                const imported = imports.named.get(typeName.text);
-                if (imported === undefined || moved.has(typeName.text)) return;
-                const v2Name = tables.types[imported];
-                if (v2Name !== undefined) {
-                    replace(typeName, typeLocal(v2Name));
-                    countUse(typeName.text, true);
+            const type_name = node.typeName;
+            if (ts.isIdentifier(type_name)) {
+                const imported = imports.named.get(type_name.text);
+                if (imported === undefined || moved.has(type_name.text)) return;
+                const v2_name = tables.types[imported];
+                if (v2_name !== undefined) {
+                    replace(type_name, typeLocal(v2_name));
+                    countUse(type_name.text, true);
                     changes += 1;
                 }
                 return;
             }
-            const left = typeName.left;
-            const right = typeName.right.text;
+            const left = type_name.left;
+            const right = type_name.right.text;
             const type = tables.types[right];
             if (!ts.isIdentifier(left) || !imports.namespaces.has(left.text)) return;
             if (type !== undefined && type.module === undefined) {
-                replace(typeName.right, type.name);
+                replace(type_name.right, type.name);
                 changes += 1;
             } else if (type !== undefined) {
                 // A staff type is not in the namespace of 6.x. It gets its own import.
-                replace(typeName, typeLocal(type));
+                replace(type_name, typeLocal(type));
                 changes += 1;
             } else if (right in tables.compat) {
-                replace(typeName, compatLocal(right));
+                replace(type_name, compatLocal(right));
                 changes += 1;
             }
             return;
@@ -653,11 +653,11 @@ export function migrateSource(
             if (!isV1Name(tables, imported)) return;
             if (isCountedAtParent(ts, node, imported, tables)) return;
             const wrapper = doubleWrapper(node);
-            const doubleMapping = tables.calls[imported];
-            const isDouble =
-                wrapper !== null || (testFile && !ts.isShorthandPropertyAssignment(node.parent));
+            const double_mapping = tables.calls[imported];
+            const is_double =
+                wrapper !== null || (test_file && !ts.isShorthandPropertyAssignment(node.parent));
             // A test double of a function whose 6.x arguments the tool cannot rebuild stays 6.x.
-            if (isDouble && doubleMapping !== undefined && !invertible(doubleMapping)) {
+            if (is_double && double_mapping !== undefined && !invertible(double_mapping)) {
                 countUse(node.text, false);
                 find(node, imported, NOT_INVERTIBLE);
                 return;
@@ -668,7 +668,7 @@ export function migrateSource(
                 return;
             }
             if (
-                testFile &&
+                test_file &&
                 imported in tables.calls &&
                 !ts.isShorthandPropertyAssignment(node.parent)
             ) {
@@ -689,11 +689,11 @@ export function migrateSource(
         ) {
             const name = node.name.text;
             const wrapper = doubleWrapper(node);
-            const doubleMapping = tables.calls[name];
+            const double_mapping = tables.calls[name];
             if (
-                (wrapper !== null || testFile) &&
-                doubleMapping !== undefined &&
-                !invertible(doubleMapping)
+                (wrapper !== null || test_file) &&
+                double_mapping !== undefined &&
+                !invertible(double_mapping)
             ) {
                 find(node, name, NOT_INVERTIBLE);
                 return;
@@ -702,7 +702,7 @@ export function migrateSource(
                 rewriteDouble(node, wrapper, name, node.expression.text);
                 return;
             }
-            if (testFile && name in tables.calls) {
+            if (test_file && name in tables.calls) {
                 rewriteDouble(node, node, name, node.expression.text);
                 return;
             }
@@ -727,11 +727,11 @@ export function migrateSource(
         // The tool changes `vi.spyOn(client, 'showZone')` on a namespace import above.
         if (ts.isStringLiteral(node) && imports.namespaces.size > 0 && node.text in tables.calls) {
             const parent = node.parent;
-            const spyOnNamespace =
+            const spy_on_namespace =
                 ts.isCallExpression(parent) &&
                 isTestCall(ts, parent.expression, 'spyOn') &&
                 parent.arguments[1] === node;
-            if (spyOnNamespace) return;
+            if (spy_on_namespace) return;
             const mapping = tables.calls[node.text];
             const target =
                 mapping === undefined ? '' : ` (${mapping.namespace}.${mapping.operation})`;
@@ -742,22 +742,22 @@ export function migrateSource(
     if (deep) return tooDeep(text);
 
     // The hoisted `fromV1Mock` of a factory is also there for the tests.
-    if (importsFromV1Mock && !usesFromV1Mock) helperLocal('fromV1Mock');
+    if (imports_from_v1_mock && !uses_from_v1_mock) helperLocal('fromV1Mock');
 
     // The new imports of the 7.x namespaces and types, and of the helpers.
     const specifiers = (module: 'staff' | null): string[] =>
         [
-            ...[...namespaceNames.values()]
+            ...[...namespace_names.values()]
                 .filter((entry) => entry.module === module)
                 .map(({ name, local }) => (name === local ? name : `${name} as ${local}`)),
-            ...[...typeNames]
+            ...[...type_names]
                 .filter(([, entry]) => entry.module === module)
                 .map(([local, { name }]) =>
                     name === local ? `type ${name}` : `type ${name} as ${local}`,
                 ),
         ].sort(compareSpecifiers);
     const added = specifiers(null);
-    const staffAdded = specifiers('staff');
+    const staff_added = specifiers('staff');
     const changed = importEdits(ts, source, imports.declarations, uses, tables, added, moved);
     edits.push(...changed.edits);
     // The new imports go after the last 6.x import, or in its place when the tool removes it.
@@ -765,16 +765,16 @@ export function migrateSource(
     if (changed.pending.length > 0) {
         lines.push(`import { ${changed.pending.join(', ')} } from '${V1_MODULE}';`);
     }
-    if (staffAdded.length > 0) {
-        lines.push(`import { ${staffAdded.join(', ')} } from '${STAFF_MODULE}';`);
+    if (staff_added.length > 0) {
+        lines.push(`import { ${staff_added.join(', ')} } from '${STAFF_MODULE}';`);
     }
-    if (compatNames.size > 0) {
-        const names = [...compatNames].sort(compareSpecifiers).join(', ');
+    if (compat_names.size > 0) {
+        const names = [...compat_names].sort(compareSpecifiers).join(', ');
         lines.push(`import { ${names} } from '${COMPAT_MODULE}';`);
     }
-    if (usesFromV1Mock) {
+    if (uses_from_v1_mock) {
         // `vi.mock` runs before the imports, so its factory gets the helper from `vi.hoisted`.
-        const local = hoistedLocal ?? fromV1MockLocal({ inFactory: true });
+        const local = hoisted_local ?? fromV1MockLocal({ in_factory: true });
         const binding = local === 'fromV1Mock' ? local : `fromV1Mock: ${local}`;
         lines.push(`const { ${binding} } = await vi.hoisted(() => import('${COMPAT_MODULE}'));`);
     }
@@ -854,8 +854,8 @@ function declaredNames(
         }
         if (ts.isIdentifier(node) && isReference(ts, node)) {
             const parent = node.parent;
-            const typeName = ts.isTypeReferenceNode(parent) && parent.typeName === node;
-            if (!typeName || !replacedType(node.text)) names.add(node.text);
+            const type_name = ts.isTypeReferenceNode(parent) && parent.typeName === node;
+            if (!type_name || !replacedType(node.text)) names.add(node.text);
         }
         // An import of another module, such as `import { orThrow } from './utils'`, has a name.
         if (ts.isImportDeclaration(node)) {
@@ -943,11 +943,11 @@ function fromV1MockArgs(mapping: CallMapping): string {
     const keys = mapping.parameters.map((_parameter, index) => inputKey(mapping, index));
     while (keys.at(-1) === null) keys.pop();
     const list = `[${keys.map((key) => (key === null ? 'null' : quote(key))).join(', ')}]`;
-    const pickKey = mapping.pick?.kind === 'arg' ? inputKey(mapping, mapping.pick.index) : null;
+    const pick_key = mapping.pick?.kind === 'arg' ? inputKey(mapping, mapping.pick.index) : null;
     return [
         list,
-        ...(mapping.result === 'page' || pickKey !== null ? [`'${mapping.result}'`] : []),
-        ...(pickKey === null ? [] : [quote(pickKey)]),
+        ...(mapping.result === 'page' || pick_key !== null ? [`'${mapping.result}'`] : []),
+        ...(pick_key === null ? [] : [quote(pick_key)]),
     ].join(', ');
 }
 
@@ -1027,7 +1027,7 @@ function hint(tables: MigrateTables, name: string): string {
 interface RenderedCall {
     readonly input: string;
     readonly pick: string | null;
-    readonly pickParameter: string;
+    readonly pick_parameter: string;
 }
 
 /** The 7.x input of a 6.x call, or the reason that the tool cannot make it. */
@@ -1041,10 +1041,10 @@ function renderCall(
     // A check does not know the `version` that 7.x reads from the data, so it checks the rest.
     const isMember = (entry: ObjectEntry) =>
         entry.kind === 'property' && entry.value.kind === 'member';
-    const entriesOf = mapping.input.kind === 'object' ? mapping.input.entries : [];
-    const loose = expectation && entriesOf.some(isMember);
+    const entries_of = mapping.input.kind === 'object' ? mapping.input.entries : [];
+    const loose = expectation && entries_of.some(isMember);
     const template: Template = loose
-        ? { kind: 'object', entries: entriesOf.filter((entry) => !isMember(entry)) }
+        ? { kind: 'object', entries: entries_of.filter((entry) => !isMember(entry)) }
         : mapping.input;
     if (args.some((arg) => ts.isSpreadElement(arg)))
         return 'a spread argument: change the call by hand';
@@ -1100,12 +1100,13 @@ function renderCall(
             ? whole.text
             : (renderTemplate(ts, template, value, textOf) ?? '{}');
     const pick = mapping.pick === null ? null : renderTemplate(ts, mapping.pick, value, textOf);
-    const pickText = pick ?? '';
-    const pickParameter =
-        ['data', 'value', 'response'].find((name) => !new RegExp(`\\b${name}\\b`).test(pickText)) ??
-        'v2Data';
-    if (loose) return { input: `expect.objectContaining(${input})`, pick, pickParameter };
-    return { input, pick, pickParameter };
+    const pick_text = pick ?? '';
+    const pick_parameter =
+        ['data', 'value', 'response'].find(
+            (name) => !new RegExp(`\\b${name}\\b`).test(pick_text),
+        ) ?? 'v2Data';
+    if (loose) return { input: `expect.objectContaining(${input})`, pick, pick_parameter };
+    return { input, pick, pick_parameter };
 }
 
 interface Value {
@@ -1287,12 +1288,12 @@ function importEdits(
             removed.add(declaration);
             continue;
         }
-        const typeOnly = clause.isTypeOnly ? 'type ' : '';
+        const type_only = clause.isTypeOnly ? 'type ' : '';
         const from = declaration.moduleSpecifier.getText(source);
         edits.push({
             start,
             end: declaration.end,
-            text: `import ${typeOnly}{ ${specifiers.join(', ')} } from ${from};`,
+            text: `import ${type_only}{ ${specifiers.join(', ')} } from ${from};`,
         });
     }
     return { edits, pending, removed };

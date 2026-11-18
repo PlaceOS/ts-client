@@ -3,7 +3,7 @@
  * variables of modules, function calls and module logs.
  *
  * ```ts
- * const realtime = createRealtime({ baseUrl: '', auth: session.clientAuth });
+ * const realtime = createRealtime({ base_url: '', auth: session.client_auth });
  * const release = realtime.bind({ sys: 'sys-1', mod: 'Display', name: 'power' }, (state) => {
  *     if (state.kind === 'value') console.log(state.value);
  * });
@@ -93,18 +93,18 @@ export interface RealtimeTarget {
 /** A module to get the logs of. The server needs the module ID, not its name. */
 export interface DebugTarget {
     readonly sys: string;
-    readonly moduleId: string;
+    readonly module_id: string;
 }
 
 export type RealtimeError =
-    | { readonly kind: 'timeout'; readonly timeoutMs: number }
+    | { readonly kind: 'timeout'; readonly timeout_ms: number }
     /** The socket closed after the server got the request. The result is not known. */
     | { readonly kind: 'disconnected' }
     /** `stop` ran before the response. */
     | { readonly kind: 'stopped' }
     /** The client could not connect `RECONNECT_ATTEMPTS_MAX` times. */
     | { readonly kind: 'unavailable' }
-    | { readonly kind: 'too_many_requests'; readonly pendingMax: number }
+    | { readonly kind: 'too_many_requests'; readonly pending_max: number }
     /** The server refused the request. `status` is the HTTP style code, such as 404. */
     | {
           readonly kind: 'server';
@@ -123,24 +123,24 @@ export interface DebugMessage {
     readonly level: string | null;
     readonly message: string;
     /** When the client got the message, in milliseconds since the Unix epoch. */
-    readonly receivedAtMs: number;
+    readonly received_at_ms: number;
 }
 
 export type RealtimeStatus =
     | { readonly kind: 'idle' }
     | { readonly kind: 'connecting'; readonly attempt: number }
-    | { readonly kind: 'open'; readonly sinceMs: number }
-    | { readonly kind: 'waiting'; readonly attempt: number; readonly delayMs: number }
+    | { readonly kind: 'open'; readonly since_ms: number }
+    | { readonly kind: 'waiting'; readonly attempt: number; readonly delay_ms: number }
     /** `RECONNECT_ATTEMPTS_MAX` attempts failed. `start` tries again. */
     | { readonly kind: 'failed' }
     | { readonly kind: 'stopped' };
 
 export interface RealtimeConfig {
     /** The origin of the server, such as `https://placeos.example.com`. `''` is this origin. */
-    readonly baseUrl: string;
+    readonly base_url: string;
     readonly auth: Auth;
     /** Tells the server that this is a device in a fixed location. */
-    readonly fixedDevice?: boolean;
+    readonly fixed_device?: boolean;
     readonly environment?: RealtimeEnvironment;
 }
 
@@ -156,7 +156,7 @@ export interface Realtime {
     exec(
         target: RealtimeTarget,
         args?: readonly JsonValue[],
-        options?: { readonly timeoutMs?: number },
+        options?: { readonly timeout_ms?: number },
     ): Promise<Result<JsonValue, RealtimeError>>;
     /**
      * Binds to a status variable. `listener` gets each new state, and the current one at once if
@@ -172,14 +172,14 @@ export interface Realtime {
 }
 
 /** `Display_2` is the module `Display` with index 2. A name without an index has index 1. */
-export function splitModuleId(moduleId: string): { readonly mod: string; readonly index: number } {
+export function splitModuleId(module_id: string): { readonly mod: string; readonly index: number } {
     // `lastIndexOf` is linear. A regular expression such as `^(.+)_(\d+)$` backtracks.
-    const separator = moduleId.lastIndexOf('_');
-    const digits = moduleId.slice(separator + 1);
-    if (separator <= 0 || !/^\d+$/.test(digits)) return { mod: moduleId, index: 1 };
+    const separator = module_id.lastIndexOf('_');
+    const digits = module_id.slice(separator + 1);
+    if (separator <= 0 || !/^\d+$/.test(digits)) return { mod: module_id, index: 1 };
     const index = Number(digits);
     assert(Number.isSafeInteger(index), 'the module index is an integer');
-    return { mod: moduleId.slice(0, separator), index: Math.max(1, index) };
+    return { mod: module_id.slice(0, separator), index: Math.max(1, index) };
 }
 
 const Meta = object({ sys: string(), mod: string(), index: integer('Int32'), name: string() }, [
@@ -232,7 +232,7 @@ interface Debugger {
 
 /** Makes a realtime client. It connects when it first needs to. */
 export function createRealtime(config: RealtimeConfig): Realtime {
-    assert(!config.baseUrl.endsWith('/'), 'the baseUrl has no trailing slash');
+    assert(!config.base_url.endsWith('/'), 'the base_url has no trailing slash');
     const environment = config.environment ?? browserRealtimeEnvironment();
 
     let status: RealtimeStatus = { kind: 'idle' };
@@ -240,27 +240,27 @@ export function createRealtime(config: RealtimeConfig): Realtime {
     /** Each socket has a generation. The client ignores the events of an old socket. */
     let generation = 0;
     /** Each connect attempt has an ID. `stop` and a new attempt make an older one stop. */
-    let connectAttempt = 0;
-    let callsPending = 0;
+    let connect_attempt = 0;
+    let calls_pending = 0;
     /** The connect attempts since the last open. */
     let attempt = 0;
-    let failuresBeforeOpen = 0;
-    let renewBeforeConnect = false;
-    let lastCredential: Credential | null = null;
-    let lastMessageAtMs = 0;
+    let failures_before_open = 0;
+    let renew_before_connect = false;
+    let last_credential: Credential | null = null;
+    let last_message_at_ms = 0;
     let cancelConnectTimer: (() => void) | null = null;
     let cancelKeepAlive: (() => void) | null = null;
     let cancelReconnect: (() => void) | null = null;
-    let drainScheduled = false;
-    let statusNotifyScheduled = false;
-    let nextId = 1;
+    let drain_scheduled = false;
+    let status_notify_scheduled = false;
+    let next_id = 1;
     const pending = new Map<number, Pending>();
     /** The pending requests that wait for a socket, in the order of the calls. */
     const queue: number[] = [];
     const bindings = new Map<string, Binding>();
     const debuggers = new Map<string, Debugger>();
     const inbox: unknown[] = [];
-    const statusListeners = new Set<(status: RealtimeStatus) => void>();
+    const status_listeners = new Set<(status: RealtimeStatus) => void>();
 
     return {
         start,
@@ -277,13 +277,13 @@ export function createRealtime(config: RealtimeConfig): Realtime {
         const kind = status.kind;
         if (kind === 'open' || kind === 'connecting' || kind === 'waiting') return;
         attempt = 0;
-        failuresBeforeOpen = 0;
+        failures_before_open = 0;
         // A rejection of `connect` is a bug, and the platform reports it as unhandled.
         void connect();
     }
 
     function stop(): void {
-        connectAttempt += 1;
+        connect_attempt += 1;
         setStatus({ kind: 'stopped' });
         cancelTimers();
         cancelReconnect?.();
@@ -296,11 +296,14 @@ export function createRealtime(config: RealtimeConfig): Realtime {
     function exec(
         target: RealtimeTarget,
         args: readonly JsonValue[] = [],
-        options: { readonly timeoutMs?: number } = {},
+        options: { readonly timeout_ms?: number } = {},
     ): Promise<Result<JsonValue, RealtimeError>> {
-        const timeoutMs = options.timeoutMs ?? REQUEST_TIMEOUT_MS;
-        assert(Number.isSafeInteger(timeoutMs) && timeoutMs > 0, 'timeoutMs is a positive integer');
-        return request('exec', normalize(target), args, timeoutMs);
+        const timeout_ms = options.timeout_ms ?? REQUEST_TIMEOUT_MS;
+        assert(
+            Number.isSafeInteger(timeout_ms) && timeout_ms > 0,
+            'timeout_ms is a positive integer',
+        );
+        return request('exec', normalize(target), args, timeout_ms);
     }
 
     function bind(target: RealtimeTarget, listener: (state: BindingState) => void): () => void {
@@ -343,8 +346,8 @@ export function createRealtime(config: RealtimeConfig): Realtime {
 
     function debug(target: DebugTarget, listener: (message: DebugMessage) => void): () => void {
         assert(target.sys.length > 0, 'the system ID is not empty');
-        assert(target.moduleId.length > 0, 'the module ID is not empty');
-        const key = debugKey(target.sys, target.moduleId);
+        assert(target.module_id.length > 0, 'the module ID is not empty');
+        const key = debugKey(target.sys, target.module_id);
         let entry = debuggers.get(key);
         if (entry === undefined) {
             assert(
@@ -376,18 +379,18 @@ export function createRealtime(config: RealtimeConfig): Realtime {
         command: Command,
         target: Required<RealtimeTarget>,
         args: readonly JsonValue[] | null,
-        timeoutMs: number,
+        timeout_ms: number,
     ): Promise<Result<JsonValue, RealtimeError>> {
         if (status.kind === 'stopped') return Promise.resolve(failure({ kind: 'stopped' }));
         if (status.kind === 'failed') return Promise.resolve(failure({ kind: 'unavailable' }));
         const call = command === 'exec';
         const limit = call ? PENDING_MAX : BINDING_REQUESTS_MAX;
-        const count = call ? callsPending : pending.size - callsPending;
+        const count = call ? calls_pending : pending.size - calls_pending;
         if (count >= limit) {
-            return Promise.resolve(failure({ kind: 'too_many_requests', pendingMax: limit }));
+            return Promise.resolve(failure({ kind: 'too_many_requests', pending_max: limit }));
         }
-        const id = nextId;
-        nextId += 1;
+        const id = next_id;
+        next_id += 1;
         assert(Number.isSafeInteger(id), 'the request ID is a safe integer');
         // The server parses the request strictly, so send only the fields that it knows.
         const text = JSON.stringify({
@@ -401,12 +404,12 @@ export function createRealtime(config: RealtimeConfig): Realtime {
             ...(target.iface ? { iface: true } : {}),
         });
         return new Promise((resolve) => {
-            const cancelTimer = environment.setTimer(timeoutMs, () =>
-                settle(id, failure({ kind: 'timeout', timeoutMs })),
+            const cancelTimer = environment.setTimer(timeout_ms, () =>
+                settle(id, failure({ kind: 'timeout', timeout_ms })),
             );
             const entry: Pending = { text, call, sent: false, resolve, cancelTimer };
             pending.set(id, entry);
-            if (call) callsPending += 1;
+            if (call) calls_pending += 1;
             if (socket !== null && status.kind === 'open') {
                 socket.send(text);
                 entry.sent = true;
@@ -421,8 +424,8 @@ export function createRealtime(config: RealtimeConfig): Realtime {
         const entry = pending.get(id);
         if (entry === undefined) return;
         pending.delete(id);
-        if (entry.call) callsPending -= 1;
-        assert(callsPending >= 0, 'the count of calls is not negative');
+        if (entry.call) calls_pending -= 1;
+        assert(calls_pending >= 0, 'the count of calls is not negative');
         // A request that times out before the socket opens leaves the queue, so it stays bounded.
         if (!entry.sent) {
             const queued = queue.indexOf(id);
@@ -453,33 +456,33 @@ export function createRealtime(config: RealtimeConfig): Realtime {
             return;
         }
         // The server reads the module ID from `mod` for logs. It does not use `index` or `name`.
-        const target = { sys: entry.target.sys, mod: entry.target.moduleId, index: 1, name: '' };
+        const target = { sys: entry.target.sys, mod: entry.target.module_id, index: 1, name: '' };
         void request(command, { ...target, iface: false }, null, REQUEST_TIMEOUT_MS);
     }
 
     async function connect(): Promise<void> {
-        connectAttempt += 1;
-        const thisAttempt = connectAttempt;
+        connect_attempt += 1;
+        const this_attempt = connect_attempt;
         attempt += 1;
         setStatus({ kind: 'connecting', attempt });
-        if (renewBeforeConnect && config.auth.kind === 'credential' && lastCredential !== null) {
-            renewBeforeConnect = false;
-            await config.auth.rejected(401, lastCredential);
-            if (thisAttempt !== connectAttempt) return;
+        if (renew_before_connect && config.auth.kind === 'credential' && last_credential !== null) {
+            renew_before_connect = false;
+            await config.auth.rejected(401, last_credential);
+            if (this_attempt !== connect_attempt) return;
         }
         const credential = await resolveCredential(config.auth);
         // `stop`, or `stop` then `start`, can run while the credential is pending.
-        if (thisAttempt !== connectAttempt) return;
+        if (this_attempt !== connect_attempt) return;
         if (status.kind !== 'connecting') return;
         if (credential === null) {
             scheduleReconnect();
             return;
         }
-        lastCredential = credential;
+        last_credential = credential;
         const url = socketUrl(credential);
         generation += 1;
-        const socketGeneration = generation;
-        const current = () => socketGeneration === generation;
+        const socket_generation = generation;
+        const current = () => socket_generation === generation;
         socket = environment.createSocket(url, {
             open: () => {
                 if (current()) onOpen();
@@ -501,9 +504,9 @@ export function createRealtime(config: RealtimeConfig): Realtime {
         cancelConnectTimer?.();
         cancelConnectTimer = null;
         attempt = 0;
-        failuresBeforeOpen = 0;
-        lastMessageAtMs = environment.now();
-        setStatus({ kind: 'open', sinceMs: lastMessageAtMs });
+        failures_before_open = 0;
+        last_message_at_ms = environment.now();
+        setStatus({ kind: 'open', since_ms: last_message_at_ms });
         const opened = socket;
         assert(opened !== null, 'an open socket exists');
         opened.send('ping');
@@ -520,25 +523,25 @@ export function createRealtime(config: RealtimeConfig): Realtime {
     }
 
     function onMessage(data: unknown): void {
-        lastMessageAtMs = environment.now();
+        last_message_at_ms = environment.now();
         if (inbox.length >= INBOX_MAX) {
             // The listeners are slower than the server. A new socket resyncs each binding.
             dropSocket();
             return;
         }
         inbox.push(data);
-        if (drainScheduled) return;
-        drainScheduled = true;
+        if (drain_scheduled) return;
+        drain_scheduled = true;
         environment.setTimer(0, drain);
     }
 
     /** Handles the inbox in one batch. Notifications for one variable give one update. */
     function drain(): void {
-        drainScheduled = false;
+        drain_scheduled = false;
         const messages = inbox.splice(0, inbox.length);
         const changed = new Map<string, JsonValue>();
         const logs: [Debugger, DebugMessage][] = [];
-        const receivedAtMs = environment.now();
+        const received_at_ms = environment.now();
         for (const data of messages) {
             if (typeof data !== 'string') continue;
             // The server sends `pong` as an answer and also as its own keep-alive.
@@ -562,7 +565,7 @@ export function createRealtime(config: RealtimeConfig): Realtime {
                     const entry = debuggers.get(debugKey(message.meta.sys, message.meta.mod));
                     if (entry === undefined) break;
                     const text = message.msg ?? '';
-                    logs.push([entry, { level: message.level, message: text, receivedAtMs }]);
+                    logs.push([entry, { level: message.level, message: text, received_at_ms }]);
                     break;
                 }
                 default:
@@ -570,10 +573,10 @@ export function createRealtime(config: RealtimeConfig): Realtime {
             }
         }
         // Update the state first, then call the listeners.
-        for (const [key, changedValue] of changed) {
+        for (const [key, changed_value] of changed) {
             const binding = bindings.get(key);
             if (binding !== undefined) {
-                setBindingState(binding, { kind: 'value', value: changedValue });
+                setBindingState(binding, { kind: 'value', value: changed_value });
             }
         }
         for (const [entry, log] of logs) {
@@ -586,7 +589,7 @@ export function createRealtime(config: RealtimeConfig): Realtime {
         if (inbox.length > 0) drain();
         cancelTimers();
         socket = null;
-        if (status.kind !== 'open') failuresBeforeOpen += 1;
+        if (status.kind !== 'open') failures_before_open += 1;
         // The result of a request that the server got is not known now.
         for (const [id, entry] of [...pending]) {
             if (entry.sent) settle(id, failure({ kind: 'disconnected' }));
@@ -602,17 +605,17 @@ export function createRealtime(config: RealtimeConfig): Realtime {
             queue.length = 0;
             return;
         }
-        if (failuresBeforeOpen >= RENEW_AFTER_FAILURES) {
+        if (failures_before_open >= RENEW_AFTER_FAILURES) {
             // The credential can be the reason. The next attempt asks the auth for a new one.
-            failuresBeforeOpen = 0;
-            renewBeforeConnect = true;
+            failures_before_open = 0;
+            renew_before_connect = true;
         }
-        const delayMs = Math.min(
+        const delay_ms = Math.min(
             RECONNECT_DELAY_MAX_MS,
             Math.max(1, attempt) * RECONNECT_DELAY_STEP_MS,
         );
-        setStatus({ kind: 'waiting', attempt, delayMs });
-        cancelReconnect = environment.setTimer(delayMs, () => {
+        setStatus({ kind: 'waiting', attempt, delay_ms });
+        cancelReconnect = environment.setTimer(delay_ms, () => {
             cancelReconnect = null;
             void connect();
         });
@@ -622,7 +625,7 @@ export function createRealtime(config: RealtimeConfig): Realtime {
         cancelKeepAlive = environment.setTimer(KEEP_ALIVE_MS, () => {
             cancelKeepAlive = null;
             if (status.kind !== 'open' || socket === null) return;
-            if (environment.now() - lastMessageAtMs > STALE_MS) {
+            if (environment.now() - last_message_at_ms > STALE_MS) {
                 dropSocket();
                 return;
             }
@@ -654,11 +657,11 @@ export function createRealtime(config: RealtimeConfig): Realtime {
     /** The URL of the socket. It puts the token in the query or in a cookie. */
     function socketUrl(credential: Credential): string {
         const origin =
-            config.baseUrl.length > 0 ? config.baseUrl : new URL(environment.currentUrl()).origin;
+            config.base_url.length > 0 ? config.base_url : new URL(environment.currentUrl()).origin;
         const url = new URL(CONTROL_PATH, origin);
         const secure = url.protocol === 'https:';
         url.protocol = secure ? 'wss:' : 'ws:';
-        if (config.fixedDevice === true) url.searchParams.set('fixed_device', 'true');
+        if (config.fixed_device === true) url.searchParams.set('fixed_device', 'true');
         let token: readonly [string, string] | null = null;
         switch (credential.kind) {
             case 'none':
@@ -673,19 +676,19 @@ export function createRealtime(config: RealtimeConfig): Realtime {
                 unreachable(credential);
         }
         if (token !== null) {
-            const [name, tokenValue] = token;
+            const [name, token_value] = token;
             // A cookie reaches only the host of the page. A socket to a different host gets the token
             // in the query.
-            const pageHost = new URL(environment.currentUrl()).hostname;
-            if (environment.tokenTransport === 'query' || url.hostname !== pageHost) {
-                url.searchParams.set(name, tokenValue);
+            const page_host = new URL(environment.currentUrl()).hostname;
+            if (environment.token_transport === 'query' || url.hostname !== page_host) {
+                url.searchParams.set(name, token_value);
             } else {
                 // The server reads the cookie value as it is, so the value must be cookie safe.
-                assert(/^[^;\s]+$/.test(tokenValue), 'the token has no semicolons or spaces');
-                const secureFlag = secure ? '; secure' : '';
+                assert(/^[^;\s]+$/.test(token_value), 'the token has no semicolons or spaces');
+                const secure_flag = secure ? '; secure' : '';
                 environment.setCookie(
-                    `${name}=${tokenValue}; max-age=${COOKIE_MAX_AGE_SECONDS}; ` +
-                        `path=${CONTROL_PATH}; samesite=strict${secureFlag}`,
+                    `${name}=${token_value}; max-age=${COOKIE_MAX_AGE_SECONDS}; ` +
+                        `path=${CONTROL_PATH}; samesite=strict${secure_flag}`,
                 );
             }
         }
@@ -704,20 +707,20 @@ export function createRealtime(config: RealtimeConfig): Realtime {
      */
     function setStatus(next: RealtimeStatus): void {
         status = next;
-        if (statusNotifyScheduled) return;
-        statusNotifyScheduled = true;
+        if (status_notify_scheduled) return;
+        status_notify_scheduled = true;
         environment.setTimer(0, () => {
-            statusNotifyScheduled = false;
+            status_notify_scheduled = false;
             const current = status;
-            for (const listener of [...statusListeners]) listener(current);
+            for (const listener of [...status_listeners]) listener(current);
         });
     }
 
     function subscribe(listener: (status: RealtimeStatus) => void): () => void {
-        assert(statusListeners.size < STATUS_LISTENERS_MAX, 'the client has room for a listener');
-        statusListeners.add(listener);
+        assert(status_listeners.size < STATUS_LISTENERS_MAX, 'the client has room for a listener');
+        status_listeners.add(listener);
         return () => {
-            statusListeners.delete(listener);
+            status_listeners.delete(listener);
         };
     }
 }
@@ -748,8 +751,8 @@ function variableKey(target: {
     return JSON.stringify([target.sys, target.mod, target.index, target.name]);
 }
 
-function debugKey(sys: string, moduleId: string): string {
-    return JSON.stringify([sys, moduleId]);
+function debugKey(sys: string, module_id: string): string {
+    return JSON.stringify([sys, module_id]);
 }
 
 /** Parses one text frame. A frame that is not a message of the server gives `null`. */

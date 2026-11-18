@@ -29,7 +29,7 @@ export function display(
 const DISPLAY = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/signage/{system_id}',
-    pathKeys: ['system_id'],
+    path_keys: ['system_id'],
     params: /* @__PURE__ */ parameters(
         {
             system_id: /* @__PURE__ */ string(),
@@ -63,7 +63,7 @@ export function fetchStaticMedia(
 const FETCH_STATIC_MEDIA = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/signage/{system_id}/static/{item_id}',
-    pathKeys: ['system_id', 'item_id'],
+    path_keys: ['system_id', 'item_id'],
     params: /* @__PURE__ */ parameters(
         {
             /** the display showing the media, sizes web page captures */
@@ -98,7 +98,7 @@ export function samsungEinkManifest(
 const SAMSUNG_EINK_MANIFEST = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/signage/{system_id}/samsung/eink/{item_id}/{expires_after}',
-    pathKeys: ['system_id', 'item_id', 'expires_after'],
+    path_keys: ['system_id', 'item_id', 'expires_after'],
     params: /* @__PURE__ */ parameters(
         {
             /** the display showing the media, sizes web page captures */
@@ -133,7 +133,7 @@ export function samsungEinkManifestWithoutExpiresAfter(
 const SAMSUNG_EINK_MANIFEST_WITHOUT_EXPIRES_AFTER = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/signage/{system_id}/samsung/eink/{item_id}',
-    pathKeys: ['system_id', 'item_id'],
+    path_keys: ['system_id', 'item_id'],
     params: /* @__PURE__ */ parameters(
         {
             /** the display showing the media, sizes web page captures */
@@ -163,7 +163,7 @@ export function updateMetrics(
 const UPDATE_METRICS = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/signage/{system_id}/metrics',
-    pathKeys: ['system_id'],
+    path_keys: ['system_id'],
     params: /* @__PURE__ */ parameters(
         {
             system_id: /* @__PURE__ */ string(),

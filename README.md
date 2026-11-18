@@ -23,7 +23,7 @@ import { configure, zones } from '@placeos/ts-client';
 
 // Do this one time, when the application starts.
 configure({
-    baseUrl: 'https://placeos.example.com', // Use '' for the origin of the page.
+    base_url: 'https://placeos.example.com', // Use '' for the origin of the page.
     auth: { kind: 'bearer', token: () => localStorage.getItem('token') },
 });
 
@@ -36,9 +36,11 @@ if (result.ok) {
 ```
 
 There is one namespace for each controller of the API, for example `zones`, `systems` and
-`users`. Each function has the name of the server action: `show`, `create`, `update`, `destroy`,
-or a custom action such as `systems.execute`. The `index` action is `query`, because a list
-operation queries the items. The comment of each function gives the HTTP method and the path.
+`alert_dashboards`. Namespaces, options and fields are snake_case, as the data of the server is.
+Functions are camelCase. Each function has the name of the server action: `show`, `create`,
+`update`, `destroy`, or a custom action such as `systems.execute`. The `index` action is `query`,
+because a list operation queries the items. The comment of each function gives the HTTP method and
+the path.
 
 The first argument has the path parameters, the query parameters and, for an operation with a
 body, `body`. The second argument has the options of the request:
@@ -61,10 +63,10 @@ A function does not throw for an expected failure. It returns a `Result`. Examin
 | -------------------- | -------------------------------------------------------------------------- |
 | `http`               | The server sent a status that is not 2xx. See `status`, `message`, `body`. |
 | `network`            | The request got no response. For example, the network is down.             |
-| `timeout`            | The request took more than `timeoutMs`.                                    |
+| `timeout`            | The request took more than `timeout_ms`.                                   |
 | `aborted`            | The `signal` of the caller cancelled the request.                          |
 | `auth_missing`       | The auth had no token or credential.                                       |
-| `response_too_large` | The body was more than `responseBytesMax`.                                 |
+| `response_too_large` | The body was more than `response_bytes_max`.                               |
 | `response_invalid`   | The body does not match the API document. See `path` and `expected`.       |
 
 A function throws only for a programmer error. For example, a parameter that the operation does
@@ -79,7 +81,7 @@ In a project without `strictNullChecks`, `if (!result.ok)` does not narrow the `
 with `createClient` and give it in the options. The configured client does not change:
 
 ```ts
-const other = createClient({ baseUrl: 'https://other.example.com', auth: { kind: 'none' } });
+const other = createClient({ base_url: 'https://other.example.com', auth: { kind: 'none' } });
 await zones.query({}, { client: other });
 ```
 
@@ -89,9 +91,9 @@ Each request has a time limit. The default is 30 seconds. Set a different limit 
 for one request:
 
 ```ts
-configure({ baseUrl: '', auth: { kind: 'none' }, timeoutMs: 10_000 });
+configure({ base_url: '', auth: { kind: 'none' }, timeout_ms: 10_000 });
 const controller = new AbortController();
-await zones.query({}, { signal: controller.signal, timeoutMs: 60_000 });
+await zones.query({}, { signal: controller.signal, timeout_ms: 60_000 });
 ```
 
 ### Pages
@@ -103,7 +105,7 @@ import { pageInfo, zones } from '@placeos/ts-client';
 
 const result = await zones.query({ limit: 100 });
 if (result.ok) {
-    const { total, nextOffset } = pageInfo(result.value.headers);
+    const { total, next_offset } = pageInfo(result.value.headers);
 }
 ```
 
@@ -114,7 +116,7 @@ its own client in the options, so it does not change the configured client:
 
 ```ts
 const client = createClient({
-    baseUrl: '',
+    base_url: '',
     auth: { kind: 'none' },
     fetch: async (url, init) => new Response(JSON.stringify({ id: 'zone-1' })),
 });
@@ -129,11 +131,11 @@ the name of the endpoint, the input that the handler gets, and the data that it 
 ```ts
 import { endpointMocks, httpError, mockEndpoint, respond } from '@placeos/ts-client/mock';
 
-configure({ baseUrl: '', auth: { kind: 'none' }, mock: endpointMocks });
+configure({ base_url: '', auth: { kind: 'none' }, mock: endpointMocks });
 
 mockEndpoint('zones.show', (input) => ({ id: input.id, name: 'Level 1' }));
 mockEndpoint('zones.query', () => respond([{ id: 'zone-1' }], { total: 1 }));
-mockEndpoint('systems.update', (input) => ({ id: input.sys_id, ...input.body }), { delayMs: 300 });
+mockEndpoint('systems.update', (input) => ({ id: input.sys_id, ...input.body }), { delay_ms: 300 });
 mockEndpoint('zones.destroy', () => {
     throw httpError(403);
 });
@@ -174,16 +176,16 @@ registerMockEndpoint({
 });
 registerSystem('sys-1', { Display: [{ power: false, $power: (on: boolean) => on }] });
 
-configure({ baseUrl: '', auth: { kind: 'none' }, fetch: mockFetch, missingFields: 'zero' });
+configure({ base_url: '', auth: { kind: 'none' }, fetch: mockFetch, missing_fields: 'zero' });
 const realtime = createRealtime({
-    baseUrl: '',
+    base_url: '',
     auth: { kind: 'none' },
     environment: mockRealtimeEnvironment(),
 });
 ```
 
 - 7.x parses each mock response with the schema of the operation. Mock data often has only some
-  fields. `missingFields: 'zero'` gives each missing required field its empty value, such as `''`,
+  fields. `missing_fields: 'zero'` gives each missing required field its empty value, such as `''`,
   `0` or `[]`, as the 6.x classes did. A field with the wrong type is still an error, because the
   real server does not send it.
 - A mock endpoint that throws an error with a `status`, such as `404`, gives that HTTP status.
@@ -216,12 +218,12 @@ const result = await bookings.query({ period_start: now, period_end: now + 86_40
 import { configure, createAuthSession } from '@placeos/ts-client';
 
 const session = createAuthSession({
-    baseUrl: '',
-    redirectUri: `${location.origin}/oauth-resp.html`,
+    base_url: '',
+    redirect_uri: `${location.origin}/oauth-resp.html`,
     scope: 'public',
     grant: { kind: 'code' },
 });
-configure({ baseUrl: '', auth: session.clientAuth, headers: { 'X-App-Id': session.clientId } });
+configure({ base_url: '', auth: session.client_auth, headers: { 'X-App-Id': session.client_id } });
 
 const result = await session.start();
 if (!result.ok && result.error.kind === 'redirecting') {
@@ -229,8 +231,8 @@ if (!result.ok && result.error.kind === 'redirecting') {
 }
 ```
 
-Copy `oauth-resp.html` from the package to your application, and use its URL as `redirectUri`. The
-client ID is the MD5 of `redirectUri`, as in 6.x.
+Copy `oauth-resp.html` from the package to your application, and use its URL as `redirect_uri`. The
+client ID is the MD5 of `redirect_uri`, as in 6.x.
 
 `session.start()` loads `/auth/authority`, and gets a credential in this order:
 
@@ -238,9 +240,9 @@ client ID is the MD5 of `redirectUri`, as in 6.x.
 2. A code or a token from the redirect. The `state` must be the nonce of this client.
 3. The refresh token.
 4. The `password` or `entra` grant.
-5. If the user has a session: the authorize page, with a redirect or, with `useFrame`, in a
+5. If the user has a session: the authorize page, with a redirect or, with `use_frame`, in a
    hidden frame.
-6. Else the login page of the authority. With `handleLogin: false`, the result is a
+6. Else the login page of the authority. With `handle_login: false`, the result is a
    `login_required` error, and the application shows its own login.
 
 The grants are `code` (with PKCE), `implicit`, `password` and `entra`. PlaceOS auth.cr refuses
@@ -266,7 +268,7 @@ Other parts of the session:
 - The session keeps the storage keys of 6.x, so a user stays logged in after the change.
 - The default token path is `/auth/oauth/token`. PlaceOS auth.cr and the older Ruby auth service
   both serve it. The Ruby auth service does not serve `/auth/token`.
-- A relative login or logout URL of the authority is on `baseUrl`. 6.x used the `domain` of the
+- A relative login or logout URL of the authority is on `base_url`. 6.x used the `domain` of the
   authority, which has no port.
 - A refused code stops the login with `token_rejected`. A new redirect could loop.
 - The token requests send their parameters in the body, not in the URL. A password is not in the
@@ -291,7 +293,7 @@ modules, calls their functions and gets their logs:
 ```ts
 import { createRealtime } from '@placeos/ts-client';
 
-const realtime = createRealtime({ baseUrl: '', auth: session.clientAuth });
+const realtime = createRealtime({ base_url: '', auth: session.client_auth });
 
 const power = { sys: 'sys-1234', mod: 'Display', index: 1, name: 'power' };
 const release = realtime.bind(power, (state) => {
@@ -312,7 +314,7 @@ release();
 - The client sends `ping` each 15 seconds. A socket without a message for 60 seconds closes, and
   the client connects again. It waits longer after each failure, to 5 seconds. After 40 attempts,
   the status is `failed`. Call `start` to try again.
-- `realtime.debug({ sys, moduleId }, listener)` gets the logs of a module.
+- `realtime.debug({ sys, module_id }, listener)` gets the logs of a module.
 - `splitModuleId('Display_2')` gives `{ mod: 'Display', index: 2 }`.
 - In a browser, the token goes in a cookie on the socket path. In a frame and on mobile Safari it
   goes in the query, as in 6.x. `createRealtime({ ..., environment })` replaces the socket, the
@@ -456,7 +458,7 @@ The tool makes these changes:
 
 - A call of a 6.x REST function becomes the 7.x operation. `.then(orThrow)` gives the data, and an
   error rejects the promise, as in 6.x. A 6.x query function gets `.then(orThrowPage)`, which gives
-  `{ data, total, nextOffset }`.
+  `{ data, total, next_offset }`.
 
     ```ts
     // 6.x
@@ -497,7 +499,7 @@ it keeps its 6.x import, so the compiler also shows it. These uses are:
 - the login and the realtime functions, such as `setup`, `token` and `getModule`;
 - `get`, `post` and the other HTTP functions;
 - `new` and `instanceof` on a 6.x class, because 7.x has plain objects;
-- the `next` function of a 6.x page. 7.x gives `nextOffset`;
+- the `next` function of a 6.x page. 7.x gives `next_offset`;
 - a function that is not called, out of a test;
 - a `vi.mock` without a factory or `{ spy: true }`: its 7.x functions give `undefined`, and
   `.then(orThrow)` fails;
@@ -533,7 +535,7 @@ arguments, and it finds the 7.x operation with the same method and path.
   from 6.x.
 - The 6.x mock types of `@placeos/ts-client/compat` (`MockHttpRequest.body`, `metadata` and
   `MockModule`) keep `any`, so that the mocks of an app still compile.
-- `missingFields: 'zero'` accepts data without its required fields. It is for mock data only.
+- `missing_fields: 'zero'` accepts data without its required fields. It is for mock data only.
 - `parseResponse`, `checkRequest` and `call` each have one `as` cast. The compiler cannot prove
   that the parser output has the type of the schema. The tests check the parser.
 - `configure` keeps one client in module state, so a call does not need a client argument. A

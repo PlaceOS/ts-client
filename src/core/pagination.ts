@@ -6,7 +6,7 @@ export interface PageInfo {
     /** The `X-Total-Count` header: the number of results for all pages. */
     readonly total: number | null;
     /** The `offset` of the next page, from the `Link` header. `null` on the last page. */
-    readonly nextOffset: number | null;
+    readonly next_offset: number | null;
 }
 
 /**
@@ -16,8 +16,8 @@ export interface PageInfo {
  * const first = await zones.query({ limit: 100 });
  * if (first.ok) {
  *     const page = pageInfo(first.value.headers);
- *     if (page.nextOffset !== null) {
- *         const second = await zones.query({ limit: 100, offset: page.nextOffset });
+ *     if (page.next_offset !== null) {
+ *         const second = await zones.query({ limit: 100, offset: page.next_offset });
  *     }
  * }
  * ```
@@ -25,7 +25,7 @@ export interface PageInfo {
 export function pageInfo(headers: Headers): PageInfo {
     return {
         total: parseCount(headers.get('x-total-count')),
-        nextOffset: parseNextOffset(headers.get('link')),
+        next_offset: parseNextOffset(headers.get('link')),
     };
 }
 

@@ -29,7 +29,7 @@ export function query(
 const QUERY = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/history',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({
         /** only return changes to these resource types (table names) */
         resource_types: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
@@ -79,7 +79,7 @@ export function show(
 const SHOW = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/history/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -109,7 +109,7 @@ export function undelete(
 const UNDELETE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/history/undelete',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters(
         {
             /** the type (table name) of the deleted resource */

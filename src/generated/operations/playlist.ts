@@ -44,7 +44,7 @@ export function approveMedia(
 const APPROVE_MEDIA = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/signage/playlists/{id}/media/approve',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -74,7 +74,7 @@ export function approvers(
 const APPROVERS = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/signage/playlists/approvers',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters(
         {
             /** group to find approvers for */
@@ -107,7 +107,7 @@ export function create(
 const CREATE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/signage/playlists',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({
         /** group id to auto-link the new playlist to (required for non-admin callers) */
         group_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -136,7 +136,7 @@ export function destroy(
 const DESTROY = /* @__PURE__ */ operation({
     method: 'DELETE',
     path: '/api/engine/v2/signage/playlists/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -175,7 +175,7 @@ export function history(
 const HISTORY = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/signage/playlists/{id}/history',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -224,7 +224,7 @@ export function media(
 const MEDIA = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/signage/playlists/{id}/media',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -251,7 +251,7 @@ export function mediaRevisions(
 const MEDIA_REVISIONS = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/signage/playlists/{id}/media/revisions',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -285,7 +285,7 @@ export function query(
 const QUERY = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/signage/playlists',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({
         /** filter to playlists linked to this group (caller must have Read on the group) */
         group_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -322,7 +322,7 @@ export function requestApproval(
 const REQUEST_APPROVAL = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/signage/playlists/{id}/media/request_approval',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -353,7 +353,7 @@ export function scheduleMedia(
 const SCHEDULE_MEDIA = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/signage/playlists/{id}/media/schedule',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -390,7 +390,7 @@ export function share(
 const SHARE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/signage/playlists/share',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters(
         {
             /** comma-separated playlist ids to share into the target group */
@@ -428,7 +428,7 @@ export function show(
 const SHOW = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/signage/playlists/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -455,7 +455,7 @@ export function update(
 const UPDATE = /* @__PURE__ */ operation({
     method: 'PATCH',
     path: '/api/engine/v2/signage/playlists/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -482,7 +482,7 @@ export function updateMedia(
 const UPDATE_MEDIA = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/signage/playlists/{id}/media',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -505,7 +505,7 @@ export function updateSchedule(
 const UPDATE_SCHEDULE = /* @__PURE__ */ operation({
     method: 'PATCH',
     path: '/api/engine/v2/signage/playlists/{id}/media/schedule/{item_id}',
-    pathKeys: ['id', 'item_id'],
+    path_keys: ['id', 'item_id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),

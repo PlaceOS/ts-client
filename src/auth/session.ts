@@ -3,12 +3,12 @@
  *
  * ```ts
  * const session = createAuthSession({
- *     baseUrl: '',
- *     redirectUri: `${location.origin}/oauth-resp.html`,
+ *     base_url: '',
+ *     redirect_uri: `${location.origin}/oauth-resp.html`,
  *     scope: 'public',
  *     grant: { kind: 'code' },
  * });
- * configure({ baseUrl: '', auth: session.clientAuth, headers: { 'X-App-Id': session.clientId } });
+ * configure({ base_url: '', auth: session.client_auth, headers: { 'X-App-Id': session.client_id } });
  * const result = await session.start();
  * ```
  *
@@ -115,7 +115,7 @@ export type Grant =
           readonly kind: 'password';
           readonly username: string;
           readonly password: string;
-          readonly clientSecret?: string;
+          readonly client_secret?: string;
       }
     /**
      * Exchanges a Microsoft Entra access token for PlaceOS tokens (RFC 8693), for applications
@@ -124,29 +124,29 @@ export type Grant =
     | {
           readonly kind: 'entra';
           readonly entraToken: () => Promise<string | null>;
-          readonly clientSecret?: string;
+          readonly client_secret?: string;
       };
 
 export interface AuthSessionConfig {
     /** The origin of the server, such as `https://placeos.example.com`. `''` is this origin. */
-    readonly baseUrl: string;
+    readonly base_url: string;
     /** The redirect page, such as `https://app.example.com/oauth-resp.html`. */
-    readonly redirectUri: string;
+    readonly redirect_uri: string;
     readonly scope: string;
     readonly grant: Grant;
     /** A path on the server, or a full URL. */
-    readonly authorizePath?: string;
+    readonly authorize_path?: string;
     /** A path on the server, or a full URL. */
-    readonly tokenPath?: string;
+    readonly token_path?: string;
     /** Opens the authorize page in a hidden frame, not with a redirect. */
-    readonly useFrame?: boolean;
+    readonly use_frame?: boolean;
     /**
      * `true` (the default) sends a user without a session to the login page. With `false`, the
      * result is a `login_required` error, and the application shows its own login.
      */
-    readonly handleLogin?: boolean;
+    readonly handle_login?: boolean;
     /** Ignores an API key in the URL or the storage. */
-    readonly ignoreApiKey?: boolean;
+    readonly ignore_api_key?: boolean;
     /** Headers for each request of the session. The session adds `X-App-Id`. */
     readonly headers?: Readonly<Record<string, string>>;
     readonly environment?: AuthEnvironment;
@@ -212,7 +212,7 @@ export type AuthError =
     | { readonly kind: 'authority_invalid'; readonly path: string; readonly expected: string }
     /** The page goes to the login or the authorize page. The application waits. */
     | { readonly kind: 'redirecting'; readonly url: string }
-    /** No session, and `handleLogin` is `false`. Show the login of the application. */
+    /** No session, and `handle_login` is `false`. Show the login of the application. */
     | { readonly kind: 'login_required' }
     /** The token endpoint refused the grant, for example a wrong password. */
     | { readonly kind: 'token_rejected'; readonly status: number; readonly message: string | null }
@@ -236,9 +236,9 @@ export type AuthError =
 
 export interface AuthSession {
     /** The OAuth client ID: the MD5 of the redirect URI, as PlaceOS registers it. */
-    readonly clientId: string;
+    readonly client_id: string;
     /** Give this to `configure` or `createClient`. */
-    readonly clientAuth: Auth;
+    readonly client_auth: Auth;
     /** Loads the authority, gets a credential, and watches for the foreground. */
     start(): Promise<Result<Credential, AuthError>>;
     /** Stops the watch for the foreground. */
@@ -258,7 +258,7 @@ export interface AuthSession {
      */
     handleRedirect(url: string): Promise<Result<Credential, AuthError>>;
     /** Uses a token from a different source. */
-    useToken(token: string, expiresAtMs?: number): void;
+    useToken(token: string, expires_at_ms?: number): void;
     /** Uses an API key, for a fixed device. */
     useApiKey(key: string, options?: { readonly trusted?: boolean }): void;
     /** Removes the access token, so the next request gets a new one. */
@@ -272,35 +272,35 @@ export interface AuthSession {
 }
 
 interface Tokens {
-    readonly accessToken: string | null;
-    readonly refreshToken: string | null;
-    readonly expiresAtMs: number;
+    readonly access_token: string | null;
+    readonly refresh_token: string | null;
+    readonly expires_at_ms: number;
 }
 
-const NO_TOKENS: Tokens = { accessToken: null, refreshToken: null, expiresAtMs: 0 };
+const NO_TOKENS: Tokens = { access_token: null, refresh_token: null, expires_at_ms: 0 };
 
 /** Makes a login session. It does no work until `start`, `authorize` or a request. */
 export function createAuthSession(config: AuthSessionConfig): AuthSession {
-    assert(!config.baseUrl.endsWith('/'), 'the baseUrl has no trailing slash');
-    assert(config.redirectUri.length > 0, 'the redirectUri is not empty');
+    assert(!config.base_url.endsWith('/'), 'the base_url has no trailing slash');
+    assert(config.redirect_uri.length > 0, 'the redirect_uri is not empty');
     const environment = config.environment ?? browserEnvironment();
     const storage = environment.storage;
-    const clientId = md5Hex(config.redirectUri);
-    const handleLogin = config.handleLogin ?? true;
-    const headers: Readonly<Record<string, string>> = { ...config.headers, 'X-App-Id': clientId };
-    const limits = { timeoutMs: AUTH_TIMEOUT_MS, bytesMax: AUTH_RESPONSE_BYTES_MAX };
-    const storageKey = (name: string) => `${clientId}_${name}`;
+    const client_id = md5Hex(config.redirect_uri);
+    const handle_login = config.handle_login ?? true;
+    const headers: Readonly<Record<string, string>> = { ...config.headers, 'X-App-Id': client_id };
+    const limits = { timeout_ms: AUTH_TIMEOUT_MS, bytes_max: AUTH_RESPONSE_BYTES_MAX };
+    const storageKey = (name: string) => `${client_id}_${name}`;
 
     let authority: DomainAuthority | null = null;
     let status: AuthStatus = { kind: 'stopped' };
     /** The tokens of an application that is not trusted. A trusted one keeps them in storage. */
-    let memoryTokens: Tokens = NO_TOKENS;
+    let memory_tokens: Tokens = NO_TOKENS;
     /** A code from a redirect. The next `authorize` exchanges it. */
-    let pendingCode: string | null = null;
+    let pending_code: string | null = null;
     let authorizing: Promise<Result<Credential, AuthError>> | null = null;
-    let loadingAuthority: Promise<Result<DomainAuthority, AuthError>> | null = null;
+    let loading_authority: Promise<Result<DomainAuthority, AuthError>> | null = null;
     let renewing: Promise<boolean> | null = null;
-    let foregroundCheck: Promise<void> | null = null;
+    let foreground_check: Promise<void> | null = null;
     let removeForegroundListener: (() => void) | null = null;
     /**
      * A login that the user or the server refused: a consent denial or a refused code. Then
@@ -313,8 +313,8 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
     const listeners = new Set<(status: AuthStatus) => void>();
 
     const session: AuthSession = {
-        clientId,
-        clientAuth: {
+        client_id,
+        client_auth: {
             kind: 'credential',
             credential: credentialForRequest,
             rejected,
@@ -365,55 +365,55 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
 
     async function runAuthorize(): Promise<Result<Credential, AuthError>> {
         // A logout during this attempt ends it. Each step checks the epoch after it waits.
-        const attemptEpoch = epoch;
+        const attempt_epoch = epoch;
         // Read the redirect first, before any wait, so its tokens leave the URL also when the
         // authority does not load.
-        const redirectOutcome = readRedirectParams();
-        if (redirectOutcome.kind === 'denied') {
-            halted = redirectOutcome.error;
-            return failed(redirectOutcome.error);
+        const redirect_outcome = readRedirectParams();
+        if (redirect_outcome.kind === 'denied') {
+            halted = redirect_outcome.error;
+            return failed(redirect_outcome.error);
         }
         if (authority === null) {
             const loaded = await loadAuthority();
-            if (epoch !== attemptEpoch) return failed({ kind: 'logged_out' });
+            if (epoch !== attempt_epoch) return failed({ kind: 'logged_out' });
             if (!loaded.ok) return failed(loaded.error);
         }
 
-        const known = await tokenFromKnownCredentials(attemptEpoch);
+        const known = await tokenFromKnownCredentials(attempt_epoch);
         // Check the epoch first: a logout during the wait makes even a known credential old.
-        if (epoch !== attemptEpoch) return failed({ kind: 'logged_out' });
+        if (epoch !== attempt_epoch) return failed({ kind: 'logged_out' });
         if (known !== null) return known;
 
         const grant = config.grant;
         switch (grant.kind) {
             case 'password': {
-                const result = await requestTokens(attemptEpoch, {
+                const result = await requestTokens(attempt_epoch, {
                     grant_type: 'password',
-                    client_id: clientId,
-                    redirect_uri: config.redirectUri,
+                    client_id,
+                    redirect_uri: config.redirect_uri,
                     scope: config.scope,
                     username: grant.username,
                     password: grant.password,
                     authority: authority?.id ?? '',
-                    ...(grant.clientSecret === undefined
+                    ...(grant.client_secret === undefined
                         ? {}
-                        : { client_secret: grant.clientSecret }),
+                        : { client_secret: grant.client_secret }),
                 });
                 return result.ok ? signedIn(result.value) : failed(result.error);
             }
             case 'entra': {
-                const subjectToken = await grant.entraToken();
-                if (epoch !== attemptEpoch) return failed({ kind: 'logged_out' });
-                if (subjectToken === null) return failed({ kind: 'entra_token_missing' });
-                const result = await requestTokens(attemptEpoch, {
+                const subject_token = await grant.entraToken();
+                if (epoch !== attempt_epoch) return failed({ kind: 'logged_out' });
+                if (subject_token === null) return failed({ kind: 'entra_token_missing' });
+                const result = await requestTokens(attempt_epoch, {
                     grant_type: 'urn:ietf:params:oauth:grant-type:token-exchange',
-                    client_id: clientId,
-                    subject_token: subjectToken,
+                    client_id,
+                    subject_token,
                     subject_token_type: 'urn:ietf:params:oauth:token-type:access_token',
                     scope: config.scope,
-                    ...(grant.clientSecret === undefined
+                    ...(grant.client_secret === undefined
                         ? {}
-                        : { client_secret: grant.clientSecret }),
+                        : { client_secret: grant.client_secret }),
                 });
                 return result.ok ? signedIn(result.value) : failed(result.error);
             }
@@ -431,9 +431,9 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
             return failed(late.error);
         }
         if (late.kind === 'applied') {
-            const fromLink = await tokenFromKnownCredentials(attemptEpoch);
-            if (epoch !== attemptEpoch) return failed({ kind: 'logged_out' });
-            if (fromLink !== null) return fromLink;
+            const from_link = await tokenFromKnownCredentials(attempt_epoch);
+            if (epoch !== attempt_epoch) return failed({ kind: 'logged_out' });
+            if (from_link !== null) return from_link;
         }
 
         // The user must act. Go to the server one time only, until a redirect comes back.
@@ -443,9 +443,9 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
         assert(current !== null, 'the authority is loaded');
         if (current.session) {
             const url = createAuthorizeUrl();
-            if (config.useFrame !== true) return redirect(url);
+            if (config.use_frame !== true) return redirect(url);
             const framed = await environment.authorizeInFrame(url, FRAME_TIMEOUT_MS);
-            if (epoch !== attemptEpoch) return failed({ kind: 'logged_out' });
+            if (epoch !== attempt_epoch) return failed({ kind: 'logged_out' });
             if (!framed.ok) return failed({ kind: 'frame_failed', reason: framed.error });
             const message = parseResponse(FrameMessage, framed.value);
             if (!message.ok) return failed({ kind: 'frame_failed', reason: 'message_invalid' });
@@ -463,12 +463,12 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
                 default:
                     return unreachable(applied);
             }
-            const fromFrame = await tokenFromKnownCredentials(attemptEpoch);
-            if (epoch !== attemptEpoch) return failed({ kind: 'logged_out' });
-            if (fromFrame !== null) return fromFrame;
+            const from_frame = await tokenFromKnownCredentials(attempt_epoch);
+            if (epoch !== attempt_epoch) return failed({ kind: 'logged_out' });
+            if (from_frame !== null) return from_frame;
             return failed({ kind: 'frame_failed', reason: 'message_invalid' });
         }
-        if (!handleLogin) return failed({ kind: 'login_required' });
+        if (!handle_login) return failed({ kind: 'login_required' });
         return redirect(loginUrl(current));
     }
 
@@ -477,20 +477,20 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
      * a redirect, and the refresh token. Returns `null` if none gives a credential.
      */
     async function tokenFromKnownCredentials(
-        attemptEpoch: number,
+        attempt_epoch: number,
     ): Promise<Result<Credential, AuthError> | null> {
         const current = currentCredential();
         if (current !== null) return signedIn(current);
 
-        if (pendingCode !== null) {
-            const code = pendingCode;
-            pendingCode = null;
-            const verifier = environment.sessionStorage.get(storageKey('code_verifier'));
-            environment.sessionStorage.remove(storageKey('code_verifier'));
-            const result = await requestTokens(attemptEpoch, {
+        if (pending_code !== null) {
+            const code = pending_code;
+            pending_code = null;
+            const verifier = environment.session_storage.get(storageKey('code_verifier'));
+            environment.session_storage.remove(storageKey('code_verifier'));
+            const result = await requestTokens(attempt_epoch, {
                 grant_type: 'authorization_code',
-                client_id: clientId,
-                redirect_uri: config.redirectUri,
+                client_id,
+                redirect_uri: config.redirect_uri,
                 code,
                 ...(verifier === null ? {} : { code_verifier: verifier }),
             });
@@ -500,30 +500,30 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
             return failed(result.error);
         }
 
-        const refreshToken = readTokens().refreshToken;
-        if (refreshToken !== null) {
-            const result = await requestTokens(attemptEpoch, {
+        const refresh_token = readTokens().refresh_token;
+        if (refresh_token !== null) {
+            const result = await requestTokens(attempt_epoch, {
                 grant_type: 'refresh_token',
-                client_id: clientId,
-                redirect_uri: config.redirectUri,
-                refresh_token: refreshToken,
+                client_id,
+                redirect_uri: config.redirect_uri,
+                refresh_token,
             });
             if (result.ok) return signedIn(result.value);
             if (!isRefusal(result.error)) return failed(result.error);
             // Keep a refresh token after a network error, but not after the server refused it.
-            writeTokens({ ...readTokens(), refreshToken: null });
+            writeTokens({ ...readTokens(), refresh_token: null });
         }
         return null;
     }
 
     /** Sends a grant to the token endpoint and keeps the tokens of the response. */
     async function requestTokens(
-        attemptEpoch: number,
+        attempt_epoch: number,
         params: Readonly<Record<string, string>>,
     ): Promise<Result<Credential, AuthError>> {
         const fetched = await fetchBody(
             environment.fetch,
-            serverUrl(config.tokenPath ?? TOKEN_PATH_DEFAULT),
+            serverUrl(config.token_path ?? TOKEN_PATH_DEFAULT),
             {
                 method: 'POST',
                 headers: {
@@ -536,7 +536,7 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
             limits,
         );
         // A logout ran while the request waited. Its tokens must not log the user in again.
-        if (epoch !== attemptEpoch) return { ok: false, error: { kind: 'logged_out' } };
+        if (epoch !== attempt_epoch) return { ok: false, error: { kind: 'logged_out' } };
         if (!fetched.ok) {
             return { ok: false, error: { kind: 'token_unavailable', error: fetched.error } };
         }
@@ -556,40 +556,40 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
         const parsed = parseResponse(TokenResponse, decoded.value);
         if (!parsed.ok) return { ok: false, error: { kind: 'token_invalid', ...parsed.error } };
         const tokens = parsed.value;
-        const expiresIn =
+        const expires_in =
             tokens.expires_in === null ? null : parseSeconds(String(tokens.expires_in));
-        storeTokens(tokens.access_token, tokens.refresh_token, expiresIn);
+        storeTokens(tokens.access_token, tokens.refresh_token, expires_in);
         return { ok: true, value: { kind: 'bearer', token: tokens.access_token } };
     }
 
     function storeTokens(
-        accessToken: string,
-        refreshToken: string | null,
-        expiresInSeconds: number | null,
+        access_token: string,
+        refresh_token: string | null,
+        expires_in_seconds: number | null,
     ): void {
-        const lifetimeSeconds =
-            expiresInSeconds === null
+        const lifetime_seconds =
+            expires_in_seconds === null
                 ? TOKEN_LIFETIME_DEFAULT_SECONDS
                 : Math.max(
                       TOKEN_LIFETIME_MIN_SECONDS,
-                      expiresInSeconds - TOKEN_EXPIRY_MARGIN_SECONDS,
+                      expires_in_seconds - TOKEN_EXPIRY_MARGIN_SECONDS,
                   );
         writeTokens({
-            accessToken,
+            access_token,
             // A refresh grant can answer without a new refresh token. Keep the one we have.
-            refreshToken: refreshToken ?? readTokens().refreshToken,
-            expiresAtMs: environment.now() + lifetimeSeconds * 1000,
+            refresh_token: refresh_token ?? readTokens().refresh_token,
+            expires_at_ms: environment.now() + lifetime_seconds * 1000,
         });
     }
 
     /** The credential now, from the API key or a valid access token. It makes no requests. */
     function currentCredential(): Credential | null {
-        const apiKey = config.ignoreApiKey === true ? null : deviceValue('x-api-key');
-        if (apiKey !== null && apiKey.length > 0) return { kind: 'api_key', key: apiKey };
+        const api_key = config.ignore_api_key === true ? null : deviceValue('x-api-key');
+        if (api_key !== null && api_key.length > 0) return { kind: 'api_key', key: api_key };
         const tokens = readTokens();
-        if (tokens.accessToken === null) return null;
-        if (environment.now() >= tokens.expiresAtMs) return null;
-        return { kind: 'bearer', token: tokens.accessToken };
+        if (tokens.access_token === null) return null;
+        if (environment.now() >= tokens.expires_at_ms) return null;
+        return { kind: 'bearer', token: tokens.access_token };
     }
 
     async function credentialForRequest(): Promise<Credential | null> {
@@ -621,25 +621,25 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
         invalidateToken();
         if (status === 511) {
             // 511: the session on the server ended. The user must log in again.
-            if (handleLogin && authority !== null) redirect(loginUrl(authority));
+            if (handle_login && authority !== null) redirect(loginUrl(authority));
             return false;
         }
         // 401: the session can have changed, so load the authority again before the new attempt.
-        const renewEpoch = epoch;
+        const renew_epoch = epoch;
         const reloaded = await loadAuthority();
         if (!reloaded.ok) return false;
         // A logout while the authority loaded ends the renewal. A new attempt would log in again.
-        if (epoch !== renewEpoch) return false;
+        if (epoch !== renew_epoch) return false;
         const result = await authorize();
         return result.ok;
     }
 
     function loadAuthority(): Promise<Result<DomainAuthority, AuthError>> {
-        if (loadingAuthority !== null) return loadingAuthority;
+        if (loading_authority !== null) return loading_authority;
         const attempt = runLoadAuthority().finally(() => {
-            loadingAuthority = null;
+            loading_authority = null;
         });
-        loadingAuthority = attempt;
+        loading_authority = attempt;
         return attempt;
     }
 
@@ -700,8 +700,8 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
 
     /** Reads and removes the parameters that `handleRedirect` kept. */
     function readDeepLink(): ReadonlyMap<string, string> {
-        const text = environment.sessionStorage.get(DEEP_LINK_KEY);
-        environment.sessionStorage.remove(DEEP_LINK_KEY);
+        const text = environment.session_storage.get(DEEP_LINK_KEY);
+        environment.session_storage.remove(DEEP_LINK_KEY);
         if (text === null) return new Map();
         const decoded = decodeJson(new TextEncoder().encode(text));
         if (!decoded.ok) return new Map();
@@ -729,13 +729,17 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
             };
         }
         const code = params.get('code');
-        if (code !== undefined) pendingCode = code;
-        const accessToken = params.get('access_token');
-        const refreshToken = params.get('refresh_token') ?? null;
-        if (accessToken !== undefined) {
-            storeTokens(accessToken, refreshToken, parseSeconds(params.get('expires_in') ?? null));
-        } else if (refreshToken !== null) {
-            writeTokens({ ...readTokens(), refreshToken });
+        if (code !== undefined) pending_code = code;
+        const access_token = params.get('access_token');
+        const refresh_token = params.get('refresh_token') ?? null;
+        if (access_token !== undefined) {
+            storeTokens(
+                access_token,
+                refresh_token,
+                parseSeconds(params.get('expires_in') ?? null),
+            );
+        } else if (refresh_token !== null) {
+            writeTokens({ ...readTokens(), refresh_token });
         }
         // The redirect came back, so the page is not on its way to the server now.
         if (status.kind === 'redirecting') setStatus({ kind: 'loading' });
@@ -746,22 +750,22 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
     function createAuthorizeUrl(): string {
         const nonce = randomString(NONCE_LENGTH);
         storage.set(storageKey('nonce'), nonce);
-        const responseType = isTrusted() || config.grant.kind === 'code' ? 'code' : 'token';
+        const response_type = isTrusted() || config.grant.kind === 'code' ? 'code' : 'token';
         const params = new URLSearchParams({
-            response_type: responseType,
-            client_id: clientId,
+            response_type,
+            client_id,
             state: nonce,
-            redirect_uri: config.redirectUri,
+            redirect_uri: config.redirect_uri,
             scope: config.scope,
         });
-        if (responseType === 'code') {
+        if (response_type === 'code') {
             const verifier = randomString(VERIFIER_LENGTH);
-            environment.sessionStorage.set(storageKey('code_verifier'), verifier);
+            environment.session_storage.set(storageKey('code_verifier'), verifier);
             const challenge = base64Url(sha256(new TextEncoder().encode(verifier)));
             params.set('code_challenge_method', 'S256');
             params.set('code_challenge', challenge);
         }
-        const base = serverUrl(config.authorizePath ?? AUTHORIZE_PATH_DEFAULT);
+        const base = serverUrl(config.authorize_path ?? AUTHORIZE_PATH_DEFAULT);
         return `${base}${base.includes('?') ? '&' : '?'}${params.toString()}`;
     }
 
@@ -776,7 +780,7 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
      */
     function serverUrl(path: string): string {
         if (/^https?:\/\//.test(path)) return path;
-        return `${config.baseUrl}${path}`;
+        return `${config.base_url}${path}`;
     }
 
     function redirect(url: string): Result<Credential, AuthError> {
@@ -799,18 +803,18 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
     async function handleRedirect(url: string): Promise<Result<Credential, AuthError>> {
         const params = urlParams(url);
         if (!hasLoginParams(params)) return { ok: false, error: { kind: 'redirect_invalid' } };
-        environment.sessionStorage.set(DEEP_LINK_KEY, JSON.stringify(Object.fromEntries(params)));
+        environment.session_storage.set(DEEP_LINK_KEY, JSON.stringify(Object.fromEntries(params)));
         // An attempt that runs now reads the deep link before it redirects. Then its result is the
         // result of the link, and a second attempt would redirect after a denial.
         if (authorizing !== null) {
-            const linkEpoch = epoch;
+            const link_epoch = epoch;
             const running = await authorizing;
             // A logout while the link waited ends it. A new attempt would log in again.
-            if (epoch !== linkEpoch) {
-                environment.sessionStorage.remove(DEEP_LINK_KEY);
+            if (epoch !== link_epoch) {
+                environment.session_storage.remove(DEEP_LINK_KEY);
                 return { ok: false, error: { kind: 'logged_out' } };
             }
-            if (environment.sessionStorage.get(DEEP_LINK_KEY) === null) return running;
+            if (environment.session_storage.get(DEEP_LINK_KEY) === null) return running;
         }
         if (status.kind === 'redirecting') setStatus({ kind: 'loading' });
         halted = null;
@@ -820,9 +824,9 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
     function onForeground(): void {
         // The handler only starts the check. Many events while a check runs give one check. A
         // rejection here is a bug, and the browser reports it as an unhandled rejection.
-        if (foregroundCheck !== null) return;
-        foregroundCheck = checkAfterForeground().finally(() => {
-            foregroundCheck = null;
+        if (foreground_check !== null) return;
+        foreground_check = checkAfterForeground().finally(() => {
+            foreground_check = null;
         });
     }
 
@@ -835,24 +839,25 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
         if (authority.session) return;
         if (currentCredential() !== null) return;
         if (status.kind === 'redirecting') setStatus({ kind: 'loading' });
-        const hasNewCredentials =
-            environment.sessionStorage.get(DEEP_LINK_KEY) !== null ||
-            pendingCode !== null ||
-            readTokens().refreshToken !== null;
-        if (!hasNewCredentials) {
-            const checkEpoch = epoch;
+        const has_new_credentials =
+            environment.session_storage.get(DEEP_LINK_KEY) !== null ||
+            pending_code !== null ||
+            readTokens().refresh_token !== null;
+        if (!has_new_credentials) {
+            const check_epoch = epoch;
             const reloaded = await loadAuthority();
             if (!reloaded.ok) return;
             // A logout while the authority loaded ends the check.
-            if (epoch !== checkEpoch) return;
+            if (epoch !== check_epoch) return;
         }
         await authorize();
     }
 
-    function useToken(token: string, expiresAtMs?: number): void {
+    function useToken(token: string, expires_at_ms?: number): void {
         assert(token.length > 0, 'the token is not empty');
-        const expiresAt = expiresAtMs ?? environment.now() + TOKEN_LIFETIME_DEFAULT_SECONDS * 1000;
-        writeTokens({ ...readTokens(), accessToken: token, expiresAtMs: expiresAt });
+        const expires_at =
+            expires_at_ms ?? environment.now() + TOKEN_LIFETIME_DEFAULT_SECONDS * 1000;
+        writeTokens({ ...readTokens(), access_token: token, expires_at_ms: expires_at });
         halted = null;
         setStatus({ kind: 'signed_in', credential: 'bearer' });
     }
@@ -866,22 +871,22 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
     }
 
     function invalidateToken(): void {
-        writeTokens({ ...readTokens(), accessToken: null, expiresAtMs: 0 });
+        writeTokens({ ...readTokens(), access_token: null, expires_at_ms: 0 });
     }
 
     async function logout(): Promise<void> {
         const url =
             authority === null ? serverUrl(LOGOUT_PATH_DEFAULT) : serverUrl(authority.logout_url);
         epoch += 1;
-        const requestHeaders: Record<string, string> = { ...headers };
+        const request_headers: Record<string, string> = { ...headers };
         // Send the token also after its local expiry. That has a margin, so the server can still
         // accept the token, and the logout revokes it.
-        const accessToken = readTokens().accessToken;
-        if (accessToken !== null) requestHeaders['Authorization'] = `Bearer ${accessToken}`;
+        const access_token = readTokens().access_token;
+        if (access_token !== null) request_headers['Authorization'] = `Bearer ${access_token}`;
         const fetched = await fetchBody(
             environment.fetch,
             url,
-            { method: 'GET', headers: requestHeaders, redirect: 'manual' },
+            { method: 'GET', headers: request_headers, redirect: 'manual' },
             limits,
         );
         // Remove the credentials also when the request fails. The navigation ends the session.
@@ -893,15 +898,15 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
 
     /** Removes each stored value of this client: each key that has the client ID, and the link. */
     function clearCredentials(): void {
-        for (const store of [storage, environment.sessionStorage]) {
+        for (const store of [storage, environment.session_storage]) {
             for (const key of store.keys()) {
-                if (key.includes(clientId)) store.remove(key);
+                if (key.includes(client_id)) store.remove(key);
             }
         }
         // The deep link key has no client ID, so 6.x can read it. A logout also ends a waiting link.
-        environment.sessionStorage.remove(DEEP_LINK_KEY);
-        memoryTokens = NO_TOKENS;
-        pendingCode = null;
+        environment.session_storage.remove(DEEP_LINK_KEY);
+        memory_tokens = NO_TOKENS;
+        pending_code = null;
     }
 
     function isTrusted(): boolean {
@@ -909,8 +914,8 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
     }
 
     function isFixedDevice(): boolean {
-        const apiKey = deviceValue('x-api-key');
-        if (config.ignoreApiKey !== true && apiKey !== null && apiKey.length > 0) return true;
+        const api_key = deviceValue('x-api-key');
+        if (config.ignore_api_key !== true && api_key !== null && api_key.length > 0) return true;
         return deviceValue('fixed_device') === 'true';
     }
 
@@ -921,22 +926,22 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
 
     /** The one place that reads the tokens: the storage if trusted, else memory. */
     function readTokens(): Tokens {
-        if (!isTrusted()) return memoryTokens;
+        if (!isTrusted()) return memory_tokens;
         return {
-            accessToken: storage.get(storageKey('access_token')),
-            refreshToken: storage.get(storageKey('refresh_token')),
-            expiresAtMs: parseStoredMs(storage.get(storageKey('expires_at'))),
+            access_token: storage.get(storageKey('access_token')),
+            refresh_token: storage.get(storageKey('refresh_token')),
+            expires_at_ms: parseStoredMs(storage.get(storageKey('expires_at'))),
         };
     }
 
     function writeTokens(tokens: Tokens): void {
         if (!isTrusted()) {
-            memoryTokens = tokens;
+            memory_tokens = tokens;
             return;
         }
-        writeStored(storageKey('access_token'), tokens.accessToken);
-        writeStored(storageKey('refresh_token'), tokens.refreshToken);
-        writeStored(storageKey('expires_at'), String(tokens.expiresAtMs));
+        writeStored(storageKey('access_token'), tokens.access_token);
+        writeStored(storageKey('refresh_token'), tokens.refresh_token);
+        writeStored(storageKey('expires_at'), String(tokens.expires_at_ms));
     }
 
     function writeStored(key: string, value: string | null): void {
@@ -985,11 +990,11 @@ export function urlParams(url: string): ReadonlyMap<string, string> {
     if (!URL.canParse(url)) return params;
     const parsed = new URL(url);
     const hash = parsed.hash.slice(1);
-    const queryStart = hash.indexOf('?');
-    const hashMain = queryStart >= 0 ? hash.slice(0, queryStart) : hash;
-    const hashQuery = queryStart >= 0 ? hash.slice(queryStart + 1) : '';
+    const query_start = hash.indexOf('?');
+    const hash_main = query_start >= 0 ? hash.slice(0, query_start) : hash;
+    const hash_query = query_start >= 0 ? hash.slice(query_start + 1) : '';
     // The query of the page wins over the hash, as in 6.x.
-    for (const part of [hashMain, hashQuery, parsed.search.slice(1)]) {
+    for (const part of [hash_main, hash_query, parsed.search.slice(1)]) {
         if (!part.includes('=')) continue;
         for (const [key, value] of new URLSearchParams(part)) {
             if (value.length > 0) params.set(key, value);
@@ -1004,12 +1009,12 @@ export function withoutParams(url: string, names: ReadonlySet<string>): string {
     const parsed = new URL(url);
     parsed.search = removeNames(parsed.search.slice(1), names);
     const hash = parsed.hash.slice(1);
-    const queryStart = hash.indexOf('?');
-    let hashMain = queryStart >= 0 ? hash.slice(0, queryStart) : hash;
-    const hashQuery = removeNames(queryStart >= 0 ? hash.slice(queryStart + 1) : '', names);
+    const query_start = hash.indexOf('?');
+    let hash_main = query_start >= 0 ? hash.slice(0, query_start) : hash;
+    const hash_query = removeNames(query_start >= 0 ? hash.slice(query_start + 1) : '', names);
     // A hash such as `#/rooms` is a route, not parameters.
-    if (hashMain.includes('=')) hashMain = removeNames(hashMain, names);
-    parsed.hash = hashQuery.length > 0 ? `${hashMain}?${hashQuery}` : hashMain;
+    if (hash_main.includes('=')) hash_main = removeNames(hash_main, names);
+    parsed.hash = hash_query.length > 0 ? `${hash_main}?${hash_query}` : hash_main;
     return parsed.toString();
 }
 

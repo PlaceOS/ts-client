@@ -44,7 +44,7 @@ export function addModule(
 const ADD_MODULE = /* @__PURE__ */ operation({
     method: 'PUT',
     path: '/api/engine/v2/systems/{sys_id}/module/{module_id}',
-    pathKeys: ['sys_id', 'module_id'],
+    path_keys: ['sys_id', 'module_id'],
     params: /* @__PURE__ */ parameters(
         {
             sys_id: /* @__PURE__ */ string(),
@@ -72,7 +72,7 @@ export function create(
 const CREATE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/systems',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({}),
     body: ControlSystem,
     response: ControlSystem,
@@ -94,7 +94,7 @@ export function destroy(
 const DESTROY = /* @__PURE__ */ operation({
     method: 'DELETE',
     path: '/api/engine/v2/systems/{sys_id}',
-    pathKeys: ['sys_id'],
+    path_keys: ['sys_id'],
     params: /* @__PURE__ */ parameters(
         {
             sys_id: /* @__PURE__ */ string(),
@@ -121,7 +121,7 @@ export function execute(
 const EXECUTE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/systems/{sys_id}/{module_slug}/{method}',
-    pathKeys: ['sys_id', 'module_slug', 'method'],
+    path_keys: ['sys_id', 'module_slug', 'method'],
     params: /* @__PURE__ */ parameters(
         {
             sys_id: /* @__PURE__ */ string(),
@@ -152,7 +152,7 @@ export function findByEmail(
 const FIND_BY_EMAIL = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/systems/with_emails',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters(
         {
             /** comma seperated list of emails */
@@ -182,7 +182,7 @@ export function functions(
 const FUNCTIONS = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/systems/{sys_id}/functions/{module_slug}',
-    pathKeys: ['sys_id', 'module_slug'],
+    path_keys: ['sys_id', 'module_slug'],
     params: /* @__PURE__ */ parameters(
         {
             sys_id: /* @__PURE__ */ string(),
@@ -211,7 +211,7 @@ export function metadata(
 const METADATA = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/systems/{sys_id}/metadata',
-    pathKeys: ['sys_id'],
+    path_keys: ['sys_id'],
     params: /* @__PURE__ */ parameters(
         {
             sys_id: /* @__PURE__ */ string(),
@@ -239,7 +239,7 @@ export function query(
 const QUERY = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/systems',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({
         /** return only bookable or non-bookable rooms (returns both when not specified) */
         bookable: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
@@ -304,7 +304,7 @@ export function removeModule(
 const REMOVE_MODULE = /* @__PURE__ */ operation({
     method: 'DELETE',
     path: '/api/engine/v2/systems/{sys_id}/module/{module_id}',
-    pathKeys: ['sys_id', 'module_id'],
+    path_keys: ['sys_id', 'module_id'],
     params: /* @__PURE__ */ parameters(
         {
             sys_id: /* @__PURE__ */ string(),
@@ -332,7 +332,7 @@ export function settings(
 const SETTINGS = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/systems/{sys_id}/settings',
-    pathKeys: ['sys_id'],
+    path_keys: ['sys_id'],
     params: /* @__PURE__ */ parameters(
         {
             sys_id: /* @__PURE__ */ string(),
@@ -359,7 +359,7 @@ export function show(
 const SHOW = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/systems/{sys_id}',
-    pathKeys: ['sys_id'],
+    path_keys: ['sys_id'],
     params: /* @__PURE__ */ parameters(
         {
             sys_id: /* @__PURE__ */ string(),
@@ -388,7 +388,7 @@ export function start(
 const START = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/systems/{sys_id}/start',
-    pathKeys: ['sys_id'],
+    path_keys: ['sys_id'],
     params: /* @__PURE__ */ parameters(
         {
             sys_id: /* @__PURE__ */ string(),
@@ -417,7 +417,7 @@ export function state(
 const STATE = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/systems/{sys_id}/{module_slug}',
-    pathKeys: ['sys_id', 'module_slug'],
+    path_keys: ['sys_id', 'module_slug'],
     params: /* @__PURE__ */ parameters(
         {
             sys_id: /* @__PURE__ */ string(),
@@ -449,7 +449,7 @@ export function stateLookup(
 const STATE_LOOKUP = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/systems/{sys_id}/{module_slug}/{key}',
-    pathKeys: ['sys_id', 'module_slug', 'key'],
+    path_keys: ['sys_id', 'module_slug', 'key'],
     params: /* @__PURE__ */ parameters(
         {
             sys_id: /* @__PURE__ */ string(),
@@ -480,7 +480,7 @@ export function stop(
 const STOP = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/systems/{sys_id}/stop',
-    pathKeys: ['sys_id'],
+    path_keys: ['sys_id'],
     params: /* @__PURE__ */ parameters(
         {
             sys_id: /* @__PURE__ */ string(),
@@ -509,7 +509,7 @@ export function sysZones(
 const SYS_ZONES = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/systems/{sys_id}/zones',
-    pathKeys: ['sys_id'],
+    path_keys: ['sys_id'],
     params: /* @__PURE__ */ parameters(
         {
             sys_id: /* @__PURE__ */ string(),
@@ -536,7 +536,7 @@ export function types(
 const TYPES = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/systems/{sys_id}/types',
-    pathKeys: ['sys_id'],
+    path_keys: ['sys_id'],
     params: /* @__PURE__ */ parameters(
         {
             sys_id: /* @__PURE__ */ string(),
@@ -563,7 +563,7 @@ export function update(
 const UPDATE = /* @__PURE__ */ operation({
     method: 'PATCH',
     path: '/api/engine/v2/systems/{sys_id}',
-    pathKeys: ['sys_id'],
+    path_keys: ['sys_id'],
     params: /* @__PURE__ */ parameters(
         {
             sys_id: /* @__PURE__ */ string(),

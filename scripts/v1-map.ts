@@ -68,7 +68,7 @@ interface V2Operation {
     readonly method: string;
     readonly segments: readonly string[];
     readonly params: ReadonlySet<string>;
-    readonly hasBody: boolean;
+    readonly has_body: boolean;
     /** `true` when the response is an array. */
     readonly list: boolean;
     /** The named schema of the response data, or of its items, such as `Zone`. */
@@ -186,7 +186,7 @@ async function main(): Promise<void> {
  * The exports of `src/compat` that 6.x also has, with `value` or `type`. The enums are generated
  * into `src/compat/enums.ts` by this script, so they count before the file exists.
  */
-function readCompatExports(v1Names: ReadonlySet<string>): Record<string, 'type' | 'value'> {
+function readCompatExports(v1_names: ReadonlySet<string>): Record<string, 'type' | 'value'> {
     const program = ts.createProgram([COMPAT_INDEX], {
         target: ts.ScriptTarget.ES2022,
         module: ts.ModuleKind.Preserve,
@@ -198,12 +198,12 @@ function readCompatExports(v1Names: ReadonlySet<string>): Record<string, 'type' 
     const checker = program.getTypeChecker();
     const source = program.getSourceFile(COMPAT_INDEX);
     assert(source !== undefined, 'the compat index exists');
-    const moduleSymbol = checker.getSymbolAtLocation(source);
-    assert(moduleSymbol !== undefined, 'the compat index is a module');
+    const module_symbol = checker.getSymbolAtLocation(source);
+    assert(module_symbol !== undefined, 'the compat index is a module');
     const compat: Record<string, 'type' | 'value'> = {};
-    for (const exported of checker.getExportsOfModule(moduleSymbol)) {
+    for (const exported of checker.getExportsOfModule(module_symbol)) {
         const name = exported.getName();
-        if (!v1Names.has(name)) continue;
+        if (!v1_names.has(name)) continue;
         const symbol =
             exported.flags & ts.SymbolFlags.Alias ? checker.getAliasedSymbol(exported) : exported;
         compat[name] = symbol.flags & ts.SymbolFlags.Value ? 'value' : 'type';
@@ -226,11 +226,11 @@ function readV1Enums(): Map<string, { key: string; value: string | number }[]> {
         if (NOT_REST.test(relative(V1_SOURCE, declaration.getSourceFile().fileName))) continue;
         const members = declaration.members.map((member) => {
             const key = member.name.getText();
-            const v1Value = checker.getConstantValue(member);
-            assert(v1Value !== undefined, `${name}.${key} has a constant value`);
+            const v1_value = checker.getConstantValue(member);
+            assert(v1_value !== undefined, `${name}.${key} has a constant value`);
             const numbers = NUMBER_ENUMS[name];
-            if (numbers === undefined) return { key, value: v1Value };
-            const value = numbers[String(v1Value)];
+            if (numbers === undefined) return { key, value: v1_value };
+            const value = numbers[String(v1_value)];
             assert(value !== undefined, `${name}.${key} has a 7.x number`);
             return { key, value };
         });
@@ -283,10 +283,10 @@ function readV1Functions(): V1Function[] {
         const data = page
             ? returned?.aliasTypeArguments?.[0]
             : returned && checker.getAwaitedType(returned);
-        const modelSymbol = data?.getSymbol();
+        const model_symbol = data?.getSymbol();
         const model =
-            modelSymbol !== undefined && modelSymbol.flags & ts.SymbolFlags.Class
-                ? modelSymbol.getName()
+            model_symbol !== undefined && model_symbol.flags & ts.SymbolFlags.Class
+                ? model_symbol.getName()
                 : null;
         const list = !page && data !== undefined && data !== null && checker.isArrayType(data);
         functions.push({ name, file, parameters, page, list, model });
@@ -304,10 +304,10 @@ function readV1OtherExports(): string[] {
     return names;
 }
 
-let cachedExports: { checker: ts.TypeChecker; exports: Map<string, ts.Symbol> } | null = null;
+let cached_exports: { checker: ts.TypeChecker; exports: Map<string, ts.Symbol> } | null = null;
 
 function v1Exports(): { checker: ts.TypeChecker; exports: Map<string, ts.Symbol> } {
-    if (cachedExports !== null) return cachedExports;
+    if (cached_exports !== null) return cached_exports;
     const program = ts.createProgram([V1_INDEX], {
         target: ts.ScriptTarget.ES2022,
         module: ts.ModuleKind.ESNext,
@@ -319,16 +319,16 @@ function v1Exports(): { checker: ts.TypeChecker; exports: Map<string, ts.Symbol>
     const checker = program.getTypeChecker();
     const source = program.getSourceFile(V1_INDEX);
     assert(source !== undefined, 'the 6.x index exists');
-    const moduleSymbol = checker.getSymbolAtLocation(source);
-    assert(moduleSymbol !== undefined, 'the 6.x index is a module');
+    const module_symbol = checker.getSymbolAtLocation(source);
+    assert(module_symbol !== undefined, 'the 6.x index is a module');
     const exports = new Map<string, ts.Symbol>();
-    for (const exported of checker.getExportsOfModule(moduleSymbol)) {
+    for (const exported of checker.getExportsOfModule(module_symbol)) {
         const symbol =
             exported.flags & ts.SymbolFlags.Alias ? checker.getAliasedSymbol(exported) : exported;
         exports.set(exported.getName(), symbol);
     }
-    cachedExports = { checker, exports };
-    return cachedExports;
+    cached_exports = { checker, exports };
+    return cached_exports;
 }
 
 function parameterKind(checker: ts.TypeChecker, type: ts.Type): ParameterKind {
@@ -368,11 +368,11 @@ async function readV2Operations(dir: string, module: 'staff' | null): Promise<V2
             const [, constant = '', method = '', path = ''] = header;
             const name = names.get(constant);
             assert(name !== undefined, `the operation ${constant} has a function`);
-            const paramsText = /params: ([\s\S]*?)\n {4}body: /.exec(block)?.[1] ?? '';
+            const params_text = /params: ([\s\S]*?)\n {4}body: /.exec(block)?.[1] ?? '';
             const params = new Set<string>();
-            for (const [, key = ''] of paramsText.matchAll(/^\s+(\w+): \/\* @__PURE__ \*\//gm))
+            for (const [, key = ''] of params_text.matchAll(/^\s+(\w+): \/\* @__PURE__ \*\//gm))
                 params.add(key);
-            const hasBody = !/\n {4}body: null,/.test(block);
+            const has_body = !/\n {4}body: null,/.test(block);
             const response = (/\n {4}response: (.*),\n/.exec(block)?.[1] ?? '').replaceAll(
                 '/* @__PURE__ */ ',
                 '',
@@ -385,7 +385,7 @@ async function readV2Operations(dir: string, module: 'staff' | null): Promise<V2
                 method,
                 segments: path.split('/').filter(Boolean),
                 params,
-                hasBody,
+                has_body,
                 // `array(` can be on its own line, before the items.
                 list: /\n {4}response: (?:\/\* @__PURE__ \*\/ )?array\(/.test(block),
                 model,
@@ -427,13 +427,13 @@ async function loadRecorder(): Promise<Recorder> {
     Reflect.set(globalThis, 'location', location);
     Reflect.set(globalThis, 'localStorage', memoryStorage());
     Reflect.set(globalThis, 'sessionStorage', memoryStorage());
-    const httpModule = join(V1_SOURCE, 'http', 'functions.ts');
+    const http_module = join(V1_SOURCE, 'http', 'functions.ts');
     Bun.plugin({
         name: '6.x HTTP recorder',
         setup(build) {
             build.onLoad({ filter: /\/src\/http\/functions\.ts$/ }, (args) => {
                 assert(
-                    args.path === httpModule,
+                    args.path === http_module,
                     `only the 6.x HTTP module is replaced: ${args.path}`,
                 );
                 return { loader: 'js', contents: RECORDER_SOURCE };
@@ -607,7 +607,7 @@ async function mapFunction(
     }
     if (request.body !== undefined) {
         const body = valueTemplate(request.body);
-        if (operation.hasBody) {
+        if (operation.has_body) {
             entries.push({ kind: 'property', key: 'body', value: body });
         } else if (body.kind === 'arg' && hasOpenQuery(operation, entries)) {
             // The API reads these values from the query. 6.x sent them in the body.
@@ -644,11 +644,11 @@ async function mapFunction(
     const input: Template = { kind: 'object', entries };
     const used = new Set<number>();
     collectArgs(input, used);
-    const pickIndex = first.reads
+    const pick_index = first.reads
         .map((key) => /^s(\d)zq$/.exec(key)?.[1])
         .find((index) => index !== undefined);
     const pick: Template | null =
-        pickIndex === undefined ? null : { kind: 'arg', index: Number(pickIndex) };
+        pick_index === undefined ? null : { kind: 'arg', index: Number(pick_index) };
     if (pick !== null) collectArgs(pick, used);
     const parameters: V1Parameter[] = fn.parameters.map((parameter, index) => {
         const use = used.has(index)
@@ -677,8 +677,8 @@ async function mapFunction(
 /** `true` when the operation has a query parameter that no other argument gives. */
 function hasOpenQuery(operation: V2Operation, entries: readonly ObjectEntry[]): boolean {
     const given = new Set(entries.map((entry) => (entry.kind === 'property' ? entry.key : '')));
-    const pathKeys = operation.segments.map((segment) => /^\{(\w+)\}$/.exec(segment)?.[1]);
-    return [...operation.params].some((key) => !pathKeys.includes(key) && !given.has(key));
+    const path_keys = operation.segments.map((segment) => /^\{(\w+)\}$/.exec(segment)?.[1]);
+    return [...operation.params].some((key) => !path_keys.includes(key) && !given.has(key));
 }
 
 /** The operation with this path. A fixed segment is a better match than a `{key}`. */
@@ -690,7 +690,7 @@ function findOperation(
     // 7.x merges the PUT and PATCH update of a resource into one operation.
     const methods = method === 'PUT' || method === 'PATCH' ? ['PUT', 'PATCH'] : [method];
     let best: V2Operation | null = null;
-    let bestScore = -1;
+    let best_score = -1;
     for (const operation of operations) {
         if (!methods.includes(operation.method)) continue;
         if (operation.segments.length !== segments.length) continue;
@@ -704,10 +704,10 @@ function findOperation(
             }
             score += 2;
         }
-        if (!matches || score < bestScore) continue;
-        assert(score !== bestScore, `one best 7.x operation for ${method} /${segments.join('/')}`);
+        if (!matches || score < best_score) continue;
+        assert(score !== best_score, `one best 7.x operation for ${method} /${segments.join('/')}`);
         best = operation;
-        bestScore = score;
+        best_score = score;
     }
     return best;
 }

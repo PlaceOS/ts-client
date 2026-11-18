@@ -28,9 +28,9 @@ export type TokenTransport =
 
 export interface RealtimeEnvironment {
     readonly createSocket: (url: string, handlers: SocketHandlers) => RealtimeSocket;
-    /** The URL of the page now. A `baseUrl` of `''` uses its origin. */
+    /** The URL of the page now. A `base_url` of `''` uses its origin. */
     readonly currentUrl: () => string;
-    readonly tokenTransport: TokenTransport;
+    readonly token_transport: TokenTransport;
     /** Sets a cookie, as `document.cookie = cookie` does. */
     readonly setCookie: (cookie: string) => void;
     /** Milliseconds since the Unix epoch. */
@@ -48,7 +48,7 @@ export function browserRealtimeEnvironment(): RealtimeEnvironment {
     return {
         createSocket,
         currentUrl: () => window.location.href,
-        tokenTransport: isNestedFrame() || isMobileSafari() ? 'query' : 'cookie',
+        token_transport: isNestedFrame() || isMobileSafari() ? 'query' : 'cookie',
         setCookie: (cookie) => {
             document.cookie = cookie;
         },

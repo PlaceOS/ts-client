@@ -41,7 +41,7 @@ export function create(
 const CREATE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/groups',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({}),
     body: Group,
     response: Group,
@@ -59,7 +59,7 @@ export function current(
 const CURRENT = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/groups/current',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({
         /** filter to groups participating in this subsystem (e.g. 'signage') */
         subsystem: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -84,7 +84,7 @@ export function destroy(
 const DESTROY = /* @__PURE__ */ operation({
     method: 'DELETE',
     path: '/api/engine/v2/groups/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -114,7 +114,7 @@ export function features(
 const FEATURES = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/groups/{id}/features',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -148,7 +148,7 @@ export function query(
 const QUERY = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/groups',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({
         /** filter by parent group id; pass 'root' for root-level groups */
         parent_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -183,7 +183,7 @@ export function show(
 const SHOW = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/groups/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -215,7 +215,7 @@ export function syncAdGroups(
 const SYNC_AD_GROUPS = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/groups/ad_groups/sync',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({}),
     body: GroupsAdGroupSync,
     response: /* @__PURE__ */ array(GroupUser),
@@ -240,7 +240,7 @@ export function update(
 const UPDATE = /* @__PURE__ */ operation({
     method: 'PATCH',
     path: '/api/engine/v2/groups/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),

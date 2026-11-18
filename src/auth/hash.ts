@@ -31,21 +31,21 @@ export function md5Hex(text: string): string {
         let d = state[3] ?? 0;
         for (let step = 0; step < 64; step += 1) {
             let mix: number;
-            let wordIndex: number;
+            let word_index: number;
             if (step < 16) {
                 mix = (b & c) | (~b & d);
-                wordIndex = step;
+                word_index = step;
             } else if (step < 32) {
                 mix = (d & b) | (~d & c);
-                wordIndex = (5 * step + 1) % 16;
+                word_index = (5 * step + 1) % 16;
             } else if (step < 48) {
                 mix = b ^ c ^ d;
-                wordIndex = (3 * step + 5) % 16;
+                word_index = (3 * step + 5) % 16;
             } else {
                 mix = c ^ (b | ~d);
-                wordIndex = (7 * step) % 16;
+                word_index = (7 * step) % 16;
             }
-            const sum = (a + mix + (MD5_CONSTANTS[step] ?? 0) + (words[wordIndex] ?? 0)) | 0;
+            const sum = (a + mix + (MD5_CONSTANTS[step] ?? 0) + (words[word_index] ?? 0)) | 0;
             a = d;
             d = c;
             c = b;
@@ -139,18 +139,18 @@ type Endian = 'little' | 'big';
 
 /** Adds the padding of MD5 and SHA-256: a 1 bit, zeros, and the bit length in 8 bytes. */
 function padBlocks(input: Uint8Array, endian: Endian): Uint8Array {
-    const blockCount = Math.ceil((input.length + 9) / 64);
-    const blocks = new Uint8Array(blockCount * 64);
+    const block_count = Math.ceil((input.length + 9) / 64);
+    const blocks = new Uint8Array(block_count * 64);
     blocks.set(input);
     blocks[input.length] = 0x80;
     // The input is less than HASH_INPUT_BYTES_MAX, so the bit length fits in 32 bits.
-    const bitLength = input.length * 8;
-    assert(bitLength < 2 ** 32, 'the bit length fits in 32 bits');
-    const lengthOffset = blocks.length - 8;
+    const bit_length = input.length * 8;
+    assert(bit_length < 2 ** 32, 'the bit length fits in 32 bits');
+    const length_offset = blocks.length - 8;
     for (let byte = 0; byte < 4; byte += 1) {
-        const value = (bitLength >>> (byte * 8)) & 0xff;
+        const value = (bit_length >>> (byte * 8)) & 0xff;
         if (endian === 'little') {
-            blocks[lengthOffset + byte] = value;
+            blocks[length_offset + byte] = value;
         } else {
             blocks[blocks.length - 1 - byte] = value;
         }

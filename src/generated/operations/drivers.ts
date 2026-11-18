@@ -29,7 +29,7 @@ export function compiled(
 const COMPILED = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/drivers/{id}/compiled',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -56,7 +56,7 @@ export function create(
 const CREATE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/drivers',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({}),
     body: Driver,
     response: Driver,
@@ -78,7 +78,7 @@ export function destroy(
 const DESTROY = /* @__PURE__ */ operation({
     method: 'DELETE',
     path: '/api/engine/v2/drivers/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -105,7 +105,7 @@ export function query(
 const QUERY = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/drivers',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({
         /** filter by the type of driver */
         role: /* @__PURE__ */ nullable(DriverRole),
@@ -145,7 +145,7 @@ export function readme(
 const README = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/drivers/{id}/readme',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -172,7 +172,7 @@ export function recompile(
 const RECOMPILE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/drivers/{id}/recompile',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -199,7 +199,7 @@ export function reload(
 const RELOAD = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/drivers/{id}/reload',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -226,7 +226,7 @@ export function show(
 const SHOW = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/drivers/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -255,7 +255,7 @@ export function update(
 const UPDATE = /* @__PURE__ */ operation({
     method: 'PATCH',
     path: '/api/engine/v2/drivers/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),

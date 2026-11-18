@@ -38,7 +38,7 @@ export function create(
 const CREATE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/zones',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({}),
     body: Zone,
     response: Zone,
@@ -60,7 +60,7 @@ export function destroy(
 const DESTROY = /* @__PURE__ */ operation({
     method: 'DELETE',
     path: '/api/engine/v2/zones/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -87,7 +87,7 @@ export function metadata(
 const METADATA = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/zones/{id}/metadata',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -116,7 +116,7 @@ export function query(
 const QUERY = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/zones',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({
         /**
          * only return zones who have this zone as a parent (supports comma-separated list). Use
@@ -170,7 +170,7 @@ export function show(
 const SHOW = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/zones/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -199,7 +199,7 @@ export function tags(
 const TAGS = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/zones/tags',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({}),
     body: null,
     response: /* @__PURE__ */ array(/* @__PURE__ */ string()),
@@ -221,7 +221,7 @@ export function triggerInstances(
 const TRIGGER_INSTANCES = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/zones/{id}/triggers',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -248,7 +248,7 @@ export function update(
 const UPDATE = /* @__PURE__ */ operation({
     method: 'PATCH',
     path: '/api/engine/v2/zones/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -275,7 +275,7 @@ export function zoneExecute(
 const ZONE_EXECUTE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/zones/{id}/exec/{module_slug}/{method}',
-    pathKeys: ['id', 'module_slug', 'method'],
+    path_keys: ['id', 'module_slug', 'method'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),

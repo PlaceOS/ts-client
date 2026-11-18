@@ -44,7 +44,7 @@ export function addAttendee(
 const ADD_ATTENDEE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/staff/v1/bookings/{id}/attendee',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ integer(),
@@ -79,7 +79,7 @@ export function approve(
 const APPROVE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/staff/v1/bookings/{id}/approve',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ integer(),
@@ -116,7 +116,7 @@ export function approveInstance(
 const APPROVE_INSTANCE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/staff/v1/bookings/{id}/approve/{instance}',
-    pathKeys: ['id', 'instance'],
+    path_keys: ['id', 'instance'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ integer(),
@@ -153,7 +153,7 @@ export function book(
 const BOOK = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/staff/v1/bookings/book',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters(
         {
             /** the asset id to book, i.e. a desk id from desks_index */
@@ -195,7 +195,7 @@ export function booked(
 const BOOKED = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/staff/v1/bookings/booked',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({
         /** start of the period to search, unix epoch in seconds. Defaults to now */
         period_start: /* @__PURE__ */ integer(),
@@ -295,7 +295,7 @@ export function checkIn(
 const CHECK_IN = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/staff/v1/bookings/{id}/check_in',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ integer(),
@@ -334,7 +334,7 @@ export function checkInInstance(
 const CHECK_IN_INSTANCE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/staff/v1/bookings/{id}/check_in/{instance}',
-    pathKeys: ['id', 'instance'],
+    path_keys: ['id', 'instance'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ integer(),
@@ -373,7 +373,7 @@ export function clashingAssets(
 const CLASHING_ASSETS = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/staff/v1/bookings/clashing-assets',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({
         /**
          * when true, return the assets from the booking's asset_ids that are NOT booked, so
@@ -408,7 +408,7 @@ export function create(
 const CREATE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/staff/v1/bookings',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({
         /** the client or channel making the change, recorded for analytics */
         utm_source: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -449,7 +449,7 @@ export function destroy(
 const DESTROY = /* @__PURE__ */ operation({
     method: 'DELETE',
     path: '/api/staff/v1/bookings/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ integer(),
@@ -486,7 +486,7 @@ export function destroyAttendee(
 const DESTROY_ATTENDEE = /* @__PURE__ */ operation({
     method: 'DELETE',
     path: '/api/staff/v1/bookings/{id}/attendee/{attendee_id}',
-    pathKeys: ['id', 'attendee_id'],
+    path_keys: ['id', 'attendee_id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ integer(),
@@ -523,7 +523,7 @@ export function destroyInstance(
 const DESTROY_INSTANCE = /* @__PURE__ */ operation({
     method: 'DELETE',
     path: '/api/staff/v1/bookings/{id}/instance/{instance}',
-    pathKeys: ['id', 'instance'],
+    path_keys: ['id', 'instance'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ integer(),
@@ -560,7 +560,7 @@ export function edit(
 const EDIT = /* @__PURE__ */ operation({
     method: 'PATCH',
     path: '/api/staff/v1/bookings/{id}/edit',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ integer(),
@@ -603,7 +603,7 @@ export function guestCheckin(
 const GUEST_CHECKIN = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/staff/v1/bookings/{id}/guests/{guest_id}/check_in',
-    pathKeys: ['id', 'guest_id'],
+    path_keys: ['id', 'guest_id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ integer(),
@@ -642,7 +642,7 @@ export function guestList(
 const GUEST_LIST = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/staff/v1/bookings/{id}/guests',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ integer(),
@@ -683,7 +683,7 @@ export function patchExtdata(
 const PATCH_EXTDATA = /* @__PURE__ */ operation({
     method: 'PATCH',
     path: '/api/staff/v1/bookings/{id}/ext_data',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ integer(),
@@ -723,7 +723,7 @@ export function patchExtdataInstance(
 const PATCH_EXTDATA_INSTANCE = /* @__PURE__ */ operation({
     method: 'PATCH',
     path: '/api/staff/v1/bookings/{id}/ext_data/{instance}',
-    pathKeys: ['id', 'instance'],
+    path_keys: ['id', 'instance'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ integer(),
@@ -763,7 +763,7 @@ export function query(
 const QUERY = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/staff/v1/bookings',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({
         /** start of the period to search, unix epoch in seconds. Defaults to now */
         period_start: /* @__PURE__ */ integer(),
@@ -887,7 +887,7 @@ export function reject(
 const REJECT = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/staff/v1/bookings/{id}/reject',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ integer(),
@@ -924,7 +924,7 @@ export function rejectInstance(
 const REJECT_INSTANCE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/staff/v1/bookings/{id}/reject/{instance}',
-    pathKeys: ['id', 'instance'],
+    path_keys: ['id', 'instance'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ integer(),
@@ -961,7 +961,7 @@ export function show(
 const SHOW = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/staff/v1/bookings/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ integer(),
@@ -996,7 +996,7 @@ export function showInstance(
 const SHOW_INSTANCE = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/staff/v1/bookings/{id}/instance/{instance}',
-    pathKeys: ['id', 'instance'],
+    path_keys: ['id', 'instance'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ integer(),
@@ -1031,7 +1031,7 @@ export function update(
 const UPDATE = /* @__PURE__ */ operation({
     method: 'PATCH',
     path: '/api/staff/v1/bookings/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ integer(),
@@ -1072,7 +1072,7 @@ export function updateInduction(
 const UPDATE_INDUCTION = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/staff/v1/bookings/{id}/update_induction',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ integer(),
@@ -1111,7 +1111,7 @@ export function updateInductionInstance(
 const UPDATE_INDUCTION_INSTANCE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/staff/v1/bookings/{id}/update_induction/{instance}',
-    pathKeys: ['id', 'instance'],
+    path_keys: ['id', 'instance'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ integer(),
@@ -1150,7 +1150,7 @@ export function updateInstance(
 const UPDATE_INSTANCE = /* @__PURE__ */ operation({
     method: 'PATCH',
     path: '/api/staff/v1/bookings/{id}/instance/{instance}',
-    pathKeys: ['id', 'instance'],
+    path_keys: ['id', 'instance'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ integer(),
@@ -1191,7 +1191,7 @@ export function updateState(
 const UPDATE_STATE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/staff/v1/bookings/{id}/update_state',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ integer(),
@@ -1230,7 +1230,7 @@ export function updateStateInstance(
 const UPDATE_STATE_INSTANCE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/staff/v1/bookings/{id}/update_state/{instance}',
-    pathKeys: ['id', 'instance'],
+    path_keys: ['id', 'instance'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ integer(),

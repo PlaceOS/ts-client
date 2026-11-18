@@ -4,7 +4,7 @@
  *
  * ```ts
  * registerSystem('sys-1', { Display: [{ power: false, $power: (on: boolean) => on }] });
- * const realtime = createRealtime({ baseUrl: '', auth, environment: mockRealtimeEnvironment() });
+ * const realtime = createRealtime({ base_url: '', auth, environment: mockRealtimeEnvironment() });
  * const display = mockSystem('sys-1')?.['Display']?.[0];
  * if (display !== undefined) display['power'] = true; // The bindings of `power` get `true`.
  * ```
@@ -115,7 +115,7 @@ export function mockRealtimeEnvironment(): RealtimeEnvironment {
     return {
         createSocket,
         currentUrl: () => (typeof location === 'undefined' ? 'http://localhost/' : location.href),
-        tokenTransport: 'query',
+        token_transport: 'query',
         setCookie: () => {},
         now: () => Date.now(),
         setTimer: (milliseconds, callback) => {

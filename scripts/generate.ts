@@ -160,12 +160,12 @@ const VALUE_ENUM_FIELDS: ReadonlyMap<string, Readonly<Record<string, ValueEnum>>
 
 interface ValueEnum {
     /** The enum schema of the document that the field refers to now. */
-    readonly specName: string;
+    readonly spec_name: string;
     readonly values: Readonly<Record<string, number>>;
 }
 
-function valueEnum(specName: string, values: Readonly<Record<string, number>>): ValueEnum {
-    return { specName, values };
+function valueEnum(spec_name: string, values: Readonly<Record<string, number>>): ValueEnum {
+    return { spec_name, values };
 }
 
 /** Operations that send JSON, but have no response schema in the document. */
@@ -311,21 +311,21 @@ type SpecNode = Readonly<Record<string, unknown>>;
 
 /** One endpoint, ready to write. */
 interface OperationPlan {
-    readonly operationId: string;
+    readonly operation_id: string;
     readonly controller: string;
     readonly action: string;
     readonly method: (typeof METHODS)[number];
     readonly path: string;
-    readonly pathKeys: readonly string[];
+    readonly path_keys: readonly string[];
     readonly summary: string;
     readonly description: string;
     /** Code of the expressions. */
     readonly params: string;
-    readonly paramsRequired: boolean;
+    readonly params_required: boolean;
     readonly body: string | null;
     readonly response: string | null;
     /** Input key to query name, from `PARAMETER_KEYS`. */
-    readonly wireNames: Readonly<Record<string, string>>;
+    readonly wire_names: Readonly<Record<string, string>>;
     readonly imports: Imports;
 }
 
@@ -341,9 +341,9 @@ interface ApiSource {
     readonly repository: string;
     readonly dir: string;
     /** The part of each `operationId` before the controller, such as `PlaceOS::Api::`. */
-    readonly idPrefix: string;
+    readonly id_prefix: string;
     /** The part of each operation name before the namespace, such as `staff.`. */
-    readonly namePrefix: string;
+    readonly name_prefix: string;
     /** The path from `dir` to `src/core`. */
     readonly core: string;
     readonly aliases: ReadonlyMap<string, string>;
@@ -353,16 +353,16 @@ const APIS: readonly ApiSource[] = [
     {
         repository: 'PlaceOS/rest-api',
         dir: join(ROOT, 'src', 'generated'),
-        idPrefix: 'PlaceOS::Api::',
-        namePrefix: '',
+        id_prefix: 'PlaceOS::Api::',
+        name_prefix: '',
         core: '../core',
         aliases: TYPE_ALIASES,
     },
     {
         repository: 'PlaceOS/staff-api',
         dir: join(ROOT, 'src', 'generated', 'staff'),
-        idPrefix: '',
-        namePrefix: 'staff.',
+        id_prefix: '',
+        name_prefix: 'staff.',
         core: '../../core',
         aliases: new Map(),
     },
@@ -387,9 +387,9 @@ function header(api: ApiSource): string {
 
 /** Generates the code of one API. Returns the files that changed, or that would change. */
 async function generate(api: ApiSource, check: boolean): Promise<string[]> {
-    const operationsDir = join(api.dir, 'operations');
-    const specText = await downloadSpec(api);
-    const spec = asNode(Bun.YAML.parse(specText), 'the document');
+    const operations_dir = join(api.dir, 'operations');
+    const spec_text = await downloadSpec(api);
+    const spec = asNode(Bun.YAML.parse(spec_text), 'the document');
     assert(asString(field(spec, 'openapi'), 'openapi').startsWith('3.'), 'the document is 3.x');
     const components = asNode(field(spec, 'components'), 'components');
     const schemas = asNode(field(components, 'schemas'), 'components.schemas');
@@ -398,16 +398,16 @@ async function generate(api: ApiSource, check: boolean): Promise<string[]> {
     // Read each operation. The emit of its schemas collects the named schemas that it uses.
     const operations: OperationPlan[] = [];
     const skipped: string[] = [];
-    for (const [path, itemValue] of Object.entries(paths)) {
-        const item = asNode(itemValue, `paths.${path}`);
+    for (const [path, item_value] of Object.entries(paths)) {
+        const item = asNode(item_value, `paths.${path}`);
         for (const key of Object.keys(item)) {
             const known = PATH_ITEM_KEYS.has(key) || METHODS.some((method) => method === key);
             assert(known, `the key "${key}" of the path ${path} is supported`);
         }
         for (const method of METHODS) {
-            const operationValue = field(item, method);
-            if (operationValue === undefined) continue;
-            const plan = planOperation(api, schemas, path, method, asNode(operationValue, path));
+            const operation_value = field(item, method);
+            if (operation_value === undefined) continue;
+            const plan = planOperation(api, schemas, path, method, asNode(operation_value, path));
             if (plan === null) {
                 skipped.push(`${method.toUpperCase()} ${path}`);
             } else {
@@ -423,27 +423,27 @@ async function generate(api: ApiSource, check: boolean): Promise<string[]> {
     const named = new Map<string, { code: string; imports: Imports }>();
     const pending: string[] = [];
     for (const plan of kept) pending.push(...plan.imports.schemas);
-    const schemaNames = new Map<string, string>();
-    const generatedNames = new Set<string>();
-    for (const specName of Object.keys(schemas)) {
-        if (!isNamedSchema(specName)) continue;
-        const name = schemaTypeName(specName);
+    const schema_names = new Map<string, string>();
+    const generated_names = new Set<string>();
+    for (const spec_name of Object.keys(schemas)) {
+        if (!isNamedSchema(spec_name)) continue;
+        const name = schemaTypeName(spec_name);
         for (const generated of [name, `${name}Input`, `${name}Schema`]) {
-            assert(!generatedNames.has(generated), `the schema name ${generated} is unique`);
+            assert(!generated_names.has(generated), `the schema name ${generated} is unique`);
             assert(!CORE_NAMES.has(generated), `the schema name ${generated} is not a core name`);
-            generatedNames.add(generated);
+            generated_names.add(generated);
         }
-        schemaNames.set(name, specName);
+        schema_names.set(name, spec_name);
     }
     for (let index = 0; index < pending.length; index += 1) {
-        assert(index <= schemaNames.size * schemaNames.size, 'the schema queue is bounded');
+        assert(index <= schema_names.size * schema_names.size, 'the schema queue is bounded');
         const name = pending[index] ?? '';
         if (named.has(name)) continue;
-        const specName = schemaNames.get(name);
-        assert(specName !== undefined, `the schema ${name} exists`);
+        const spec_name = schema_names.get(name);
+        assert(spec_name !== undefined, `the schema ${name} exists`);
         const imports: Imports = { combinators: new Set(), schemas: new Set() };
-        const node = asNode(field(schemas, specName), specName);
-        const code = emitNamedSchema(schemas, specName, node, imports);
+        const node = asNode(field(schemas, spec_name), spec_name);
+        const code = emitNamedSchema(schemas, spec_name, node, imports);
         named.set(name, { code, imports });
         pending.push(...imports.schemas);
     }
@@ -459,45 +459,45 @@ async function generate(api: ApiSource, check: boolean): Promise<string[]> {
     const namespaces: string[] = [];
     for (const controller of [...controllers.keys()].sort()) {
         const plans = controllers.get(controller) ?? [];
-        const fileName = kebabCase(controllerWords(controller));
+        const file_name = kebabCase(controllerWords(controller));
         files.set(
-            join(operationsDir, `${fileName}.ts`),
+            join(operations_dir, `${file_name}.ts`),
             writeOperationsFile(api, controller, plans),
         );
         namespaces.push(
-            `export * as ${camelCase(controllerWords(controller))} from './${fileName}.ts';`,
+            `export * as ${snakeCase(controllerWords(controller))} from './${file_name}.ts';`,
         );
     }
-    const indexIntro = '/** One namespace for each controller of the API. */';
+    const index_intro = '/** One namespace for each controller of the API. */';
     files.set(
-        join(operationsDir, 'index.ts'),
-        `${header(api)}\n${indexIntro}\n${namespaces.join('\n')}\n`,
+        join(operations_dir, 'index.ts'),
+        `${header(api)}\n${index_intro}\n${namespaces.join('\n')}\n`,
     );
 
     // Format, then write or compare.
     const config = (await resolveConfig(join(ROOT, 'package.json'))) ?? {};
     const stale: string[] = [];
-    for (const [filePath, code] of files) {
+    for (const [file_path, code] of files) {
         const annotated = markPure(code);
         const formatted = wrapLongComments(
-            await format(annotated, { ...config, filepath: filePath }),
+            await format(annotated, { ...config, filepath: file_path }),
         );
-        const current = await readFile(filePath, 'utf8').catch(() => null);
+        const current = await readFile(file_path, 'utf8').catch(() => null);
         if (current === formatted) continue;
-        stale.push(filePath);
+        stale.push(file_path);
         if (!check) {
-            await mkdir(join(filePath, '..'), { recursive: true });
-            await writeFile(filePath, formatted);
+            await mkdir(join(file_path, '..'), { recursive: true });
+            await writeFile(file_path, formatted);
         }
     }
     // Remove generated files of controllers that the document does not have now.
-    for (const entry of await readdir(operationsDir).catch(() => [])) {
-        const filePath = join(operationsDir, entry);
-        if (files.has(filePath)) continue;
-        const text = await readFile(filePath, 'utf8');
-        assert(text.startsWith(header(api)), `${filePath} is a generated file`);
-        stale.push(filePath);
-        if (!check) await rm(filePath);
+    for (const entry of await readdir(operations_dir).catch(() => [])) {
+        const file_path = join(operations_dir, entry);
+        if (files.has(file_path)) continue;
+        const text = await readFile(file_path, 'utf8');
+        assert(text.startsWith(header(api)), `${file_path} is a generated file`);
+        stale.push(file_path);
+        if (!check) await rm(file_path);
     }
 
     console.log(
@@ -515,9 +515,9 @@ async function downloadSpec(api: ApiSource): Promise<string> {
     const url = `https://raw.githubusercontent.com/${api.repository}/refs/heads/master/OPENAPI_DOC.yml`;
     const response = await fetch(url, { signal: AbortSignal.timeout(SPEC_TIMEOUT_MS) });
     assert(response.ok, `the download of ${url} succeeds (status ${response.status})`);
-    const lengthText = response.headers.get('content-length');
-    if (lengthText !== null) {
-        assert(Number(lengthText) <= SPEC_BYTES_MAX, 'the document is less than SPEC_BYTES_MAX');
+    const length_text = response.headers.get('content-length');
+    if (length_text !== null) {
+        assert(Number(length_text) <= SPEC_BYTES_MAX, 'the document is less than SPEC_BYTES_MAX');
     }
     const text = await response.text();
     assert(text.length <= SPEC_BYTES_MAX, 'the document is less than SPEC_BYTES_MAX');
@@ -532,97 +532,99 @@ function planOperation(
     method: (typeof METHODS)[number],
     operation: SpecNode,
 ): OperationPlan | null {
-    const operationId = asString(field(operation, 'operationId'), `${path} operationId`);
-    const id = operationId.startsWith(api.idPrefix) ? operationId.slice(api.idPrefix.length) : '';
-    const idMatch = /^([A-Za-z:]+)_([a-z0-9_]+)$/.exec(id);
-    assert(idMatch !== null, `${operationId} has the form ${api.idPrefix}Controller_action`);
-    const controller = idMatch[1] ?? '';
+    const operation_id = asString(field(operation, 'operationId'), `${path} operationId`);
+    const id = operation_id.startsWith(api.id_prefix)
+        ? operation_id.slice(api.id_prefix.length)
+        : '';
+    const id_match = /^([A-Za-z:]+)_([a-z0-9_]+)$/.exec(id);
+    assert(id_match !== null, `${operation_id} has the form ${api.id_prefix}Controller_action`);
+    const controller = id_match[1] ?? '';
     // The list action of a controller is `index` in the server. The client calls it `query`.
-    const action = (idMatch[2] ?? '').replace(/^index(?=_\d+$|$)/, 'query');
+    const action = (id_match[2] ?? '').replace(/^index(?=_\d+$|$)/, 'query');
 
     // The success response. The API has one for each operation.
-    const responses = asNode(field(operation, 'responses'), `${operationId} responses`);
+    const responses = asNode(field(operation, 'responses'), `${operation_id} responses`);
     const successes = Object.keys(responses).filter((status) => /^[123]\d\d$/.test(status));
-    assert(successes.length === 1, `${operationId} has one success response`);
+    assert(successes.length === 1, `${operation_id} has one success response`);
     const status = successes[0] ?? '';
     if (status === '101') return null;
 
     const imports: Imports = { combinators: new Set(), schemas: new Set() };
     let response: string | null = null;
-    const success = asNode(field(responses, status), `${operationId} ${status}`);
+    const success = asNode(field(responses, status), `${operation_id} ${status}`);
     const content = field(success, 'content');
-    if (JSON_RESPONSE_OPERATIONS.has(operationId)) {
-        assert(content === undefined, `${operationId} has no response schema to replace`);
+    if (JSON_RESPONSE_OPERATIONS.has(operation_id)) {
+        assert(content === undefined, `${operation_id} has no response schema to replace`);
         imports.combinators.add('json');
         response = 'json()';
     } else if (content !== undefined) {
-        const schema = asNode(jsonContentSchema(content, operationId), `${operationId} schema`);
+        const schema = asNode(jsonContentSchema(content, operation_id), `${operation_id} schema`);
         response = emitSchema(schemas, schema, imports, 0);
     }
 
     // The parameters: one object schema with the path parameters and the query parameters.
-    const pathKeys = [...path.matchAll(/\{([^}]+)\}/g)].map((match) => match[1] ?? '');
+    const path_keys = [...path.matchAll(/\{([^}]+)\}/g)].map((match) => match[1] ?? '');
     const fields: string[] = [];
     const required: string[] = [];
-    const parameterNames = new Set<string>();
-    const wireNames: Record<string, string> = {};
-    for (const parameterValue of asArray(field(operation, 'parameters') ?? [], operationId)) {
-        const parameter = asNode(parameterValue, `${operationId} parameter`);
-        const name = asString(field(parameter, 'name'), `${operationId} parameter name`);
-        const location = asString(field(parameter, 'in'), `${operationId} ${name} in`);
-        assert(location === 'path' || location === 'query', `${operationId} ${name} is supported`);
-        assert(!parameterNames.has(name), `${operationId} ${name} is unique`);
-        const key = PARAMETER_KEYS.get(operationId)?.[name] ?? name;
-        assert(key !== 'body', `${operationId} has no parameter named body, or a key for it`);
+    const parameter_names = new Set<string>();
+    const wire_names: Record<string, string> = {};
+    for (const parameter_value of asArray(field(operation, 'parameters') ?? [], operation_id)) {
+        const parameter = asNode(parameter_value, `${operation_id} parameter`);
+        const name = asString(field(parameter, 'name'), `${operation_id} parameter name`);
+        const location = asString(field(parameter, 'in'), `${operation_id} ${name} in`);
+        assert(location === 'path' || location === 'query', `${operation_id} ${name} is supported`);
+        assert(!parameter_names.has(name), `${operation_id} ${name} is unique`);
+        const key = PARAMETER_KEYS.get(operation_id)?.[name] ?? name;
+        assert(key !== 'body', `${operation_id} has no parameter named body, or a key for it`);
         if (key !== name) {
-            assert(location === 'query', `${operationId} renames only a query parameter`);
-            wireNames[key] = name;
+            assert(location === 'query', `${operation_id} renames only a query parameter`);
+            wire_names[key] = name;
         }
-        parameterNames.add(name);
+        parameter_names.add(name);
         if (location === 'path') {
-            assert(pathKeys.includes(name), `${operationId} ${name} is in the path`);
+            assert(path_keys.includes(name), `${operation_id} ${name} is in the path`);
             required.push(name);
         } else if (field(parameter, 'required') === true) {
             required.push(key);
         }
-        const schema = asNode(field(parameter, 'schema'), `${operationId} ${name} schema`);
+        const schema = asNode(field(parameter, 'schema'), `${operation_id} ${name} schema`);
         const expression = emitSchema(schemas, schema, imports, 0);
         const description = optionalString(field(parameter, 'description'), name) ?? '';
         fields.push(`${docComment(description, 4)}${propertyKey(key)}: ${expression},`);
     }
-    for (const key of pathKeys) {
-        assert(parameterNames.has(key), `${operationId} has a path parameter ${key}`);
+    for (const key of path_keys) {
+        assert(parameter_names.has(key), `${operation_id} has a path parameter ${key}`);
     }
     imports.combinators.add('parameters');
-    const requiredList = required.length > 0 ? `, ${JSON.stringify(required)}` : '';
-    const params = `parameters({\n${fields.join('\n')}\n}${requiredList})`;
+    const required_list = required.length > 0 ? `, ${JSON.stringify(required)}` : '';
+    const params = `parameters({\n${fields.join('\n')}\n}${required_list})`;
 
     let body: string | null = null;
-    const requestBody = field(operation, 'requestBody');
-    if (requestBody !== undefined) {
-        const bodyNode = asNode(requestBody, `${operationId} requestBody`);
-        assert(field(bodyNode, 'required') === true, `${operationId} requires its body`);
+    const request_body = field(operation, 'requestBody');
+    if (request_body !== undefined) {
+        const body_node = asNode(request_body, `${operation_id} requestBody`);
+        assert(field(body_node, 'required') === true, `${operation_id} requires its body`);
         const schema = asNode(
-            jsonContentSchema(field(bodyNode, 'content'), operationId),
-            `${operationId} body schema`,
+            jsonContentSchema(field(body_node, 'content'), operation_id),
+            `${operation_id} body schema`,
         );
         body = emitSchema(schemas, schema, imports, 0);
     }
 
     return {
-        operationId,
+        operation_id,
         controller,
         action,
         method,
         path,
-        pathKeys,
-        summary: optionalString(field(operation, 'summary'), `${operationId} summary`) ?? '',
-        description: optionalString(field(operation, 'description'), operationId) ?? '',
+        path_keys,
+        summary: optionalString(field(operation, 'summary'), `${operation_id} summary`) ?? '',
+        description: optionalString(field(operation, 'description'), operation_id) ?? '',
         params,
-        paramsRequired: required.length > 0 || body !== null,
+        params_required: required.length > 0 || body !== null,
         body,
         response,
-        wireNames,
+        wire_names,
         imports,
     };
 }
@@ -646,23 +648,23 @@ function mergeRoutes(operations: readonly OperationPlan[]): OperationPlan[] {
     const kept: OperationPlan[] = [];
     for (const group of groups.values()) {
         const action = (group[0]?.action ?? '').replace(/_\d+$/, '');
-        const byPath = new Map<string, OperationPlan[]>();
-        for (const plan of group) byPath.set(plan.path, [...(byPath.get(plan.path) ?? []), plan]);
+        const by_path = new Map<string, OperationPlan[]>();
+        for (const plan of group) by_path.set(plan.path, [...(by_path.get(plan.path) ?? []), plan]);
         const routes: OperationPlan[] = [];
-        for (const plans of byPath.values()) {
+        for (const plans of by_path.values()) {
             const [first, second] = plans;
             assert(first !== undefined, 'a path has a plan');
             if (second === undefined) {
                 routes.push(first);
                 continue;
             }
-            assert(plans.length === 2, `${first.operationId} has at most two methods on its path`);
+            assert(plans.length === 2, `${first.operation_id} has at most two methods on its path`);
             assert(
                 sameSignature(first, second),
-                `${first.operationId} has the same signature as ${second.operationId}`,
+                `${first.operation_id} has the same signature as ${second.operation_id}`,
             );
             const methods = [first.method, second.method].sort().join();
-            assert(methods === 'patch,put', `${first.operationId} is a PATCH and PUT pair`);
+            assert(methods === 'patch,put', `${first.operation_id} is a PATCH and PUT pair`);
             routes.push(first.method === 'patch' ? first : second);
         }
         const distinct: OperationPlan[] = [];
@@ -676,14 +678,14 @@ function mergeRoutes(operations: readonly OperationPlan[]): OperationPlan[] {
         const [base, ...others] = distinct;
         assert(base !== undefined, 'an action has a route');
         kept.push({ ...base, action });
-        const baseSegments = new Set(base.path.split('/'));
+        const base_segments = new Set(base.path.split('/'));
         for (const other of others) {
             const extra = other.path
                 .split('/')
-                .filter((segment) => !baseSegments.has(segment))
+                .filter((segment) => !base_segments.has(segment))
                 .map((segment) => segment.replace(/[{}]/g, ''));
             const words = [...new Set(extra)];
-            assert(words.length > 0, `${other.operationId} has a path with more segments`);
+            assert(words.length > 0, `${other.operation_id} has a path with more segments`);
             kept.push({ ...other, action: `${action}_${words.join('_')}` });
         }
     }
@@ -698,48 +700,48 @@ function sameSignature(a: OperationPlan, b: OperationPlan): boolean {
 /** The emit of a named schema. It applies the time field patches to its properties. */
 function emitNamedSchema(
     schemas: SpecNode,
-    specName: string,
+    spec_name: string,
     node: SpecNode,
     imports: Imports,
 ): string {
-    const epochFields = new Set(EPOCH_FIELDS.get(specName) ?? []);
-    const stringFields = new Set(STRING_TIME_FIELDS.get(specName) ?? []);
-    const name = schemaTypeName(specName);
-    const description = optionalString(field(node, 'description'), specName) ?? '';
+    const epoch_fields = new Set(EPOCH_FIELDS.get(spec_name) ?? []);
+    const string_fields = new Set(STRING_TIME_FIELDS.get(spec_name) ?? []);
+    const name = schemaTypeName(spec_name);
+    const description = optionalString(field(node, 'description'), spec_name) ?? '';
     // The named interfaces make the declaration files and the editor hovers show `Zone`, not the
     // full shape at each use. The shape is in the schema only.
-    const schemaName = `${name}Schema`;
+    const schema_name = `${name}Schema`;
     const doc = docComment(description, 0);
     if (field(node, 'properties') === undefined) {
-        assert(epochFields.size === 0, `${specName} has the time fields of the patch`);
+        assert(epoch_fields.size === 0, `${spec_name} has the time fields of the patch`);
         imports.combinators.add('Output');
         imports.combinators.add('Input');
         imports.combinators.add('Schema');
         return (
-            `const ${schemaName} = ${emitSchema(schemas, node, imports, 0)};\n` +
-            `${doc}export type ${name} = Output<typeof ${schemaName}>;\n` +
-            `export type ${name}Input = Input<typeof ${schemaName}>;\n` +
-            `${doc}export const ${name}: Schema<${name}, ${name}Input> = ${schemaName};\n`
+            `const ${schema_name} = ${emitSchema(schemas, node, imports, 0)};\n` +
+            `${doc}export type ${name} = Output<typeof ${schema_name}>;\n` +
+            `export type ${name}Input = Input<typeof ${schema_name}>;\n` +
+            `${doc}export const ${name}: Schema<${name}, ${name}Input> = ${schema_name};\n`
         );
     }
-    const timeFields = { specName, epochFields, stringFields };
-    const expression = emitObject(schemas, node, imports, 0, timeFields);
+    const time_fields = { spec_name, epoch_fields, string_fields };
+    const expression = emitObject(schemas, node, imports, 0, time_fields);
     imports.combinators.add('Output');
     imports.combinators.add('Input');
     imports.combinators.add('Schema');
     return (
-        `const ${schemaName} = ${expression};\n` +
-        `${doc}export interface ${name} extends Output<typeof ${schemaName}> {}\n` +
-        `export interface ${name}Input extends Input<typeof ${schemaName}> {}\n` +
-        `${doc}export const ${name}: Schema<${name}, ${name}Input> = ${schemaName};\n`
+        `const ${schema_name} = ${expression};\n` +
+        `${doc}export interface ${name} extends Output<typeof ${schema_name}> {}\n` +
+        `export interface ${name}Input extends Input<typeof ${schema_name}> {}\n` +
+        `${doc}export const ${name}: Schema<${name}, ${name}Input> = ${schema_name};\n`
     );
 }
 
 /** The time field decisions of one named schema. */
 interface TimeFields {
-    readonly specName: string;
-    readonly epochFields: ReadonlySet<string>;
-    readonly stringFields: ReadonlySet<string>;
+    readonly spec_name: string;
+    readonly epoch_fields: ReadonlySet<string>;
+    readonly string_fields: ReadonlySet<string>;
 }
 
 /** Returns the code of a schema expression, such as `nullable(string())`. */
@@ -749,21 +751,21 @@ function emitSchema(schemas: SpecNode, node: SpecNode, imports: Imports, depth: 
 
     const ref = field(node, '$ref');
     if (ref !== undefined) {
-        const specName = asString(ref, '$ref').replace('#/components/schemas/', '');
-        assert(Object.hasOwn(schemas, specName), `the schema ${specName} exists`);
-        if (specName === 'JSON.Any') {
+        const spec_name = asString(ref, '$ref').replace('#/components/schemas/', '');
+        assert(Object.hasOwn(schemas, spec_name), `the schema ${spec_name} exists`);
+        if (spec_name === 'JSON.Any') {
             imports.combinators.add('json');
             return 'json()';
         }
-        if (!isNamedSchema(specName)) {
+        if (!isNamedSchema(spec_name)) {
             return emitSchema(
                 schemas,
-                asNode(field(schemas, specName), specName),
+                asNode(field(schemas, spec_name), spec_name),
                 imports,
                 depth + 1,
             );
         }
-        const name = schemaTypeName(specName);
+        const name = schemaTypeName(spec_name);
         imports.schemas.add(name);
         return name;
     }
@@ -784,9 +786,9 @@ function emitSchema(schemas: SpecNode, node: SpecNode, imports: Imports, depth: 
         return `nullable(${inner})`;
     }
 
-    const enumValue = field(node, 'enum');
-    if (enumValue !== undefined) {
-        const values = asArray(enumValue, 'enum');
+    const enum_value = field(node, 'enum');
+    if (enum_value !== undefined) {
+        const values = asArray(enum_value, 'enum');
         const strings = values.every((value) => typeof value === 'string');
         const integers = values.every((value) => Number.isSafeInteger(value));
         assert(strings || integers, 'an enum has strings only or integers only');
@@ -795,28 +797,28 @@ function emitSchema(schemas: SpecNode, node: SpecNode, imports: Imports, depth: 
     }
 
     const type = field(node, 'type');
-    const formatValue = optionalString(field(node, 'format'), 'format');
+    const format_value = optionalString(field(node, 'format'), 'format');
     switch (type) {
         case 'string':
             assert(
-                formatValue === null || STRING_FORMATS.has(formatValue),
-                `format ${formatValue}`,
+                format_value === null || STRING_FORMATS.has(format_value),
+                `format ${format_value}`,
             );
             imports.combinators.add('string');
             return 'string()';
         case 'integer':
             assert(
-                formatValue === null || INTEGER_FORMATS.has(formatValue),
-                `format ${formatValue}`,
+                format_value === null || INTEGER_FORMATS.has(format_value),
+                `format ${format_value}`,
             );
             imports.combinators.add('integer');
-            return formatValue === null || formatValue === 'Int64'
+            return format_value === null || format_value === 'Int64'
                 ? 'integer()'
-                : `integer('${formatValue}')`;
+                : `integer('${format_value}')`;
         case 'number':
             assert(
-                formatValue === null || NUMBER_FORMATS.has(formatValue),
-                `format ${formatValue}`,
+                format_value === null || NUMBER_FORMATS.has(format_value),
+                `format ${format_value}`,
             );
             imports.combinators.add('number');
             return 'number()';
@@ -824,10 +826,10 @@ function emitSchema(schemas: SpecNode, node: SpecNode, imports: Imports, depth: 
             imports.combinators.add('boolean');
             return 'boolean()';
         case 'array': {
-            const prefixItems = field(node, 'prefixItems');
-            if (prefixItems !== undefined) {
+            const prefix_items = field(node, 'prefixItems');
+            if (prefix_items !== undefined) {
                 // A Crystal `Tuple`: a fixed length and no other items.
-                const list = asArray(prefixItems, 'prefixItems');
+                const list = asArray(prefix_items, 'prefixItems');
                 assert(field(node, 'items') === false, 'a tuple has no other items');
                 assert(field(node, 'minItems') === list.length, 'a tuple has a fixed length');
                 assert(field(node, 'maxItems') === list.length, 'a tuple has a fixed length');
@@ -874,7 +876,7 @@ function emitObject(
     node: SpecNode,
     imports: Imports,
     depth: number,
-    timeFields: TimeFields | null,
+    time_fields: TimeFields | null,
 ): string {
     // A named schema comes here without `emitSchema`, so check its keys here too. An object
     // with properties cannot also be one of these: the output would ignore them.
@@ -893,41 +895,46 @@ function emitObject(
         const property = asNode(value, `property ${key}`);
         let description = optionalString(field(property, 'description'), key) ?? '';
         let expression: string;
-        const isTime = isDateTime(property);
-        const valueEnumField =
-            timeFields === null ? undefined : VALUE_ENUM_FIELDS.get(timeFields.specName)?.[key];
-        if (timeFields === null) {
+        const is_time = isDateTime(property);
+        const value_enum_field =
+            time_fields === null ? undefined : VALUE_ENUM_FIELDS.get(time_fields.spec_name)?.[key];
+        if (time_fields === null) {
             expression = emitSchema(schemas, property, imports, depth + 1);
-        } else if (valueEnumField !== undefined) {
-            const target = `#/components/schemas/${valueEnumField.specName}`;
-            const subject = `${timeFields.specName}.${key}`;
+        } else if (value_enum_field !== undefined) {
+            const target = `#/components/schemas/${value_enum_field.spec_name}`;
+            const subject = `${time_fields.spec_name}.${key}`;
             assertPatchedShape(property, (node) => isOnly(node, { $ref: target }), subject);
             // A new member of the enum needs its number in the patch.
-            const enumNode = asNode(field(schemas, valueEnumField.specName), 'the patched enum');
-            assertSupportedKeys(enumNode);
-            assert(
-                isOnly(enumNode, { type: 'string', enum: field(enumNode, 'enum') }),
-                `${valueEnumField.specName} is a string enum and nothing else`,
+            const enum_node = asNode(
+                field(schemas, value_enum_field.spec_name),
+                'the patched enum',
             );
-            const members = asArray(field(enumNode, 'enum'), 'the patched enum values').map(String);
-            const mapped = Object.keys(valueEnumField.values);
+            assertSupportedKeys(enum_node);
+            assert(
+                isOnly(enum_node, { type: 'string', enum: field(enum_node, 'enum') }),
+                `${value_enum_field.spec_name} is a string enum and nothing else`,
+            );
+            const members = asArray(field(enum_node, 'enum'), 'the patched enum values').map(
+                String,
+            );
+            const mapped = Object.keys(value_enum_field.values);
             assert(
                 [...members].sort().join() === [...mapped].sort().join(),
-                `the numbers of ${valueEnumField.specName} cover each member of the enum`,
+                `the numbers of ${value_enum_field.spec_name} cover each member of the enum`,
             );
             imports.combinators.add('literal');
-            expression = `literal(${JSON.stringify(Object.values(valueEnumField.values))})`;
+            expression = `literal(${JSON.stringify(Object.values(value_enum_field.values))})`;
             if (isNullable(property)) {
                 imports.combinators.add('nullable');
                 expression = `nullable(${expression})`;
             }
-            const names = Object.entries(valueEnumField.values).map(([n, v]) => `${v} ${n}`);
+            const names = Object.entries(value_enum_field.values).map(([n, v]) => `${v} ${n}`);
             const separator = description.length > 0 ? '\n\n' : '';
             description = `${description}${separator}The number of the enum: ${names.join(', ')}.`;
-        } else if (timeFields.epochFields.has(key)) {
-            const subject = `${timeFields.specName}.${key}`;
-            const dateTime = { type: 'string', format: 'date-time' };
-            assertPatchedShape(property, (node) => isOnly(node, dateTime), subject);
+        } else if (time_fields.epoch_fields.has(key)) {
+            const subject = `${time_fields.spec_name}.${key}`;
+            const date_time = { type: 'string', format: 'date-time' };
+            assertPatchedShape(property, (node) => isOnly(node, date_time), subject);
             imports.combinators.add('integer');
             expression = 'integer()';
             if (isNullable(property)) {
@@ -937,20 +944,20 @@ function emitObject(
             const separator = description.length > 0 ? '\n\n' : '';
             description = `${description}${separator}Unix time in seconds.`;
         } else {
-            const known = timeFields.stringFields.has(key);
-            assert(isTime === known, `${timeFields.specName}.${key} has a time decision`);
+            const known = time_fields.string_fields.has(key);
+            assert(is_time === known, `${time_fields.spec_name}.${key} has a time decision`);
             expression = emitSchema(schemas, property, imports, depth + 1);
         }
         fields.push(`${docComment(description, 4)}${propertyKey(key)}: ${expression},`);
     }
-    if (timeFields !== null) {
-        const keys = [...timeFields.epochFields, ...timeFields.stringFields];
-        keys.push(...Object.keys(VALUE_ENUM_FIELDS.get(timeFields.specName) ?? {}));
+    if (time_fields !== null) {
+        const keys = [...time_fields.epoch_fields, ...time_fields.string_fields];
+        keys.push(...Object.keys(VALUE_ENUM_FIELDS.get(time_fields.spec_name) ?? {}));
         for (const key of keys) assert(Object.hasOwn(properties, key), `${key} is a property`);
     }
     imports.combinators.add('object');
-    const requiredList = required.length > 0 ? `, ${JSON.stringify(required)}` : '';
-    return `object({\n${fields.join('\n')}\n}${requiredList})`;
+    const required_list = required.length > 0 ? `, ${JSON.stringify(required)}` : '';
+    return `object({\n${fields.join('\n')}\n}${required_list})`;
 }
 
 function assertSupportedKeys(node: SpecNode): void {
@@ -1010,11 +1017,11 @@ function isNullable(node: SpecNode): boolean {
     );
 }
 
-function jsonContentSchema(content: unknown, operationId: string): unknown {
-    const contentNode = asNode(content, `${operationId} content`);
-    const types = Object.keys(contentNode);
-    assert(types.join() === 'application/json', `${operationId} has JSON content only`);
-    return field(asNode(field(contentNode, 'application/json'), operationId), 'schema');
+function jsonContentSchema(content: unknown, operation_id: string): unknown {
+    const content_node = asNode(content, `${operation_id} content`);
+    const types = Object.keys(content_node);
+    assert(types.join() === 'application/json', `${operation_id} has JSON content only`);
+    return field(asNode(field(content_node, 'application/json'), operation_id), 'schema');
 }
 
 function writeSchemasFile(
@@ -1071,56 +1078,56 @@ function writeOperationsFile(
     plans: readonly OperationPlan[],
 ): string {
     const combinators = new Set<string>();
-    const schemaImports = new Set<string>();
-    const functionNames = new Set<string>();
+    const schema_imports = new Set<string>();
+    const function_names = new Set<string>();
     const blocks: string[] = [];
     for (const plan of [...plans].sort((a, b) => a.action.localeCompare(b.action, 'en'))) {
         for (const name of plan.imports.combinators) combinators.add(name);
-        for (const name of plan.imports.schemas) schemaImports.add(name);
-        const functionName = camelCase(plan.action.split('_'));
-        assert(!RESERVED_WORDS.has(functionName), `${functionName} is not a reserved word`);
-        assert(!functionNames.has(functionName), `${controller}.${functionName} is unique`);
-        functionNames.add(functionName);
+        for (const name of plan.imports.schemas) schema_imports.add(name);
+        const function_name = camelCase(plan.action.split('_'));
+        assert(!RESERVED_WORDS.has(function_name), `${function_name} is not a reserved word`);
+        assert(!function_names.has(function_name), `${controller}.${function_name} is unique`);
+        function_names.add(function_name);
         const constant = plan.action.toUpperCase();
         const method = plan.method.toUpperCase();
         const text = [sentence(plan.summary), plan.description, `\`${method} ${plan.path}\``]
             .filter((part) => part.length > 0)
             .join('\n\n');
-        const inputDefault = plan.paramsRequired ? '' : ' = {}';
+        const input_default = plan.params_required ? '' : ' = {}';
         blocks.push(
-            `${docComment(text, 0)}export function ${functionName}(\n` +
-                `input: OperationInput<typeof ${constant}>${inputDefault},\n` +
+            `${docComment(text, 0)}export function ${function_name}(\n` +
+                `input: OperationInput<typeof ${constant}>${input_default},\n` +
                 `options?: CallOptions,\n` +
                 `): Promise<CallResult<typeof ${constant}>> {\n` +
                 `return call(${constant}, input, options);\n}\n\n` +
                 `const ${constant} = operation({\n` +
                 `method: '${method}',\n` +
                 `path: '${plan.path}',\n` +
-                `pathKeys: ${JSON.stringify(plan.pathKeys)},\n` +
+                `path_keys: ${JSON.stringify(plan.path_keys)},\n` +
                 `params: ${plan.params},\n` +
                 `body: ${plan.body ?? 'null'},\n` +
                 `response: ${plan.response ?? 'null'},\n` +
-                `name: '${api.namePrefix}${camelCase(controllerWords(controller))}.${functionName}',\n` +
-                (Object.keys(plan.wireNames).length > 0
-                    ? `wireNames: ${JSON.stringify(plan.wireNames)},\n`
+                `name: '${api.name_prefix}${snakeCase(controllerWords(controller))}.${function_name}',\n` +
+                (Object.keys(plan.wire_names).length > 0
+                    ? `wire_names: ${JSON.stringify(plan.wire_names)},\n`
                     : '') +
                 `});\n`,
         );
     }
-    const namespace = camelCase(controllerWords(controller));
+    const namespace = snakeCase(controllerWords(controller));
     const intro =
         `/**\n * The \`${controller}\` controller of the API. Import it as the \`${namespace}\` ` +
         `namespace.\n *\n * @module\n */\n`;
-    const schemaLine =
-        schemaImports.size > 0
-            ? `import { ${[...schemaImports].sort().join(', ')} } from '../schemas.ts';\n`
+    const schema_line =
+        schema_imports.size > 0
+            ? `import { ${[...schema_imports].sort().join(', ')} } from '../schemas.ts';\n`
             : '';
     return (
         `${header(api)}${intro}` +
         `import { call, operation, type CallOptions, type CallResult, ` +
         `type OperationInput } from '../${api.core}/client.ts';\n` +
         importLine([...combinators], `../${api.core}/schema.ts`) +
-        `${schemaLine}\n${blocks.join('\n')}`
+        `${schema_line}\n${blocks.join('\n')}`
     );
 }
 
@@ -1132,14 +1139,14 @@ function importLine(names: readonly string[], from: string): string {
 }
 
 /** True for a schema of the document that gets a name in the output. */
-function isNamedSchema(specName: string): boolean {
-    if (INLINE_SCHEMA_NAMES.has(specName)) return false;
-    return /^[A-Za-z][A-Za-z0-9]*(\.[A-Za-z][A-Za-z0-9]*)*$/.test(specName);
+function isNamedSchema(spec_name: string): boolean {
+    if (INLINE_SCHEMA_NAMES.has(spec_name)) return false;
+    return /^[A-Za-z][A-Za-z0-9]*(\.[A-Za-z][A-Za-z0-9]*)*$/.test(spec_name);
 }
 
 /** `PlaceOS.Model.Playlist.Item` becomes `PlaylistItem`. Acronyms become words: `UserJwt`. */
-function schemaTypeName(specName: string): string {
-    let name = specName;
+function schemaTypeName(spec_name: string): string {
+    let name = spec_name;
     for (const prefix of ['PlaceOS.Model.', 'PlaceOS.Api.', 'PlaceOS.Core.Client.', 'PlaceOS.']) {
         if (name.startsWith(prefix)) {
             name = name.slice(prefix.length);
@@ -1172,6 +1179,11 @@ function pascalCase(words: readonly string[]): string {
 function camelCase(words: readonly string[]): string {
     const name = pascalCase(words);
     return name.charAt(0).toLowerCase() + name.slice(1);
+}
+
+/** The name of a namespace, such as `alert_dashboards`. */
+function snakeCase(words: readonly string[]): string {
+    return words.join('_');
 }
 
 function kebabCase(words: readonly string[]): string {

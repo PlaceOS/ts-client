@@ -29,7 +29,7 @@ export function members(
 const MEMBERS = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/staff/v1/groups/{id}/members',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             /** the directory group id */
@@ -57,7 +57,7 @@ export function query(
 const QUERY = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/staff/v1/groups',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({
         /** optional search query, matches groups whose display name starts with this text */
         q: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -82,7 +82,7 @@ export function show(
 const SHOW = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/staff/v1/groups/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             /** the directory group id */

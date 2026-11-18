@@ -48,7 +48,7 @@ export function addAttendee(
 const ADD_ATTENDEE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/staff/v1/events/{id}/attendee',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             /** the event id, as found on the calendar being searched */
@@ -89,7 +89,7 @@ export function approve(
 const APPROVE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/staff/v1/events/{id}/approve',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             /** the event id on the room's resource calendar */
@@ -119,7 +119,7 @@ export function approveAll(
 const APPROVE_ALL = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/staff/v1/events/approve_all',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters(
         {
             /** period start as a unix epoch in seconds */
@@ -163,7 +163,7 @@ export function book(
 const BOOK = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/staff/v1/events/book',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters(
         {
             /** the meeting title */
@@ -186,7 +186,7 @@ const BOOK = /* @__PURE__ */ operation({
     body: null,
     response: PlaceCalendarEvent,
     name: 'staff.events.book',
-    wireNames: { body_text: 'body' },
+    wire_names: { body_text: 'body' },
 });
 
 /**
@@ -204,7 +204,7 @@ export function clashingAssets(
 const CLASHING_ASSETS = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/staff/v1/events/clashing-assets',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({
         /**
          * return the system if it is available instead of clashes, requires `system_id` on the
@@ -238,7 +238,7 @@ export function create(
 const CREATE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/staff/v1/events',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({}),
     body: PlaceCalendarEvent,
     response: PlaceCalendarEvent,
@@ -260,7 +260,7 @@ export function decline(
 const DECLINE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/staff/v1/events/{id}/decline',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             /** the event id, as found on the calendar being searched */
@@ -301,7 +301,7 @@ export function deleteAttendee(
 const DELETE_ATTENDEE = /* @__PURE__ */ operation({
     method: 'DELETE',
     path: '/api/staff/v1/events/{id}/attendee/{email}',
-    pathKeys: ['id', 'email'],
+    path_keys: ['id', 'email'],
     params: /* @__PURE__ */ parameters(
         {
             /** the event id, as found on the calendar being searched */
@@ -338,7 +338,7 @@ export function destroy(
 const DESTROY = /* @__PURE__ */ operation({
     method: 'DELETE',
     path: '/api/staff/v1/events/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             /** the event id, as found on the calendar being searched */
@@ -379,7 +379,7 @@ export function edit(
 const EDIT = /* @__PURE__ */ operation({
     method: 'PATCH',
     path: '/api/staff/v1/events/{id}/edit',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             /** the event id, as found on the calendar being searched */
@@ -422,7 +422,7 @@ export function extensionMetadata(
 const EXTENSION_METADATA = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/staff/v1/events/extension_metadata/{system_id}',
-    pathKeys: ['system_id'],
+    path_keys: ['system_id'],
     params: /* @__PURE__ */ parameters(
         {
             /** only return metadata for this room (system) */
@@ -460,7 +460,7 @@ export function extensionMetadataWithoutSystemId(
 const EXTENSION_METADATA_WITHOUT_SYSTEM_ID = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/staff/v1/events/extension_metadata',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({
         /** only return metadata for this room (system) */
         system_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -495,7 +495,7 @@ export function getMetadata(
 const GET_METADATA = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/staff/v1/events/{id}/metadata/{system_id}',
-    pathKeys: ['id', 'system_id'],
+    path_keys: ['id', 'system_id'],
     params: /* @__PURE__ */ parameters(
         {
             /** the event id, on the host's or the room's calendar */
@@ -527,7 +527,7 @@ export function guestCheckin(
 const GUEST_CHECKIN = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/staff/v1/events/{id}/guests/{guest_id}/check_in',
-    pathKeys: ['id', 'guest_id'],
+    path_keys: ['id', 'guest_id'],
     params: /* @__PURE__ */ parameters(
         {
             /** the event id, as found on the calendar being searched */
@@ -567,7 +567,7 @@ export function guestList(
 const GUEST_LIST = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/staff/v1/events/{id}/guests',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             /** the event id on the room's resource calendar */
@@ -602,7 +602,7 @@ export function history(
 const HISTORY = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/staff/v1/events/history',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters(
         {
             /** period start as a unix epoch in seconds */
@@ -646,7 +646,7 @@ export function linkMasterMetadata(
 const LINK_MASTER_METADATA = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/staff/v1/events/{id}/metadata/{system_id}/link/{ical_uid}',
-    pathKeys: ['id', 'system_id', 'ical_uid'],
+    path_keys: ['id', 'system_id', 'ical_uid'],
     params: /* @__PURE__ */ parameters(
         {
             /** the event id to link */
@@ -678,7 +678,7 @@ export function notifyChange(
 const NOTIFY_CHANGE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/staff/v1/events/notify/{change}/{system_id}/{event_id}',
-    pathKeys: ['change', 'system_id', 'event_id'],
+    path_keys: ['change', 'system_id', 'event_id'],
     params: /* @__PURE__ */ parameters(
         {
             /** the type of change that has occured */
@@ -710,7 +710,7 @@ export function patchMetadata(
 const PATCH_METADATA = /* @__PURE__ */ operation({
     method: 'PATCH',
     path: '/api/staff/v1/events/{id}/metadata/{system_id}',
-    pathKeys: ['id', 'system_id'],
+    path_keys: ['id', 'system_id'],
     params: /* @__PURE__ */ parameters(
         {
             /** the event id, on the host's or the room's calendar */
@@ -756,7 +756,7 @@ export function query(
 const QUERY = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/staff/v1/events',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters(
         {
             /** period start as a unix epoch in seconds */
@@ -820,7 +820,7 @@ export function reject(
 const REJECT = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/staff/v1/events/{id}/reject',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             /** the event id on the room's resource calendar */
@@ -850,7 +850,7 @@ export function replaceMetadata(
 const REPLACE_METADATA = /* @__PURE__ */ operation({
     method: 'PUT',
     path: '/api/staff/v1/events/{id}/metadata/{system_id}',
-    pathKeys: ['id', 'system_id'],
+    path_keys: ['id', 'system_id'],
     params: /* @__PURE__ */ parameters(
         {
             /** the event id, on the host's or the room's calendar */
@@ -896,7 +896,7 @@ export function show(
 const SHOW = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/staff/v1/events/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             /** the event id, as found on the calendar being searched */
@@ -928,7 +928,7 @@ export function update(
 const UPDATE = /* @__PURE__ */ operation({
     method: 'PATCH',
     path: '/api/staff/v1/events/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             /** the event id, as found on the calendar being searched */

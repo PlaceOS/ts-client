@@ -29,7 +29,7 @@ export function query(
 const QUERY = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/staff/v1/teams/{teams_id}/{channel_id}',
-    pathKeys: ['teams_id', 'channel_id'],
+    path_keys: ['teams_id', 'channel_id'],
     params: /* @__PURE__ */ parameters(
         {
             /** the Microsoft Teams team id */
@@ -61,7 +61,7 @@ export function sendChannelMessage(
 const SEND_CHANNEL_MESSAGE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/staff/v1/teams/{teams_id}/{channel_id}',
-    pathKeys: ['teams_id', 'channel_id'],
+    path_keys: ['teams_id', 'channel_id'],
     params: /* @__PURE__ */ parameters(
         {
             /** the Microsoft Teams team id */
@@ -93,7 +93,7 @@ export function show(
 const SHOW = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/staff/v1/teams/{teams_id}/{channel_id}/{message_id}',
-    pathKeys: ['teams_id', 'channel_id', 'message_id'],
+    path_keys: ['teams_id', 'channel_id', 'message_id'],
     params: /* @__PURE__ */ parameters(
         {
             /** the Microsoft Teams team id */

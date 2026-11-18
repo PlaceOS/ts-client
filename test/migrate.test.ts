@@ -15,8 +15,8 @@ const TABLES: MigrateTables = {
     unmapped: V1_UNMAPPED,
 };
 
-function migrate(text: string, fileName = 'file.ts') {
-    return migrateSource(ts, fileName, text, TABLES);
+function migrate(text: string, file_name = 'file.ts') {
+    return migrateSource(ts, file_name, text, TABLES);
 }
 
 test('rewrites calls, types and imports', () => {
@@ -321,14 +321,14 @@ test('a helper reuses the compat import of the file, and gets an alias when the 
         'await zones.show({ id }).then(orThrow);',
     ]);
     // A type-only import has no value, so the call gets a value import.
-    const typeOnly = migrate(
+    const type_only = migrate(
         [
             "import { showZone } from '@placeos/ts-client';",
             "import type { orThrow } from '@placeos/ts-client/compat';",
             'await showZone(id);',
         ].join('\n'),
     );
-    expect(typeOnly.text).toContain('.then(orThrowV2)');
+    expect(type_only.text).toContain('.then(orThrowV2)');
     const local = migrate(
         [
             "import { showZone } from '@placeos/ts-client';",

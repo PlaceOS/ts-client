@@ -29,7 +29,7 @@ export function bulkCreate(
 const BULK_CREATE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/staff/v1/assets/bulk',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({}),
     body: /* @__PURE__ */ array(Asset),
     response: /* @__PURE__ */ array(Asset),
@@ -51,7 +51,7 @@ export function bulkDestroy(
 const BULK_DESTROY = /* @__PURE__ */ operation({
     method: 'DELETE',
     path: '/api/staff/v1/assets/bulk',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({}),
     body: /* @__PURE__ */ array(/* @__PURE__ */ string()),
     response: null,
@@ -73,7 +73,7 @@ export function bulkUpdate(
 const BULK_UPDATE = /* @__PURE__ */ operation({
     method: 'PATCH',
     path: '/api/staff/v1/assets/bulk',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({}),
     body: /* @__PURE__ */ array(Asset),
     response: /* @__PURE__ */ array(Asset),
@@ -95,7 +95,7 @@ export function create(
 const CREATE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/staff/v1/assets',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({}),
     body: Asset,
     response: Asset,
@@ -117,7 +117,7 @@ export function destroy(
 const DESTROY = /* @__PURE__ */ operation({
     method: 'DELETE',
     path: '/api/staff/v1/assets/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -144,7 +144,7 @@ export function map(
 const MAP = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/staff/v1/assets/{id}/map',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -171,7 +171,7 @@ export function query(
 const QUERY = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/staff/v1/assets',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({
         /** only return assets whose zone_id field is this zone id */
         zone_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -227,7 +227,7 @@ export function show(
 const SHOW = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/staff/v1/assets/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),
@@ -254,7 +254,7 @@ export function update(
 const UPDATE = /* @__PURE__ */ operation({
     method: 'PATCH',
     path: '/api/staff/v1/assets/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             id: /* @__PURE__ */ string(),

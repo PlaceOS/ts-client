@@ -4,7 +4,7 @@ import type { CallMap, TypeMapping } from './map.ts';
 /** The 7.x call for each 6.x REST function. */
 export const V1_CALLS: CallMap = {
     acceptGroupInvitation: {
-        namespace: 'groupsInvitations',
+        namespace: 'groups_invitations',
         operation: 'accept',
         parameters: [{ name: 'id', initializer: null, use: 'mapped' }],
         input: {
@@ -28,7 +28,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     addAlertDashboard: {
-        namespace: 'alertDashboards',
+        namespace: 'alert_dashboards',
         operation: 'create',
         parameters: [{ name: 'form_data', initializer: null, use: 'mapped' }],
         input: {
@@ -41,7 +41,7 @@ export const V1_CALLS: CallMap = {
     },
     addAnswer: {
         module: 'staff',
-        namespace: 'surveysAnswers',
+        namespace: 'surveys_answers',
         operation: 'create',
         parameters: [{ name: 'form_data', initializer: null, use: 'mapped' }],
         input: {
@@ -53,7 +53,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     addApiKey: {
-        namespace: 'apiKeys',
+        namespace: 'api_keys',
         operation: 'create',
         parameters: [{ name: 'form_data', initializer: null, use: 'mapped' }],
         input: {
@@ -65,7 +65,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     addApplication: {
-        namespace: 'oauthApplications',
+        namespace: 'oauth_applications',
         operation: 'create',
         parameters: [{ name: 'form_data', initializer: null, use: 'mapped' }],
         input: {
@@ -89,7 +89,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     addAssetCategory: {
-        namespace: 'assetCategories',
+        namespace: 'asset_categories',
         operation: 'create',
         parameters: [{ name: 'form_data', initializer: null, use: 'mapped' }],
         input: {
@@ -101,7 +101,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     addAssetPurchaseOrder: {
-        namespace: 'assetPurchaseOrders',
+        namespace: 'asset_purchase_orders',
         operation: 'create',
         parameters: [{ name: 'form_data', initializer: null, use: 'mapped' }],
         input: {
@@ -125,7 +125,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     addAssetType: {
-        namespace: 'assetTypes',
+        namespace: 'asset_types',
         operation: 'create',
         parameters: [{ name: 'form_data', initializer: null, use: 'mapped' }],
         input: {
@@ -197,7 +197,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     addGroupInvitation: {
-        namespace: 'groupsInvitations',
+        namespace: 'groups_invitations',
         operation: 'create',
         parameters: [{ name: 'form_data', initializer: null, use: 'mapped' }],
         input: {
@@ -209,7 +209,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     addGroupUser: {
-        namespace: 'groupsUsers',
+        namespace: 'groups_users',
         operation: 'create',
         parameters: [{ name: 'form_data', initializer: null, use: 'mapped' }],
         input: {
@@ -221,7 +221,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     addGroupZone: {
-        namespace: 'groupsZones',
+        namespace: 'groups_zones',
         operation: 'create',
         parameters: [{ name: 'form_data', initializer: null, use: 'mapped' }],
         input: {
@@ -234,7 +234,7 @@ export const V1_CALLS: CallMap = {
     },
     addInvitation: {
         module: 'staff',
-        namespace: 'surveysInvitations',
+        namespace: 'surveys_invitations',
         operation: 'create',
         parameters: [{ name: 'form_data', initializer: null, use: 'mapped' }],
         input: {
@@ -246,7 +246,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     addLDAPSource: {
-        namespace: 'ldapAuthentications',
+        namespace: 'ldap_authentications',
         operation: 'create',
         parameters: [{ name: 'form_data', initializer: null, use: 'mapped' }],
         input: {
@@ -270,7 +270,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     addOAuthSource: {
-        namespace: 'oauthAuthentications',
+        namespace: 'oauth_authentications',
         operation: 'create',
         parameters: [{ name: 'form_data', initializer: null, use: 'mapped' }],
         input: {
@@ -283,7 +283,7 @@ export const V1_CALLS: CallMap = {
     },
     addQuestion: {
         module: 'staff',
-        namespace: 'surveysQuestions',
+        namespace: 'surveys_questions',
         operation: 'create',
         parameters: [{ name: 'form_data', initializer: null, use: 'mapped' }],
         input: {
@@ -307,7 +307,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     addSAMLSource: {
-        namespace: 'samlAuthentications',
+        namespace: 'saml_authentications',
         operation: 'create',
         parameters: [{ name: 'form_data', initializer: null, use: 'mapped' }],
         input: {
@@ -337,7 +337,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     addShortUrl: {
-        namespace: 'shortUrl',
+        namespace: 'short_url',
         operation: 'create',
         parameters: [{ name: 'form_data', initializer: null, use: 'mapped' }],
         input: {
@@ -349,7 +349,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     addSignageAIProvider: {
-        namespace: 'signageAiProviders',
+        namespace: 'signage_ai_providers',
         operation: 'create',
         parameters: [{ name: 'form_data', initializer: null, use: 'mapped' }],
         input: {
@@ -361,7 +361,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     addSignageMedia: {
-        namespace: 'playlistMedia',
+        namespace: 'playlist_media',
         operation: 'create',
         parameters: [
             { name: 'form_data', initializer: null, use: 'mapped' },
@@ -397,7 +397,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     addSignagePlugin: {
-        namespace: 'signagePlugins',
+        namespace: 'signage_plugins',
         operation: 'create',
         parameters: [{ name: 'form_data', initializer: null, use: 'mapped' }],
         input: {
@@ -409,7 +409,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     addSignageTemplate: {
-        namespace: 'signageTemplates',
+        namespace: 'signage_templates',
         operation: 'create',
         parameters: [
             { name: 'form_data', initializer: null, use: 'mapped' },
@@ -427,7 +427,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     addSignageTemplateMapping: {
-        namespace: 'signageTemplateMappings',
+        namespace: 'signage_template_mappings',
         operation: 'create',
         parameters: [{ name: 'form_data', initializer: null, use: 'mapped' }],
         input: {
@@ -495,7 +495,7 @@ export const V1_CALLS: CallMap = {
         notes: ['7.x has no body for data'],
     },
     addSystemTrigger: {
-        namespace: 'systemTriggers',
+        namespace: 'system_triggers',
         operation: 'create',
         parameters: [
             { name: 'id', initializer: null, use: 'mapped' },
@@ -570,7 +570,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     approveSignageTemplate: {
-        namespace: 'signageTemplates',
+        namespace: 'signage_templates',
         operation: 'approve',
         parameters: [{ name: 'id', initializer: null, use: 'mapped' }],
         input: {
@@ -582,7 +582,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     buildMonitor: {
-        namespace: 'buildMonitor',
+        namespace: 'build_monitor',
         operation: 'monitor',
         parameters: [{ name: 'query_params', initializer: '{}', use: 'mapped' }],
         input: { kind: 'object', entries: [{ kind: 'spread', index: 0 }] },
@@ -609,7 +609,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     cancelBuildJob: {
-        namespace: 'buildMonitor',
+        namespace: 'build_monitor',
         operation: 'cancel',
         parameters: [{ name: 'job', initializer: null, use: 'mapped' }],
         input: {
@@ -621,7 +621,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     cancelSignageAIJob: {
-        namespace: 'signageAi',
+        namespace: 'signage_ai',
         operation: 'cancel',
         parameters: [{ name: 'id', initializer: null, use: 'mapped' }],
         input: {
@@ -633,7 +633,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     claimSignageAIImage: {
-        namespace: 'signageAi',
+        namespace: 'signage_ai',
         operation: 'claim',
         parameters: [
             { name: 'id', initializer: null, use: 'mapped' },
@@ -834,7 +834,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     editSignageImage: {
-        namespace: 'signageAi',
+        namespace: 'signage_ai',
         operation: 'edit',
         parameters: [{ name: 'request', initializer: null, use: 'mapped' }],
         input: {
@@ -943,7 +943,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     generateQrCode: {
-        namespace: 'shortUrl',
+        namespace: 'short_url',
         operation: 'generateQrCode',
         parameters: [{ name: 'options', initializer: null, use: 'mapped' }],
         input: { kind: 'object', entries: [{ kind: 'spread', index: 0 }] },
@@ -952,7 +952,7 @@ export const V1_CALLS: CallMap = {
         notes: ['6.x sent format=svg, and 7.x has no format parameter'],
     },
     generateSignageImage: {
-        namespace: 'signageAi',
+        namespace: 'signage_ai',
         operation: 'generate',
         parameters: [{ name: 'request', initializer: null, use: 'mapped' }],
         input: {
@@ -964,7 +964,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     getShortUrlQrCodeSvg: {
-        namespace: 'shortUrl',
+        namespace: 'short_url',
         operation: 'svgQr',
         parameters: [{ name: 'id', initializer: null, use: 'mapped' }],
         input: {
@@ -976,7 +976,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     googleNotification: {
-        namespace: 'pushNotifications',
+        namespace: 'push_notifications',
         operation: 'google',
         parameters: [{ name: 'body', initializer: '{}', use: 'unsupported' }],
         input: { kind: 'object', entries: [] },
@@ -994,7 +994,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     inspectApiKey: {
-        namespace: 'apiKeys',
+        namespace: 'api_keys',
         operation: 'inspectKey',
         parameters: [],
         input: { kind: 'object', entries: [] },
@@ -1033,7 +1033,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     listDashboardAlerts: {
-        namespace: 'alertDashboards',
+        namespace: 'alert_dashboards',
         operation: 'alerts',
         parameters: [{ name: 'id', initializer: null, use: 'mapped' }],
         input: {
@@ -1045,7 +1045,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     listPublicEvents: {
-        namespace: 'publicEvents',
+        namespace: 'public_events',
         operation: 'query',
         parameters: [
             { name: 'system_id', initializer: null, use: 'mapped' },
@@ -1204,7 +1204,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     listSignageMediaTagCounts: {
-        namespace: 'playlistMedia',
+        namespace: 'playlist_media',
         operation: 'tagCounts',
         parameters: [{ name: 'query_params', initializer: '{}', use: 'mapped' }],
         input: { kind: 'object', entries: [{ kind: 'spread', index: 0 }] },
@@ -1213,7 +1213,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     listSignageMediaTags: {
-        namespace: 'playlistMedia',
+        namespace: 'playlist_media',
         operation: 'tags',
         parameters: [{ name: 'query_params', initializer: '{}', use: 'mapped' }],
         input: { kind: 'object', entries: [{ kind: 'spread', index: 0 }] },
@@ -1264,7 +1264,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     listSignageTemplateApprovers: {
-        namespace: 'signageTemplates',
+        namespace: 'signage_templates',
         operation: 'approvers',
         parameters: [{ name: 'group_id', initializer: null, use: 'mapped' }],
         input: {
@@ -1276,7 +1276,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     listSystemTriggers: {
-        namespace: 'systemTriggers',
+        namespace: 'system_triggers',
         operation: 'query',
         parameters: [
             { name: 'id', initializer: null, use: 'mapped' },
@@ -1466,7 +1466,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     office365Notification: {
-        namespace: 'pushNotifications',
+        namespace: 'push_notifications',
         operation: 'microsoft',
         parameters: [{ name: 'body', initializer: null, use: 'mapped' }],
         input: {
@@ -1487,7 +1487,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     proxyUrl: {
-        namespace: 'urlProxy',
+        namespace: 'url_proxy',
         operation: 'proxy',
         parameters: [
             { name: 'url', initializer: null, use: 'mapped' },
@@ -1502,7 +1502,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     publicEventGuestToken: {
-        namespace: 'publicEvents',
+        namespace: 'public_events',
         operation: 'guestToken',
         parameters: [
             { name: 'system_id', initializer: null, use: 'mapped' },
@@ -1535,7 +1535,7 @@ export const V1_CALLS: CallMap = {
         notes: ['7.x has no body for query_params'],
     },
     queryAlertDashboards: {
-        namespace: 'alertDashboards',
+        namespace: 'alert_dashboards',
         operation: 'query',
         parameters: [{ name: 'query_params', initializer: '{}', use: 'mapped' }],
         input: { kind: 'object', entries: [{ kind: 'spread', index: 0 }] },
@@ -1554,7 +1554,7 @@ export const V1_CALLS: CallMap = {
     },
     queryAnswers: {
         module: 'staff',
-        namespace: 'surveysAnswers',
+        namespace: 'surveys_answers',
         operation: 'query',
         parameters: [{ name: 'query_params', initializer: '{}', use: 'mapped' }],
         input: { kind: 'object', entries: [{ kind: 'spread', index: 0 }] },
@@ -1563,7 +1563,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     queryApiKeys: {
-        namespace: 'apiKeys',
+        namespace: 'api_keys',
         operation: 'query',
         parameters: [{ name: 'query_params', initializer: '{}', use: 'mapped' }],
         input: { kind: 'object', entries: [{ kind: 'spread', index: 0 }] },
@@ -1572,7 +1572,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     queryApplications: {
-        namespace: 'oauthApplications',
+        namespace: 'oauth_applications',
         operation: 'query',
         parameters: [{ name: 'query_params', initializer: '{}', use: 'mapped' }],
         input: { kind: 'object', entries: [{ kind: 'spread', index: 0 }] },
@@ -1581,7 +1581,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     queryAssetCategories: {
-        namespace: 'assetCategories',
+        namespace: 'asset_categories',
         operation: 'query',
         parameters: [{ name: 'query_params', initializer: '{}', use: 'mapped' }],
         input: { kind: 'object', entries: [{ kind: 'spread', index: 0 }] },
@@ -1590,7 +1590,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     queryAssetPurchaseOrders: {
-        namespace: 'assetPurchaseOrders',
+        namespace: 'asset_purchase_orders',
         operation: 'query',
         parameters: [{ name: 'query_params', initializer: '{}', use: 'mapped' }],
         input: { kind: 'object', entries: [{ kind: 'spread', index: 0 }] },
@@ -1608,7 +1608,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     queryAssetTypes: {
-        namespace: 'assetTypes',
+        namespace: 'asset_types',
         operation: 'query',
         parameters: [{ name: 'query_params', initializer: '{}', use: 'mapped' }],
         input: { kind: 'object', entries: [{ kind: 'spread', index: 0 }] },
@@ -1662,7 +1662,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     queryGroupHistory: {
-        namespace: 'groupsHistory',
+        namespace: 'groups_history',
         operation: 'query',
         parameters: [{ name: 'query_params', initializer: '{}', use: 'mapped' }],
         input: { kind: 'object', entries: [{ kind: 'spread', index: 0 }] },
@@ -1671,7 +1671,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     queryGroupInvitations: {
-        namespace: 'groupsInvitations',
+        namespace: 'groups_invitations',
         operation: 'query',
         parameters: [{ name: 'query_params', initializer: '{}', use: 'mapped' }],
         input: { kind: 'object', entries: [{ kind: 'spread', index: 0 }] },
@@ -1689,7 +1689,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     queryGroupUsers: {
-        namespace: 'groupsUsers',
+        namespace: 'groups_users',
         operation: 'query',
         parameters: [{ name: 'query_params', initializer: '{}', use: 'mapped' }],
         input: { kind: 'object', entries: [{ kind: 'spread', index: 0 }] },
@@ -1698,7 +1698,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     queryGroupZones: {
-        namespace: 'groupsZones',
+        namespace: 'groups_zones',
         operation: 'query',
         parameters: [{ name: 'query_params', initializer: '{}', use: 'mapped' }],
         input: { kind: 'object', entries: [{ kind: 'spread', index: 0 }] },
@@ -1717,7 +1717,7 @@ export const V1_CALLS: CallMap = {
     },
     queryInvitations: {
         module: 'staff',
-        namespace: 'surveysInvitations',
+        namespace: 'surveys_invitations',
         operation: 'query',
         parameters: [{ name: 'query_params', initializer: '{}', use: 'mapped' }],
         input: { kind: 'object', entries: [{ kind: 'spread', index: 0 }] },
@@ -1726,7 +1726,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     queryLDAPSources: {
-        namespace: 'ldapAuthentications',
+        namespace: 'ldap_authentications',
         operation: 'query',
         parameters: [{ name: 'query_params', initializer: '{}', use: 'mapped' }],
         input: { kind: 'object', entries: [{ kind: 'spread', index: 0 }] },
@@ -1744,7 +1744,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     queryOAuthSources: {
-        namespace: 'oauthAuthentications',
+        namespace: 'oauth_authentications',
         operation: 'query',
         parameters: [{ name: 'query_params', initializer: '{}', use: 'mapped' }],
         input: { kind: 'object', entries: [{ kind: 'spread', index: 0 }] },
@@ -1772,7 +1772,7 @@ export const V1_CALLS: CallMap = {
     },
     queryQuestions: {
         module: 'staff',
-        namespace: 'surveysQuestions',
+        namespace: 'surveys_questions',
         operation: 'query',
         parameters: [{ name: 'query_params', initializer: '{}', use: 'mapped' }],
         input: { kind: 'object', entries: [{ kind: 'spread', index: 0 }] },
@@ -1790,7 +1790,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     querySAMLSources: {
-        namespace: 'samlAuthentications',
+        namespace: 'saml_authentications',
         operation: 'query',
         parameters: [{ name: 'query_params', initializer: '{}', use: 'mapped' }],
         input: { kind: 'object', entries: [{ kind: 'spread', index: 0 }] },
@@ -1808,7 +1808,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     queryShortUrls: {
-        namespace: 'shortUrl',
+        namespace: 'short_url',
         operation: 'query',
         parameters: [{ name: 'query_params', initializer: '{}', use: 'mapped' }],
         input: { kind: 'object', entries: [{ kind: 'spread', index: 0 }] },
@@ -1817,7 +1817,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     querySignageAIJobs: {
-        namespace: 'signageAi',
+        namespace: 'signage_ai',
         operation: 'indexJobs',
         parameters: [{ name: 'query_params', initializer: '{}', use: 'mapped' }],
         input: { kind: 'object', entries: [{ kind: 'spread', index: 0 }] },
@@ -1826,7 +1826,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     querySignageAIProviders: {
-        namespace: 'signageAiProviders',
+        namespace: 'signage_ai_providers',
         operation: 'query',
         parameters: [{ name: 'query_params', initializer: '{}', use: 'mapped' }],
         input: { kind: 'object', entries: [{ kind: 'spread', index: 0 }] },
@@ -1835,7 +1835,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     querySignageMedia: {
-        namespace: 'playlistMedia',
+        namespace: 'playlist_media',
         operation: 'query',
         parameters: [{ name: 'query_params', initializer: '{}', use: 'mapped' }],
         input: { kind: 'object', entries: [{ kind: 'spread', index: 0 }] },
@@ -1853,7 +1853,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     querySignagePlugins: {
-        namespace: 'signagePlugins',
+        namespace: 'signage_plugins',
         operation: 'query',
         parameters: [{ name: 'query_params', initializer: '{}', use: 'mapped' }],
         input: { kind: 'object', entries: [{ kind: 'spread', index: 0 }] },
@@ -1862,7 +1862,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     querySignageTemplateMappings: {
-        namespace: 'signageTemplateMappings',
+        namespace: 'signage_template_mappings',
         operation: 'query',
         parameters: [{ name: 'query_params', initializer: '{}', use: 'mapped' }],
         input: { kind: 'object', entries: [{ kind: 'spread', index: 0 }] },
@@ -1871,7 +1871,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     querySignageTemplates: {
-        namespace: 'signageTemplates',
+        namespace: 'signage_templates',
         operation: 'query',
         parameters: [{ name: 'query_params', initializer: '{}', use: 'mapped' }],
         input: { kind: 'object', entries: [{ kind: 'spread', index: 0 }] },
@@ -1944,7 +1944,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     queryWebrtcRooms: {
-        namespace: 'webRtc',
+        namespace: 'web_rtc',
         operation: 'query',
         parameters: [{ name: 'query_params', initializer: '{}', use: 'mapped' }],
         input: { kind: 'object', entries: [{ kind: 'spread', index: 0 }] },
@@ -1974,7 +1974,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     registerPublicEvent: {
-        namespace: 'publicEvents',
+        namespace: 'public_events',
         operation: 'register',
         parameters: [
             { name: 'system_id', initializer: null, use: 'mapped' },
@@ -2016,7 +2016,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     removeAlertDashboard: {
-        namespace: 'alertDashboards',
+        namespace: 'alert_dashboards',
         operation: 'destroy',
         parameters: [{ name: 'id', initializer: null, use: 'mapped' }],
         input: {
@@ -2028,7 +2028,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     removeApiKey: {
-        namespace: 'apiKeys',
+        namespace: 'api_keys',
         operation: 'destroy',
         parameters: [{ name: 'id', initializer: null, use: 'mapped' }],
         input: {
@@ -2040,7 +2040,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     removeApplication: {
-        namespace: 'oauthApplications',
+        namespace: 'oauth_applications',
         operation: 'destroy',
         parameters: [{ name: 'id', initializer: null, use: 'mapped' }],
         input: {
@@ -2070,7 +2070,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     removeAssetCategory: {
-        namespace: 'assetCategories',
+        namespace: 'asset_categories',
         operation: 'destroy',
         parameters: [
             { name: 'id', initializer: null, use: 'mapped' },
@@ -2088,7 +2088,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     removeAssetPurchaseOrder: {
-        namespace: 'assetPurchaseOrders',
+        namespace: 'asset_purchase_orders',
         operation: 'destroy',
         parameters: [
             { name: 'id', initializer: null, use: 'mapped' },
@@ -2124,7 +2124,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     removeAssetType: {
-        namespace: 'assetTypes',
+        namespace: 'asset_types',
         operation: 'destroy',
         parameters: [
             { name: 'id', initializer: null, use: 'mapped' },
@@ -2208,7 +2208,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     removeGroupInvitation: {
-        namespace: 'groupsInvitations',
+        namespace: 'groups_invitations',
         operation: 'destroy',
         parameters: [{ name: 'id', initializer: null, use: 'mapped' }],
         input: {
@@ -2220,7 +2220,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     removeGroupUser: {
-        namespace: 'groupsUsers',
+        namespace: 'groups_users',
         operation: 'destroy',
         parameters: [
             { name: 'user_id', initializer: null, use: 'mapped' },
@@ -2238,7 +2238,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     removeGroupZone: {
-        namespace: 'groupsZones',
+        namespace: 'groups_zones',
         operation: 'destroy',
         parameters: [
             { name: 'group_id', initializer: null, use: 'mapped' },
@@ -2257,7 +2257,7 @@ export const V1_CALLS: CallMap = {
     },
     removeInvitation: {
         module: 'staff',
-        namespace: 'surveysInvitations',
+        namespace: 'surveys_invitations',
         operation: 'destroy',
         parameters: [
             { name: 'token', initializer: null, use: 'mapped' },
@@ -2275,7 +2275,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     removeLDAPSource: {
-        namespace: 'ldapAuthentications',
+        namespace: 'ldap_authentications',
         operation: 'destroy',
         parameters: [{ name: 'id', initializer: null, use: 'mapped' }],
         input: {
@@ -2317,7 +2317,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     removeOAuthSource: {
-        namespace: 'oauthAuthentications',
+        namespace: 'oauth_authentications',
         operation: 'destroy',
         parameters: [{ name: 'id', initializer: null, use: 'mapped' }],
         input: {
@@ -2330,7 +2330,7 @@ export const V1_CALLS: CallMap = {
     },
     removeQuestion: {
         module: 'staff',
-        namespace: 'surveysQuestions',
+        namespace: 'surveys_questions',
         operation: 'destroy',
         parameters: [
             { name: 'id', initializer: null, use: 'mapped' },
@@ -2360,7 +2360,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     removeSAMLSource: {
-        namespace: 'samlAuthentications',
+        namespace: 'saml_authentications',
         operation: 'destroy',
         parameters: [{ name: 'id', initializer: null, use: 'mapped' }],
         input: {
@@ -2384,7 +2384,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     removeShortUrl: {
-        namespace: 'shortUrl',
+        namespace: 'short_url',
         operation: 'destroy',
         parameters: [
             { name: 'id', initializer: null, use: 'mapped' },
@@ -2402,7 +2402,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     removeSignageAIProvider: {
-        namespace: 'signageAiProviders',
+        namespace: 'signage_ai_providers',
         operation: 'destroy',
         parameters: [{ name: 'id', initializer: null, use: 'mapped' }],
         input: {
@@ -2414,7 +2414,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     removeSignageMedia: {
-        namespace: 'playlistMedia',
+        namespace: 'playlist_media',
         operation: 'destroy',
         parameters: [
             { name: 'id', initializer: null, use: 'mapped' },
@@ -2432,7 +2432,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     removeSignageMediaTag: {
-        namespace: 'playlistMedia',
+        namespace: 'playlist_media',
         operation: 'removeTag',
         parameters: [{ name: 'query_params', initializer: null, use: 'mapped' }],
         input: { kind: 'object', entries: [{ kind: 'spread', index: 0 }] },
@@ -2459,7 +2459,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     removeSignagePlugin: {
-        namespace: 'signagePlugins',
+        namespace: 'signage_plugins',
         operation: 'destroy',
         parameters: [
             { name: 'id', initializer: null, use: 'mapped' },
@@ -2477,7 +2477,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     removeSignageTemplate: {
-        namespace: 'signageTemplates',
+        namespace: 'signage_templates',
         operation: 'destroy',
         parameters: [
             { name: 'id', initializer: null, use: 'mapped' },
@@ -2495,7 +2495,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     removeSignageTemplateDraft: {
-        namespace: 'signageTemplates',
+        namespace: 'signage_templates',
         operation: 'destroyDraft',
         parameters: [{ name: 'id', initializer: null, use: 'mapped' }],
         input: {
@@ -2507,7 +2507,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     removeSignageTemplateMapping: {
-        namespace: 'signageTemplateMappings',
+        namespace: 'signage_template_mappings',
         operation: 'destroy',
         parameters: [{ name: 'id', initializer: null, use: 'mapped' }],
         input: {
@@ -2586,7 +2586,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     removeSystemTrigger: {
-        namespace: 'systemTriggers',
+        namespace: 'system_triggers',
         operation: 'destroy',
         parameters: [
             { name: 'id', initializer: null, use: 'mapped' },
@@ -2676,7 +2676,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     renameSignageMediaTag: {
-        namespace: 'playlistMedia',
+        namespace: 'playlist_media',
         operation: 'renameTag',
         parameters: [{ name: 'query_params', initializer: null, use: 'mapped' }],
         input: { kind: 'object', entries: [{ kind: 'spread', index: 0 }] },
@@ -2716,7 +2716,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     requestApprovalSignageTemplate: {
-        namespace: 'signageTemplates',
+        namespace: 'signage_templates',
         operation: 'requestApproval',
         parameters: [
             { name: 'id', initializer: null, use: 'mapped' },
@@ -2825,7 +2825,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     shareSignageMedia: {
-        namespace: 'playlistMedia',
+        namespace: 'playlist_media',
         operation: 'share',
         parameters: [{ name: 'query_params', initializer: null, use: 'mapped' }],
         input: { kind: 'object', entries: [{ kind: 'spread', index: 0 }] },
@@ -2843,7 +2843,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     shareSignageTemplates: {
-        namespace: 'signageTemplates',
+        namespace: 'signage_templates',
         operation: 'share',
         parameters: [{ name: 'query_params', initializer: null, use: 'mapped' }],
         input: { kind: 'object', entries: [{ kind: 'spread', index: 0 }] },
@@ -2870,7 +2870,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     showAlertDashboard: {
-        namespace: 'alertDashboards',
+        namespace: 'alert_dashboards',
         operation: 'show',
         parameters: [{ name: 'id', initializer: null, use: 'mapped' }],
         input: {
@@ -2882,7 +2882,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     showApiKey: {
-        namespace: 'apiKeys',
+        namespace: 'api_keys',
         operation: 'show',
         parameters: [{ name: 'id', initializer: null, use: 'mapped' }],
         input: {
@@ -2894,7 +2894,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     showApplication: {
-        namespace: 'oauthApplications',
+        namespace: 'oauth_applications',
         operation: 'show',
         parameters: [{ name: 'id', initializer: null, use: 'mapped' }],
         input: {
@@ -2924,7 +2924,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     showAssetCategory: {
-        namespace: 'assetCategories',
+        namespace: 'asset_categories',
         operation: 'show',
         parameters: [
             { name: 'id', initializer: null, use: 'mapped' },
@@ -2942,7 +2942,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     showAssetPurchaseOrder: {
-        namespace: 'assetPurchaseOrders',
+        namespace: 'asset_purchase_orders',
         operation: 'show',
         parameters: [
             { name: 'id', initializer: null, use: 'mapped' },
@@ -2960,7 +2960,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     showAssetType: {
-        namespace: 'assetTypes',
+        namespace: 'asset_types',
         operation: 'show',
         parameters: [
             { name: 'id', initializer: null, use: 'mapped' },
@@ -3086,7 +3086,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     showGroupHistory: {
-        namespace: 'groupsHistory',
+        namespace: 'groups_history',
         operation: 'show',
         parameters: [{ name: 'id', initializer: null, use: 'mapped' }],
         input: {
@@ -3098,7 +3098,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     showGroupInvitation: {
-        namespace: 'groupsInvitations',
+        namespace: 'groups_invitations',
         operation: 'show',
         parameters: [{ name: 'id', initializer: null, use: 'mapped' }],
         input: {
@@ -3110,7 +3110,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     showGroupUser: {
-        namespace: 'groupsUsers',
+        namespace: 'groups_users',
         operation: 'show',
         parameters: [
             { name: 'user_id', initializer: null, use: 'mapped' },
@@ -3128,7 +3128,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     showGroupZone: {
-        namespace: 'groupsZones',
+        namespace: 'groups_zones',
         operation: 'show',
         parameters: [
             { name: 'group_id', initializer: null, use: 'mapped' },
@@ -3159,7 +3159,7 @@ export const V1_CALLS: CallMap = {
     },
     showInvitation: {
         module: 'staff',
-        namespace: 'surveysInvitations',
+        namespace: 'surveys_invitations',
         operation: 'show',
         parameters: [
             { name: 'token', initializer: null, use: 'mapped' },
@@ -3177,7 +3177,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     showLDAPSource: {
-        namespace: 'ldapAuthentications',
+        namespace: 'ldap_authentications',
         operation: 'show',
         parameters: [{ name: 'id', initializer: null, use: 'mapped' }],
         input: {
@@ -3225,7 +3225,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     showOAuthSource: {
-        namespace: 'oauthAuthentications',
+        namespace: 'oauth_authentications',
         operation: 'show',
         parameters: [{ name: 'id', initializer: null, use: 'mapped' }],
         input: {
@@ -3238,7 +3238,7 @@ export const V1_CALLS: CallMap = {
     },
     showQuestion: {
         module: 'staff',
-        namespace: 'surveysQuestions',
+        namespace: 'surveys_questions',
         operation: 'show',
         parameters: [
             { name: 'id', initializer: null, use: 'mapped' },
@@ -3268,7 +3268,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     showSAMLSource: {
-        namespace: 'samlAuthentications',
+        namespace: 'saml_authentications',
         operation: 'show',
         parameters: [{ name: 'id', initializer: null, use: 'mapped' }],
         input: {
@@ -3292,7 +3292,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     showShortUrl: {
-        namespace: 'shortUrl',
+        namespace: 'short_url',
         operation: 'show',
         parameters: [
             { name: 'id', initializer: null, use: 'mapped' },
@@ -3329,7 +3329,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     showSignageAIJob: {
-        namespace: 'signageAi',
+        namespace: 'signage_ai',
         operation: 'showJob',
         parameters: [
             { name: 'id', initializer: null, use: 'mapped' },
@@ -3348,7 +3348,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     showSignageAIProvider: {
-        namespace: 'signageAiProviders',
+        namespace: 'signage_ai_providers',
         operation: 'show',
         parameters: [{ name: 'id', initializer: null, use: 'mapped' }],
         input: {
@@ -3360,7 +3360,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     showSignageMedia: {
-        namespace: 'playlistMedia',
+        namespace: 'playlist_media',
         operation: 'show',
         parameters: [
             { name: 'id', initializer: null, use: 'mapped' },
@@ -3396,7 +3396,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     showSignagePlugin: {
-        namespace: 'signagePlugins',
+        namespace: 'signage_plugins',
         operation: 'show',
         parameters: [
             { name: 'id', initializer: null, use: 'mapped' },
@@ -3414,7 +3414,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     showSignageTemplate: {
-        namespace: 'signageTemplates',
+        namespace: 'signage_templates',
         operation: 'show',
         parameters: [
             { name: 'id', initializer: null, use: 'mapped' },
@@ -3432,7 +3432,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     showSignageTemplateMapping: {
-        namespace: 'signageTemplateMappings',
+        namespace: 'signage_template_mappings',
         operation: 'show',
         parameters: [{ name: 'id', initializer: null, use: 'mapped' }],
         input: {
@@ -3499,7 +3499,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     showSystemTrigger: {
-        namespace: 'systemTriggers',
+        namespace: 'system_triggers',
         operation: 'show',
         parameters: [
             { name: 'sys_id', initializer: null, use: 'mapped' },
@@ -3573,7 +3573,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     showWebrtcRoom: {
-        namespace: 'webRtc',
+        namespace: 'web_rtc',
         operation: 'publicRoom',
         parameters: [{ name: 'system_id', initializer: null, use: 'mapped' }],
         input: {
@@ -3603,7 +3603,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     signageAICapabilities: {
-        namespace: 'signageAi',
+        namespace: 'signage_ai',
         operation: 'capabilities',
         parameters: [],
         input: { kind: 'object', entries: [] },
@@ -3612,7 +3612,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     signageAIUsage: {
-        namespace: 'signageAi',
+        namespace: 'signage_ai',
         operation: 'usage',
         parameters: [{ name: 'query_params', initializer: '{}', use: 'mapped' }],
         input: { kind: 'object', entries: [{ kind: 'spread', index: 0 }] },
@@ -3800,7 +3800,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     testSignageAIProvider: {
-        namespace: 'signageAiProviders',
+        namespace: 'signage_ai_providers',
         operation: 'test',
         parameters: [{ name: 'id', initializer: null, use: 'mapped' }],
         input: {
@@ -3831,7 +3831,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     updateAlertDashboard: {
-        namespace: 'alertDashboards',
+        namespace: 'alert_dashboards',
         operation: 'update',
         parameters: [
             { name: 'id', initializer: null, use: 'mapped' },
@@ -3850,7 +3850,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     updateApiKey: {
-        namespace: 'apiKeys',
+        namespace: 'api_keys',
         operation: 'update',
         parameters: [
             { name: 'id', initializer: null, use: 'mapped' },
@@ -3869,7 +3869,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     updateApplication: {
-        namespace: 'oauthApplications',
+        namespace: 'oauth_applications',
         operation: 'update',
         parameters: [
             { name: 'id', initializer: null, use: 'mapped' },
@@ -3907,7 +3907,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     updateAssetCategory: {
-        namespace: 'assetCategories',
+        namespace: 'asset_categories',
         operation: 'update',
         parameters: [
             { name: 'id', initializer: null, use: 'mapped' },
@@ -3926,7 +3926,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     updateAssetPurchaseOrder: {
-        namespace: 'assetPurchaseOrders',
+        namespace: 'asset_purchase_orders',
         operation: 'update',
         parameters: [
             { name: 'id', initializer: null, use: 'mapped' },
@@ -3960,7 +3960,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     updateAssetType: {
-        namespace: 'assetTypes',
+        namespace: 'asset_types',
         operation: 'update',
         parameters: [
             { name: 'id', initializer: null, use: 'mapped' },
@@ -4074,7 +4074,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     updateGroupUser: {
-        namespace: 'groupsUsers',
+        namespace: 'groups_users',
         operation: 'update',
         parameters: [
             { name: 'user_id', initializer: null, use: 'mapped' },
@@ -4095,7 +4095,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     updateGroupZone: {
-        namespace: 'groupsZones',
+        namespace: 'groups_zones',
         operation: 'update',
         parameters: [
             { name: 'group_id', initializer: null, use: 'mapped' },
@@ -4117,7 +4117,7 @@ export const V1_CALLS: CallMap = {
     },
     updateInvitation: {
         module: 'staff',
-        namespace: 'surveysInvitations',
+        namespace: 'surveys_invitations',
         operation: 'update',
         parameters: [
             { name: 'token', initializer: null, use: 'mapped' },
@@ -4136,7 +4136,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     updateLDAPSource: {
-        namespace: 'ldapAuthentications',
+        namespace: 'ldap_authentications',
         operation: 'update',
         parameters: [
             { name: 'id', initializer: null, use: 'mapped' },
@@ -4193,7 +4193,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     updateOAuthSource: {
-        namespace: 'oauthAuthentications',
+        namespace: 'oauth_authentications',
         operation: 'update',
         parameters: [
             { name: 'id', initializer: null, use: 'mapped' },
@@ -4213,7 +4213,7 @@ export const V1_CALLS: CallMap = {
     },
     updateQuestion: {
         module: 'staff',
-        namespace: 'surveysQuestions',
+        namespace: 'surveys_questions',
         operation: 'update',
         parameters: [
             { name: 'id', initializer: null, use: 'mapped' },
@@ -4251,7 +4251,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     updateSAMLSource: {
-        namespace: 'samlAuthentications',
+        namespace: 'saml_authentications',
         operation: 'update',
         parameters: [
             { name: 'id', initializer: null, use: 'mapped' },
@@ -4291,7 +4291,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     updateShortUrl: {
-        namespace: 'shortUrl',
+        namespace: 'short_url',
         operation: 'update',
         parameters: [
             { name: 'id', initializer: null, use: 'mapped' },
@@ -4310,7 +4310,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     updateSignageAIProvider: {
-        namespace: 'signageAiProviders',
+        namespace: 'signage_ai_providers',
         operation: 'update',
         parameters: [
             { name: 'id', initializer: null, use: 'mapped' },
@@ -4329,7 +4329,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     updateSignageMedia: {
-        namespace: 'playlistMedia',
+        namespace: 'playlist_media',
         operation: 'update',
         parameters: [
             { name: 'id', initializer: null, use: 'mapped' },
@@ -4423,7 +4423,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     updateSignagePlugin: {
-        namespace: 'signagePlugins',
+        namespace: 'signage_plugins',
         operation: 'update',
         parameters: [
             { name: 'id', initializer: null, use: 'mapped' },
@@ -4442,7 +4442,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     updateSignageTemplate: {
-        namespace: 'signageTemplates',
+        namespace: 'signage_templates',
         operation: 'update',
         parameters: [
             { name: 'id', initializer: null, use: 'mapped' },
@@ -4461,7 +4461,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     updateSignageTemplateMapping: {
-        namespace: 'signageTemplateMappings',
+        namespace: 'signage_template_mappings',
         operation: 'update',
         parameters: [
             { name: 'id', initializer: null, use: 'mapped' },
@@ -4543,7 +4543,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     updateSystemTrigger: {
-        namespace: 'systemTriggers',
+        namespace: 'system_triggers',
         operation: 'show',
         parameters: [
             { name: 'sys_id', initializer: null, use: 'mapped' },
@@ -4651,7 +4651,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     webrtcGuestEntry: {
-        namespace: 'webRtc',
+        namespace: 'web_rtc',
         operation: 'guestEntry',
         parameters: [
             { name: 'system_id', initializer: null, use: 'mapped' },
@@ -4669,7 +4669,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     webrtcGuestExit: {
-        namespace: 'webRtc',
+        namespace: 'web_rtc',
         operation: 'guestExit',
         parameters: [],
         input: { kind: 'object', entries: [] },
@@ -4678,7 +4678,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     webrtcKickUser: {
-        namespace: 'webRtc',
+        namespace: 'web_rtc',
         operation: 'kickUser',
         parameters: [
             { name: 'user_id', initializer: null, use: 'mapped' },
@@ -4698,7 +4698,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     webrtcSessionMembers: {
-        namespace: 'webRtc',
+        namespace: 'web_rtc',
         operation: 'members',
         parameters: [{ name: 'session_id', initializer: null, use: 'mapped' }],
         input: {
@@ -4710,7 +4710,7 @@ export const V1_CALLS: CallMap = {
         notes: [],
     },
     webrtcTransferUser: {
-        namespace: 'webRtc',
+        namespace: 'web_rtc',
         operation: 'transferGuest',
         parameters: [
             { name: 'user_id', initializer: null, use: 'mapped' },

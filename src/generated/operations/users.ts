@@ -47,7 +47,7 @@ export function create(
 const CREATE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/users',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({}),
     body: /* @__PURE__ */ json(),
     response: /* @__PURE__ */ union([
@@ -74,7 +74,7 @@ export function current(
 const CURRENT = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/users/current',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({}),
     body: null,
     response: UserAdminMetadataResponse,
@@ -98,7 +98,7 @@ export function deleteResourceToken(
 const DELETE_RESOURCE_TOKEN = /* @__PURE__ */ operation({
     method: 'DELETE',
     path: '/api/engine/v2/users/{id}/resource_token',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             /** the id of the user */
@@ -126,7 +126,7 @@ export function destroy(
 const DESTROY = /* @__PURE__ */ operation({
     method: 'DELETE',
     path: '/api/engine/v2/users/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             /** the id of the user */
@@ -155,7 +155,7 @@ export function groups(
 const GROUPS = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/users/groups',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters(
         {
             /** the user emails whos group membership we are interested */
@@ -183,7 +183,7 @@ export function metadata(
 const METADATA = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/users/{id}/metadata',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             /** the id of the user */
@@ -213,7 +213,7 @@ export function query(
 const QUERY = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/users',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({
         /** include soft deleted users in the results */
         include_deleted: /* @__PURE__ */ boolean(),
@@ -266,7 +266,7 @@ export function resourceToken(
 const RESOURCE_TOKEN = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/users/resource_token',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters({}),
     body: null,
     response: UserResourceToken,
@@ -288,7 +288,7 @@ export function revive(
 const REVIVE = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/users/{id}/revive',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             /** the id of the user */
@@ -319,7 +319,7 @@ export function search(
 const SEARCH = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/users/metadata/search',
-    pathKeys: [],
+    path_keys: [],
     params: /* @__PURE__ */ parameters(
         {
             /** filter expression in JSONPath format */
@@ -358,7 +358,7 @@ export function show(
 const SHOW = /* @__PURE__ */ operation({
     method: 'GET',
     path: '/api/engine/v2/users/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             /** the id of the user */
@@ -393,7 +393,7 @@ export function update(
 const UPDATE = /* @__PURE__ */ operation({
     method: 'PATCH',
     path: '/api/engine/v2/users/{id}',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             /** the id of the user */
@@ -429,7 +429,7 @@ export function userResourceToken(
 const USER_RESOURCE_TOKEN = /* @__PURE__ */ operation({
     method: 'POST',
     path: '/api/engine/v2/users/{id}/resource_token',
-    pathKeys: ['id'],
+    path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
             /** the id of the user */

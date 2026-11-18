@@ -7,7 +7,7 @@
  *     id: request.route_params.id,
  *     name: 'Zone',
  * }) });
- * configure({ baseUrl: '', auth: { kind: 'none' }, fetch: mockFetch });
+ * configure({ base_url: '', auth: { kind: 'none' }, fetch: mockFetch });
  * ```
  *
  * The behavior is the same as 6.x: a path segment `:name` is a route parameter, the response comes
@@ -145,12 +145,12 @@ export const mockFetch: FetchFunction = async (url, init) => {
     if (body === undefined) return new Response(null, { status: 204, headers });
     // 6.x gave the value of the callback as it was, also a string. A JSON response has the string
     // as JSON. A handler with another `content-type`, such as `text/plain`, sends its text.
-    const contentType = headers['content-type'] ?? 'application/json';
+    const content_type = headers['content-type'] ?? 'application/json';
     const text =
-        typeof body === 'string' && !contentType.includes('json') ? body : JSON.stringify(body);
+        typeof body === 'string' && !content_type.includes('json') ? body : JSON.stringify(body);
     return new Response(text, {
         status: 200,
-        headers: { 'content-type': contentType, ...headers },
+        headers: { 'content-type': content_type, ...headers },
     });
 };
 
