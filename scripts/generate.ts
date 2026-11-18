@@ -28,39 +28,75 @@ const EMIT_DEPTH_MAX = 32;
 const LINE_WIDTH_MAX = 100;
 
 /**
+ * The `Time` fields that the server sends and accepts as Unix time in seconds, by schema. Each
+ * entry comes from the source of PlaceOS/models, PlaceOS/staff-api and PlaceOS/calendar. These
+ * fields get the note "Unix time in seconds.", because `integer` does not give the unit.
+ *
  * The spec generator of the server lost the `type: "integer"` hint of a `Time` field that has an
  * epoch converter, if the field is a PgORM `attribute` or can be nil. The document then says
- * `date-time`, but the server sends and accepts Unix time in seconds. PlaceOS/rest-api#469 fixed
- * the generator, so the rest-api document is correct. The staff-api document is not regenerated
- * yet, and these are its fields. Each entry comes from the source of PlaceOS/models and
- * PlaceOS/staff-api. When the document is correct, the patch fails, and the list can go.
+ * `date-time`. PlaceOS/rest-api#469 fixed the generator, so the rest-api document says `integer`.
+ * The staff-api document is not regenerated yet, so its `date-time` is patched to `integer`. See
+ * `ApiSource.epoch_patch`.
  */
 const TIMESTAMPS = ['created_at', 'updated_at'];
-const STAFF_EPOCH_FIELDS: ReadonlyMap<string, readonly string[]> = new Map([
+const SECONDS_FIELDS: ReadonlyMap<string, readonly string[]> = new Map([
+    ['PlaceOS.Api.ApiKeys.Response', ['expires_at']],
+    ['PlaceOS.Model.Alert', TIMESTAMPS],
+    ['PlaceOS.Model.AlertDashboard', TIMESTAMPS],
+    ['PlaceOS.Model.ApiKey', [...TIMESTAMPS, 'expires_at']],
     ['PlaceOS.Model.Asset', TIMESTAMPS],
     ['PlaceOS.Model.AssetCategory', TIMESTAMPS],
     ['PlaceOS.Model.AssetPurchaseOrder', TIMESTAMPS],
     ['PlaceOS.Model.AssetType', TIMESTAMPS],
+    ['PlaceOS.Model.Authority', TIMESTAMPS],
+    ['PlaceOS.Model.Broker', TIMESTAMPS],
+    ['PlaceOS.Model.Chat', TIMESTAMPS],
+    ['PlaceOS.Model.ControlSystem', [...TIMESTAMPS, 'signage_last_seen']],
+    ['PlaceOS.Model.DoorkeeperApplication', TIMESTAMPS],
+    ['PlaceOS.Model.Driver', TIMESTAMPS],
+    ['PlaceOS.Model.Edge', [...TIMESTAMPS, 'last_seen']],
+    ['PlaceOS.Model.Edge.KeyResponse', [...TIMESTAMPS, 'last_seen']],
+    ['PlaceOS.Model.History', ['created_at']],
+    ['PlaceOS.Model.JsonSchema', TIMESTAMPS],
+    ['PlaceOS.Model.LdapAuthentication', TIMESTAMPS],
+    ['PlaceOS.Model.Module', [...TIMESTAMPS, 'error_timestamp']],
+    ['PlaceOS.Model.OAuthAuthentication', TIMESTAMPS],
+    ['PlaceOS.Model.Playlist', TIMESTAMPS],
+    ['PlaceOS.Model.Playlist.Item', TIMESTAMPS],
+    ['PlaceOS.Model.Playlist.ItemSchedule', TIMESTAMPS],
+    ['PlaceOS.Model.Playlist.Revision', TIMESTAMPS],
+    ['PlaceOS.Model.Repository', TIMESTAMPS],
+    ['PlaceOS.Model.SamlAuthentication', TIMESTAMPS],
+    ['PlaceOS.Model.Settings', TIMESTAMPS],
+    ['PlaceOS.Model.Shortener', [...TIMESTAMPS, 'valid_from', 'valid_until']],
+    ['PlaceOS.Model.SignagePlugin', TIMESTAMPS],
+    ['PlaceOS.Model.Storage', TIMESTAMPS],
+    ['PlaceOS.Model.Trigger', TIMESTAMPS],
+    ['PlaceOS.Model.Trigger.Conditions.TimeDependent', ['time']],
+    ['PlaceOS.Model.TriggerInstance', TIMESTAMPS],
+    ['PlaceOS.Model.Upload', TIMESTAMPS],
+    ['PlaceOS.Model.User.AdminMetadataResponse', ['created_at', 'last_login']],
+    ['PlaceOS.Model.User.AdminResponse', ['created_at', 'last_login']],
+    ['PlaceOS.Model.User.PublicMetadataResponse', ['created_at', 'last_login']],
+    // The staff API. Its models are `ModelWithAutoKey`, which has the epoch `Timestamps`.
     ['PlaceOS.Model.Attendee', TIMESTAMPS],
     ['PlaceOS.Model.Booking', TIMESTAMPS],
-    ['PlaceOS.Model.ControlSystem', [...TIMESTAMPS, 'signage_last_seen']],
     ['PlaceOS.Model.EventMetadata', TIMESTAMPS],
     ['PlaceOS.Model.Guest', TIMESTAMPS],
-    ['PlaceOS.Model.History', ['created_at']],
     ['PlaceOS.Model.Survey', TIMESTAMPS],
     ['PlaceOS.Model.Survey.Answer', TIMESTAMPS],
     ['PlaceOS.Model.Survey.Invitation', TIMESTAMPS],
     ['PlaceOS.Model.Survey.Question', TIMESTAMPS],
-    ['PlaceOS.Model.User.AdminResponse', ['created_at', 'last_login']],
-    ['PlaceOS.Model.Zone', TIMESTAMPS],
     // PlaceOS/calendar: `Time::EpochConverter` on a `Time?`.
     ['PlaceCalendar.Event', ['event_end']],
+    ['PlaceOS.Model.User.PublicResponse', ['created_at', 'last_login']],
+    ['PlaceOS.Model.Zone', TIMESTAMPS],
 ]);
 
 /**
  * The `date-time` fields that really are RFC 3339 strings: models with `PgORM::Timestamps`, and
  * `Time` fields without a converter. Each `date-time` field of a named schema must be in this list
- * or in the epoch list of its API, so that a new field gets a decision.
+ * or in `SECONDS_FIELDS`, so that a new field gets a decision.
  */
 const STRING_TIME_FIELDS: ReadonlyMap<string, readonly string[]> = new Map([
     ['PlaceOS.Api.BuildMonitor.TaskStatus', ['timestamp']],
@@ -380,8 +416,12 @@ interface ApiSource {
     /** The path from `dir` to `src/core`. */
     readonly core: string;
     readonly aliases: ReadonlyMap<string, string>;
-    /** The `date-time` fields of the document that are Unix time in seconds, by schema. */
-    readonly epoch_fields: ReadonlyMap<string, readonly string[]>;
+    /**
+     * `true` when the document says `date-time` for the fields of `SECONDS_FIELDS`, and the patch
+     * makes them `integer`. `false` when the document says `integer`. The generator stops when the
+     * document does not match, so that the flag changes when the document is regenerated.
+     */
+    readonly epoch_patch: boolean;
 }
 
 const APIS: readonly ApiSource[] = [
@@ -392,7 +432,7 @@ const APIS: readonly ApiSource[] = [
         name_prefix: '',
         core: '../core',
         aliases: TYPE_ALIASES,
-        epoch_fields: new Map(),
+        epoch_patch: false,
     },
     {
         repository: 'PlaceOS/staff-api',
@@ -401,7 +441,7 @@ const APIS: readonly ApiSource[] = [
         name_prefix: 'staff.',
         core: '../../core',
         aliases: new Map(),
-        epoch_fields: STAFF_EPOCH_FIELDS,
+        epoch_patch: true,
     },
 ];
 
@@ -542,7 +582,8 @@ async function generate(api: ApiSource, check: boolean): Promise<string[]> {
             `${named.size} schemas.`,
     );
     if (skipped.length > 0) {
-        console.log(`Skipped ${skipped.length} WebSocket endpoints: ${skipped.join(', ')}.`);
+        const list = skipped.join(', ');
+        console.log(`Skipped ${skipped.length} WebSocket and redirect endpoints: ${list}.`);
     }
     return stale;
 }
@@ -561,7 +602,11 @@ async function downloadSpec(api: ApiSource): Promise<string> {
     return text;
 }
 
-/** Reads one operation of the document. Returns `null` for a WebSocket endpoint. */
+/**
+ * Reads one operation of the document. Returns `null` for a WebSocket endpoint and for a redirect,
+ * such as `short_url.redirect`: the useful part of a redirect is its `Location` header, which is
+ * for a browser, and the client does not follow a redirect with an API key.
+ */
 function planOperation(
     api: ApiSource,
     schemas: SpecNode,
@@ -584,7 +629,7 @@ function planOperation(
     const successes = Object.keys(responses).filter((status) => /^[123]\d\d$/.test(status));
     assert(successes.length === 1, `${operation_id} has one success response`);
     const status = successes[0] ?? '';
-    if (status === '101') return null;
+    if (status === '101' || status.startsWith('3')) return null;
 
     const imports: Imports = { combinators: new Set(), schemas: new Set() };
     let response: string | null = null;
@@ -742,7 +787,7 @@ function emitNamedSchema(
     node: SpecNode,
     imports: Imports,
 ): string {
-    const epoch_fields = new Set(api.epoch_fields.get(spec_name) ?? []);
+    const epoch_fields = new Set(SECONDS_FIELDS.get(spec_name) ?? []);
     const string_fields = new Set(STRING_TIME_FIELDS.get(spec_name) ?? []);
     const name = schemaTypeName(spec_name);
     const description = optionalString(field(node, 'description'), spec_name) ?? '';
@@ -762,7 +807,7 @@ function emitNamedSchema(
             `${doc}export const ${name}: Schema<${name}, ${name}Input> = ${schema_name};\n`
         );
     }
-    const time_fields = { spec_name, epoch_fields, string_fields };
+    const time_fields = { spec_name, epoch_fields, epoch_patch: api.epoch_patch, string_fields };
     const expression = emitObject(schemas, node, imports, 0, time_fields);
     imports.combinators.add('Output');
     imports.combinators.add('Input');
@@ -778,7 +823,10 @@ function emitNamedSchema(
 /** The time field decisions of one named schema. */
 interface TimeFields {
     readonly spec_name: string;
+    /** The fields of `SECONDS_FIELDS`. */
     readonly epoch_fields: ReadonlySet<string>;
+    /** See `ApiSource.epoch_patch`. */
+    readonly epoch_patch: boolean;
     readonly string_fields: ReadonlySet<string>;
 }
 
@@ -992,7 +1040,9 @@ function emitObject(
         } else if (time_fields.epoch_fields.has(key)) {
             const subject = `${time_fields.spec_name}.${key}`;
             const date_time = { type: 'string', format: 'date-time' };
-            assertPatchedShape(property, (node) => isOnly(node, date_time), subject);
+            const int64 = { type: 'integer', format: 'Int64' };
+            const shape = time_fields.epoch_patch ? date_time : int64;
+            assertPatchedShape(property, (node) => isOnly(node, shape), subject);
             imports.combinators.add('integer');
             expression = 'integer()';
             if (isNullable(property)) {
@@ -1172,7 +1222,7 @@ function writeOperationsFile(
                 `return call(${constant}, input, options);\n}\n\n` +
                 `const ${constant} = operation({\n` +
                 `method: '${method}',\n` +
-                `path: '${plan.path}',\n` +
+                `path: ${JSON.stringify(plan.path)},\n` +
                 `path_keys: ${JSON.stringify(plan.path_keys)},\n` +
                 `params: ${plan.params},\n` +
                 `body: ${plan.body ?? 'null'},\n` +

@@ -4,7 +4,7 @@
  * 6.x, or a function of your own:
  *
  * ```ts
- * configure({ base_url: '', auth, log: (entry) => console.debug(entry.scope, entry.message) });
+ * configure({ base_url: '', auth, log: (entry) => console.debug(entry.scope, ...entry.args) });
  * ```
  *
  * An entry has no tokens, API keys, cookies, request bodies or input values.

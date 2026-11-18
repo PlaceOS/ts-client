@@ -23,7 +23,7 @@ import {
 } from '../src/compat/index.ts';
 import { createClient } from '../src/core/client.ts';
 import { createRealtime, type BindingState } from '../src/realtime/realtime.ts';
-import { zones } from '../src/generated/operations/index.ts';
+import { settings, zones } from '../src/generated/operations/index.ts';
 
 // An app gives `base_url: ''`. Outside a browser, a URL needs an origin. 6.x mock data often has
 // only some fields. `missing_fields: 'zero'` fills the others, as the 6.x classes did.
@@ -159,6 +159,9 @@ test('consoleLog writes the 6.x format with the console method of the level', ()
 test('mockReply and mockPage make the results of test doubles', () => {
     const zone = { id: 'zone-1' };
     expect(orThrow(mockReply(zone))).toBe(zone);
+    // The double of an operation with pages needs `next`.
+    const history: Awaited<ReturnType<typeof settings.history>> = mockReply([]);
+    expect(history.ok && history.value.next()).toBeNull();
     expect(orThrowPage(mockPage({ data: [zone], total: 3 }))).toEqual({
         data: [zone],
         total: 3,

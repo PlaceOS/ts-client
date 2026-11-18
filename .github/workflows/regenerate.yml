@@ -1,6 +1,9 @@
 # Regenerates the client from the API documents on master each day. A change opens a PR, and the
 # older regeneration PRs close. See scripts/regenerate-pr.sh.
 #
+# The schedule runs on the default branch. A manual run regenerates the branch that it runs on, such
+# as `next`, and opens the PR to that branch.
+#
 # A PR that `GITHUB_TOKEN` opens does not start the CI checks, so the script runs the checks and
 # puts the results in the PR. Set the secret `REGENERATE_TOKEN` (a token with `contents` and
 # `pull-requests` write access) to open the PRs as that token, and then the checks start too.
@@ -28,7 +31,6 @@ jobs:
         steps:
             - uses: actions/checkout@v4
               with:
-                  ref: master
                   token: ${{ secrets.REGENERATE_TOKEN || github.token }}
 
             - uses: oven-sh/setup-bun@v2
@@ -40,3 +42,4 @@ jobs:
             - run: scripts/regenerate-pr.sh
               env:
                   GH_TOKEN: ${{ secrets.REGENERATE_TOKEN || github.token }}
+                  BASE: ${{ github.ref_name }}

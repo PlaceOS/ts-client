@@ -62,13 +62,15 @@ test('maps path templates, default values, members and picked keys', () => {
 
 test('keeps the uses that it cannot rewrite, with a finding', () => {
     const text = [
-        "import { addSystemModule, getModule, listMetadata, showMetadata, showZone } from '@placeos/ts-client';",
+        "import { addSystemModule, getModule, listMetadata, showMetadata, showZone, updateMetadata } from '@placeos/ts-client';",
         // 6.x made a list of the metadata, which 7.x gives by name.
         'listMetadata(zone.id);',
         "addSystemModule('sys-1', 'mod-1', { a: 1 });",
         'showMetadata(id, names()[0]);',
         "getModule('sys-1', 'Bookings');",
         'const load = showZone;',
+        // 7.x has `metadata.update` (PUT) and `metadata.merge` (PATCH).
+        "updateMetadata(id, data, 'patch');",
     ].join('\n');
     const result = migrate(text);
     expect(result.text).toBe(text);
@@ -78,6 +80,7 @@ test('keeps the uses that it cannot rewrite, with a finding', () => {
         '4 showMetadata',
         '5 getModule',
         '6 showZone',
+        '7 updateMetadata',
     ]);
 });
 
@@ -400,5 +403,38 @@ test('the hoisted helper gets its own name when the file imports fromV1Mock', ()
         "const { fromV1Mock: fromV1MockV7 } = await vi.hoisted(() => import('@placeos/ts-client/compat'));",
         "import { fromV1Mock } from '@placeos/ts-client/compat';",
         "vi.mock('@placeos/ts-client', () => ({ zones: { show: vi.fn(fromV1MockV7(undefined, ['id', '...'])) } }));",
+    ]);
+});
+
+test('finds the test doubles that it cannot change: an unnamed spread, a method, a variable', () => {
+    const result = migrate(
+        [
+            "import { queryZones, showZone } from '@placeos/ts-client';",
+            "vi.mock('@placeos/ts-client', async (importOriginal) => ({ ...(await importOriginal()), showZone: vi.fn() }));",
+            "vi.mock('@placeos/ts-client', () => ({ showZone() { return null; }, queryZones: vi.fn() }));",
+            'const spy = vi.mocked(showZone);',
+        ].join('\n'),
+        'zone.spec.ts',
+    );
+    // A new `zones` object without `...actual.zones` would remove the other functions.
+    expect(result.text).toContain('({ ...(await importOriginal()), showZone: vi.fn() })');
+    expect(result.findings.map((finding) => `${finding.line} ${finding.name}`)).toEqual([
+        '2 @placeos/ts-client',
+        '3 showZone',
+        '4 showZone',
+    ]);
+});
+
+test('finds the unmapped names on a namespace import', () => {
+    const result = migrate(
+        [
+            "import * as client from '@placeos/ts-client';",
+            'client.authority();',
+            "client.getModule('sys-1', 'Bookings');",
+        ].join('\n'),
+    );
+    expect(result.findings.map((finding) => `${finding.line} ${finding.name}`)).toEqual([
+        '2 authority',
+        '3 getModule',
     ]);
 });

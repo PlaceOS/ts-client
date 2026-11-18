@@ -66,7 +66,9 @@ export type AlertAlertTypeInput = Input<typeof AlertAlertTypeSchema>;
 export const AlertAlertType: Schema<AlertAlertType, AlertAlertTypeInput> = AlertAlertTypeSchema;
 
 const AlertDashboardSchema = /* @__PURE__ */ object({
+    /** Unix time in seconds. */
     created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    /** Unix time in seconds. */
     updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     description: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -170,6 +172,7 @@ export const TriggerConditionsTimeDependentType: Schema<
 
 const TriggerConditionsTimeDependentSchema = /* @__PURE__ */ object({
     type: /* @__PURE__ */ nullable(TriggerConditionsTimeDependentType),
+    /** Unix time in seconds. */
     time: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     cron: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     timezone: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -197,7 +200,9 @@ export const TriggerConditions: Schema<TriggerConditions, TriggerConditionsInput
     TriggerConditionsSchema;
 
 const AlertSchema = /* @__PURE__ */ object({
+    /** Unix time in seconds. */
     created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    /** Unix time in seconds. */
     updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     description: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -227,13 +232,16 @@ export const UserJwtPermissions: Schema<UserJwtPermissions, UserJwtPermissionsIn
     UserJwtPermissionsSchema;
 
 const ApiKeySchema = /* @__PURE__ */ object({
+    /** Unix time in seconds. */
     created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    /** Unix time in seconds. */
     updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     description: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     scopes: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
     permissions: /* @__PURE__ */ nullable(UserJwtPermissions),
     secret: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    /** Unix time in seconds. */
     expires_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     ttl: /* @__PURE__ */ nullable(/* @__PURE__ */ integer('Int32')),
     user_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -245,7 +253,9 @@ export interface ApiKeyInput extends Input<typeof ApiKeySchema> {}
 export const ApiKey: Schema<ApiKey, ApiKeyInput> = ApiKeySchema;
 
 const AuthoritySchema = /* @__PURE__ */ object({
+    /** Unix time in seconds. */
     created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    /** Unix time in seconds. */
     updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     description: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -288,6 +298,7 @@ export const UserWorktimePreference: Schema<UserWorktimePreference, UserWorktime
 
 const UserAdminResponseSchema = /* @__PURE__ */ object(
     {
+        /** Unix time in seconds. */
         created_at: /* @__PURE__ */ integer(),
         name: /* @__PURE__ */ string(),
         nickname: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -312,6 +323,7 @@ const UserAdminResponseSchema = /* @__PURE__ */ object(
         support: /* @__PURE__ */ boolean(),
         locatable: /* @__PURE__ */ boolean(),
         login_count: /* @__PURE__ */ integer(),
+        /** Unix time in seconds. */
         last_login: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
         work_preferences: /* @__PURE__ */ array(UserWorktimePreference),
         work_overrides: /* @__PURE__ */ record(UserWorktimePreference),
@@ -349,6 +361,7 @@ const ApiKeysResponseSchema = /* @__PURE__ */ object(
         authority_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         created_at: /* @__PURE__ */ integer(),
         updated_at: /* @__PURE__ */ integer(),
+        /** Unix time in seconds. */
         expires_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
         x_api_key: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         user: /* @__PURE__ */ nullable(UserAdminResponse),
@@ -363,7 +376,9 @@ export interface ApiKeysResponseInput extends Input<typeof ApiKeysResponseSchema
 export const ApiKeysResponse: Schema<ApiKeysResponse, ApiKeysResponseInput> = ApiKeysResponseSchema;
 
 const AssetSchema = /* @__PURE__ */ object({
+    /** Unix time in seconds. */
     created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    /** Unix time in seconds. */
     updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     identifier: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     serial_number: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -395,7 +410,9 @@ export interface AssetInput extends Input<typeof AssetSchema> {}
 export const Asset: Schema<Asset, AssetInput> = AssetSchema;
 
 const AssetCategorySchema = /* @__PURE__ */ object({
+    /** Unix time in seconds. */
     created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    /** Unix time in seconds. */
     updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     description: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -409,7 +426,9 @@ export interface AssetCategoryInput extends Input<typeof AssetCategorySchema> {}
 export const AssetCategory: Schema<AssetCategory, AssetCategoryInput> = AssetCategorySchema;
 
 const AssetPurchaseOrderSchema = /* @__PURE__ */ object({
+    /** Unix time in seconds. */
     created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    /** Unix time in seconds. */
     updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     purchase_order_number: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     invoice_number: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -427,7 +446,9 @@ export const AssetPurchaseOrder: Schema<AssetPurchaseOrder, AssetPurchaseOrderIn
     AssetPurchaseOrderSchema;
 
 const AssetTypeSchema = /* @__PURE__ */ object({
+    /** Unix time in seconds. */
     created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    /** Unix time in seconds. */
     updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     brand: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -444,7 +465,9 @@ export interface AssetTypeInput extends Input<typeof AssetTypeSchema> {}
 export const AssetType: Schema<AssetType, AssetTypeInput> = AssetTypeSchema;
 
 const BrokerSchema = /* @__PURE__ */ object({
+    /** Unix time in seconds. */
     created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    /** Unix time in seconds. */
     updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     /** The number of the enum: 0 certificate, 1 no_auth, 2 user_password. */
     auth_type: /* @__PURE__ */ nullable(/* @__PURE__ */ literal([0, 1, 2])),
@@ -511,7 +534,9 @@ export const BuildMonitorTaskStatus: Schema<BuildMonitorTaskStatus, BuildMonitor
     BuildMonitorTaskStatusSchema;
 
 const ChatSchema = /* @__PURE__ */ object({
+    /** Unix time in seconds. */
     created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    /** Unix time in seconds. */
     updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     summary: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     user_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -799,7 +824,9 @@ export const SystemTriggersControlSystemDetails: Schema<
 > = SystemTriggersControlSystemDetailsSchema;
 
 const TriggerInstanceSchema = /* @__PURE__ */ object({
+    /** Unix time in seconds. */
     created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    /** Unix time in seconds. */
     updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     enabled: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
     triggered: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
@@ -820,7 +847,9 @@ export interface TriggerInstanceInput extends Input<typeof TriggerInstanceSchema
 export const TriggerInstance: Schema<TriggerInstance, TriggerInstanceInput> = TriggerInstanceSchema;
 
 const TriggerSchema = /* @__PURE__ */ object({
+    /** Unix time in seconds. */
     created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    /** Unix time in seconds. */
     updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     description: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -841,7 +870,9 @@ export const Trigger: Schema<Trigger, TriggerInput> = TriggerSchema;
 
 const ZoneSchema = /* @__PURE__ */ object(
     {
+        /** Unix time in seconds. */
         created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+        /** Unix time in seconds. */
         updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
         name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         description: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -904,7 +935,9 @@ export const ModulesDriverDetails: Schema<ModulesDriverDetails, ModulesDriverDet
     ModulesDriverDetailsSchema;
 
 const ModuleSchema = /* @__PURE__ */ object({
+    /** Unix time in seconds. */
     created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    /** Unix time in seconds. */
     updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     ip: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     port: /* @__PURE__ */ nullable(/* @__PURE__ */ integer('Int32')),
@@ -924,6 +957,7 @@ const ModuleSchema = /* @__PURE__ */ object({
     ignore_connected: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
     ignore_startstop: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
     has_runtime_error: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    /** Unix time in seconds. */
     error_timestamp: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     launch_on_execute: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
     control_system_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -968,7 +1002,9 @@ export const PlaylistSchedule: Schema<PlaylistSchedule, PlaylistScheduleInput> =
     PlaylistScheduleSchema;
 
 const PlaylistSchema = /* @__PURE__ */ object({
+    /** Unix time in seconds. */
     created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    /** Unix time in seconds. */
     updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     description: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -1007,7 +1043,9 @@ export const PlaylistItemMediaType: Schema<PlaylistItemMediaType, PlaylistItemMe
     PlaylistItemMediaTypeSchema;
 
 const PlaylistItemSchema = /* @__PURE__ */ object({
+    /** Unix time in seconds. */
     created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    /** Unix time in seconds. */
     updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     description: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -1058,7 +1096,9 @@ export const SignagePluginPluginType: Schema<
 > = SignagePluginPluginTypeSchema;
 
 const SignagePluginSchema = /* @__PURE__ */ object({
+    /** Unix time in seconds. */
     created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    /** Unix time in seconds. */
     updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     description: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -1097,7 +1137,9 @@ export const SignageTemplateSystemTemplate: Schema<
 
 const ControlSystemSchema = /* @__PURE__ */ object(
     {
+        /** Unix time in seconds. */
         created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+        /** Unix time in seconds. */
         updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
         name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         description: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -1130,6 +1172,7 @@ const ControlSystemSchema = /* @__PURE__ */ object(
         sign_width: /* @__PURE__ */ nullable(/* @__PURE__ */ integer('Int32')),
         playlists: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
         signage: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+        /** Unix time in seconds. */
         signage_last_seen: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
         playlist_item_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         space_config: /* @__PURE__ */ nullable(/* @__PURE__ */ record(/* @__PURE__ */ json())),
@@ -1170,7 +1213,9 @@ const DoorkeeperApplicationSchema = /* @__PURE__ */ object({
     subsystems: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
     uid: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     id: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    /** Unix time in seconds. */
     created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    /** Unix time in seconds. */
     updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
 });
 export interface DoorkeeperApplication extends Output<typeof DoorkeeperApplicationSchema> {}
@@ -1193,7 +1238,9 @@ export const DriverUpdateInfo: Schema<DriverUpdateInfo, DriverUpdateInfoInput> =
     DriverUpdateInfoSchema;
 
 const DriverSchema = /* @__PURE__ */ object({
+    /** Unix time in seconds. */
     created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    /** Unix time in seconds. */
     updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     description: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -1231,12 +1278,15 @@ export type DriverRoleInput = Input<typeof DriverRoleSchema>;
 export const DriverRole: Schema<DriverRole, DriverRoleInput> = DriverRoleSchema;
 
 const EdgeSchema = /* @__PURE__ */ object({
+    /** Unix time in seconds. */
     created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    /** Unix time in seconds. */
     updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     description: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     api_key_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     user_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    /** Unix time in seconds. */
     last_seen: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     online: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
     id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -1298,11 +1348,14 @@ export const EdgeHealth: Schema<EdgeHealth, EdgeHealthInput> = EdgeHealthSchema;
 
 const EdgeKeyResponseSchema = /* @__PURE__ */ object(
     {
+        /** Unix time in seconds. */
         created_at: /* @__PURE__ */ integer(),
+        /** Unix time in seconds. */
         updated_at: /* @__PURE__ */ integer(),
         name: /* @__PURE__ */ string(),
         description: /* @__PURE__ */ string(),
         user_id: /* @__PURE__ */ string(),
+        /** Unix time in seconds. */
         last_seen: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
         online: /* @__PURE__ */ boolean(),
         x_api_key: /* @__PURE__ */ string(),
@@ -1409,6 +1462,7 @@ export const GroupInvitation: Schema<GroupInvitation, GroupInvitationInput> = Gr
 
 const UserPublicResponseSchema = /* @__PURE__ */ object(
     {
+        /** Unix time in seconds. */
         created_at: /* @__PURE__ */ integer(),
         name: /* @__PURE__ */ string(),
         nickname: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -1427,6 +1481,7 @@ const UserPublicResponseSchema = /* @__PURE__ */ object(
         groups: /* @__PURE__ */ array(/* @__PURE__ */ string()),
         locatable: /* @__PURE__ */ boolean(),
         login_count: /* @__PURE__ */ integer(),
+        /** Unix time in seconds. */
         last_login: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
         work_preferences: /* @__PURE__ */ array(UserWorktimePreference),
         work_overrides: /* @__PURE__ */ record(UserWorktimePreference),
@@ -1589,6 +1644,7 @@ const HistorySchema = /* @__PURE__ */ object({
     user_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     user_email: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     context: /* @__PURE__ */ nullable(/* @__PURE__ */ json()),
+    /** Unix time in seconds. */
     created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
 });
 export interface History extends Output<typeof HistorySchema> {}
@@ -1651,7 +1707,9 @@ export const ImageGenProviderCapabilities: Schema<
 > = ImageGenProviderCapabilitiesSchema;
 
 const JsonSchemaSchema = /* @__PURE__ */ object({
+    /** Unix time in seconds. */
     created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    /** Unix time in seconds. */
     updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     description: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -1673,7 +1731,9 @@ export interface KickReasonInput extends Input<typeof KickReasonSchema> {}
 export const KickReason: Schema<KickReason, KickReasonInput> = KickReasonSchema;
 
 const LdapAuthenticationSchema = /* @__PURE__ */ object({
+    /** Unix time in seconds. */
     created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    /** Unix time in seconds. */
     updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     port: /* @__PURE__ */ nullable(/* @__PURE__ */ integer('Int32')),
@@ -1993,7 +2053,9 @@ export type MqttMqttAclInput = Input<typeof MqttMqttAclSchema>;
 export const MqttMqttAcl: Schema<MqttMqttAcl, MqttMqttAclInput> = MqttMqttAclSchema;
 
 const OauthAuthenticationSchema = /* @__PURE__ */ object({
+    /** Unix time in seconds. */
     created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    /** Unix time in seconds. */
     updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     client_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -2091,7 +2153,9 @@ export const PlaylistApprover: Schema<PlaylistApprover, PlaylistApproverInput> =
     PlaylistApproverSchema;
 
 const PlaylistItemScheduleSchema = /* @__PURE__ */ object({
+    /** Unix time in seconds. */
     created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    /** Unix time in seconds. */
     updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     playlist_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     item_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -2104,7 +2168,9 @@ export const PlaylistItemSchedule: Schema<PlaylistItemSchedule, PlaylistItemSche
     PlaylistItemScheduleSchema;
 
 const PlaylistRevisionSchema = /* @__PURE__ */ object({
+    /** Unix time in seconds. */
     created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    /** Unix time in seconds. */
     updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     user_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     user_email: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -2166,7 +2232,9 @@ export type RepositoryTypeInput = Input<typeof RepositoryTypeSchema>;
 export const RepositoryType: Schema<RepositoryType, RepositoryTypeInput> = RepositoryTypeSchema;
 
 const RepositorySchema = /* @__PURE__ */ object({
+    /** Unix time in seconds. */
     created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    /** Unix time in seconds. */
     updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     description: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -2220,7 +2288,9 @@ export const RootSourceResyncStatus: Schema<RootSourceResyncStatus, RootSourceRe
     RootSourceResyncStatusSchema;
 
 const SamlAuthenticationSchema = /* @__PURE__ */ object({
+    /** Unix time in seconds. */
     created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    /** Unix time in seconds. */
     updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     issuer: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -2277,7 +2347,9 @@ export const SettingsParentType: Schema<SettingsParentType, SettingsParentTypeIn
     SettingsParentTypeSchema;
 
 const SettingsSchema = /* @__PURE__ */ object({
+    /** Unix time in seconds. */
     created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    /** Unix time in seconds. */
     updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     modified_by_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     settings_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -2299,7 +2371,9 @@ export type ShortUrlFormatInput = Input<typeof ShortUrlFormatSchema>;
 export const ShortUrlFormat: Schema<ShortUrlFormat, ShortUrlFormatInput> = ShortUrlFormatSchema;
 
 const ShortenerSchema = /* @__PURE__ */ object({
+    /** Unix time in seconds. */
     created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    /** Unix time in seconds. */
     updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     uri: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -2309,7 +2383,9 @@ const ShortenerSchema = /* @__PURE__ */ object({
     user_name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     redirect_count: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     enabled: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    /** Unix time in seconds. */
     valid_from: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    /** Unix time in seconds. */
     valid_until: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     authority_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -2708,7 +2784,9 @@ export type StorageTypeInput = Input<typeof StorageTypeSchema>;
 export const StorageType: Schema<StorageType, StorageTypeInput> = StorageTypeSchema;
 
 const StorageSchema = /* @__PURE__ */ object({
+    /** Unix time in seconds. */
     created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    /** Unix time in seconds. */
     updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     storage_type: /* @__PURE__ */ nullable(StorageType),
     bucket_name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -2763,7 +2841,9 @@ export const UploadPermissions: Schema<UploadPermissions, UploadPermissionsInput
     UploadPermissionsSchema;
 
 const UploadSchema = /* @__PURE__ */ object({
+    /** Unix time in seconds. */
     created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    /** Unix time in seconds. */
     updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     uploaded_email: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     file_name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -2854,6 +2934,7 @@ export const UploadsUploadInfo: Schema<UploadsUploadInfo, UploadsUploadInfoInput
 
 const UserAdminMetadataResponseSchema = /* @__PURE__ */ object(
     {
+        /** Unix time in seconds. */
         created_at: /* @__PURE__ */ integer(),
         name: /* @__PURE__ */ string(),
         nickname: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -2878,6 +2959,7 @@ const UserAdminMetadataResponseSchema = /* @__PURE__ */ object(
         support: /* @__PURE__ */ boolean(),
         locatable: /* @__PURE__ */ boolean(),
         login_count: /* @__PURE__ */ integer(),
+        /** Unix time in seconds. */
         last_login: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
         work_preferences: /* @__PURE__ */ array(UserWorktimePreference),
         work_overrides: /* @__PURE__ */ record(UserWorktimePreference),
@@ -2955,6 +3037,7 @@ export const UserJwt: Schema<UserJwt, UserJwtInput> = UserJwtSchema;
 
 const UserPublicMetadataResponseSchema = /* @__PURE__ */ object(
     {
+        /** Unix time in seconds. */
         created_at: /* @__PURE__ */ integer(),
         name: /* @__PURE__ */ string(),
         nickname: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -2973,6 +3056,7 @@ const UserPublicMetadataResponseSchema = /* @__PURE__ */ object(
         groups: /* @__PURE__ */ array(/* @__PURE__ */ string()),
         locatable: /* @__PURE__ */ boolean(),
         login_count: /* @__PURE__ */ integer(),
+        /** Unix time in seconds. */
         last_login: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
         work_preferences: /* @__PURE__ */ array(UserWorktimePreference),
         work_overrides: /* @__PURE__ */ record(UserWorktimePreference),

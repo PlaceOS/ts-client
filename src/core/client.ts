@@ -362,8 +362,10 @@ function logOutcome(
     const error = result.error;
     const status = error.kind === 'http' ? ` ${error.status}` : '';
     const message = `${operation.name}: ${error.kind}${status} in ${duration_ms} ms`;
-    // The server answered: a warning. No answer, such as a timeout: an error.
-    if (error.kind === 'http') log.warn(message, { ...call_data, error });
+    // The caller sent the abort: debug. The server answered: a warning. No answer, such as a
+    // timeout: an error.
+    if (error.kind === 'aborted') log.debug(message, { ...call_data, error });
+    else if (error.kind === 'http') log.warn(message, { ...call_data, error });
     else log.error(message, { ...call_data, error });
 }
 
@@ -450,7 +452,10 @@ async function send(
         headers.set('Accept', 'application/json');
         if (body_text !== null) headers.set('Content-Type', 'application/json');
         setCredentialHeader(headers, credential.value);
-        const init = { method: operation.method, headers, body: body_text };
+        // On a redirect to another origin, `fetch` removes `Authorization` but keeps `X-API-Key`.
+        // So with an API key, a redirect is a `network` error. The API has no redirect operations.
+        const redirect: RequestRedirect = credential.value.kind === 'api_key' ? 'error' : 'follow';
+        const init = { method: operation.method, headers, body: body_text, redirect };
         const remaining_ms = deadline_ms - Date.now();
         if (remaining_ms <= 0) return { ok: false, error: { kind: 'timeout', timeout_ms } };
         const limits = {
@@ -578,7 +583,9 @@ function buildUrl(
     for (const key of operation.path_keys) {
         const text = queryScalar(params[key]);
         // An empty segment sends the request to a different endpoint, such as the collection.
+        // `encodeURIComponent` keeps dots, and URL parsing removes `.` and `..` segments.
         assert(text.length > 0, `the path parameter "${key}" is not empty`);
+        assert(text !== '.' && text !== '..', `the path parameter "${key}" is not . or ..`);
         path = path.replace(`{${key}}`, () => encodeURIComponent(text));
     }
 

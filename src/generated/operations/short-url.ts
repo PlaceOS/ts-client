@@ -162,33 +162,6 @@ const QUERY = /* @__PURE__ */ operation({
 });
 
 /**
- * Redirects to the URI specified by the provided short URL id.
- *
- * `GET /api/engine/v2/short_url/{id}/redirect`
- */
-export function redirect(
-    input: OperationInput<typeof REDIRECT>,
-    options?: CallOptions,
-): Promise<CallResult<typeof REDIRECT>> {
-    return call(REDIRECT, input, options);
-}
-
-const REDIRECT = /* @__PURE__ */ operation({
-    method: 'GET',
-    path: '/api/engine/v2/short_url/{id}/redirect',
-    path_keys: ['id'],
-    params: /* @__PURE__ */ parameters(
-        {
-            id: /* @__PURE__ */ string(),
-        },
-        ['id'],
-    ),
-    body: null,
-    response: null,
-    name: 'short_url.redirect',
-});
-
-/**
  * Return the details of the requested shortened URL.
  *
  * `GET /api/engine/v2/short_url/{id}`

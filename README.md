@@ -289,6 +289,8 @@ Other parts of the session:
 - A trusted application with the `implicit` grant uses the code with PKCE.
 - The frame login checks the `state`. It needs the `oauth-resp.html` of 7.x.
 - The session removes `x-api-key` from the URL after it reads it.
+- With an API key, a call does not follow a redirect. It gets a `network` error. On a redirect to
+  another origin, `fetch` removes `Authorization`, but it keeps `X-API-Key`.
 - After a refused refresh token, the login continues immediately.
 - A refusal on the consent page (`error=access_denied` with the state of this client) stops the
   login with `authorization_denied`. 6.x sent the user to the authorize page again.
@@ -382,7 +384,7 @@ window.debug = true;
 | `error`     | A failure without an answer, such as a timeout.           | `console.error`    |
 | `warn`      | A refusal or a drop, such as a 404 or a closed socket.    | `console.warn`     |
 | `info`      | A step, such as a new token or a connected socket.        | `console.info`     |
-| `debug`     | A detail, such as each call or each value change.         | `console.debug`    |
+| `debug`     | A detail, such as each call or an aborted call.           | `console.debug`    |
 | `print`     | A line without a level, such as a field of the authority. | `console.log`      |
 | `group`     | Starts a group of the entries that follow.                | `console.group`    |
 | `group_end` | Ends the group.                                           | `console.groupEnd` |
@@ -433,8 +435,9 @@ The generator changes some parts of the document. Each change has a comment in
 - **Time fields.** The staff-api document says `date-time` for some fields that the server sends
   as Unix time in seconds, for example `created_at` on most models. The generator changes these
   fields to integers. The list comes from the source of PlaceOS/models. The rest-api document has
-  the correct types. The generator stops if it finds a `date-time` field that is not in a list, so
-  each new field gets a decision.
+  the correct types. In both clients, the fields of the list have the note "Unix time in seconds.",
+  because `integer` does not give the unit. The generator stops if it finds a `date-time` field
+  that is not in a list, so each new field gets a decision.
 - **Enum numbers.** The server sends some enums as numbers, for example `Driver.role` (`99` is
   `logic`). The document gives their names. The generator changes these fields to the numbers.
 - **String fields.** The document says `object` for some fields that the server sends as strings,
@@ -462,7 +465,8 @@ The generator changes some parts of the document. Each change has a comment in
 - **Responses without a schema.** The data is a `Uint8Array` with the raw body. `systems.execute`,
   `modules.execute` and `modules.stateValue` are exceptions: they return a `JsonValue`.
 - **WebSocket endpoints** (`systems/control`, `webrtc/signaller` and others) are not in the
-  client.
+  client. Also `short_url/{id}/redirect` is not in the client: the useful part of its answer is the
+  `Location` header, which is for a browser.
 
 ## Change the generated code
 
@@ -486,7 +490,8 @@ Each day, the `Regenerate` workflow regenerates the client from the API document
 of the checks. It also closes the older regeneration PRs, because the new one has their changes.
 When master matches the documents again, it closes all of them. Each run deletes the
 regeneration branches that have no open PR, such as the branch of a merged PR. `DRY_RUN=1
-scripts/regenerate-pr.sh` (from the root of the repository) shows what it would do.
+scripts/regenerate-pr.sh` (from the root of the repository) shows what it would do. A manual run
+of the workflow on another branch, such as `next`, regenerates that branch and opens the PR to it.
 
 The commit of a regeneration PR is a `fix`, so its merge publishes a patch release. Before the
 merge, change the commit message to a `feat` for new operations, or add a `BREAKING CHANGE:` footer
@@ -527,6 +532,13 @@ can examine and undo the changes. Run it in the folder of the project, because i
 ```sh
 npx -p @placeos/ts-client@next placeos-migrate src           # Shows the changes. Writes no file.
 npx -p @placeos/ts-client@next placeos-migrate --write src   # Writes the changes.
+```
+
+The tool needs TypeScript 4.9 to 6.x, because TypeScript 7 has no JavaScript API. If the project
+has TypeScript 7, or no TypeScript, give the tool TypeScript 5:
+
+```sh
+npx -p typescript@5 -p @placeos/ts-client@next placeos-migrate src
 ```
 
 The tool makes these changes:
@@ -579,6 +591,10 @@ it keeps its 6.x import, so the compiler also shows it. These uses are:
 - a `vi.mock` without a factory or `{ spy: true }`: its 7.x functions give `undefined`, and
   `.then(orThrow)` fails;
 - a `jest.mock` factory with 6.x functions;
+- in a `vi.mock` factory, a 6.x function that is a method, and a spread without a name, such as
+  `...(await importOriginal())`;
+- a test double in a variable, such as `const spy = vi.mocked(showZone)`: the tool changes the
+  function, but not the calls on `spy`;
 - an argument that has no place in 7.x, and an argument with side effects that 7.x uses two times.
 
 On a copy of backoffice, 329 of the 399 tests pass after the tool. 6.x passes 394. The other tests

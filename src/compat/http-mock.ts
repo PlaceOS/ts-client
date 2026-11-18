@@ -83,10 +83,13 @@ const handlers = new Map<string, MockHttpRequestHandler>();
 /** The logs of the mock endpoints. As in 6.x, they go to the console when `window.debug` is set. */
 const log = scopedLog('mock', { sink: consoleLog });
 
-let notFound: NotFoundHandler = (method, url) =>
-    Promise.reject(
+/** The default handler logs the 404, as in 6.x. A handler that returns `null` logs nothing. */
+let notFound: NotFoundHandler = (method, url) => {
+    log.warn(`404 ${method} ${url}`);
+    return Promise.reject(
         Object.assign(new Error(`Mock endpoint not found: ${method} ${url}`), { status: 404 }),
     );
+};
 
 /** Adds an endpoint. An endpoint with the same method and path is replaced. */
 export function registerMockEndpoint<T>(options: MockHttpRequestHandlerOptions<T>): void {
@@ -126,7 +129,6 @@ export const mockFetch: FetchFunction = async (url, init) => {
     const method = verb(init.method);
     const handler = findHandler(method, url);
     if (handler === null) {
-        log.warn(`404 ${method} ${url}`);
         const fallback = notFound(method, url);
         if (fallback === null) return fetch(url, init);
         return fallback.then(

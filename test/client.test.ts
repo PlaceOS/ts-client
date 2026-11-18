@@ -147,6 +147,27 @@ describe('call', () => {
         expect(sent).toHaveLength(2);
     });
 
+    test('does not send the API key to the target of a redirect', async () => {
+        const target = Bun.serve({
+            port: 0,
+            fetch: (request) => new Response(request.headers.get('x-api-key') ?? 'no key'),
+        });
+        const server = Bun.serve({
+            port: 0,
+            fetch: () => Response.redirect(`http://127.0.0.1:${target.port}/`, 302),
+        });
+        try {
+            const client = createClient({
+                base_url: `http://localhost:${server.port}`,
+                auth: { kind: 'api_key', key: 'key-1' },
+            });
+            const result = await call(DOWNLOAD, {}, { client });
+            expect(result.ok ? 'followed' : result.error.kind).toBe('network');
+        } finally {
+            await Promise.all([server.stop(true), target.stop(true)]);
+        }
+    });
+
     test('throws on input that does not match the schema, before it sends', async () => {
         const { fetch, sent } = fakeFetch(() => new Response(''));
         const client = clientWith(fetch);
@@ -157,6 +178,9 @@ describe('call', () => {
         );
         await expect(call(UPDATE, { id: '', body: {} }, { client })).rejects.toThrow(
             'the path parameter "id" is not empty',
+        );
+        await expect(call(UPDATE, { id: '..', body: {} }, { client })).rejects.toThrow(
+            'the path parameter "id" is not . or ..',
         );
         expect(sent).toHaveLength(0);
     });

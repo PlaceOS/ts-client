@@ -4160,7 +4160,7 @@ export const V1_CALLS: CallMap = {
         parameters: [
             { name: 'id', initializer: null, use: 'mapped' },
             { name: 'form_data', initializer: null, use: 'mapped' },
-            { name: 'method', initializer: "'put'", use: 'ignored' },
+            { name: 'method', initializer: "'put'", use: 'unsupported' },
         ],
         input: {
             kind: 'object',

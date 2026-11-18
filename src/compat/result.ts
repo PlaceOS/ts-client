@@ -60,9 +60,15 @@ export function orThrowPage<T>(result: Result<Reply<T>, CallError>): Page<T> {
  * ```ts
  * vi.mocked(zones.show).mockResolvedValue(mockReply(zone));
  * ```
+ *
+ * The reply has `next()`, which gives `null`, so it is also the last page of an operation with
+ * pages, such as `settings.history`.
  */
-export function mockReply<T>(data: T, status = 200): Result<Reply<T>, CallError> {
-    return { ok: true, value: { status, headers: new Headers(), data } };
+export function mockReply<T>(
+    data: T,
+    status = 200,
+): Result<Reply<T> & { next(): null }, CallError> {
+    return { ok: true, value: { status, headers: new Headers(), data, next: () => null } };
 }
 
 /**

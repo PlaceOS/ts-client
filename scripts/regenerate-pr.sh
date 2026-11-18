@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Opens a pull request when the generated client does not match the API documents on master, and
 # closes the older regeneration pull requests. `.github/workflows/regenerate.yml` runs it each day,
-# from the root of the repository.
+# from the root of the repository. The PR goes to `$BASE` (default `master`), and `$BASE` must be
+# the branch that is checked out.
 #
 #     scripts/regenerate-pr.sh            Regenerates, then pushes and opens or closes PRs.
 #     DRY_RUN=1 scripts/regenerate-pr.sh  Regenerates and shows what it would do on GitHub.
@@ -11,10 +12,12 @@
 # deletes the regeneration branches that have no open PR, such as the branch of a merged PR.
 set -euo pipefail
 
-readonly BRANCH_PREFIX='bot/regenerate-'
 readonly BASE="${BASE:-master}"
-# More open regeneration PRs or branches than this is a bug in this script, not a normal state.
-readonly PRS_MAX=50
+# Each base has its own prefix, so that a run for one base does not close the PRs or delete the
+# branches of another base.
+readonly BRANCH_PREFIX="bot/regenerate-$BASE-"
+# More open PRs to the base, or regeneration branches, than this is not a normal state.
+readonly OPEN_PRS_MAX=500
 readonly BRANCHES_MAX=200
 readonly LOG_DIR="${RUNNER_TEMP:-$(mktemp -d)}"
 # The files that `generate` and `v1-map` write.
@@ -29,10 +32,20 @@ remote() {
     fi
 }
 
-# The open regeneration PRs: "<number> <branch>" on each line.
+# The open regeneration PRs: "<number> <branch>" on each line. A PR from a fork is not one, even
+# when its branch has the prefix. The filter runs after `--limit`, so a full list stops the script:
+# a regeneration PR can be out of the list.
 open_prs() {
-    gh pr list --state open --base "$BASE" --limit "$PRS_MAX" --json number,headRefName \
-        --jq ".[] | select(.headRefName | startswith(\"$BRANCH_PREFIX\")) | \"\(.number) \(.headRefName)\""
+    local prs
+    prs="$(gh pr list --state open --base "$BASE" --limit "$OPEN_PRS_MAX" \
+        --json number,headRefName,isCrossRepository)"
+    if [ "$(jq length <<<"$prs")" -ge "$OPEN_PRS_MAX" ]; then
+        echo "$OPEN_PRS_MAX or more open PRs to $BASE. Close some, then run again." >&2
+        exit 1
+    fi
+    jq -r --arg prefix "$BRANCH_PREFIX" '.[]
+        | select((.isCrossRepository | not) and (.headRefName | startswith($prefix)))
+        | "\(.number) \(.headRefName)"' <<<"$prs"
 }
 
 # Closes each open regeneration PR except the one on branch $1, with the comment $2.

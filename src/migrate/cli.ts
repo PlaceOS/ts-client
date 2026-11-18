@@ -2,10 +2,11 @@
 /**
  * The migration tool. It rewrites the 6.x calls of a project to 7.x.
  *
- *     npx -p @placeos/ts-client@2 placeos-migrate src           Shows the changes. Writes no file.
- *     npx -p @placeos/ts-client@2 placeos-migrate --write src   Writes the changes.
+ *     npx -p @placeos/ts-client@next placeos-migrate src           Shows the changes. Writes no file.
+ *     npx -p @placeos/ts-client@next placeos-migrate --write src   Writes the changes.
  *
- * It uses the `typescript` package of the project in the current folder.
+ * It uses the `typescript` package of the project in the current folder, or else the one next to
+ * the tool. It needs TypeScript 4.9 to 6.x, because TypeScript 7 has no JavaScript API.
  *
  * @module
  */
@@ -33,6 +34,8 @@ const SKIPPED_FOLDERS: ReadonlySet<string> = new Set([
     '.nx',
 ]);
 const SOURCE_FILE = /\.(ts|tsx|mts|cts)$/;
+/** The TypeScript versions that the tool can use. See `isSupportedVersion`. */
+const TS_SUPPORTED = '4.9 to 6.x';
 
 const USAGE = `Usage: placeos-migrate [--write] <folder or file>...
 
@@ -49,14 +52,16 @@ async function main(argv: readonly string[]): Promise<void> {
         process.exitCode = paths.length === 0 ? 1 : 0;
         return;
     }
-    const ts = loadTypeScript();
-    if (ts === null) {
+    const loaded = loadTypeScript();
+    if (!loaded.ok) {
         console.error(
-            'The tool needs the typescript package. Run it in the folder of your project.',
+            `${loaded.error}\nThe tool needs TypeScript ${TS_SUPPORTED}. Give it TypeScript 5:\n` +
+                `  npx -p typescript@5 -p @placeos/ts-client@next placeos-migrate ${argv.join(' ')}`,
         );
         process.exitCode = 1;
         return;
     }
+    const ts = loaded.value;
 
     const tables: MigrateTables = {
         calls: V1_CALLS,
@@ -135,15 +140,36 @@ async function ownVersion(): Promise<string> {
     return version;
 }
 
-/** The `typescript` package of the project, or `null`. */
-function loadTypeScript(): typeof TS | null {
-    const require = createRequire(join(process.cwd(), 'package.json'));
+/**
+ * The `typescript` package of the project. If the project has none, or a version that the tool
+ * cannot use, the package next to the tool, such as the one of `npx -p typescript@5`.
+ */
+function loadTypeScript(): { ok: true; value: typeof TS } | { ok: false; error: string } {
+    const project = loadFrom(join(process.cwd(), 'package.json'));
+    if (project.ok) return project;
+    const own = loadFrom(import.meta.url);
+    return own.ok ? own : project;
+}
+
+function loadFrom(base: string): { ok: true; value: typeof TS } | { ok: false; error: string } {
+    let loaded: unknown;
     try {
-        const loaded: unknown = require('typescript');
-        return isTypeScript(loaded) ? loaded : null;
+        loaded = createRequire(base)('typescript');
     } catch {
-        return null;
+        return { ok: false, error: 'The project has no typescript package.' };
     }
+    const version = Reflect.get(Object(loaded), 'versionMajorMinor');
+    if (!isTypeScript(loaded) || !isSupportedVersion(version)) {
+        return { ok: false, error: `The project has TypeScript ${String(version)}.` };
+    }
+    return { ok: true, value: loaded };
+}
+
+/** 4.9 added `satisfies`, which the tool reads. TypeScript 7 has no JavaScript API. */
+function isSupportedVersion(version: unknown): boolean {
+    if (typeof version !== 'string') return false;
+    const [major = 0, minor = 0] = version.split('.').map(Number);
+    return (major === 4 && minor >= 9) || major === 5 || major === 6;
 }
 
 /** The tool uses only the parser, so a check of its entry points is enough. */

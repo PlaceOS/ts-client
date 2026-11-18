@@ -650,10 +650,13 @@ async function mapFunction(
     const pick: Template | null =
         pick_index === undefined ? null : { kind: 'arg', index: Number(pick_index) };
     if (pick !== null) collectArgs(pick, used);
+    // A choice, such as the `method` of the 6.x updates, can select PUT or PATCH. When 7.x has
+    // both for the path, such as `metadata.update` and `metadata.merge`, the tool cannot drop it.
+    const both_methods = hasPutAndPatch(operations, operation);
     const parameters: V1Parameter[] = fn.parameters.map((parameter, index) => {
         const use = used.has(index)
             ? 'mapped'
-            : parameter.kind === 'choice'
+            : parameter.kind === 'choice' && !both_methods
               ? 'ignored'
               : 'unsupported';
         return { name: parameter.name, initializer: parameter.initializer, use };
@@ -672,6 +675,17 @@ async function mapFunction(
         notes,
     };
     return { call, model: operation.model };
+}
+
+/** `true` when 7.x has a PUT and a PATCH operation for the path of `operation`. */
+function hasPutAndPatch(operations: readonly V2Operation[], operation: V2Operation): boolean {
+    const path = operation.segments.join('/');
+    const methods = new Set(
+        operations
+            .filter((other) => other.segments.join('/') === path)
+            .map((other) => other.method),
+    );
+    return methods.has('PUT') && methods.has('PATCH');
 }
 
 /** `true` when the operation has a query parameter that no other argument gives. */

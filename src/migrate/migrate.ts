@@ -436,7 +436,12 @@ export function migrateSource(
                 const mapping = tables.calls[name.text];
                 if (mapping === undefined) continue;
                 if (mapping.module !== 'staff') {
-                    if (!invertible(mapping)) find(property, name.text, NOT_INVERTIBLE);
+                    if (!invertible(mapping)) {
+                        find(property, name.text, NOT_INVERTIBLE);
+                    } else if (mappingOf(property) === null) {
+                        // A method or an accessor stays 6.x, and the code calls the 7.x name.
+                        find(property, name.text, `a method of a mock factory: ${FACTORY_VALUE}`);
+                    }
                     continue;
                 }
                 find(
@@ -475,6 +480,15 @@ export function migrateSource(
     }
 
     function rewriteFactoryObject(object: TS.ObjectLiteralExpression): void {
+        // The new namespace replaces the namespace of a spread, so it needs `...spread.zones`. The
+        // tool cannot repeat an expression, such as `...(await importOriginal())`.
+        const unnamed = object.properties.find(
+            (property) => ts.isSpreadAssignment(property) && !ts.isIdentifier(property.expression),
+        );
+        if (unnamed !== undefined && object.properties.some((p) => mappingOf(p) !== null)) {
+            find(unnamed, V1_MODULE, UNNAMED_SPREAD);
+            return;
+        }
         const kept: string[] = [];
         const groups = new Map<string, string[]>();
         let spread: string | null = null;
@@ -524,6 +538,24 @@ export function migrateSource(
         // Another value, such as `vi.fn().mockResolvedValue(zone)` or a hoisted mock, is the 6.x
         // implementation of a new mock, so the 7.x function is still a mock that tests can change.
         return `vi.fn(${from_v1_mock}(${value === null ? name : textOf(value)}, ${extra}))`;
+    }
+
+    /**
+     * A finding for a test double in a variable, such as `const spy = vi.mocked(showZone)`. The
+     * tool changes only the calls in the chain of the double, not the calls on the variable.
+     */
+    function findStoredDouble(wrapper: TS.CallExpression, name: string): void {
+        let node: TS.Node = wrapper;
+        for (let depth = 0; depth < CHAIN_DEPTH_MAX && isWrapping(ts, node.parent); depth += 1) {
+            node = node.parent;
+        }
+        const parent = node.parent;
+        const stored =
+            (ts.isVariableDeclaration(parent) && parent.initializer === node) ||
+            (ts.isBinaryExpression(parent) &&
+                parent.right === node &&
+                parent.operatorToken.kind === ts.SyntaxKind.EqualsToken);
+        if (stored) find(node, name, STORED_DOUBLE);
     }
 
     /** `vi.mocked(f)`, `jest.mocked(f)` or `expect(f)`, with `f` as the first argument. */
@@ -616,6 +648,14 @@ export function migrateSource(
                 callee.name.text in tables.calls
             ) {
                 rewriteCall(node, callee.name.text, callee.expression.text);
+            } else if (
+                ts.isPropertyAccessExpression(callee) &&
+                ts.isIdentifier(callee.expression) &&
+                imports.namespaces.has(callee.expression.text) &&
+                (callee.name.text in tables.unmapped || callee.name.text in tables.types)
+            ) {
+                // The same finding as for a call of a named import, such as `authority()`.
+                find(callee, callee.name.text, hint(tables, callee.name.text));
             }
             return;
         }
@@ -671,6 +711,7 @@ export function migrateSource(
             if (wrapper !== null && imported in tables.calls) {
                 rewriteDouble(node, wrapper, imported, null);
                 countUse(node.text, true);
+                findStoredDouble(wrapper, imported);
                 return;
             }
             if (
@@ -706,6 +747,7 @@ export function migrateSource(
             }
             if (wrapper !== null && name in tables.calls) {
                 rewriteDouble(node, wrapper, name, node.expression.text);
+                findStoredDouble(wrapper, name);
                 return;
             }
             if (test_file && name in tables.calls) {
@@ -932,6 +974,25 @@ function factoryObjects(
 const NOT_INVERTIBLE =
     'the 7.x input has an argument in a template, such as `${module}_${index}`, so a 6.x ' +
     'implementation cannot get it: change the mock by hand';
+/** How to write a 6.x function of a factory, so that the tool can change it. */
+const FACTORY_VALUE = 'write it as a property, such as showZone: vi.fn(...)';
+const UNNAMED_SPREAD =
+    'a mock factory spreads a value without a name: put it in a variable first, such as ' +
+    'const actual = await importOriginal(), then spread actual';
+const STORED_DOUBLE =
+    'a test double in a variable: the tool does not change its mock values and checks, so ' +
+    'change them by hand (mockReply, the 7.x input)';
+
+/** A node that gives the value of its expression: `(f)`, `f as Mock`, `f!` or `f satisfies T`. */
+function isWrapping(ts: typeof TS, node: TS.Node): boolean {
+    return (
+        ts.isParenthesizedExpression(node) ||
+        ts.isAsExpression(node) ||
+        ts.isNonNullExpression(node) ||
+        ts.isSatisfiesExpression(node) ||
+        ts.isTypeAssertionExpression(node)
+    );
+}
 
 /** `true` when each 6.x argument that the 7.x input has is a key of the input, or its spread. */
 function invertible(mapping: CallMapping): boolean {
