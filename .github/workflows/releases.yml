@@ -2,13 +2,13 @@
 
 name: Release
 
-# Controls when the action will run. Triggers the workflow on push or pull request
-# events but only for the master branch
+# The maintenance branch of 6.x: a fix here publishes a 6.x release, such as 6.13.1. Version 7
+# releases from master and next.
 on:
     workflow_dispatch:
     push:
         branches:
-            - master
+            - 6.x
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -44,16 +44,7 @@ jobs:
             - name: Build Library
               run: npm run build
 
-            - name: Generate Documentation
-              run: npm run docs
-
             - name: Update application version
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: npm run semantic-release
-
-            - name: Publish generated content to GitHub Pages
-              uses: peaceiris/actions-gh-pages@v4.0.0
-              with:
-                  github_token: ${{ secrets.GITHUB_TOKEN }}
-                  publish_dir: ./docs
