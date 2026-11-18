@@ -9,8 +9,8 @@
  *
  * An entry has no tokens, API keys, cookies, request bodies or input values.
  *
- * Inside the library, each part logs through a scoped logger, as `std.log.scoped` does in Zig. The
- * log function of the application decides where the entries go, as `logFn` does in Zig:
+ * Inside the library, each part logs through a scoped logger. The log function of the application
+ * decides where the entries go:
  *
  * ```ts
  * const log = scopedLog('auth', { sink: config.log ?? null });

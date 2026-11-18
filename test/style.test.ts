@@ -1,5 +1,5 @@
 /**
- * Goal: the library does not bypass the type checks (TigerStyle "Boundaries").
+ * Goal: the library does not bypass the type checks.
  * Method: search the source for `any`, `@ts-ignore`, `@ts-expect-error`, non-null assertions and
  * casts. The casts that the parser needs are listed here, with the reason in the code.
  */

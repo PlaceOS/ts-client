@@ -3,8 +3,7 @@
 A typed client for the PlaceOS REST API and the staff API. A script generates the types and the
 request functions from the OpenAPI documents of
 [PlaceOS/rest-api](https://github.com/PlaceOS/rest-api/blob/master/OPENAPI_DOC.yml) and
-[PlaceOS/staff-api](https://github.com/PlaceOS/staff-api/blob/master/OPENAPI_DOC.yml). The code follows [TigerStyle for JS/TS](https://github.com/tigerbeetle/tigerbeetle/blob/main/docs/TIGER_STYLE.md)
-where possible.
+[PlaceOS/staff-api](https://github.com/PlaceOS/staff-api/blob/master/OPENAPI_DOC.yml).
 
 The library has no runtime dependencies. It runs in browsers, in Node 20.3 and later, and in Bun.
 
@@ -393,11 +392,11 @@ window.debug = true;
   path only, because the query has the state of the login.
 - A log function that throws does not change the call, the login or the socket.
 - The `mock` entries of the 6.x mock endpoints always go to `consoleLog`, as in 6.x.
-- In the library, each part logs through a scoped logger, as `std.log.scoped` does in Zig:
+- In the library, each part logs through a scoped logger:
   `const log = scopedLog('auth', { sink: config.log ?? null })`. Its methods have the arguments
   of the console methods: `log.error(...data)`, `log.warn(...data)`, `log.info(...data)`,
   `log.debug(...data)`, `log.print(...data)` (`console.log`), `log.group(...label)` and
-  `log.groupEnd()`. The `log` function of the application is the sink, as `logFn` is in Zig.
+  `log.groupEnd()`. The `log` function of the application gets the entries.
 
 ## Types
 
@@ -597,7 +596,10 @@ arguments, and it finds the 7.x operation with the same method and path.
 
 - Classes with methods for each model. 7.x has plain data and functions.
 
-## Where 7.x does not follow TigerStyle
+## Exceptions to the design rules
+
+The library gives errors as values, has no `any` and no unchecked casts, keeps no module state,
+keeps its state in plain data, and keeps keyed data in a `Map`. These are the exceptions:
 
 - `orThrow` and `orThrowPage` of `@placeos/ts-client/compat` throw. They are for code that moves
   from 6.x.
