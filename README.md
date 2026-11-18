@@ -437,6 +437,13 @@ The generator changes some parts of the document. Each change has a comment in
   each new field gets a decision.
 - **Enum numbers.** The server sends some enums as numbers, for example `Driver.role` (`99` is
   `logic`). The document gives their names. The generator changes these fields to the numbers.
+- **String fields.** The document says `object` for some fields that the server sends as strings,
+  for example `Zone.timezone` (`"Australia/Melbourne"`) and the `scopes` of an API key. The
+  generator changes these fields to strings.
+- **Missing fields.** The document does not have the fields that a request cannot set, for example
+  `AssetType.asset_count` and `Guest.checked_in`. The generator adds these fields. They are `null`
+  when the server does not send them. The generator stops when the document gets one of these
+  fields, so that the patch can go.
 - **Required fields in a request.** The document marks a field as required when the server always
   sends it. The server can have a default for the same field in a request. Thus each field of a
   request body is optional, and the server checks the body. Path and query parameters keep the

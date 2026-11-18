@@ -231,7 +231,7 @@ const ApiKeySchema = /* @__PURE__ */ object({
     updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     description: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-    scopes: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ json())),
+    scopes: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
     permissions: /* @__PURE__ */ nullable(UserJwtPermissions),
     secret: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     expires_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
@@ -343,7 +343,7 @@ const ApiKeysResponseSchema = /* @__PURE__ */ object(
         id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         name: /* @__PURE__ */ string(),
         description: /* @__PURE__ */ string(),
-        scopes: /* @__PURE__ */ array(/* @__PURE__ */ json()),
+        scopes: /* @__PURE__ */ array(/* @__PURE__ */ string()),
         permissions: /* @__PURE__ */ nullable(UserJwtPermissions),
         user_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         authority_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -436,6 +436,8 @@ const AssetTypeSchema = /* @__PURE__ */ object({
     images: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
     category_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    /** The number of assets of this type. */
+    asset_count: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
 });
 export interface AssetType extends Output<typeof AssetTypeSchema> {}
 export interface AssetTypeInput extends Input<typeof AssetTypeSchema> {}
@@ -709,7 +711,7 @@ export const Load: Schema<Load, LoadInput> = LoadSchema;
 const ClusterNodeStatusSchema = /* @__PURE__ */ object(
     {
         id: /* @__PURE__ */ string(),
-        uri: /* @__PURE__ */ json(),
+        uri: /* @__PURE__ */ string(),
         load: /* @__PURE__ */ nullable(Load),
         status: /* @__PURE__ */ nullable(CoreStatus),
     },
@@ -851,7 +853,7 @@ const ZoneSchema = /* @__PURE__ */ object(
         count: /* @__PURE__ */ nullable(/* @__PURE__ */ integer('Int32')),
         capacity: /* @__PURE__ */ nullable(/* @__PURE__ */ integer('Int32')),
         map_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-        timezone: /* @__PURE__ */ nullable(/* @__PURE__ */ json()),
+        timezone: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         triggers: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
         images: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
         playlists: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
@@ -1111,7 +1113,7 @@ const ControlSystemSchema = /* @__PURE__ */ object(
         approval: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
         images: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
         security_groups: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
-        timezone: /* @__PURE__ */ nullable(/* @__PURE__ */ json()),
+        timezone: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         support_url: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         timetable_url: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         camera_snapshot_urls: /* @__PURE__ */ nullable(
@@ -1195,7 +1197,7 @@ const DriverSchema = /* @__PURE__ */ object({
     updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     description: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-    json_schema: /* @__PURE__ */ nullable(/* @__PURE__ */ json()),
+    json_schema: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     default_uri: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     default_port: /* @__PURE__ */ nullable(/* @__PURE__ */ integer('Int32')),
     /** The number of the enum: 0 ssh, 1 device, 2 service, 3 websocket, 99 logic. */
@@ -2883,6 +2885,8 @@ const UserAdminMetadataResponseSchema = /* @__PURE__ */ object(
         photo_upload_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         subsystem_access: /* @__PURE__ */ array(/* @__PURE__ */ string()),
+        /** The metadata of the user, by name. */
+        associated_metadata: /* @__PURE__ */ nullable(/* @__PURE__ */ record(MetadataInterface)),
     },
     [
         'created_at',
@@ -2940,7 +2944,7 @@ const UserJwtSchema = /* @__PURE__ */ object(
         exp: /* @__PURE__ */ integer(),
         aud: /* @__PURE__ */ string(),
         sub: /* @__PURE__ */ string(),
-        scope: /* @__PURE__ */ array(/* @__PURE__ */ json()),
+        scope: /* @__PURE__ */ array(/* @__PURE__ */ string()),
         u: UserJwtMetadata,
     },
     ['iss', 'iat', 'exp', 'aud', 'sub', 'scope', 'u'],
@@ -2975,6 +2979,8 @@ const UserPublicMetadataResponseSchema = /* @__PURE__ */ object(
         authority_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         photo_upload_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        /** The metadata of the user, by name. */
+        associated_metadata: /* @__PURE__ */ nullable(/* @__PURE__ */ record(MetadataInterface)),
     },
     [
         'created_at',

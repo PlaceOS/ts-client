@@ -98,6 +98,8 @@ const AssetTypeSchema = /* @__PURE__ */ object({
     images: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
     category_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    /** The number of assets of this type. */
+    asset_count: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
 });
 export interface AssetType extends Output<typeof AssetTypeSchema> {}
 export interface AssetTypeInput extends Input<typeof AssetTypeSchema> {}
@@ -134,7 +136,7 @@ const ControlSystemSchema = /* @__PURE__ */ object(
         approval: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
         images: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
         security_groups: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
-        timezone: /* @__PURE__ */ nullable(/* @__PURE__ */ json()),
+        timezone: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         support_url: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         timetable_url: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         camera_snapshot_urls: /* @__PURE__ */ nullable(
@@ -465,6 +467,14 @@ const BookingSchema = /* @__PURE__ */ object({
     created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     /** Unix time in seconds. */
     updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    booked_by_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    /** The digest of `user_email`. */
+    email_digest: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    /** The digest of `booked_by_email`. */
+    booked_by_email_digest: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    /** Unix time in seconds. */
+    created: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    current_state: /* @__PURE__ */ nullable(BookingState),
 });
 export interface Booking extends Output<typeof BookingSchema> {}
 export interface BookingInput extends Input<typeof BookingSchema> {}
@@ -722,6 +732,12 @@ const GuestSchema = /* @__PURE__ */ object({
     created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     /** Unix time in seconds. */
     updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    checked_in: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    visit_expected: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    booking: /* @__PURE__ */ nullable(Booking),
+    event: /* @__PURE__ */ nullable(PlaceCalendarEvent),
+    /** The metadata of the event, as JSON. */
+    event_metadata: /* @__PURE__ */ json(),
 });
 export interface Guest extends Output<typeof GuestSchema> {}
 export interface GuestInput extends Input<typeof GuestSchema> {}
@@ -762,7 +778,7 @@ const ZoneSchema = /* @__PURE__ */ object(
         count: /* @__PURE__ */ nullable(/* @__PURE__ */ integer('Int32')),
         capacity: /* @__PURE__ */ nullable(/* @__PURE__ */ integer('Int32')),
         map_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-        timezone: /* @__PURE__ */ nullable(/* @__PURE__ */ json()),
+        timezone: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         triggers: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
         images: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
         playlists: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),

@@ -137,6 +137,70 @@ function valueEnum(spec_name: string, values: Readonly<Record<string, number>>):
     return { spec_name, values };
 }
 
+/**
+ * Fields that the document gives as `type: object` without properties, because the spec
+ * generator of the server does not know their Crystal type. The server sends a string:
+ * `Time::Location` as its name, `URI` as text, `UserJWT::Scope` as its name, and `JSON::Any` with
+ * `StringConverter` as JSON text. `string` replaces the object, and `array` replaces the object
+ * items of an array. Each entry comes from the source of PlaceOS/models and PlaceOS/rest-api.
+ */
+const STRING_FIELDS: ReadonlyMap<string, Readonly<Record<string, 'string' | 'array'>>> = new Map([
+    ['PlaceOS.Api.ApiKeys.Response', { scopes: 'array' }],
+    ['PlaceOS.Api.Cluster.NodeStatus', { uri: 'string' }],
+    ['PlaceOS.Model.ApiKey', { scopes: 'array' }],
+    ['PlaceOS.Model.ControlSystem', { timezone: 'string' }],
+    ['PlaceOS.Model.Driver', { json_schema: 'string' }],
+    ['PlaceOS.Model.UserJWT', { scope: 'array' }],
+    ['PlaceOS.Model.Zone', { timezone: 'string' }],
+]);
+
+/**
+ * Fields that the server sends, but the document does not have. The spec generator of the server
+ * leaves out the fields that a request cannot set: an attribute with `ignore_deserialize`, and a
+ * getter with a `JSON::Field`. Each field is a schema of the document, from the source of
+ * PlaceOS/models. It is optional, so it is `null` when the server does not send it. The fields
+ * that refer to their own schema, such as `Booking.linked_bookings`, are not here, because the
+ * schemas cannot have a cycle.
+ */
+const ASSET_COUNT = {
+    type: 'integer',
+    format: 'Int64',
+    description: 'The number of assets of this type.',
+};
+const METADATA = {
+    type: 'object',
+    additionalProperties: { $ref: '#/components/schemas/PlaceOS.Model.Metadata.Interface' },
+    description: 'The metadata of the user, by name.',
+};
+const ADDED_FIELDS: ReadonlyMap<string, Readonly<Record<string, SpecNode>>> = new Map([
+    ['PlaceOS.Model.AssetType', { asset_count: ASSET_COUNT }],
+    [
+        'PlaceOS.Model.Booking',
+        {
+            booked_by_id: { type: 'string' },
+            email_digest: { type: 'string', description: 'The digest of `user_email`.' },
+            booked_by_email_digest: {
+                type: 'string',
+                description: 'The digest of `booked_by_email`.',
+            },
+            created: { type: 'integer', format: 'Int64', description: 'Unix time in seconds.' },
+            current_state: { $ref: '#/components/schemas/PlaceOS.Model.Booking.State' },
+        },
+    ],
+    [
+        'PlaceOS.Model.Guest',
+        {
+            checked_in: { type: 'boolean' },
+            visit_expected: { type: 'boolean' },
+            booking: { $ref: '#/components/schemas/PlaceOS.Model.Booking' },
+            event: { $ref: '#/components/schemas/PlaceCalendar.Event' },
+            event_metadata: { description: 'The metadata of the event, as JSON.' },
+        },
+    ],
+    ['PlaceOS.Model.User.AdminMetadataResponse', { associated_metadata: METADATA }],
+    ['PlaceOS.Model.User.PublicMetadataResponse', { associated_metadata: METADATA }],
+]);
+
 /** Operations that send JSON, but have no response schema in the document. */
 const JSON_RESPONSE_OPERATIONS: ReadonlySet<string> = new Set([
     'PlaceOS::Api::Modules_execute',
@@ -872,6 +936,8 @@ function emitObject(
         const is_time = isDateTime(property);
         const value_enum_field =
             time_fields === null ? undefined : VALUE_ENUM_FIELDS.get(time_fields.spec_name)?.[key];
+        const string_field =
+            time_fields === null ? undefined : STRING_FIELDS.get(time_fields.spec_name)?.[key];
         if (time_fields === null) {
             expression = emitSchema(schemas, property, imports, depth + 1);
         } else if (value_enum_field !== undefined) {
@@ -905,6 +971,24 @@ function emitObject(
             const names = Object.entries(value_enum_field.values).map(([n, v]) => `${v} ${n}`);
             const separator = description.length > 0 ? '\n\n' : '';
             description = `${description}${separator}The number of the enum: ${names.join(', ')}.`;
+        } else if (string_field !== undefined) {
+            const subject = `${time_fields.spec_name}.${key}`;
+            const isBare = (node: SpecNode) => isOnly(node, { type: 'object' });
+            const isBareArray = (node: SpecNode) => {
+                const items = field(node, 'items');
+                return isOnly(node, { type: 'array', items }) && isRecord(items) && isBare(items);
+            };
+            assertPatchedShape(property, string_field === 'string' ? isBare : isBareArray, subject);
+            imports.combinators.add('string');
+            expression = 'string()';
+            if (string_field === 'array') {
+                imports.combinators.add('array');
+                expression = 'array(string())';
+            }
+            if (isNullable(property)) {
+                imports.combinators.add('nullable');
+                expression = `nullable(${expression})`;
+            }
         } else if (time_fields.epoch_fields.has(key)) {
             const subject = `${time_fields.spec_name}.${key}`;
             const date_time = { type: 'string', format: 'date-time' };
@@ -927,7 +1011,19 @@ function emitObject(
     if (time_fields !== null) {
         const keys = [...time_fields.epoch_fields, ...time_fields.string_fields];
         keys.push(...Object.keys(VALUE_ENUM_FIELDS.get(time_fields.spec_name) ?? {}));
+        keys.push(...Object.keys(STRING_FIELDS.get(time_fields.spec_name) ?? {}));
         for (const key of keys) assert(Object.hasOwn(properties, key), `${key} is a property`);
+        const added = Object.entries(ADDED_FIELDS.get(time_fields.spec_name) ?? {});
+        for (const [key, property] of added) {
+            // When the document gets the field, the patch must go.
+            const subject = `${time_fields.spec_name}.${key}`;
+            assert(!Object.hasOwn(properties, key), `${subject} is not in the document`);
+            const description = optionalString(field(property, 'description'), key) ?? '';
+            const code = emitSchema(schemas, property, imports, depth + 1);
+            const expression = code === 'json()' ? code : `nullable(${code})`;
+            if (code !== 'json()') imports.combinators.add('nullable');
+            fields.push(`${docComment(description, 4)}${propertyKey(key)}: ${expression},`);
+        }
     }
     imports.combinators.add('object');
     const required_list = required.length > 0 ? `, ${JSON.stringify(required)}` : '';
