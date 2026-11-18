@@ -430,10 +430,11 @@ short name too. The short name is the same value and type:
 The generator changes some parts of the document. Each change has a comment in
 `scripts/generate.ts`.
 
-- **Time fields.** The document says `date-time` for some fields that the server sends as Unix time
-  in seconds, for example `created_at` on most models. The generator changes these fields to
-  integers. The list comes from the source of PlaceOS/models. The generator stops if it finds a
-  `date-time` field that is not in a list, so each new field gets a decision.
+- **Time fields.** The staff-api document says `date-time` for some fields that the server sends
+  as Unix time in seconds, for example `created_at` on most models. The generator changes these
+  fields to integers. The list comes from the source of PlaceOS/models. The rest-api document has
+  the correct types. The generator stops if it finds a `date-time` field that is not in a list, so
+  each new field gets a decision.
 - **Enum numbers.** The server sends some enums as numbers, for example `Driver.role` (`99` is
   `logic`). The document gives their names. The generator changes these fields to the numbers.
 - **Required fields in a request.** The document marks a field as required when the server always
