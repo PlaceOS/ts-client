@@ -411,6 +411,10 @@ When master matches the documents again, it closes all of them. Each run deletes
 regeneration branches that have no open PR, such as the branch of a merged PR. `DRY_RUN=1
 scripts/regenerate-pr.sh` (from the root of the repository) shows what it would do.
 
+The commit of a regeneration PR is a `fix`, so its merge publishes a patch release. Before the
+merge, change the commit message to a `feat` for new operations, or add a `BREAKING CHANGE:` footer
+for a change that breaks apps.
+
 The generator stops with an assertion on a part of the document that it does not support. Add the
 support to `scripts/generate.ts` and `src/core/schema.ts`.
 

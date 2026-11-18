@@ -117,6 +117,10 @@ This regenerates \`src/generated\`, \`src/generated/staff\` and the 6.x migratio
 Examine the diff for changes that break apps, such as a field that is now \`null\` or a removed
 operation.
 
+The commit is a \`fix\`, so a merge publishes a patch release. For new operations, change it to a
+\`feat\` (a minor release). For a change that breaks apps, add a \`BREAKING CHANGE:\` footer (a
+major release).
+
 ${results}
 \`\`\`
 $(git diff --cached --stat -- "${GENERATED[@]}" | tail -n 25)
@@ -129,12 +133,13 @@ EOF
 git config user.name 'github-actions[bot]'
 git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
 git switch -c "$branch"
-git commit -q -m 'chore: regenerate the client from the API documents'
+# A `fix` commit, so that semantic-release publishes the new client when the PR merges.
+git commit -q -m 'fix: regenerate the client from the API documents'
 # A branch of this name can be left from a failed run on an older base. Only this script writes to
 # the prefix, so the push replaces it.
 remote git push --force origin "$branch"
 remote gh pr create --base "$BASE" --head "$branch" \
-    --title 'chore: regenerate the client from the API documents' --body-file "$body"
+    --title 'fix: regenerate the client from the API documents' --body-file "$body"
 
 if [ "${DRY_RUN:-}" = 1 ]; then
     number='<new>'
