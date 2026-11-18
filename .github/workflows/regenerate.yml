@@ -1,0 +1,42 @@
+# Regenerates the client from the API documents on master each day. A change opens a PR, and the
+# older regeneration PRs close. See scripts/regenerate-pr.sh.
+#
+# A PR that `GITHUB_TOKEN` opens does not start the CI checks, so the script runs the checks and
+# puts the results in the PR. Set the secret `REGENERATE_TOKEN` (a token with `contents` and
+# `pull-requests` write access) to open the PRs as that token, and then the checks start too.
+# With `GITHUB_TOKEN`, "Allow GitHub Actions to create and approve pull requests" must be on in the
+# settings of the repository.
+name: Regenerate
+
+on:
+    schedule:
+        - cron: '17 3 * * *'
+    workflow_dispatch:
+
+permissions:
+    contents: write
+    pull-requests: write
+
+concurrency:
+    group: regenerate
+    cancel-in-progress: false
+
+jobs:
+    regenerate:
+        runs-on: ubuntu-latest
+        timeout-minutes: 20
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  ref: master
+                  token: ${{ secrets.REGENERATE_TOKEN || github.token }}
+
+            - uses: oven-sh/setup-bun@v2
+              with:
+                  bun-version: 1.4.3
+
+            - run: bun install --frozen-lockfile
+
+            - run: scripts/regenerate-pr.sh
+              env:
+                  GH_TOKEN: ${{ secrets.REGENERATE_TOKEN || github.token }}
