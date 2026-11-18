@@ -55,6 +55,19 @@ test('respond sets the status and the page total, and the body reaches the mock'
     expect(updated.ok && updated.value.data.name).toBe('Room');
 });
 
+test('respond gives the next offset, and next() asks the mock for that page', async () => {
+    mockEndpoint('zones.query', (input) =>
+        input.offset === undefined
+            ? respond([{ id: 'zone-1' }], { next_offset: 1 })
+            : respond([{ id: `zone-${input.offset + 1}` }]),
+    );
+    const first = await zones.query({ limit: 1 }, options);
+    if (!first.ok) throw new Error('the first page is ok');
+    const second = await first.value.next();
+    expect(second?.ok && second.value.data.map((zone) => zone.id)).toEqual(['zone-2']);
+    expect(second?.ok && second.value.next()).toBeNull();
+});
+
 test('httpError gives an http error, and data with a wrong type is invalid', async () => {
     mockEndpoint('zones.show', () => {
         throw httpError(404, 'zone not found');

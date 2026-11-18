@@ -69,6 +69,8 @@ export {
     type Operation,
     type OperationData,
     type OperationInput,
+    type OperationReply,
+    type PageReply,
     type Reply,
 } from './core/client.ts';
 export { pageInfo, type PageInfo } from './core/pagination.ts';

@@ -67,7 +67,8 @@ export function mockReply<T>(data: T, status = 200): Result<Reply<T>, CallError>
 
 /**
  * The 7.x result for a 6.x page, for a test double of a `query` call. `total` goes in the
- * `X-Total-Count` header, so `orThrowPage` gives it back.
+ * `X-Total-Count` header, so `orThrowPage` gives it back. The page is the last one: `next()` gives
+ * `null`.
  *
  * ```ts
  * vi.mocked(zones.query).mockResolvedValue(mockPage({ data: [zone], total: 1 }));
@@ -78,10 +79,10 @@ export function mockPage<T>(page: {
     readonly total?: number;
     /** The `next` of a 6.x page. 7.x has no use for it. */
     readonly next?: unknown;
-}): Result<Reply<T>, CallError> {
+}): Result<Reply<T> & { next(): null }, CallError> {
     const headers = new Headers();
     if (page.total !== undefined) headers.set('x-total-count', String(page.total));
-    return { ok: true, value: { status: 200, headers, data: page.data } };
+    return { ok: true, value: { status: 200, headers, data: page.data, next: () => null } };
 }
 
 /** In the arguments of `fromV1Mock`, the input values that no other argument has. */

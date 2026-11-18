@@ -10,15 +10,13 @@ export interface PageInfo {
 }
 
 /**
- * Reads the pagination headers of a `query` response.
+ * Reads the pagination headers of a `query` response. `next()` of the reply uses `next_offset`
+ * to request the next page.
  *
  * ```ts
  * const first = await zones.query({ limit: 100 });
  * if (first.ok) {
- *     const page = pageInfo(first.value.headers);
- *     if (page.next_offset !== null) {
- *         const second = await zones.query({ limit: 100, offset: page.next_offset });
- *     }
+ *     const { total, next_offset } = pageInfo(first.value.headers);
  * }
  * ```
  */

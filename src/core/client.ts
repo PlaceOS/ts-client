@@ -1,4 +1,5 @@
 import { assert, unreachable } from './assert.ts';
+import { pageInfo } from './pagination.ts';
 import type { Result } from './result.ts';
 import {
     checkRequest,
@@ -201,7 +202,34 @@ export interface Reply<T> {
     readonly data: T;
 }
 
-export type CallResult<O> = Result<Reply<OperationData<O>>, CallError>;
+/**
+ * The reply of an operation with an `offset` parameter, such as `zones.query`: one page of a list.
+ *
+ * ```ts
+ * let result = await zones.query({ limit: 100 });
+ * while (result.ok) {
+ *     show(result.value.data);
+ *     const next = result.value.next();
+ *     if (next === null) break;
+ *     result = await next;
+ * }
+ * ```
+ */
+export interface PageReply<O, T> extends Reply<T> {
+    /**
+     * Requests the next page: the same input with the `offset` of the `Link` header, through the
+     * same client. `options` replace the options of the first call. `null` on the last page, and
+     * when the offset does not move forward, so that a loop over the pages ends.
+     */
+    next(options?: CallOptions): Promise<CallResult<O>> | null;
+}
+
+/** The reply of an operation: a `PageReply` when the operation has an `offset` parameter. */
+export type OperationReply<O> = 'offset' extends keyof OperationInput<O>
+    ? PageReply<O, OperationData<O>>
+    : Reply<OperationData<O>>;
+
+export type CallResult<O> = Result<OperationReply<O>, CallError>;
 
 /** Checks the client settings once, so that each request can trust them. */
 export function createClient(config: ClientConfig): Client {
@@ -282,9 +310,54 @@ export async function call<O extends AnyOperation>(
     // Read the client before the first `await`, so the whole request uses one client.
     const client = options.client ?? configured_client;
     assert(client !== null, 'configure() ran before this call, or the options have a client');
-    const result = await send(client, operation, input, options);
+    const result = await request(client, operation, input, options);
     // `send` parsed the data with `operation.response`, which gives `OperationData<O>` its type.
+    // `paged` gives the reply a `next` when `OperationReply<O>` is a `PageReply`.
     return result as CallResult<O>;
+}
+
+/** A reply before `call` gives it the types of its operation. */
+interface RawPage extends Reply<unknown> {
+    next(options?: CallOptions): Promise<RawResult> | null;
+}
+type RawResult = Result<Reply<unknown> | RawPage, CallError>;
+
+/** Sends the request. The reply of an operation with an `offset` parameter gets `next`. */
+async function request(
+    client: Client,
+    operation: AnyOperation,
+    input: unknown,
+    options: CallOptions,
+): Promise<RawResult> {
+    const sent = await send(client, operation, input, options);
+    if (!sent.ok || !paged(operation)) return sent;
+    const reply = sent.value;
+    const next = (next_options: CallOptions = {}) =>
+        nextPage(client, operation, input, reply.headers, { ...options, ...next_options });
+    return { ok: true, value: { ...reply, next } };
+}
+
+/** `true` when the operation has an `offset` parameter, so that its reply is a page. */
+function paged(operation: AnyOperation): boolean {
+    const node = operation.params.node;
+    return node.kind === 'object' && node.keys.has('offset');
+}
+
+/** The request of the next page, or `null` when the `Link` header has no offset after this one. */
+function nextPage(
+    client: Client,
+    operation: AnyOperation,
+    input: unknown,
+    headers: Headers,
+    options: CallOptions,
+): Promise<RawResult> | null {
+    assert(isRecord(input), 'the input is an object');
+    const next_offset = pageInfo(headers).next_offset;
+    if (next_offset === null) return null;
+    const offset = typeof input['offset'] === 'number' ? input['offset'] : 0;
+    // A link back to this page or an earlier one would make a loop over the pages endless.
+    if (next_offset <= offset) return null;
+    return request(options.client ?? client, operation, { ...input, offset: next_offset }, options);
 }
 
 async function send(

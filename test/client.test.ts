@@ -161,6 +161,66 @@ describe('call', () => {
     });
 });
 
+const LIST = operation({
+    method: 'GET',
+    path: '/api/items',
+    path_keys: [],
+    params: parameters({ q: string(), limit: integer('UInt32'), offset: integer('UInt32') }),
+    body: null,
+    response: array(Item),
+    name: 'items.query',
+});
+
+/** A page of the list. `next` is the offset of the `Link` header, or no header. */
+function pageResponse(ids: readonly string[], next: number | null): Response {
+    const response = jsonResponse(ids.map((id) => ({ id })));
+    if (next !== null) response.headers.set('link', `</api/items?offset=${next}>; rel="next"`);
+    return response;
+}
+
+describe('pages', () => {
+    test('next() asks for the next offset with the same input and client, to the last page', async () => {
+        const pages = new Map([
+            [0, pageResponse(['a', 'b'], 2)],
+            [2, pageResponse(['c'], null)],
+        ]);
+        const urls: string[] = [];
+        const client = clientWith(async (url) => {
+            urls.push(url);
+            const offset = Number(new URL(url).searchParams.get('offset') ?? 0);
+            return pages.get(offset) ?? jsonResponse([], 404);
+        });
+        const first = await call(LIST, { q: 'lobby', limit: 2 }, { client });
+        if (!first.ok) throw new Error('the first page is ok');
+        const second = await first.value.next();
+        expect(second?.ok && second.value.data.map((item) => item.id)).toEqual(['c']);
+        expect(urls).toEqual([
+            'https://placeos.test/api/items?q=lobby&limit=2',
+            'https://placeos.test/api/items?q=lobby&limit=2&offset=2',
+        ]);
+        expect(second?.ok && second.value.next()).toBeNull();
+    });
+
+    test('a link to this offset or an earlier one ends the pages, so a loop ends', async () => {
+        const back = clientWith(async () => pageResponse(['a'], 4));
+        const page = await call(LIST, { offset: 4 }, { client: back });
+        expect(page.ok && page.value.next()).toBeNull();
+    });
+
+    test('an operation without an offset has no next()', async () => {
+        const { fetch } = fakeFetch(() => jsonResponse({ id: 'item-1' }));
+        const result = await call(
+            UPDATE,
+            { id: 'item-1', body: {} },
+            { client: clientWith(fetch) },
+        );
+        if (!result.ok) throw new Error('the call is ok');
+        expect('next' in result.value).toBe(false);
+        // @ts-expect-error `UPDATE` has no `offset`, so its reply is not a page.
+        expect(result.value.next).toBeUndefined();
+    });
+});
+
 describe('call errors', () => {
     test('gives the status, the message and the body of an HTTP error', async () => {
         const { fetch } = fakeFetch(() => jsonResponse({ error: 'not found' }, 404));

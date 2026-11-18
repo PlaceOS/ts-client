@@ -98,16 +98,26 @@ await zones.query({}, { signal: controller.signal, timeout_ms: 60_000 });
 
 ### Pages
 
-A `query` operation returns one page. Use `pageInfo` to get the total and the next offset:
+A `query` operation returns one page. `next()` of the reply requests the next page: the same
+input with the offset of the `Link` header, through the same client. It gives `null` on the last
+page:
 
 ```ts
-import { pageInfo, zones } from '@placeos/ts-client';
-
-const result = await zones.query({ limit: 100 });
-if (result.ok) {
-    const { total, next_offset } = pageInfo(result.value.headers);
+let result = await zones.query({ limit: 100 });
+while (result.ok) {
+    show(result.value.data);
+    const next = result.value.next();
+    if (next === null) break;
+    result = await next;
 }
 ```
+
+- Each operation with an `offset` parameter has `next()`, such as `zones.query`, `history.query`
+  and `staff.bookings.query`. The compiler knows which ones do.
+- `next(options)` replaces the options of the first call, such as `signal` or `timeout_ms`.
+- `next()` also gives `null` when the offset of the link does not move forward, so that a loop over
+  the pages always ends.
+- `pageInfo(result.value.headers)` gives the `total` (`X-Total-Count`) and the `next_offset`.
 
 ### Tests and mocks
 
@@ -145,8 +155,9 @@ mockEndpoint('zones.destroy', () => {
   the response schema of the endpoint, as it parses a response. The data can leave out fields: a
   missing required field gets its empty value, such as `''`, `0` or `[]`. A field with the wrong
   type is a `response_invalid` error.
-- `respond(data, { status, headers, total })` sets the status and the headers. `total` is the
-  `X-Total-Count` that `pageInfo` and `orThrowPage` read.
+- `respond(data, { status, headers, total, next_offset })` sets the status and the headers.
+  `total` is the `X-Total-Count` that `pageInfo` and `orThrowPage` read. `next_offset` goes in
+  the `Link` header, so `next()` of the reply asks the mock for that page.
 - `mockEndpoint` returns the function that removes the mock. `clearEndpointMocks()` removes all.
 - A call to an endpoint without a mock goes to the `fetch` of the client. Give `mockFetch` of
   `@placeos/ts-client/compat` to answer it from the 6.x mock endpoints.
@@ -499,7 +510,7 @@ it keeps its 6.x import, so the compiler also shows it. These uses are:
 - the login and the realtime functions, such as `setup`, `token` and `getModule`;
 - `get`, `post` and the other HTTP functions;
 - `new` and `instanceof` on a 6.x class, because 7.x has plain objects;
-- the `next` function of a 6.x page. 7.x gives `next_offset`;
+- the `next` function of a 6.x page. In 7.x, `next()` is on the reply of the call;
 - a function that is not called, out of a test;
 - a `vi.mock` without a factory or `{ spy: true }`: its 7.x functions give `undefined`, and
   `.then(orThrow)` fails;

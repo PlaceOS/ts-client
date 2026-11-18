@@ -138,7 +138,7 @@ export function clearEndpointMocks(): void {
     mocks.clear();
 }
 
-/** Data with a status, headers, or the `X-Total-Count` of a page. */
+/** Data with a status, headers, or the `X-Total-Count` and the next offset of a page. */
 export function respond<T>(
     data: T,
     options: {
@@ -146,10 +146,16 @@ export function respond<T>(
         readonly headers?: Readonly<Record<string, string>>;
         /** The number of items on all pages. `pageInfo` reads it. */
         readonly total?: number;
+        /** The `offset` of the next page, in the `Link` header. `next()` of the reply uses it. */
+        readonly next_offset?: number;
     } = {},
 ): MockResponse<T> {
     const headers: Record<string, string> = { ...options.headers };
     if (options.total !== undefined) headers['x-total-count'] = String(options.total);
+    if (options.next_offset !== undefined) {
+        assert(Number.isSafeInteger(options.next_offset) && options.next_offset > 0, 'an offset');
+        headers['link'] = `<?offset=${options.next_offset}>; rel="next"`;
+    }
     return { [RESPONSE]: true, data, status: options.status ?? 200, headers };
 }
 
