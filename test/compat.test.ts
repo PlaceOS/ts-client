@@ -7,6 +7,7 @@ import { afterEach, expect, test } from 'bun:test';
 import {
     clearMockEndpoints,
     deregisterSystem,
+    fromV1Mock,
     mockFetch,
     mockPage,
     mockRealtimeEnvironment,
@@ -107,6 +108,18 @@ test('without missing_fields: zero, partial mock data is not valid', async () =>
     });
     const result = await zones.show({ id: 'z' }, { client: strict });
     expect(result.ok === false && result.error.kind).toBe('response_invalid');
+});
+
+test('fromV1Mock fits the mockImplementation of an operation, with and without an input', async () => {
+    // `vi.mocked(zones.show).mockImplementation(...)` asks for these types.
+    const show: (...args: Parameters<typeof zones.show>) => ReturnType<typeof zones.show> =
+        fromV1Mock((id: string) => Promise.resolve({ id, name: 'Level 1' }), ['id']);
+    const query: (...args: Parameters<typeof zones.query>) => ReturnType<typeof zones.query> =
+        fromV1Mock(() => Promise.resolve({ data: [{ id: 'zone-1' }], total: 1 }), ['...'], 'page');
+    expect(orThrow(await show({ id: 'zone-1' })).name).toBe('Level 1');
+    const page = await query();
+    expect(orThrowPage(page).total).toBe(1);
+    expect(page.ok && page.value.next()).toBeNull();
 });
 
 test('mockReply and mockPage make the results of test doubles', () => {

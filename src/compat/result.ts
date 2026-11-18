@@ -104,15 +104,27 @@ export const REST = '...';
  * `name` of `showMetadata`.
  *
  * Without an implementation, the data is `undefined`, as the value of a 6.x `vi.fn()` was.
+ *
+ * `R` is the result of the operation, from the place of the double, such as the
+ * `mockImplementation` of `vi.mocked(zones.show)`. The 6.x implementation has no types, so the
+ * data is what it gives, as with other mock data.
  */
-export function fromV1Mock(
+export function fromV1Mock<R = Result<Reply<unknown>, CallError>>(
     implementation: ((...args: never[]) => unknown) | undefined,
     args: readonly (string | null)[],
     result: 'data' | 'page' = 'data',
     key?: string,
-): (input: Readonly<Record<string, unknown>>) => Promise<Result<Reply<unknown>, CallError>> {
+): (input?: Readonly<Record<string, unknown>>) => Promise<R> {
     const named = new Set(args.filter((arg) => arg !== null && arg !== REST));
-    return async (input) => {
+    // An operation without a required parameter, such as `zones.query`, can have no input.
+    return async (input = {}) => {
+        const reply = await answer(input);
+        return reply as R;
+    };
+
+    async function answer(
+        input: Readonly<Record<string, unknown>>,
+    ): Promise<Result<Reply<unknown>, CallError>> {
         const values = args.map((arg) => {
             if (arg === null) return undefined;
             if (arg !== REST) return input[arg];
@@ -133,7 +145,7 @@ export function fromV1Mock(
         const total: unknown = Reflect.get(page, 'total');
         const data: unknown = Reflect.get(page, 'data');
         return mockPage(typeof total === 'number' ? { data, total } : { data });
-    };
+    }
 }
 
 function describe(error: CallError): string {

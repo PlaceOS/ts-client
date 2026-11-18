@@ -90,9 +90,9 @@ test('gives a new import another name when the file has the name', () => {
     );
     expect(result.text).toBe(
         [
-            "import { zones as zonesV2 } from '@placeos/ts-client';",
+            "import { zones as zones_v7 } from '@placeos/ts-client';",
             "import { orThrowPage } from '@placeos/ts-client/compat';",
-            'const zones = await zonesV2.query({}).then(orThrowPage);',
+            'const zones = await zones_v7.query({}).then(orThrowPage);',
         ].join('\n'),
     );
 });
@@ -263,8 +263,8 @@ test('a 7.x type gets an alias when the 6.x class stays for a value use', () => 
         ].join('\n'),
     );
     expect(result.text.split('\n')).toEqual([
-        "import { SignagePlugin, type SignagePlugin as SignagePluginV2 } from '@placeos/ts-client';",
-        'const plugin: SignagePluginV2 = new SignagePlugin();',
+        "import { SignagePlugin, type SignagePlugin as SignagePluginV7 } from '@placeos/ts-client';",
+        'const plugin: SignagePluginV7 = new SignagePlugin();',
     ]);
 });
 
@@ -328,7 +328,7 @@ test('a helper reuses the compat import of the file, and gets an alias when the 
             'await showZone(id);',
         ].join('\n'),
     );
-    expect(type_only.text).toContain('.then(orThrowV2)');
+    expect(type_only.text).toContain('.then(orThrowV7)');
     const local = migrate(
         [
             "import { showZone } from '@placeos/ts-client';",
@@ -337,9 +337,9 @@ test('a helper reuses the compat import of the file, and gets an alias when the 
         ].join('\n'),
     );
     expect(local.text.split('\n').slice(1)).toEqual([
-        "import { orThrow as orThrowV2 } from '@placeos/ts-client/compat';",
+        "import { orThrow as orThrowV7 } from '@placeos/ts-client/compat';",
         'const orThrow = 1;',
-        'await zones.show({ id }).then(orThrowV2);',
+        'await zones.show({ id }).then(orThrowV7);',
     ]);
 });
 
@@ -397,8 +397,8 @@ test('the hoisted helper gets its own name when the file imports fromV1Mock', ()
         ].join('\n'),
     );
     expect(result.text.split('\n')).toEqual([
-        "const { fromV1Mock: fromV1MockV2 } = await vi.hoisted(() => import('@placeos/ts-client/compat'));",
+        "const { fromV1Mock: fromV1MockV7 } = await vi.hoisted(() => import('@placeos/ts-client/compat'));",
         "import { fromV1Mock } from '@placeos/ts-client/compat';",
-        "vi.mock('@placeos/ts-client', () => ({ zones: { show: vi.fn(fromV1MockV2(undefined, ['id', '...'])) } }));",
+        "vi.mock('@placeos/ts-client', () => ({ zones: { show: vi.fn(fromV1MockV7(undefined, ['id', '...'])) } }));",
     ]);
 });

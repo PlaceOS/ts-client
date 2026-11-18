@@ -13,6 +13,7 @@ import { readdir, readFile, stat, writeFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { join, relative, resolve } from 'node:path';
 import type * as TS from 'typescript-5';
+import { assert } from '../core/assert.ts';
 import { COMPAT_MODULE, migrateSource, type Finding, type MigrateTables } from './migrate.ts';
 import { V1_CALLS, V1_COMPAT, V1_TYPES, V1_UNMAPPED } from './v1-map.ts';
 
@@ -110,15 +111,28 @@ async function main(argv: readonly string[]): Promise<void> {
     );
     if (!write && changed_files > 0) console.log('Run again with --write to write the changes.');
     if (write && changed_files > 0) {
+        const version = await ownVersion();
         console.log(
             `\nNext:\n` +
-                `  1. Install 7.x: npm install @placeos/ts-client@7\n` +
+                `  1. Install 7.x: npm install @placeos/ts-client@${version}\n` +
                 `  2. Call configure() once, before the first call (README: Log in). For a mock mode,\n` +
                 `     give fetch: mockFetch and missing_fields: 'zero' (README: Mock mode).\n` +
                 `  3. Run the compiler. It shows the changes to the data, such as a field that can be null.\n` +
                 `  4. orThrow from ${COMPAT_MODULE} keeps the 6.x errors. Check the Result in new code.`,
         );
     }
+}
+
+/**
+ * The version of this package, such as `7.0.0-next.1`. The tool tells the project to install the
+ * version that made its changes. `@7` does not install a prerelease.
+ */
+async function ownVersion(): Promise<string> {
+    // The same path from `src/migrate/cli.ts` and from `dist/migrate/cli.js`.
+    const text = await readFile(new URL('../../package.json', import.meta.url), 'utf8');
+    const version: unknown = Reflect.get(Object(JSON.parse(text)), 'version');
+    assert(typeof version === 'string' && version.length > 0, 'the package has a version');
+    return version;
 }
 
 /** The `typescript` package of the project, or `null`. */

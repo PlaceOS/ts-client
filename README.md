@@ -13,8 +13,11 @@ Version 7 is a new client, with a different API from 6.x. To move an application
 [`6.x` branch](https://github.com/PlaceOS/ts-client/tree/6.x), which gets the 6.x fixes.
 
 ```sh
-npm install @placeos/ts-client@7
+npm install @placeos/ts-client@next
 ```
+
+Version 7 is a prerelease on the npm tag `next` until 7.0.0 is out. `@7` does not install a
+prerelease.
 
 ## Use the client
 
@@ -461,8 +464,8 @@ can examine and undo the changes. Run it in the folder of the project, because i
 `typescript` package of the project:
 
 ```sh
-npx -p @placeos/ts-client@7 placeos-migrate src           # Shows the changes. Writes no file.
-npx -p @placeos/ts-client@7 placeos-migrate --write src   # Writes the changes.
+npx -p @placeos/ts-client@next placeos-migrate src           # Shows the changes. Writes no file.
+npx -p @placeos/ts-client@next placeos-migrate --write src   # Writes the changes.
 ```
 
 The tool makes these changes:
@@ -485,7 +488,7 @@ The tool makes these changes:
   `@placeos/ts-client/compat`. The enums have the 7.x values, so they fit the 7.x fields of the
   data. A query parameter takes the name: the `role` of `drivers.query` is `'logic'`, not `99`.
 - A new import gets another name when the file has the name. For example, a file with a
-  `zones` variable gets `zones as zonesV2`.
+  `zones` variable gets `zones as zones_v7`.
 
 The tool also changes the test doubles, so that the tests of the app still work:
 
@@ -549,6 +552,8 @@ arguments, and it finds the 7.x operation with the same method and path.
 - `missing_fields: 'zero'` accepts data without its required fields. It is for mock data only.
 - `parseResponse`, `checkRequest` and `call` each have one `as` cast. The compiler cannot prove
   that the parser output has the type of the schema. The tests check the parser.
+- `fromV1Mock` of `@placeos/ts-client/compat` has one `as` cast. It gives the result of a 6.x mock
+  implementation, which has no types, the type of the test double that holds it.
 - `configure` keeps one client in module state, so a call does not need a client argument. A
   call before `configure` is a run-time assertion, not a compile error.
 - The mocks keep their registries in module state, as 6.x did: the endpoints of

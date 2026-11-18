@@ -204,14 +204,20 @@ export function migrateSource(
         findings.push({ line: at.line + 1, column: at.character + 1, name, message });
     }
 
-    /** A local name for a new import: the name, or the name with a suffix if the file has it. */
+    /**
+     * A local name for a new import: the name, or the name with a suffix if the file has it. The
+     * suffix keeps the style of the name: `zones_v7` for a namespace, `orThrowV7` for a function
+     * and `SignagePluginV7` for a type.
+     */
     function localName(name: string): string {
         if (!taken.has(name)) {
             taken.add(name);
             return name;
         }
+        const snake_case = /^[a-z][a-z0-9_]*$/.test(name);
         for (let index = 1; index <= ALIASES_MAX; index += 1) {
-            const alias = `${name}V2${index === 1 ? '' : index}`;
+            const count = index === 1 ? '' : snake_case ? `_${index}` : String(index);
+            const alias = snake_case ? `${name}_v7${count}` : `${name}V7${count}`;
             if (taken.has(alias)) continue;
             taken.add(alias);
             return alias;
