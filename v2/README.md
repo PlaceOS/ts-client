@@ -28,9 +28,9 @@ if (result.ok) {
 ```
 
 There is one namespace for each controller of the API, for example `zones`, `systems` and
-`users`. Each function has the name of the server action: `index`, `show`, `create`, `update`,
-`destroy`, or a custom action such as `systems.execute`. The comment of each function gives the
-HTTP method and the path.
+`users`. Each function has the name of the server action: `show`, `create`, `update`, `destroy`,
+or a custom action such as `systems.execute`. The `index` action is `query`, because a list
+operation queries the items. The comment of each function gives the HTTP method and the path.
 
 The first argument has the path parameters, the query parameters and, for an operation with a
 body, `body`. The second argument has the options of the request:
@@ -88,7 +88,7 @@ await zones.query({}, { signal: controller.signal, timeoutMs: 60_000 });
 
 ### Pages
 
-An `index` operation returns one page. Use `pageInfo` to get the total and the next offset:
+A `query` operation returns one page. Use `pageInfo` to get the total and the next offset:
 
 ```ts
 import { pageInfo, zones } from '@placeos/ts-client';
