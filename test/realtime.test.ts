@@ -17,7 +17,7 @@ import {
     RECONNECT_DELAY_MAX_MS,
     RENEW_AFTER_FAILURES,
     REQUEST_TIMEOUT_MS,
-    splitModuleId,
+    splitModuleSlug,
     STALE_MS,
     type BindingState,
     type RealtimeConfig,
@@ -483,8 +483,8 @@ describe('debug', () => {
     });
 });
 
-test('splitModuleId reads the index at the end of a module ID', () => {
-    expect(splitModuleId('Display_2')).toEqual({ mod: 'Display', index: 2 });
-    expect(splitModuleId('Lighting_Control')).toEqual({ mod: 'Lighting_Control', index: 1 });
-    expect(splitModuleId('Display')).toEqual({ mod: 'Display', index: 1 });
+test('splitModuleSlug reads the index at the end of a module slug', () => {
+    expect(splitModuleSlug('Display_2')).toEqual({ mod: 'Display', index: 2 });
+    expect(splitModuleSlug('Lighting_Control')).toEqual({ mod: 'Lighting_Control', index: 1 });
+    expect(splitModuleSlug('Display')).toEqual({ mod: 'Display', index: 1 });
 });

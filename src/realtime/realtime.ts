@@ -174,15 +174,21 @@ export interface Realtime {
     debug(target: DebugTarget, listener: (message: DebugMessage) => void): () => void;
 }
 
-/** `Display_2` is the module `Display` with index 2. A name without an index has index 1. */
-export function splitModuleId(module_id: string): { readonly mod: string; readonly index: number } {
+/**
+ * Splits a module slug, such as the `module_slug` of `systems.execute`. `Display_2` is the module
+ * `Display` with index 2. A slug without an index has index 1.
+ */
+export function splitModuleSlug(module_slug: string): {
+    readonly mod: string;
+    readonly index: number;
+} {
     // `lastIndexOf` is linear. A regular expression such as `^(.+)_(\d+)$` backtracks.
-    const separator = module_id.lastIndexOf('_');
-    const digits = module_id.slice(separator + 1);
-    if (separator <= 0 || !/^\d+$/.test(digits)) return { mod: module_id, index: 1 };
+    const separator = module_slug.lastIndexOf('_');
+    const digits = module_slug.slice(separator + 1);
+    if (separator <= 0 || !/^\d+$/.test(digits)) return { mod: module_slug, index: 1 };
     const index = Number(digits);
     assert(Number.isSafeInteger(index), 'the module index is an integer');
-    return { mod: module_id.slice(0, separator), index: Math.max(1, index) };
+    return { mod: module_slug.slice(0, separator), index: Math.max(1, index) };
 }
 
 const Meta = object({ sys: string(), mod: string(), index: integer('Int32'), name: string() }, [

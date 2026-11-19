@@ -242,7 +242,7 @@ release();
   closes, and the client connects again. The wait before each new attempt increases, to a maximum
   of 5 seconds. After 40 failed attempts, the status is `failed`. Call `start` to try again.
 - `realtime.debug({ sys, module_id }, listener)` gets the logs of a module.
-- `splitModuleId('Display_2')` gives `{ mod: 'Display', index: 2 }`.
+- `splitModuleSlug('Display_2')` gives `{ mod: 'Display', index: 2 }`.
 - In a browser, the token goes in a cookie on the socket path. In a frame and on mobile Safari it
   goes in the query, as in 6.x. `createRealtime({ ..., environment })` replaces the socket, the
   timers and the cookie, for tests.

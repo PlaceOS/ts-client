@@ -39,7 +39,7 @@ export {
 } from './realtime/environment.ts';
 export {
     createRealtime,
-    splitModuleId,
+    splitModuleSlug,
     type BindingState,
     type DebugMessage,
     type DebugTarget,
