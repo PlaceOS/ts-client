@@ -29,14 +29,10 @@ const LINE_WIDTH_MAX = 100;
 
 /**
  * The `Time` fields that the server sends and accepts as Unix time in seconds, by schema. Each
- * entry comes from the source of PlaceOS/models, PlaceOS/staff-api and PlaceOS/calendar. These
- * fields get the note "Unix time in seconds.", because `integer` does not give the unit.
- *
- * The spec generator of the server lost the `type: "integer"` hint of a `Time` field that has an
- * epoch converter, if the field is a PgORM `attribute` or can be nil. The document then says
- * `date-time`. PlaceOS/rest-api#469 fixed the generator, so the rest-api document says `integer`.
- * The staff-api document is not regenerated yet, so its `date-time` is patched to `integer`. See
- * `ApiSource.epoch_patch`.
+ * entry comes from the source of PlaceOS/models, PlaceOS/staff-api and PlaceOS/calendar. The
+ * documents give them as `integer` (PlaceOS/rest-api#469, PlaceOS/staff-api#398), but `integer`
+ * does not give the unit, so these fields get the note "Unix time in seconds.". The generator
+ * stops when a field of the list is not an `Int64`.
  */
 const TIMESTAMPS = ['created_at', 'updated_at'];
 const SECONDS_FIELDS: ReadonlyMap<string, readonly string[]> = new Map([
@@ -123,13 +119,24 @@ const STRING_TIME_FIELDS: ReadonlyMap<string, readonly string[]> = new Map([
 ]);
 
 /**
- * Enum fields that the server sends as the number of the enum. A PgORM `attribute` with
- * `Enum::ValueConverter` writes `value`, but the document gives the names of the enum. The values
- * come from PlaceOS/models, and the live server sends these numbers. `ApiKey.permissions` has the
- * same converter in the models source, but the server sends its name, so it is not here.
+ * The names of the enum fields that the server sends as numbers: a PgORM `attribute` with
+ * `Enum::ValueConverter`. The document gives the numbers only (PlaceOS/rest-api#471), so these
+ * fields get a note with the name of each number. The values come from PlaceOS/models. The
+ * generator stops when the numbers of the document are not the numbers of the list.
  */
 const DRIVER_ROLES = { ssh: 0, device: 1, service: 2, websocket: 3, logic: 99 };
 const VALUE_ENUM_FIELDS: ReadonlyMap<string, Readonly<Record<string, ValueEnum>>> = new Map([
+    [
+        'PlaceOS.Model.ApiKey',
+        {
+            permissions: valueEnum('PlaceOS.Model.UserJWT.Permissions', {
+                user: 0,
+                support: 1,
+                admin: 2,
+                admin_support: 3,
+            }),
+        },
+    ],
     [
         'PlaceOS.Model.Broker',
         {
@@ -164,7 +171,7 @@ const VALUE_ENUM_FIELDS: ReadonlyMap<string, Readonly<Record<string, ValueEnum>>
 ]);
 
 interface ValueEnum {
-    /** The enum schema of the document that the field refers to now. */
+    /** The enum of PlaceOS/models, for the error messages. */
     readonly spec_name: string;
     readonly values: Readonly<Record<string, number>>;
 }
@@ -174,67 +181,17 @@ function valueEnum(spec_name: string, values: Readonly<Record<string, number>>):
 }
 
 /**
- * Fields that the document gives as `type: object` without properties, because the spec
- * generator of the server does not know their Crystal type. The server sends a string:
- * `Time::Location` as its name, `URI` as text, `UserJWT::Scope` as its name, and `JSON::Any` with
- * `StringConverter` as JSON text. `string` replaces the object, and `array` replaces the object
- * items of an array. Each entry comes from the source of PlaceOS/models and PlaceOS/rest-api.
+ * Fields that refer back to `Booking`, by schema. `Booking` has its guests, attendees, linked
+ * event and linked bookings, and each of these refers to `Booking` again. The schemas cannot have
+ * a cycle, so these fields are `json()`: the data is kept, but without a type. `Booking` keeps
+ * the types of its own fields. The generator stops when a field does not refer to `Booking`.
  */
-const STRING_FIELDS: ReadonlyMap<string, Readonly<Record<string, 'string' | 'array'>>> = new Map([
-    ['PlaceOS.Api.ApiKeys.Response', { scopes: 'array' }],
-    ['PlaceOS.Api.Cluster.NodeStatus', { uri: 'string' }],
-    ['PlaceOS.Model.ApiKey', { scopes: 'array' }],
-    ['PlaceOS.Model.ControlSystem', { timezone: 'string' }],
-    ['PlaceOS.Model.Driver', { json_schema: 'string' }],
-    ['PlaceOS.Model.UserJWT', { scope: 'array' }],
-    ['PlaceOS.Model.Zone', { timezone: 'string' }],
-]);
-
-/**
- * Fields that the server sends, but the document does not have. The spec generator of the server
- * leaves out the fields that a request cannot set: an attribute with `ignore_deserialize`, and a
- * getter with a `JSON::Field`. Each field is a schema of the document, from the source of
- * PlaceOS/models. It is optional, so it is `null` when the server does not send it. The fields
- * that refer to their own schema, such as `Booking.linked_bookings`, are not here, because the
- * schemas cannot have a cycle.
- */
-const ASSET_COUNT = {
-    type: 'integer',
-    format: 'Int64',
-    description: 'The number of assets of this type.',
-};
-const METADATA = {
-    type: 'object',
-    additionalProperties: { $ref: '#/components/schemas/PlaceOS.Model.Metadata.Interface' },
-    description: 'The metadata of the user, by name.',
-};
-const ADDED_FIELDS: ReadonlyMap<string, Readonly<Record<string, SpecNode>>> = new Map([
-    ['PlaceOS.Model.AssetType', { asset_count: ASSET_COUNT }],
-    [
-        'PlaceOS.Model.Booking',
-        {
-            booked_by_id: { type: 'string' },
-            email_digest: { type: 'string', description: 'The digest of `user_email`.' },
-            booked_by_email_digest: {
-                type: 'string',
-                description: 'The digest of `booked_by_email`.',
-            },
-            created: { type: 'integer', format: 'Int64', description: 'Unix time in seconds.' },
-            current_state: { $ref: '#/components/schemas/PlaceOS.Model.Booking.State' },
-        },
-    ],
-    [
-        'PlaceOS.Model.Guest',
-        {
-            checked_in: { type: 'boolean' },
-            visit_expected: { type: 'boolean' },
-            booking: { $ref: '#/components/schemas/PlaceOS.Model.Booking' },
-            event: { $ref: '#/components/schemas/PlaceCalendar.Event' },
-            event_metadata: { description: 'The metadata of the event, as JSON.' },
-        },
-    ],
-    ['PlaceOS.Model.User.AdminMetadataResponse', { associated_metadata: METADATA }],
-    ['PlaceOS.Model.User.PublicMetadataResponse', { associated_metadata: METADATA }],
+const BOOKING = 'PlaceOS.Model.Booking';
+const CYCLE_FIELDS: ReadonlyMap<string, readonly string[]> = new Map([
+    ['PlaceCalendar.Event', ['linked_bookings']],
+    ['PlaceOS.Model.Booking', ['linked_bookings', 'linked_parent_booking']],
+    ['PlaceOS.Model.EventMetadata', ['linked_bookings']],
+    ['PlaceOS.Model.Guest', ['booking']],
 ]);
 
 /** Operations that send JSON, but have no response schema in the document. */
@@ -330,7 +287,12 @@ const RESERVED_WORDS: ReadonlySet<string> = new Set(
 );
 
 /** Schema keys that change nothing in the output. Other keys stop the generator. */
-const IGNORED_SCHEMA_KEYS: ReadonlySet<string> = new Set(['description', 'example', 'title']);
+const IGNORED_SCHEMA_KEYS: ReadonlySet<string> = new Set([
+    'description',
+    'example',
+    'readOnly',
+    'title',
+]);
 /** The schema combinators of `src/core/schema.ts` that the generated code calls. */
 const SCHEMA_COMBINATORS = [
     'array',
@@ -416,12 +378,6 @@ interface ApiSource {
     /** The path from `dir` to `src/core`. */
     readonly core: string;
     readonly aliases: ReadonlyMap<string, string>;
-    /**
-     * `true` when the document says `date-time` for the fields of `SECONDS_FIELDS`, and the patch
-     * makes them `integer`. `false` when the document says `integer`. The generator stops when the
-     * document does not match, so that the flag changes when the document is regenerated.
-     */
-    readonly epoch_patch: boolean;
 }
 
 const APIS: readonly ApiSource[] = [
@@ -432,7 +388,6 @@ const APIS: readonly ApiSource[] = [
         name_prefix: '',
         core: '../core',
         aliases: TYPE_ALIASES,
-        epoch_patch: false,
     },
     {
         repository: 'PlaceOS/staff-api',
@@ -441,7 +396,6 @@ const APIS: readonly ApiSource[] = [
         name_prefix: 'staff.',
         core: '../../core',
         aliases: new Map(),
-        epoch_patch: true,
     },
 ];
 
@@ -520,7 +474,7 @@ async function generate(api: ApiSource, check: boolean): Promise<string[]> {
         assert(spec_name !== undefined, `the schema ${name} exists`);
         const imports: Imports = { combinators: new Set(), schemas: new Set() };
         const node = asNode(field(schemas, spec_name), spec_name);
-        const code = emitNamedSchema(api, schemas, spec_name, node, imports);
+        const code = emitNamedSchema(schemas, spec_name, node, imports);
         named.set(name, { code, imports });
         pending.push(...imports.schemas);
     }
@@ -624,10 +578,22 @@ function planOperation(
     // The list action of a controller is `index` in the server. The client calls it `query`.
     const action = (id_match[2] ?? '').replace(/^index(?=_\d+$|$)/, 'query');
 
-    // The success response. The API has one for each operation.
+    // The success response. The API has one for each operation, and some also have a 204 without
+    // a body, such as `staff.calendars.availability` when no calendar matches. The client gives
+    // `null` for a 204, so the data of the other response can be `null`.
     const responses = asNode(field(operation, 'responses'), `${operation_id} responses`);
-    const successes = Object.keys(responses).filter((status) => /^[123]\d\d$/.test(status));
-    assert(successes.length === 1, `${operation_id} has one success response`);
+    const all_successes = Object.keys(responses).filter((status) => /^[123]\d\d$/.test(status));
+    const successes =
+        all_successes.length > 1 ? all_successes.filter((s) => s !== '204') : all_successes;
+    assert(successes.length === 1, `${operation_id} has one success response, and maybe a 204`);
+    const empty_204 = successes.length < all_successes.length;
+    if (empty_204) {
+        const no_content = asNode(field(responses, '204'), `${operation_id} 204`);
+        assert(
+            field(no_content, 'content') === undefined,
+            `the 204 of ${operation_id} has no body`,
+        );
+    }
     const status = successes[0] ?? '';
     if (status === '101' || status.startsWith('3')) return null;
 
@@ -642,6 +608,10 @@ function planOperation(
     } else if (content !== undefined) {
         const schema = asNode(jsonContentSchema(content, operation_id), `${operation_id} schema`);
         response = emitSchema(schemas, schema, imports, 0);
+        if (empty_204 && !response.startsWith('nullable(')) {
+            imports.combinators.add('nullable');
+            response = `nullable(${response})`;
+        }
     }
 
     // The parameters: one object schema with the path parameters and the query parameters.
@@ -779,9 +749,8 @@ function sameSignature(a: OperationPlan, b: OperationPlan): boolean {
     return a.params === b.params && a.body === b.body && a.response === b.response;
 }
 
-/** The emit of a named schema. It applies the time field patches to its properties. */
+/** The emit of a named schema. It applies the field patches to its properties. */
 function emitNamedSchema(
-    api: ApiSource,
     schemas: SpecNode,
     spec_name: string,
     node: SpecNode,
@@ -807,7 +776,7 @@ function emitNamedSchema(
             `${doc}export const ${name}: Schema<${name}, ${name}Input> = ${schema_name};\n`
         );
     }
-    const time_fields = { spec_name, epoch_fields, epoch_patch: api.epoch_patch, string_fields };
+    const time_fields = { spec_name, epoch_fields, string_fields };
     const expression = emitObject(schemas, node, imports, 0, time_fields);
     imports.combinators.add('Output');
     imports.combinators.add('Input');
@@ -825,8 +794,6 @@ interface TimeFields {
     readonly spec_name: string;
     /** The fields of `SECONDS_FIELDS`. */
     readonly epoch_fields: ReadonlySet<string>;
-    /** See `ApiSource.epoch_patch`. */
-    readonly epoch_patch: boolean;
     readonly string_fields: ReadonlySet<string>;
 }
 
@@ -984,71 +951,52 @@ function emitObject(
         const is_time = isDateTime(property);
         const value_enum_field =
             time_fields === null ? undefined : VALUE_ENUM_FIELDS.get(time_fields.spec_name)?.[key];
-        const string_field =
-            time_fields === null ? undefined : STRING_FIELDS.get(time_fields.spec_name)?.[key];
+        const cycle_field =
+            time_fields !== null && CYCLE_FIELDS.get(time_fields.spec_name)?.includes(key) === true;
         if (time_fields === null) {
             expression = emitSchema(schemas, property, imports, depth + 1);
-        } else if (value_enum_field !== undefined) {
-            const target = `#/components/schemas/${value_enum_field.spec_name}`;
+        } else if (cycle_field) {
             const subject = `${time_fields.spec_name}.${key}`;
-            assertPatchedShape(property, (node) => isOnly(node, { $ref: target }), subject);
-            // A new member of the enum needs its number in the patch.
-            const enum_node = asNode(
-                field(schemas, value_enum_field.spec_name),
-                'the patched enum',
-            );
-            assertSupportedKeys(enum_node);
-            assert(
-                isOnly(enum_node, { type: 'string', enum: field(enum_node, 'enum') }),
-                `${value_enum_field.spec_name} is a string enum and nothing else`,
-            );
-            const members = asArray(field(enum_node, 'enum'), 'the patched enum values').map(
-                String,
-            );
-            const mapped = Object.keys(value_enum_field.values);
-            assert(
-                [...members].sort().join() === [...mapped].sort().join(),
-                `the numbers of ${value_enum_field.spec_name} cover each member of the enum`,
-            );
-            imports.combinators.add('literal');
-            expression = `literal(${JSON.stringify(Object.values(value_enum_field.values))})`;
-            if (isNullable(property)) {
-                imports.combinators.add('nullable');
-                expression = `nullable(${expression})`;
-            }
+            const ref = { $ref: `#/components/schemas/${BOOKING}` };
+            const isBooking = (node: SpecNode) => isOnly(node, ref);
+            const isBookings = (node: SpecNode) => {
+                const items = field(node, 'items');
+                return (
+                    isOnly(node, { type: 'array', items }) && isRecord(items) && isBooking(items)
+                );
+            };
+            const list =
+                isBookings(property) ||
+                asArray(field(property, 'anyOf') ?? [], subject).some(
+                    (variant) => isRecord(variant) && isBookings(variant),
+                );
+            assertPatchedShape(property, list ? isBookings : isBooking, subject);
+            imports.combinators.add('json');
+            expression = 'json()';
+            const separator = description.length > 0 ? '\n\n' : '';
+            const shape = list ? 'A list of `Booking`' : 'A `Booking`';
+            const note = `${shape}, as JSON, because the client schemas cannot refer to themselves.`;
+            description = `${description}${separator}${note}`;
+        } else if (value_enum_field !== undefined) {
+            const subject = `${time_fields.spec_name}.${key}`;
+            const numbers = [...Object.values(value_enum_field.values)].sort((a, b) => a - b);
+            const isNumbers = (node: SpecNode) => {
+                const values = field(node, 'enum');
+                if (!isOnly(node, { type: 'integer', enum: values })) return false;
+                const given = asArray(values, `${subject} enum`).map(Number);
+                return given.sort((a, b) => a - b).join() === numbers.join();
+            };
+            // A new member of the enum needs its name in the list.
+            assertPatchedShape(property, isNumbers, `${subject} (${value_enum_field.spec_name})`);
+            expression = emitSchema(schemas, property, imports, depth + 1);
             const names = Object.entries(value_enum_field.values).map(([n, v]) => `${v} ${n}`);
             const separator = description.length > 0 ? '\n\n' : '';
             description = `${description}${separator}The number of the enum: ${names.join(', ')}.`;
-        } else if (string_field !== undefined) {
-            const subject = `${time_fields.spec_name}.${key}`;
-            const isBare = (node: SpecNode) => isOnly(node, { type: 'object' });
-            const isBareArray = (node: SpecNode) => {
-                const items = field(node, 'items');
-                return isOnly(node, { type: 'array', items }) && isRecord(items) && isBare(items);
-            };
-            assertPatchedShape(property, string_field === 'string' ? isBare : isBareArray, subject);
-            imports.combinators.add('string');
-            expression = 'string()';
-            if (string_field === 'array') {
-                imports.combinators.add('array');
-                expression = 'array(string())';
-            }
-            if (isNullable(property)) {
-                imports.combinators.add('nullable');
-                expression = `nullable(${expression})`;
-            }
         } else if (time_fields.epoch_fields.has(key)) {
             const subject = `${time_fields.spec_name}.${key}`;
-            const date_time = { type: 'string', format: 'date-time' };
             const int64 = { type: 'integer', format: 'Int64' };
-            const shape = time_fields.epoch_patch ? date_time : int64;
-            assertPatchedShape(property, (node) => isOnly(node, shape), subject);
-            imports.combinators.add('integer');
-            expression = 'integer()';
-            if (isNullable(property)) {
-                imports.combinators.add('nullable');
-                expression = 'nullable(integer())';
-            }
+            assertPatchedShape(property, (node) => isOnly(node, int64), subject);
+            expression = emitSchema(schemas, property, imports, depth + 1);
             const separator = description.length > 0 ? '\n\n' : '';
             description = `${description}${separator}Unix time in seconds.`;
         } else {
@@ -1061,19 +1009,8 @@ function emitObject(
     if (time_fields !== null) {
         const keys = [...time_fields.epoch_fields, ...time_fields.string_fields];
         keys.push(...Object.keys(VALUE_ENUM_FIELDS.get(time_fields.spec_name) ?? {}));
-        keys.push(...Object.keys(STRING_FIELDS.get(time_fields.spec_name) ?? {}));
+        keys.push(...(CYCLE_FIELDS.get(time_fields.spec_name) ?? []));
         for (const key of keys) assert(Object.hasOwn(properties, key), `${key} is a property`);
-        const added = Object.entries(ADDED_FIELDS.get(time_fields.spec_name) ?? {});
-        for (const [key, property] of added) {
-            // When the document gets the field, the patch must go.
-            const subject = `${time_fields.spec_name}.${key}`;
-            assert(!Object.hasOwn(properties, key), `${subject} is not in the document`);
-            const description = optionalString(field(property, 'description'), key) ?? '';
-            const code = emitSchema(schemas, property, imports, depth + 1);
-            const expression = code === 'json()' ? code : `nullable(${code})`;
-            if (code !== 'json()') imports.combinators.add('nullable');
-            fields.push(`${docComment(description, 4)}${propertyKey(key)}: ${expression},`);
-        }
     }
     imports.combinators.add('object');
     const required_list = required.length > 0 ? `, ${JSON.stringify(required)}` : '';
@@ -1126,14 +1063,6 @@ function isDateTime(node: SpecNode): boolean {
     if (anyOf === undefined) return false;
     return asArray(anyOf, 'anyOf').some(
         (variant) => field(asNode(variant, 'anyOf'), 'format') === 'date-time',
-    );
-}
-
-function isNullable(node: SpecNode): boolean {
-    const anyOf = field(node, 'anyOf');
-    if (anyOf === undefined) return false;
-    return asArray(anyOf, 'anyOf').some(
-        (variant) => field(asNode(variant, 'anyOf'), 'type') === 'null',
     );
 }
 

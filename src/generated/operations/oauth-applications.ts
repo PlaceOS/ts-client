@@ -54,7 +54,7 @@ const DESTROY = /* @__PURE__ */ operation({
     path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
-            id: /* @__PURE__ */ string(),
+            id: /* @__PURE__ */ integer(),
         },
         ['id'],
     ),
@@ -123,7 +123,7 @@ const SHOW = /* @__PURE__ */ operation({
     path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
-            id: /* @__PURE__ */ string(),
+            id: /* @__PURE__ */ integer(),
         },
         ['id'],
     ),
@@ -150,7 +150,7 @@ const UPDATE = /* @__PURE__ */ operation({
     path_keys: ['id'],
     params: /* @__PURE__ */ parameters(
         {
-            id: /* @__PURE__ */ string(),
+            id: /* @__PURE__ */ integer(),
         },
         ['id'],
     ),

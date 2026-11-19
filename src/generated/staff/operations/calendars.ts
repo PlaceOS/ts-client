@@ -70,7 +70,7 @@ const AVAILABILITY = /* @__PURE__ */ operation({
         ['period_start', 'period_end'],
     ),
     body: null,
-    response: /* @__PURE__ */ array(CalendarsAvailability),
+    response: /* @__PURE__ */ nullable(/* @__PURE__ */ array(CalendarsAvailability)),
     name: 'staff.calendars.availability',
 });
 

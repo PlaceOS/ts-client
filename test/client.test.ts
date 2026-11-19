@@ -22,7 +22,7 @@ import {
     string,
 } from '../src/core/schema.ts';
 import { join } from 'node:path';
-import { asset_types, zones } from '../src/index.ts';
+import { zones } from '../src/index.ts';
 
 interface Sent {
     readonly url: string;
@@ -303,6 +303,20 @@ describe('call errors', () => {
         });
     });
 
+    test('gives null for a 204, which only a nullable response accepts', async () => {
+        const empty = fakeFetch(() => new Response(null, { status: 204 }));
+        const client = clientWith(empty.fetch);
+        const LIST = operation({
+            ...DOWNLOAD,
+            response: nullable(array(Item)),
+            name: 'items.list',
+        });
+        const list = await call(LIST, {}, { client });
+        expect(list.ok ? list.value.data : list.error).toBeNull();
+        const update = await call(UPDATE, { id: 'item-1', body: {} }, { client });
+        expect(update.ok ? null : update.error.kind).toBe('response_invalid');
+    });
+
     test('converts a fetch exception to a network error', async () => {
         const fetch: FetchFunction = async () => {
             throw new TypeError('Failed to fetch');
@@ -405,13 +419,12 @@ describe('call errors', () => {
 });
 
 describe('generated operations', () => {
-    test('zones.show reads the epoch timestamps and the timezone that the server sends', async () => {
+    test('zones.show reads the epoch timestamps that the server sends', async () => {
         const { fetch, sent } = fakeFetch(() =>
             jsonResponse({
                 id: 'zone-1',
                 name: 'Level 1',
                 created_at: 1_700_000_000,
-                timezone: 'Australia/Melbourne',
                 update_systems: false,
             }),
         );
@@ -425,17 +438,6 @@ describe('generated operations', () => {
         expect(result.value.data.created_at).toBe(1_700_000_000);
         expect(result.value.data.name).toBe('Level 1');
         expect(result.value.data.tags).toBeNull();
-        // The document says `object`. The patch makes it a string.
-        const timezone: string | null = result.value.data.timezone;
-        expect(timezone).toBe('Australia/Melbourne');
-    });
-
-    test('asset_types.show reads asset_count, which the document does not have', async () => {
-        const { fetch } = fakeFetch(() =>
-            jsonResponse({ id: 'type-1', name: 'Desk', category_id: 'cat-1', asset_count: 3 }),
-        );
-        const result = await asset_types.show({ id: 'type-1' }, { client: clientWith(fetch) });
-        expect(result.ok && result.value.data.asset_count).toBe(3);
     });
 });
 

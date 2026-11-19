@@ -432,21 +432,16 @@ short name too. The short name is the same value and type:
 The generator changes some parts of the document. Each change has a comment in
 `scripts/generate.ts`.
 
-- **Time fields.** The staff-api document says `date-time` for some fields that the server sends
-  as Unix time in seconds, for example `created_at` on most models. The generator changes these
-  fields to integers. The list comes from the source of PlaceOS/models. The rest-api document has
-  the correct types. In both clients, the fields of the list have the note "Unix time in seconds.",
-  because `integer` does not give the unit. The generator stops if it finds a `date-time` field
-  that is not in a list, so each new field gets a decision.
-- **Enum numbers.** The server sends some enums as numbers, for example `Driver.role` (`99` is
-  `logic`). The document gives their names. The generator changes these fields to the numbers.
-- **String fields.** The document says `object` for some fields that the server sends as strings,
-  for example `Zone.timezone` (`"Australia/Melbourne"`) and the `scopes` of an API key. The
-  generator changes these fields to strings.
-- **Missing fields.** The document does not have the fields that a request cannot set, for example
-  `AssetType.asset_count` and `Guest.checked_in`. The generator adds these fields. They are `null`
-  when the server does not send them. The generator stops when the document gets one of these
-  fields, so that the patch can go.
+- **Notes on numbers.** The documents give Unix times and some enums as integers, but not the unit
+  or the names. The generator adds a note: "Unix time in seconds." on fields such as `created_at`,
+  and the name of each number on enums such as `Driver.role` (`99` is `logic`). The lists come
+  from the source of PlaceOS/models. The generator stops if a field of a list changes its type, or
+  if it finds a `date-time` field that is not in a list, so each new field gets a decision.
+- **Fields that refer back to `Booking`.** `Booking` has its guests, attendees and linked events,
+  and these refer to `Booking` again. The client schemas cannot refer to themselves, so
+  `Guest.booking` and the `linked_bookings` and `linked_parent_booking` fields are `JsonValue`.
+- **A 204 without a body.** `staff.calendars.availability` sends 204 when no calendar matches. The
+  data is then `null`.
 - **Required fields in a request.** The document marks a field as required when the server always
   sends it. The server can have a default for the same field in a request. Thus each field of a
   request body is optional, and the server checks the body. Path and query parameters keep the

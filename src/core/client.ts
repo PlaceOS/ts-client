@@ -500,7 +500,7 @@ async function send(
 
     const reply = { status: response.status, headers: response.headers };
     if (operation.response === null) return { ok: true, value: { ...reply, data: response.bytes } };
-    const parsed = decodeJson(response.bytes);
+    const parsed = successJson(reply.status, response.bytes);
     if (!parsed.ok) {
         return {
             ok: false,
@@ -551,7 +551,7 @@ function mockResult(
         };
     }
     if (operation.response === null) return { ok: true, value: { ...reply, data: bytes } };
-    const parsed = decodeJson(bytes);
+    const parsed = successJson(reply.status, bytes);
     if (!parsed.ok) {
         return {
             ok: false,
@@ -814,6 +814,15 @@ async function readBody(
     }
     await reader.cancel();
     return { ok: false, error: 'too_large' };
+}
+
+/**
+ * The JSON of a 2xx body. A 204 has no body, so it is `null`. The generator makes the response
+ * schema nullable when the document has a 204, such as `staff.calendars.availability`. For another
+ * operation, `null` does not match the schema, so the 204 is a `response_invalid`.
+ */
+function successJson(status: number, bytes: Uint8Array): Result<unknown, 'json_invalid'> {
+    return status === 204 ? { ok: true, value: null } : decodeJson(bytes);
 }
 
 /** `JSON.parse` throws on bad input. This converts the exception to a value. */

@@ -60,11 +60,6 @@ export interface AdminConsentFlowInput extends Input<typeof AdminConsentFlowSche
 export const AdminConsentFlow: Schema<AdminConsentFlow, AdminConsentFlowInput> =
     AdminConsentFlowSchema;
 
-const AlertAlertTypeSchema = /* @__PURE__ */ literal(['threshold', 'status', 'custom']);
-export type AlertAlertType = Output<typeof AlertAlertTypeSchema>;
-export type AlertAlertTypeInput = Input<typeof AlertAlertTypeSchema>;
-export const AlertAlertType: Schema<AlertAlertType, AlertAlertTypeInput> = AlertAlertTypeSchema;
-
 const AlertDashboardSchema = /* @__PURE__ */ object({
     /** Unix time in seconds. */
     created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
@@ -79,11 +74,6 @@ const AlertDashboardSchema = /* @__PURE__ */ object({
 export interface AlertDashboard extends Output<typeof AlertDashboardSchema> {}
 export interface AlertDashboardInput extends Input<typeof AlertDashboardSchema> {}
 export const AlertDashboard: Schema<AlertDashboard, AlertDashboardInput> = AlertDashboardSchema;
-
-const AlertSeveritySchema = /* @__PURE__ */ literal(['low', 'medium', 'high', 'critical']);
-export type AlertSeverity = Output<typeof AlertSeveritySchema>;
-export type AlertSeverityInput = Input<typeof AlertSeveritySchema>;
-export const AlertSeverity: Schema<AlertSeverity, AlertSeverityInput> = AlertSeveritySchema;
 
 const TriggerConditionsComparisonOperatorSchema = /* @__PURE__ */ literal([
     'and',
@@ -209,8 +199,12 @@ const AlertSchema = /* @__PURE__ */ object({
     enabled: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
     any_match: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
     conditions: /* @__PURE__ */ nullable(TriggerConditions),
-    severity: /* @__PURE__ */ nullable(AlertSeverity),
-    alert_type: /* @__PURE__ */ nullable(AlertAlertType),
+    severity: /* @__PURE__ */ nullable(
+        /* @__PURE__ */ literal(['low', 'medium', 'high', 'critical']),
+    ),
+    alert_type: /* @__PURE__ */ nullable(
+        /* @__PURE__ */ literal(['threshold', 'status', 'custom']),
+    ),
     debounce_period: /* @__PURE__ */ nullable(/* @__PURE__ */ integer('Int32')),
     alert_dashboard_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     alert_dashboard_details: /* @__PURE__ */ nullable(AlertDashboard),
@@ -220,17 +214,6 @@ export interface Alert extends Output<typeof AlertSchema> {}
 export interface AlertInput extends Input<typeof AlertSchema> {}
 export const Alert: Schema<Alert, AlertInput> = AlertSchema;
 
-const UserJwtPermissionsSchema = /* @__PURE__ */ literal([
-    'user',
-    'support',
-    'admin',
-    'admin_support',
-]);
-export type UserJwtPermissions = Output<typeof UserJwtPermissionsSchema>;
-export type UserJwtPermissionsInput = Input<typeof UserJwtPermissionsSchema>;
-export const UserJwtPermissions: Schema<UserJwtPermissions, UserJwtPermissionsInput> =
-    UserJwtPermissionsSchema;
-
 const ApiKeySchema = /* @__PURE__ */ object({
     /** Unix time in seconds. */
     created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
@@ -239,7 +222,8 @@ const ApiKeySchema = /* @__PURE__ */ object({
     name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     description: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     scopes: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
-    permissions: /* @__PURE__ */ nullable(UserJwtPermissions),
+    /** The number of the enum: 0 user, 1 support, 2 admin, 3 admin_support. */
+    permissions: /* @__PURE__ */ nullable(/* @__PURE__ */ literal([0, 1, 2, 3])),
     secret: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     /** Unix time in seconds. */
     expires_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
@@ -350,6 +334,17 @@ export interface UserAdminResponseInput extends Input<typeof UserAdminResponseSc
 export const UserAdminResponse: Schema<UserAdminResponse, UserAdminResponseInput> =
     UserAdminResponseSchema;
 
+const UserJwtPermissionsSchema = /* @__PURE__ */ literal([
+    'user',
+    'support',
+    'admin',
+    'admin_support',
+]);
+export type UserJwtPermissions = Output<typeof UserJwtPermissionsSchema>;
+export type UserJwtPermissionsInput = Input<typeof UserJwtPermissionsSchema>;
+export const UserJwtPermissions: Schema<UserJwtPermissions, UserJwtPermissionsInput> =
+    UserJwtPermissionsSchema;
+
 const ApiKeysResponseSchema = /* @__PURE__ */ object(
     {
         id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -456,9 +451,8 @@ const AssetTypeSchema = /* @__PURE__ */ object({
     model_number: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     images: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
     category_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-    id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-    /** The number of assets of this type. */
     asset_count: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
 });
 export interface AssetType extends Output<typeof AssetTypeSchema> {}
 export interface AssetTypeInput extends Input<typeof AssetTypeSchema> {}
@@ -950,7 +944,9 @@ const ModuleSchema = /* @__PURE__ */ object({
     /** The number of the enum: 0 ssh, 1 device, 2 service, 3 websocket, 99 logic. */
     role: /* @__PURE__ */ nullable(/* @__PURE__ */ literal([0, 1, 2, 3, 99])),
     /** the alert level for stagehand issues */
-    alert_level: /* @__PURE__ */ nullable(AlertSeverity),
+    alert_level: /* @__PURE__ */ nullable(
+        /* @__PURE__ */ literal(['low', 'medium', 'high', 'critical']),
+    ),
     connected: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
     running: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
     notes: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -972,16 +968,29 @@ export interface Module extends Output<typeof ModuleSchema> {}
 export interface ModuleInput extends Input<typeof ModuleSchema> {}
 export const Module: Schema<Module, ModuleInput> = ModuleSchema;
 
-const PlaylistOrientationSchema = /* @__PURE__ */ literal([
-    'unspecified',
-    'landscape',
-    'portrait',
-    'square',
-]);
-export type PlaylistOrientation = Output<typeof PlaylistOrientationSchema>;
-export type PlaylistOrientationInput = Input<typeof PlaylistOrientationSchema>;
-export const PlaylistOrientation: Schema<PlaylistOrientation, PlaylistOrientationInput> =
-    PlaylistOrientationSchema;
+const GroupSchema = /* @__PURE__ */ object({
+    created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    description: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    subsystems: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
+    default_permissions: /* @__PURE__ */ nullable(/* @__PURE__ */ integer('Int32')),
+    ad_group_mappings: /* @__PURE__ */ nullable(
+        /* @__PURE__ */ record(
+            /* @__PURE__ */ tuple([/* @__PURE__ */ string(), /* @__PURE__ */ integer('Int32')]),
+        ),
+    ),
+    features: /* @__PURE__ */ nullable(
+        /* @__PURE__ */ record(/* @__PURE__ */ record(/* @__PURE__ */ json())),
+    ),
+    authority_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    parent_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    children_count: /* @__PURE__ */ nullable(/* @__PURE__ */ integer('Int32')),
+});
+export interface Group extends Output<typeof GroupSchema> {}
+export interface GroupInput extends Input<typeof GroupSchema> {}
+export const Group: Schema<Group, GroupInput> = GroupSchema;
 
 const PlaylistScheduleSchema = /* @__PURE__ */ object(
     {
@@ -1009,7 +1018,9 @@ const PlaylistSchema = /* @__PURE__ */ object({
     name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     description: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     authority_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-    orientation: /* @__PURE__ */ nullable(PlaylistOrientation),
+    orientation: /* @__PURE__ */ nullable(
+        /* @__PURE__ */ literal(['unspecified', 'landscape', 'portrait', 'square']),
+    ),
     play_count: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     play_through_count: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     /**
@@ -1024,23 +1035,12 @@ const PlaylistSchema = /* @__PURE__ */ object({
     valid_from: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     valid_until: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     schedules: /* @__PURE__ */ nullable(/* @__PURE__ */ array(PlaylistSchedule)),
+    shared_with: /* @__PURE__ */ nullable(/* @__PURE__ */ array(Group)),
     id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
 });
 export interface Playlist extends Output<typeof PlaylistSchema> {}
 export interface PlaylistInput extends Input<typeof PlaylistSchema> {}
 export const Playlist: Schema<Playlist, PlaylistInput> = PlaylistSchema;
-
-const PlaylistItemMediaTypeSchema = /* @__PURE__ */ literal([
-    'image',
-    'video',
-    'plugin',
-    'webpage',
-    'external_image',
-]);
-export type PlaylistItemMediaType = Output<typeof PlaylistItemMediaTypeSchema>;
-export type PlaylistItemMediaTypeInput = Input<typeof PlaylistItemMediaTypeSchema>;
-export const PlaylistItemMediaType: Schema<PlaylistItemMediaType, PlaylistItemMediaTypeInput> =
-    PlaylistItemMediaTypeSchema;
 
 const PlaylistItemSchema = /* @__PURE__ */ object({
     /** Unix time in seconds. */
@@ -1059,8 +1059,12 @@ const PlaylistItemSchema = /* @__PURE__ */ object({
      * slide_right, 6 slide_bottom.
      */
     animation: /* @__PURE__ */ nullable(/* @__PURE__ */ literal([0, 1, 2, 3, 4, 5, 6])),
-    media_type: /* @__PURE__ */ nullable(PlaylistItemMediaType),
-    orientation: /* @__PURE__ */ nullable(PlaylistOrientation),
+    media_type: /* @__PURE__ */ nullable(
+        /* @__PURE__ */ literal(['image', 'video', 'plugin', 'webpage', 'external_image']),
+    ),
+    orientation: /* @__PURE__ */ nullable(
+        /* @__PURE__ */ literal(['unspecified', 'landscape', 'portrait', 'square']),
+    ),
     media_uri: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     media_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     thumbnail_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -1069,31 +1073,13 @@ const PlaylistItemSchema = /* @__PURE__ */ object({
     play_count: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     valid_from: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     valid_until: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    shared_with: /* @__PURE__ */ nullable(/* @__PURE__ */ array(Group)),
+    playlists: /* @__PURE__ */ nullable(/* @__PURE__ */ array(Playlist)),
     id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
 });
 export interface PlaylistItem extends Output<typeof PlaylistItemSchema> {}
 export interface PlaylistItemInput extends Input<typeof PlaylistItemSchema> {}
 export const PlaylistItem: Schema<PlaylistItem, PlaylistItemInput> = PlaylistItemSchema;
-
-const SignagePluginPlaybackTypeSchema = /* @__PURE__ */ literal([
-    'static',
-    'interactive',
-    'playsthrough',
-]);
-export type SignagePluginPlaybackType = Output<typeof SignagePluginPlaybackTypeSchema>;
-export type SignagePluginPlaybackTypeInput = Input<typeof SignagePluginPlaybackTypeSchema>;
-export const SignagePluginPlaybackType: Schema<
-    SignagePluginPlaybackType,
-    SignagePluginPlaybackTypeInput
-> = SignagePluginPlaybackTypeSchema;
-
-const SignagePluginPluginTypeSchema = /* @__PURE__ */ literal(['plugin', 'widget']);
-export type SignagePluginPluginType = Output<typeof SignagePluginPluginTypeSchema>;
-export type SignagePluginPluginTypeInput = Input<typeof SignagePluginPluginTypeSchema>;
-export const SignagePluginPluginType: Schema<
-    SignagePluginPluginType,
-    SignagePluginPluginTypeInput
-> = SignagePluginPluginTypeSchema;
 
 const SignagePluginSchema = /* @__PURE__ */ object({
     /** Unix time in seconds. */
@@ -1103,8 +1089,10 @@ const SignagePluginSchema = /* @__PURE__ */ object({
     name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     description: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     uri: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-    playback_type: /* @__PURE__ */ nullable(SignagePluginPlaybackType),
-    plugin_type: /* @__PURE__ */ nullable(SignagePluginPluginType),
+    playback_type: /* @__PURE__ */ nullable(
+        /* @__PURE__ */ literal(['static', 'interactive', 'playsthrough']),
+    ),
+    plugin_type: /* @__PURE__ */ nullable(/* @__PURE__ */ literal(['plugin', 'widget'])),
     authority_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     enabled: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
     params: /* @__PURE__ */ nullable(/* @__PURE__ */ record(/* @__PURE__ */ json())),
@@ -1115,6 +1103,61 @@ export interface SignagePlugin extends Output<typeof SignagePluginSchema> {}
 export interface SignagePluginInput extends Input<typeof SignagePluginSchema> {}
 export const SignagePlugin: Schema<SignagePlugin, SignagePluginInput> = SignagePluginSchema;
 
+const SignageTemplateLayoutPositionSchema = /* @__PURE__ */ literal([
+    'top',
+    'bottom',
+    'left',
+    'right',
+    'floating',
+]);
+export type SignageTemplateLayoutPosition = Output<typeof SignageTemplateLayoutPositionSchema>;
+export type SignageTemplateLayoutPositionInput = Input<typeof SignageTemplateLayoutPositionSchema>;
+export const SignageTemplateLayoutPosition: Schema<
+    SignageTemplateLayoutPosition,
+    SignageTemplateLayoutPositionInput
+> = SignageTemplateLayoutPositionSchema;
+
+const SignageTemplateLayoutSchema = /* @__PURE__ */ object(
+    {
+        plugin_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        position: SignageTemplateLayoutPosition,
+        x_pos: /* @__PURE__ */ nullable(/* @__PURE__ */ number()),
+        y_pos: /* @__PURE__ */ nullable(/* @__PURE__ */ number()),
+        plugin_params: /* @__PURE__ */ record(/* @__PURE__ */ json()),
+    },
+    ['position', 'plugin_params'],
+);
+export interface SignageTemplateLayout extends Output<typeof SignageTemplateLayoutSchema> {}
+export interface SignageTemplateLayoutInput extends Input<typeof SignageTemplateLayoutSchema> {}
+export const SignageTemplateLayout: Schema<SignageTemplateLayout, SignageTemplateLayoutInput> =
+    SignageTemplateLayoutSchema;
+
+const SignageTemplateSchema = /* @__PURE__ */ object({
+    created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    description: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    tags: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
+    authority_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    background_item_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    layouts: /* @__PURE__ */ nullable(/* @__PURE__ */ array(SignageTemplateLayout)),
+    full_screen_takeover: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    merge: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    approval_requested: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    requested_by_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    approved: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    approved_by_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    approved_by_name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    approved_by_email: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    live_template_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    background_media: /* @__PURE__ */ nullable(PlaylistItem),
+    shared_with: /* @__PURE__ */ nullable(/* @__PURE__ */ array(Group)),
+});
+export interface SignageTemplate extends Output<typeof SignageTemplateSchema> {}
+export interface SignageTemplateInput extends Input<typeof SignageTemplateSchema> {}
+export const SignageTemplate: Schema<SignageTemplate, SignageTemplateInput> = SignageTemplateSchema;
+
 const SignageTemplateSystemTemplateSchema = /* @__PURE__ */ object({
     created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -1123,6 +1166,7 @@ const SignageTemplateSystemTemplateSchema = /* @__PURE__ */ object({
     zone_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     template_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     schedule: /* @__PURE__ */ nullable(PlaylistSchedule),
+    template_details: /* @__PURE__ */ nullable(SignageTemplate),
 });
 export interface SignageTemplateSystemTemplate extends Output<
     typeof SignageTemplateSystemTemplateSchema
@@ -1167,7 +1211,9 @@ const ControlSystemSchema = /* @__PURE__ */ object(
         installed_ui_devices: /* @__PURE__ */ nullable(/* @__PURE__ */ integer('Int32')),
         zones: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
         modules: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
-        orientation: /* @__PURE__ */ nullable(PlaylistOrientation),
+        orientation: /* @__PURE__ */ nullable(
+            /* @__PURE__ */ literal(['unspecified', 'landscape', 'portrait', 'square']),
+        ),
         sign_height: /* @__PURE__ */ nullable(/* @__PURE__ */ integer('Int32')),
         sign_width: /* @__PURE__ */ nullable(/* @__PURE__ */ integer('Int32')),
         playlists: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
@@ -1244,13 +1290,16 @@ const DriverSchema = /* @__PURE__ */ object({
     updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     description: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-    json_schema: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    /** Schema data. JSON objects are encoded as JSON strings in responses. */
+    json_schema: /* @__PURE__ */ nullable(/* @__PURE__ */ json()),
     default_uri: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     default_port: /* @__PURE__ */ nullable(/* @__PURE__ */ integer('Int32')),
     /** The number of the enum: 0 ssh, 1 device, 2 service, 3 websocket, 99 logic. */
     role: /* @__PURE__ */ nullable(/* @__PURE__ */ literal([0, 1, 2, 3, 99])),
     /** the default alert level for stagehand issues */
-    alert_level: /* @__PURE__ */ nullable(AlertSeverity),
+    alert_level: /* @__PURE__ */ nullable(
+        /* @__PURE__ */ literal(['low', 'medium', 'high', 'critical']),
+    ),
     file_name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     commit: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     compilation_output: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -1421,30 +1470,6 @@ export interface GitRepositoryCommit extends Output<typeof GitRepositoryCommitSc
 export interface GitRepositoryCommitInput extends Input<typeof GitRepositoryCommitSchema> {}
 export const GitRepositoryCommit: Schema<GitRepositoryCommit, GitRepositoryCommitInput> =
     GitRepositoryCommitSchema;
-
-const GroupSchema = /* @__PURE__ */ object({
-    created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-    updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-    id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-    name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-    description: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-    subsystems: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
-    default_permissions: /* @__PURE__ */ nullable(/* @__PURE__ */ integer('Int32')),
-    ad_group_mappings: /* @__PURE__ */ nullable(
-        /* @__PURE__ */ record(
-            /* @__PURE__ */ tuple([/* @__PURE__ */ string(), /* @__PURE__ */ integer('Int32')]),
-        ),
-    ),
-    features: /* @__PURE__ */ nullable(
-        /* @__PURE__ */ record(/* @__PURE__ */ record(/* @__PURE__ */ json())),
-    ),
-    authority_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-    parent_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-    children_count: /* @__PURE__ */ nullable(/* @__PURE__ */ integer('Int32')),
-});
-export interface Group extends Output<typeof GroupSchema> {}
-export interface GroupInput extends Input<typeof GroupSchema> {}
-export const Group: Schema<Group, GroupInput> = GroupSchema;
 
 const GroupInvitationSchema = /* @__PURE__ */ object({
     created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -2160,6 +2185,7 @@ const PlaylistItemScheduleSchema = /* @__PURE__ */ object({
     playlist_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     item_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     schedules: /* @__PURE__ */ nullable(/* @__PURE__ */ array(PlaylistSchedule)),
+    media: /* @__PURE__ */ nullable(PlaylistItem),
     id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
 });
 export interface PlaylistItemSchedule extends Output<typeof PlaylistItemScheduleSchema> {}
@@ -2183,6 +2209,8 @@ const PlaylistRevisionSchema = /* @__PURE__ */ object({
     approved_by_email: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     items: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
     playlist_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    media: /* @__PURE__ */ nullable(/* @__PURE__ */ array(PlaylistItem)),
+    schedules: /* @__PURE__ */ nullable(/* @__PURE__ */ array(PlaylistItemSchedule)),
     id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
 });
 export interface PlaylistRevision extends Output<typeof PlaylistRevisionSchema> {}
@@ -2226,11 +2254,6 @@ export const PublicEventsTokenRequest: Schema<
     PublicEventsTokenRequestInput
 > = PublicEventsTokenRequestSchema;
 
-const RepositoryTypeSchema = /* @__PURE__ */ literal(['driver', 'interface']);
-export type RepositoryType = Output<typeof RepositoryTypeSchema>;
-export type RepositoryTypeInput = Input<typeof RepositoryTypeSchema>;
-export const RepositoryType: Schema<RepositoryType, RepositoryTypeInput> = RepositoryTypeSchema;
-
 const RepositorySchema = /* @__PURE__ */ object({
     /** Unix time in seconds. */
     created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
@@ -2246,7 +2269,7 @@ const RepositorySchema = /* @__PURE__ */ object({
     release: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
     username: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     password: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-    repo_type: /* @__PURE__ */ nullable(RepositoryType),
+    repo_type: /* @__PURE__ */ nullable(/* @__PURE__ */ literal(['driver', 'interface'])),
     root_path: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     has_runtime_error: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
     error_message: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -2335,17 +2358,6 @@ export type ScreenshotFormatInput = Input<typeof ScreenshotFormatSchema>;
 export const ScreenshotFormat: Schema<ScreenshotFormat, ScreenshotFormatInput> =
     ScreenshotFormatSchema;
 
-const SettingsParentTypeSchema = /* @__PURE__ */ literal([
-    'control_system',
-    'driver',
-    'module',
-    'zone',
-]);
-export type SettingsParentType = Output<typeof SettingsParentTypeSchema>;
-export type SettingsParentTypeInput = Input<typeof SettingsParentTypeSchema>;
-export const SettingsParentType: Schema<SettingsParentType, SettingsParentTypeInput> =
-    SettingsParentTypeSchema;
-
 const SettingsSchema = /* @__PURE__ */ object({
     /** Unix time in seconds. */
     created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
@@ -2357,7 +2369,9 @@ const SettingsSchema = /* @__PURE__ */ object({
     encryption_level: /* @__PURE__ */ nullable(/* @__PURE__ */ literal([0, 1, 2, 3])),
     settings_string: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     keys: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
-    parent_type: /* @__PURE__ */ nullable(SettingsParentType),
+    parent_type: /* @__PURE__ */ nullable(
+        /* @__PURE__ */ literal(['control_system', 'driver', 'module', 'zone']),
+    ),
     parent_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
 });
@@ -2608,6 +2622,14 @@ export interface SignageMetrics extends Output<typeof SignageMetricsSchema> {}
 export interface SignageMetricsInput extends Input<typeof SignageMetricsSchema> {}
 export const SignageMetrics: Schema<SignageMetrics, SignageMetricsInput> = SignageMetricsSchema;
 
+const SignagePluginPluginTypeSchema = /* @__PURE__ */ literal(['plugin', 'widget']);
+export type SignagePluginPluginType = Output<typeof SignagePluginPluginTypeSchema>;
+export type SignagePluginPluginTypeInput = Input<typeof SignagePluginPluginTypeSchema>;
+export const SignagePluginPluginType: Schema<
+    SignagePluginPluginType,
+    SignagePluginPluginTypeInput
+> = SignagePluginPluginTypeSchema;
+
 const SignageSamsungEinkManifestContentSchema = /* @__PURE__ */ object(
     {
         image_url: /* @__PURE__ */ string(),
@@ -2685,59 +2707,6 @@ export const SignageSamsungEinkManifest: Schema<
     SignageSamsungEinkManifestInput
 > = SignageSamsungEinkManifestSchema;
 
-const SignageTemplateLayoutPositionSchema = /* @__PURE__ */ literal([
-    'top',
-    'bottom',
-    'left',
-    'right',
-    'floating',
-]);
-export type SignageTemplateLayoutPosition = Output<typeof SignageTemplateLayoutPositionSchema>;
-export type SignageTemplateLayoutPositionInput = Input<typeof SignageTemplateLayoutPositionSchema>;
-export const SignageTemplateLayoutPosition: Schema<
-    SignageTemplateLayoutPosition,
-    SignageTemplateLayoutPositionInput
-> = SignageTemplateLayoutPositionSchema;
-
-const SignageTemplateLayoutSchema = /* @__PURE__ */ object(
-    {
-        plugin_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-        position: SignageTemplateLayoutPosition,
-        x_pos: /* @__PURE__ */ nullable(/* @__PURE__ */ number()),
-        y_pos: /* @__PURE__ */ nullable(/* @__PURE__ */ number()),
-        plugin_params: /* @__PURE__ */ record(/* @__PURE__ */ json()),
-    },
-    ['position', 'plugin_params'],
-);
-export interface SignageTemplateLayout extends Output<typeof SignageTemplateLayoutSchema> {}
-export interface SignageTemplateLayoutInput extends Input<typeof SignageTemplateLayoutSchema> {}
-export const SignageTemplateLayout: Schema<SignageTemplateLayout, SignageTemplateLayoutInput> =
-    SignageTemplateLayoutSchema;
-
-const SignageTemplateSchema = /* @__PURE__ */ object({
-    created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-    updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-    id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-    name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-    description: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-    tags: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
-    authority_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-    background_item_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-    layouts: /* @__PURE__ */ nullable(/* @__PURE__ */ array(SignageTemplateLayout)),
-    full_screen_takeover: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
-    merge: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
-    approval_requested: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
-    requested_by_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-    approved: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
-    approved_by_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-    approved_by_name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-    approved_by_email: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-    live_template_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-});
-export interface SignageTemplate extends Output<typeof SignageTemplateSchema> {}
-export interface SignageTemplateInput extends Input<typeof SignageTemplateSchema> {}
-export const SignageTemplate: Schema<SignageTemplate, SignageTemplateInput> = SignageTemplateSchema;
-
 const SignageTemplatesApprovalMessageSchema = /* @__PURE__ */ object(
     {
         message: /* @__PURE__ */ string(),
@@ -2778,17 +2747,12 @@ export type State = Output<typeof StateSchema>;
 export type StateInput = Input<typeof StateSchema>;
 export const State: Schema<State, StateInput> = StateSchema;
 
-const StorageTypeSchema = /* @__PURE__ */ literal(['s3', 'azure', 'google']);
-export type StorageType = Output<typeof StorageTypeSchema>;
-export type StorageTypeInput = Input<typeof StorageTypeSchema>;
-export const StorageType: Schema<StorageType, StorageTypeInput> = StorageTypeSchema;
-
 const StorageSchema = /* @__PURE__ */ object({
     /** Unix time in seconds. */
     created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     /** Unix time in seconds. */
     updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
-    storage_type: /* @__PURE__ */ nullable(StorageType),
+    storage_type: /* @__PURE__ */ nullable(/* @__PURE__ */ literal(['s3', 'azure', 'google'])),
     bucket_name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     region: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     access_key: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -2834,12 +2798,6 @@ export interface SystemsFunctionDetailsInput extends Input<typeof SystemsFunctio
 export const SystemsFunctionDetails: Schema<SystemsFunctionDetails, SystemsFunctionDetailsInput> =
     SystemsFunctionDetailsSchema;
 
-const UploadPermissionsSchema = /* @__PURE__ */ literal(['none', 'admin', 'support']);
-export type UploadPermissions = Output<typeof UploadPermissionsSchema>;
-export type UploadPermissionsInput = Input<typeof UploadPermissionsSchema>;
-export const UploadPermissions: Schema<UploadPermissions, UploadPermissionsInput> =
-    UploadPermissionsSchema;
-
 const UploadSchema = /* @__PURE__ */ object({
     /** Unix time in seconds. */
     created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
@@ -2854,7 +2812,7 @@ const UploadSchema = /* @__PURE__ */ object({
     cache_etag: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     cache_modified: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     public: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
-    permissions: /* @__PURE__ */ nullable(UploadPermissions),
+    permissions: /* @__PURE__ */ nullable(/* @__PURE__ */ literal(['none', 'admin', 'support'])),
     object_options: /* @__PURE__ */ nullable(/* @__PURE__ */ record(/* @__PURE__ */ json())),
     resumable_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     resumable: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
@@ -2869,6 +2827,12 @@ const UploadSchema = /* @__PURE__ */ object({
 export interface Upload extends Output<typeof UploadSchema> {}
 export interface UploadInput extends Input<typeof UploadSchema> {}
 export const Upload: Schema<Upload, UploadInput> = UploadSchema;
+
+const UploadPermissionsSchema = /* @__PURE__ */ literal(['none', 'admin', 'support']);
+export type UploadPermissions = Output<typeof UploadPermissionsSchema>;
+export type UploadPermissionsInput = Input<typeof UploadPermissionsSchema>;
+export const UploadPermissions: Schema<UploadPermissions, UploadPermissionsInput> =
+    UploadPermissionsSchema;
 
 const UploadsPartInfoSchema = /* @__PURE__ */ object(
     {
@@ -2966,9 +2930,8 @@ const UserAdminMetadataResponseSchema = /* @__PURE__ */ object(
         authority_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         photo_upload_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        associated_metadata: /* @__PURE__ */ record(MetadataInterface),
         subsystem_access: /* @__PURE__ */ array(/* @__PURE__ */ string()),
-        /** The metadata of the user, by name. */
-        associated_metadata: /* @__PURE__ */ nullable(/* @__PURE__ */ record(MetadataInterface)),
     },
     [
         'created_at',
@@ -2982,6 +2945,7 @@ const UserAdminMetadataResponseSchema = /* @__PURE__ */ object(
         'login_count',
         'work_preferences',
         'work_overrides',
+        'associated_metadata',
         'subsystem_access',
     ],
 );
@@ -3063,8 +3027,7 @@ const UserPublicMetadataResponseSchema = /* @__PURE__ */ object(
         authority_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         photo_upload_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-        /** The metadata of the user, by name. */
-        associated_metadata: /* @__PURE__ */ nullable(/* @__PURE__ */ record(MetadataInterface)),
+        associated_metadata: /* @__PURE__ */ record(MetadataInterface),
     },
     [
         'created_at',
@@ -3076,6 +3039,7 @@ const UserPublicMetadataResponseSchema = /* @__PURE__ */ object(
         'login_count',
         'work_preferences',
         'work_overrides',
+        'associated_metadata',
     ],
 );
 export interface UserPublicMetadataResponse extends Output<

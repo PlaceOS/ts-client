@@ -97,24 +97,12 @@ const AssetTypeSchema = /* @__PURE__ */ object({
     model_number: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     images: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
     category_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-    id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-    /** The number of assets of this type. */
     asset_count: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
 });
 export interface AssetType extends Output<typeof AssetTypeSchema> {}
 export interface AssetTypeInput extends Input<typeof AssetTypeSchema> {}
 export const AssetType: Schema<AssetType, AssetTypeInput> = AssetTypeSchema;
-
-const PlaylistOrientationSchema = /* @__PURE__ */ literal([
-    'unspecified',
-    'landscape',
-    'portrait',
-    'square',
-]);
-export type PlaylistOrientation = Output<typeof PlaylistOrientationSchema>;
-export type PlaylistOrientationInput = Input<typeof PlaylistOrientationSchema>;
-export const PlaylistOrientation: Schema<PlaylistOrientation, PlaylistOrientationInput> =
-    PlaylistOrientationSchema;
 
 const ControlSystemSchema = /* @__PURE__ */ object(
     {
@@ -148,7 +136,9 @@ const ControlSystemSchema = /* @__PURE__ */ object(
         installed_ui_devices: /* @__PURE__ */ nullable(/* @__PURE__ */ integer('Int32')),
         zones: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
         modules: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
-        orientation: /* @__PURE__ */ nullable(PlaylistOrientation),
+        orientation: /* @__PURE__ */ nullable(
+            /* @__PURE__ */ literal(['unspecified', 'landscape', 'portrait', 'square']),
+        ),
         sign_height: /* @__PURE__ */ nullable(/* @__PURE__ */ integer('Int32')),
         sign_width: /* @__PURE__ */ nullable(/* @__PURE__ */ integer('Int32')),
         playlists: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
@@ -314,6 +304,8 @@ const PlaceCalendarEventSchema = /* @__PURE__ */ object(
         ),
         extension_data: /* @__PURE__ */ nullable(/* @__PURE__ */ json()),
         recurring_master_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        /** A list of `Booking`, as JSON, because the client schemas cannot refer to themselves. */
+        linked_bookings: /* @__PURE__ */ json(),
         setup_time: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
         breakdown_time: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
         setup_event_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -378,23 +370,69 @@ export interface BookingHistory extends Output<typeof BookingHistorySchema> {}
 export interface BookingHistoryInput extends Input<typeof BookingHistorySchema> {}
 export const BookingHistory: Schema<BookingHistory, BookingHistoryInput> = BookingHistorySchema;
 
-const BookingInductionSchema = /* @__PURE__ */ literal(['tentative', 'accepted', 'declined']);
-export type BookingInduction = Output<typeof BookingInductionSchema>;
-export type BookingInductionInput = Input<typeof BookingInductionSchema>;
-export const BookingInduction: Schema<BookingInduction, BookingInductionInput> =
-    BookingInductionSchema;
+const EventMetadataSchema = /* @__PURE__ */ object({
+    system_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    event_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    recurring_master_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    ical_uid: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    resource_master_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    host_email: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    resource_calendar: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    event_start: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    event_end: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    cancelled: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    ext_data: /* @__PURE__ */ nullable(/* @__PURE__ */ json()),
+    setup_time: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    breakdown_time: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    setup_event_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    breakdown_event_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    /**
+     * The permission level for the event. Defaults to private. If set to private, attendees must be
+     * invited.If set to open, users in the same tenant can join. If set to public, the event is
+     * open for everyone to join.
+     */
+    permission: /* @__PURE__ */ nullable(/* @__PURE__ */ literal(['private', 'open', 'public'])),
+    tenant_id: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    /** A list of `Booking`, as JSON, because the client schemas cannot refer to themselves. */
+    linked_bookings: /* @__PURE__ */ json(),
+    id: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    /** Unix time in seconds. */
+    created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    /** Unix time in seconds. */
+    updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+});
+export interface EventMetadata extends Output<typeof EventMetadataSchema> {}
+export interface EventMetadataInput extends Input<typeof EventMetadataSchema> {}
+export const EventMetadata: Schema<EventMetadata, EventMetadataInput> = EventMetadataSchema;
 
-const BookingPermissionSchema = /* @__PURE__ */ literal(['private', 'open', 'public']);
-export type BookingPermission = Output<typeof BookingPermissionSchema>;
-export type BookingPermissionInput = Input<typeof BookingPermissionSchema>;
-export const BookingPermission: Schema<BookingPermission, BookingPermissionInput> =
-    BookingPermissionSchema;
-
-const BookingRecurrenceSchema = /* @__PURE__ */ literal(['none', 'daily', 'weekly', 'monthly']);
-export type BookingRecurrence = Output<typeof BookingRecurrenceSchema>;
-export type BookingRecurrenceInput = Input<typeof BookingRecurrenceSchema>;
-export const BookingRecurrence: Schema<BookingRecurrence, BookingRecurrenceInput> =
-    BookingRecurrenceSchema;
+const GuestSchema = /* @__PURE__ */ object({
+    email: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    preferred_name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    phone: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    organisation: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    notes: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    photo: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    banned: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    dangerous: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    searchable: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    extension_data: /* @__PURE__ */ nullable(/* @__PURE__ */ json()),
+    checked_in: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    visit_expected: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
+    /** A `Booking`, as JSON, because the client schemas cannot refer to themselves. */
+    booking: /* @__PURE__ */ json(),
+    event: /* @__PURE__ */ nullable(PlaceCalendarEvent),
+    event_metadata: /* @__PURE__ */ nullable(/* @__PURE__ */ json()),
+    tenant_id: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    id: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    /** Unix time in seconds. */
+    created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    /** Unix time in seconds. */
+    updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+});
+export interface Guest extends Output<typeof GuestSchema> {}
+export interface GuestInput extends Input<typeof GuestSchema> {}
+export const Guest: Schema<Guest, GuestInput> = GuestSchema;
 
 const BookingSchema = /* @__PURE__ */ object({
     booking_type: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -428,24 +466,41 @@ const BookingSchema = /* @__PURE__ */ object({
     booked_from: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     extension_data: /* @__PURE__ */ nullable(/* @__PURE__ */ json()),
     history: /* @__PURE__ */ nullable(/* @__PURE__ */ array(BookingHistory)),
+    email_digest: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    booked_by_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    booked_by_email_digest: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+    created: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     parent_id: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     /** provided if this booking is associated with a calendar event */
     event_id: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     /** provided when this booking is an instance of recurring booking */
     instance: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
-    attendees: /* @__PURE__ */ nullable(/* @__PURE__ */ array(PlaceCalendarEventAttendee)),
+    linked_event: /* @__PURE__ */ nullable(EventMetadata),
+    /** A list of `Booking`, as JSON, because the client schemas cannot refer to themselves. */
+    linked_bookings: /* @__PURE__ */ json(),
+    /** A `Booking`, as JSON, because the client schemas cannot refer to themselves. */
+    linked_parent_booking: /* @__PURE__ */ json(),
+    attendees: /* @__PURE__ */ union([
+        /* @__PURE__ */ nullable(/* @__PURE__ */ array(PlaceCalendarEventAttendee)),
+        /* @__PURE__ */ nullable(/* @__PURE__ */ array(Attendee)),
+    ]),
+    current_state: /* @__PURE__ */ nullable(BookingState),
     asset_ids: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
     images: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
     /** The induction status of the booking. Defaults to TENTATIVE. */
-    induction: /* @__PURE__ */ nullable(BookingInduction),
+    induction: /* @__PURE__ */ nullable(
+        /* @__PURE__ */ literal(['tentative', 'accepted', 'declined']),
+    ),
     /**
      * The permission level for the booking. Defaults to private. If set to private, attendees must
      * be invited.If set to open, users in the same tenant can join. If set to public, the booking
      * is open for everyone to join.
      */
-    permission: /* @__PURE__ */ nullable(BookingPermission),
+    permission: /* @__PURE__ */ nullable(/* @__PURE__ */ literal(['private', 'open', 'public'])),
     /** Is this a recurring booking. This field defines the type of recurrence */
-    recurrence_type: /* @__PURE__ */ nullable(BookingRecurrence),
+    recurrence_type: /* @__PURE__ */ nullable(
+        /* @__PURE__ */ literal(['none', 'daily', 'weekly', 'monthly']),
+    ),
     /**
      * a bitmap of valid days of the week for booking recurrences to land on, defaults to all days
      * of the week
@@ -462,23 +517,22 @@ const BookingSchema = /* @__PURE__ */ object({
     recurrence_end: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     all_day: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
     tenant_id: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    guests: /* @__PURE__ */ nullable(/* @__PURE__ */ array(Guest)),
     id: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     /** Unix time in seconds. */
     created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     /** Unix time in seconds. */
     updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
-    booked_by_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-    /** The digest of `user_email`. */
-    email_digest: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-    /** The digest of `booked_by_email`. */
-    booked_by_email_digest: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-    /** Unix time in seconds. */
-    created: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
-    current_state: /* @__PURE__ */ nullable(BookingState),
 });
 export interface Booking extends Output<typeof BookingSchema> {}
 export interface BookingInput extends Input<typeof BookingSchema> {}
 export const Booking: Schema<Booking, BookingInput> = BookingSchema;
+
+const BookingInductionSchema = /* @__PURE__ */ literal(['tentative', 'accepted', 'declined']);
+export type BookingInduction = Output<typeof BookingInductionSchema>;
+export type BookingInductionInput = Input<typeof BookingInductionSchema>;
+export const BookingInduction: Schema<BookingInduction, BookingInductionInput> =
+    BookingInductionSchema;
 
 const PlaceCalendarAvailabilityStatusSchema = /* @__PURE__ */ literal(['busy', 'free']);
 export type PlaceCalendarAvailabilityStatus = Output<typeof PlaceCalendarAvailabilityStatusSchema>;
@@ -670,39 +724,6 @@ export interface DesksNearbyDesksInput extends Input<typeof DesksNearbyDesksSche
 export const DesksNearbyDesks: Schema<DesksNearbyDesks, DesksNearbyDesksInput> =
     DesksNearbyDesksSchema;
 
-const EventMetadataSchema = /* @__PURE__ */ object({
-    system_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-    event_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-    recurring_master_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-    ical_uid: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-    resource_master_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-    host_email: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-    resource_calendar: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-    event_start: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
-    event_end: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
-    cancelled: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
-    ext_data: /* @__PURE__ */ nullable(/* @__PURE__ */ json()),
-    setup_time: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
-    breakdown_time: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
-    setup_event_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-    breakdown_event_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-    /**
-     * The permission level for the event. Defaults to private. If set to private, attendees must be
-     * invited.If set to open, users in the same tenant can join. If set to public, the event is
-     * open for everyone to join.
-     */
-    permission: /* @__PURE__ */ nullable(EventMetadataPermission),
-    tenant_id: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
-    id: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
-    /** Unix time in seconds. */
-    created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
-    /** Unix time in seconds. */
-    updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
-});
-export interface EventMetadata extends Output<typeof EventMetadataSchema> {}
-export interface EventMetadataInput extends Input<typeof EventMetadataSchema> {}
-export const EventMetadata: Schema<EventMetadata, EventMetadataInput> = EventMetadataSchema;
-
 const EventsChangeTypeSchema = /* @__PURE__ */ literal(['created', 'updated', 'deleted']);
 export type EventsChangeType = Output<typeof EventsChangeTypeSchema>;
 export type EventsChangeTypeInput = Input<typeof EventsChangeTypeSchema>;
@@ -713,35 +734,6 @@ const EventsStrictSchema = /* @__PURE__ */ literal(['notify', 'limit', 'all']);
 export type EventsStrict = Output<typeof EventsStrictSchema>;
 export type EventsStrictInput = Input<typeof EventsStrictSchema>;
 export const EventsStrict: Schema<EventsStrict, EventsStrictInput> = EventsStrictSchema;
-
-const GuestSchema = /* @__PURE__ */ object({
-    email: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-    name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-    preferred_name: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-    phone: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-    organisation: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-    notes: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-    photo: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-    banned: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
-    dangerous: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
-    searchable: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
-    extension_data: /* @__PURE__ */ nullable(/* @__PURE__ */ json()),
-    tenant_id: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
-    id: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
-    /** Unix time in seconds. */
-    created_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
-    /** Unix time in seconds. */
-    updated_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
-    checked_in: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
-    visit_expected: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
-    booking: /* @__PURE__ */ nullable(Booking),
-    event: /* @__PURE__ */ nullable(PlaceCalendarEvent),
-    /** The metadata of the event, as JSON. */
-    event_metadata: /* @__PURE__ */ json(),
-});
-export interface Guest extends Output<typeof GuestSchema> {}
-export interface GuestInput extends Input<typeof GuestSchema> {}
-export const Guest: Schema<Guest, GuestInput> = GuestSchema;
 
 const MetadataInterfaceSchema = /* @__PURE__ */ object(
     {
@@ -1465,23 +1457,6 @@ export interface SurveyPage extends Output<typeof SurveyPageSchema> {}
 export interface SurveyPageInput extends Input<typeof SurveyPageSchema> {}
 export const SurveyPage: Schema<SurveyPage, SurveyPageInput> = SurveyPageSchema;
 
-const SurveyTriggerTypeSchema = /* @__PURE__ */ literal([
-    'none',
-    'reserved',
-    'checkedin',
-    'checkedout',
-    'noshow',
-    'rejected',
-    'cancelled',
-    'ended',
-    'visitor_checkedin',
-    'visitor_checkedout',
-]);
-export type SurveyTriggerType = Output<typeof SurveyTriggerTypeSchema>;
-export type SurveyTriggerTypeInput = Input<typeof SurveyTriggerTypeSchema>;
-export const SurveyTriggerType: Schema<SurveyTriggerType, SurveyTriggerTypeInput> =
-    SurveyTriggerTypeSchema;
-
 const SurveySchema = /* @__PURE__ */ object({
     title: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     description: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
@@ -1489,7 +1464,20 @@ const SurveySchema = /* @__PURE__ */ object({
      * Triggers on booking states: RESERVED, CHECKEDIN, CHECKEDOUT, REJECTED, CANCELLED,
      * VISITOR_CHECKEDIN, VISITOR_CHECKEDOUT
      */
-    trigger: /* @__PURE__ */ nullable(SurveyTriggerType),
+    trigger: /* @__PURE__ */ nullable(
+        /* @__PURE__ */ literal([
+            'none',
+            'reserved',
+            'checkedin',
+            'checkedout',
+            'noshow',
+            'rejected',
+            'cancelled',
+            'ended',
+            'visitor_checkedin',
+            'visitor_checkedout',
+        ]),
+    ),
     zone_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     building_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     pages: /* @__PURE__ */ nullable(/* @__PURE__ */ array(SurveyPage)),
@@ -1546,6 +1534,7 @@ const SurveyQuestionSchema = /* @__PURE__ */ object({
     tags: /* @__PURE__ */ nullable(/* @__PURE__ */ array(/* @__PURE__ */ string())),
     deleted_at: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     previous_question_id: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
+    deleted: /* @__PURE__ */ nullable(/* @__PURE__ */ boolean()),
     authority_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     id: /* @__PURE__ */ nullable(/* @__PURE__ */ integer()),
     /** Unix time in seconds. */
