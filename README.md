@@ -58,49 +58,53 @@ await systems.execute({
 });
 ```
 
-### Results and errors
+### The result
 
-A function does not throw for an expected failure. It returns a `Result`. Examine `ok` first:
+Each call returns a `Result`, also when it fails. Check `ok`, then read `value` or `error`:
 
-| `error.kind`         | Meaning                                                                    |
-| -------------------- | -------------------------------------------------------------------------- |
-| `http`               | The server sent a status that is not 2xx. See `status`, `message`, `body`. |
-| `network`            | No response, for example because the network is down. See below.           |
-| `timeout`            | The request took more than `timeout_ms`.                                   |
-| `aborted`            | The `signal` of the caller cancelled the request.                          |
-| `auth_missing`       | The auth had no token or credential.                                       |
-| `response_too_large` | The body was more than `response_bytes_max`.                               |
-| `response_invalid`   | The body does not match the API document. See `path` and `expected`.       |
+```ts
+type Result<T, E> = { ok: true; value: T } | { ok: false; error: E };
+```
 
-A call with an API key does not follow a redirect, so a redirect gives a `network` error. See
-[Changes from 6.x](#changes-from-6x).
+When `ok` is `true`, `value` is the reply:
+
+| Field     | Value                                                                 |
+| --------- | --------------------------------------------------------------------- |
+| `status`  | The HTTP status, such as `200`.                                       |
+| `headers` | The `Headers` of the response, such as `X-Total-Count`.               |
+| `data`    | The body, parsed with the schema of the operation.                    |
+| `next()`  | Only on an operation with an `offset` parameter. See [Pages](#pages). |
+
+An operation without a response schema gives the raw body in `data`, as a `Uint8Array`. A 204
+has no body, so `data` is `null`. Only an operation with a 204 in the API document, such as
+`staff.calendars.availability`, accepts it. For the other operations, a 204 is a
+`response_invalid` error.
+
+When `ok` is `false`, `error.kind` tells what failed. The other fields depend on the kind:
+
+| `error.kind`         | Fields                       | Meaning                                        |
+| -------------------- | ---------------------------- | ---------------------------------------------- |
+| `http`               | `status`, `message`, `body`  | The server sent a status that is not 2xx.      |
+| `network`            | `message`                    | No response, such as when the network is down. |
+| `timeout`            | `timeout_ms`                 | The request took more than `timeout_ms`.       |
+| `aborted`            |                              | The `signal` of the caller cancelled the call. |
+| `auth_missing`       |                              | The auth had no token or credential.           |
+| `response_too_large` | `bytes_max`                  | The body was more than `response_bytes_max`.   |
+| `response_invalid`   | `status`, `path`, `expected` | The body does not match the API document.      |
+
+- In an `http` error, `message` is the `error` field of the JSON body, or `null`. `body` is the
+  parsed JSON body, or `null`.
+- In a `response_invalid` error, `path` names the field, such as `$.id`, and `expected` is the
+  type that the schema wants, such as `string`.
+- A call with an API key does not follow a redirect, so a redirect gives a `network` error. See
+  [Changes in the login](#changes-in-the-login).
+- To name the type of a result, use `Awaited<ReturnType<typeof zones.show>>`.
 
 A function throws only for a programmer error. Examples are a parameter that the operation does
 not have, a path parameter that is empty, `.` or `..`, and a call before `configure`.
 
 In a project without `strictNullChecks`, `if (!result.ok)` does not narrow the `Result`. Use
 `if (result.ok === false)`.
-
-### More than one client
-
-`configure` makes the client that each call uses. To use a different client for one call, make it
-with `createClient` and give it in the options. The configured client does not change:
-
-```ts
-const other = createClient({ base_url: 'https://other.example.com', auth: { kind: 'none' } });
-await zones.query({}, { client: other });
-```
-
-### Timeouts and cancel
-
-Each request has a time limit. The default is 30 seconds. Set a different limit for the client or
-for one request:
-
-```ts
-configure({ base_url: '', auth: { kind: 'none' }, timeout_ms: 10_000 });
-const controller = new AbortController();
-await zones.query({}, { signal: controller.signal, timeout_ms: 60_000 });
-```
 
 ### Pages
 
@@ -125,7 +129,220 @@ while (result.ok) {
   the pages always ends.
 - `pageInfo(result.value.headers)` gives the `total` (`X-Total-Count`) and the `next_offset`.
 
-### Tests and mocks
+### Timeouts and cancel
+
+Each request has a time limit. The default is 30 seconds. Set a different limit for the client or
+for one request:
+
+```ts
+configure({ base_url: '', auth: { kind: 'none' }, timeout_ms: 10_000 });
+const controller = new AbortController();
+await zones.query({}, { signal: controller.signal, timeout_ms: 60_000 });
+```
+
+### More than one client
+
+`configure` makes the client that each call uses. To use a different client for one call, make it
+with `createClient` and give it in the options. The configured client does not change:
+
+```ts
+const other = createClient({ base_url: 'https://other.example.com', auth: { kind: 'none' } });
+await zones.query({}, { client: other });
+```
+
+## Log in
+
+`createAuthSession` does the OAuth login of PlaceOS and gives the client its credential:
+
+```ts
+import { configure, createAuthSession } from '@placeos/ts-client';
+
+const session = createAuthSession({
+    base_url: '',
+    redirect_uri: `${location.origin}/oauth-resp.html`,
+    scope: 'public',
+    grant: { kind: 'code' },
+});
+configure({ base_url: '', auth: session.client_auth, headers: { 'X-App-Id': session.client_id } });
+
+const result = await session.start();
+if (!result.ok && result.error.kind === 'redirecting') {
+    // The page goes to the login page now.
+}
+```
+
+Copy `oauth-resp.html` from the package to your application, and use its URL as `redirect_uri`. The
+client ID is the MD5 of `redirect_uri`, as in 6.x.
+
+`session.start()` loads `/auth/authority`, and gets a credential in this order:
+
+1. An API key from the URL or the storage (for a fixed device), or a valid access token.
+2. A code or a token from the redirect. The `state` must be the nonce of this client.
+3. The refresh token.
+4. The `password` or `entra` grant.
+5. If the user has a session: the authorize page, with a redirect or, with `use_frame`, in a
+   hidden frame.
+6. Else the login page of the authority. With `handle_login: false`, the result is a
+   `login_required` error, and the application shows its own login.
+
+The grants are `code` (with PKCE), `implicit`, `password` and `entra`. PlaceOS auth.cr refuses
+the `password` grant. Only older auth services accept it.
+
+A trusted application (`?trust=true` in the URL) keeps its tokens in `localStorage`. Other
+applications keep their tokens in memory only.
+
+After a 401, the client asks the session for a new token and sends the request again, one time.
+Parallel requests share one renewal. After a 511, the session sends the user to the login page.
+
+Other parts of the session:
+
+- `session.status()` and `session.subscribe(listener)` give the state: `loading`, `signed_in`,
+  `redirecting` or `signed_out` with the error.
+- `session.handleRedirect(url)` completes a login from a deep link, in a native wrapper.
+- When the application comes back to the foreground without a session, the session loads the
+  authority again, because the user can log in from a different tab.
+- `session.useToken(token)` and `session.useApiKey(key)` use a credential from a different source.
+- `session.invalidateToken()` removes the access token, so the next request gets a new one.
+- `session.logout()` ends the session on the server, removes the credentials and goes to the
+  logout page.
+- `createAuthSession({ ..., environment })` replaces the browser parts, for tests or a native
+  wrapper. See `AuthEnvironment`.
+
+## Realtime
+
+`createRealtime` opens one WebSocket to `systems/control`. It binds to the status variables of
+modules, calls their functions and gets their logs:
+
+```ts
+import { createRealtime } from '@placeos/ts-client';
+
+const realtime = createRealtime({ base_url: '', auth: session.client_auth });
+
+const power = { sys: 'sys-1234', mod: 'Display', index: 1, name: 'power' };
+const release = realtime.bind(power, (state) => {
+    if (state.kind === 'value') console.log('power', state.value);
+});
+const result = await realtime.exec(power, [true]);
+release();
+```
+
+- The client connects when the first binding or call needs it. `start` connects now.
+- A binding has a count. The first `bind` sends `bind`. The last release sends `unbind`.
+- After a new connection, the client binds each variable again.
+- The client handles the messages of the server in batches. In one batch, many notifications for
+  one variable give one call to its listeners, with the last value.
+- `exec` gives a `Result` with the return value of the function, or a `RealtimeError`:
+  `timeout`, `disconnected` (the socket closed after the server got the call), `stopped`,
+  `unavailable`, `too_many_requests` or `server` (with the error code and the status).
+- The client sends `ping` each 15 seconds. When the socket gets no message for 60 seconds, it
+  closes, and the client connects again. The wait before each new attempt increases, to a maximum
+  of 5 seconds. After 40 failed attempts, the status is `failed`. Call `start` to try again.
+- `realtime.debug({ sys, module_id }, listener)` gets the logs of a module.
+- `splitModuleId('Display_2')` gives `{ mod: 'Display', index: 2 }`.
+- In a browser, the token goes in a cookie on the socket path. In a frame and on mobile Safari it
+  goes in the query, as in 6.x. `createRealtime({ ..., environment })` replaces the socket, the
+  timers and the cookie, for tests.
+
+## Staff API
+
+The staff API (bookings, events, guests, desks, surveys and more) is at
+`@placeos/ts-client/staff`. It uses the client of `configure`, as the REST API functions do:
+
+```ts
+import { bookings } from '@placeos/ts-client/staff';
+
+const now = Math.floor(Date.now() / 1000);
+const result = await bookings.query({ period_start: now, period_end: now + 86_400, type: 'desk' });
+```
+
+- The staff API has its own schemas, such as `Booking` and `Guest`. Each API has its own document,
+  so a schema with the same name can have different fields in each API. For example, the `Zone` of
+  the REST API has `children_count`, and the `Zone` of the staff API does not. Import the type
+  from the entry point of the API that sends the data.
+- The names of the typed mocks of the staff API start with `staff.`, for example
+  `mockEndpoint('staff.bookings.show', ...)`.
+- A booking operation that ends in `Instance` reads or changes one occurrence of a recurring
+  booking. For example, `bookings.showInstance` is `GET /bookings/{id}/instance/{instance}`.
+
+## Types
+
+Each schema of the API document has a value and two types with the same base name:
+
+- `Zone` is the type of a zone from the server. Each field is present. A field that the server can
+  leave out is `null`.
+- `ZoneInput` is the type of a zone that you send. Each field is optional.
+- The `Zone` value is the schema. `parseResponse(Zone, value)` parses data from other sources.
+
+The parser removes the fields of a response that the schema does not have. A request with a field
+that the schema does not have throws, because a misspelled field name is a bug.
+
+Some schemas have a name from the server code that does not say what they are. These have a
+short name too. The short name is the same value and type:
+
+| Short name               | Name in the API document        |
+| ------------------------ | ------------------------------- |
+| `User`                   | `UserAdminMetadataResponse`     |
+| `System`                 | `ControlSystem`                 |
+| `Application`            | `DoorkeeperApplication`         |
+| `Domain`                 | `Authority`                     |
+| `Metadata`               | `MetadataInterface`             |
+| `ShortUrl`               | `Shortener`                     |
+| `SignageTemplateMapping` | `SignageTemplateSystemTemplate` |
+
+`TYPE_ALIASES` in `scripts/generate.ts` has the list.
+
+## Debug logs
+
+The client, the login and the realtime client log nothing by default. Give each one a `log`
+function to get an entry for each step: `{ scope, level, args }`. `args` are the arguments of the
+call, as a console method gets them: a message, then values such as a status. `consoleLog` of
+`@placeos/ts-client/compat` writes the entries in the console format of 6.x, and only when
+`window.debug` is set:
+
+```ts
+import { consoleLog } from '@placeos/ts-client/compat';
+
+const session = createAuthSession({ ..., log: consoleLog });
+configure({ base_url: '', auth: session.client_auth, log: consoleLog });
+const realtime = createRealtime({ base_url: '', auth: session.client_auth, log: consoleLog });
+// In the console of the browser:
+window.debug = true;
+// [PlaceOS][Auth] the authority is loaded {id: 'authority-1'}
+//     [PlaceOS][Auth] name: PlaceOS
+//     [PlaceOS][Auth] domain: placeos.example.com
+// [PlaceOS][HTTP] zones.query: 200 in 41 ms {name: 'zones.query', method: 'GET', ...}
+// [PlaceOS][WS] sys-1 Display_1 power changed {sys: 'sys-1', ..., value: true}
+```
+
+| `scope`    | Entries                                                                         |
+| ---------- | ------------------------------------------------------------------------------- |
+| `auth`     | The steps of the login: the authority, each grant, redirects, renewals, logout. |
+| `http`     | Each call: the name, the status or the error, and the time.                     |
+| `realtime` | The socket: connect, close and reconnect, value changes, server errors, logs.   |
+| `mock`     | The 6.x mock endpoints of `compat`: added, matched and not found.               |
+
+| `level`     | Use                                                       | Console method     |
+| ----------- | --------------------------------------------------------- | ------------------ |
+| `error`     | A failure without an answer, such as a timeout.           | `console.error`    |
+| `warn`      | A refusal or a drop, such as a 404 or a closed socket.    | `console.warn`     |
+| `info`      | A step, such as a new token or a connected socket.        | `console.info`     |
+| `debug`     | A detail, such as each call or an aborted call.           | `console.debug`    |
+| `print`     | A line without a level, such as a field of the authority. | `console.log`      |
+| `group`     | Starts a group of the entries that follow.                | `console.group`    |
+| `group_end` | Ends the group.                                           | `console.groupEnd` |
+
+- `createConsoleLog({ colors: false })` writes the same text without the `%c` colors.
+- An entry has no tokens, API keys, cookies, request bodies or input values. A redirect gives its
+  path only, because the query has the state of the login.
+- A log function that throws does not change the call, the login or the socket.
+- The `mock` entries of the 6.x mock endpoints always go to `consoleLog`, as in 6.x.
+- For contributors: in the library, each part logs through a scoped logger:
+  `const log = scopedLog('auth', { sink: config.log ?? null })`. Its methods have the arguments
+  of the console methods: `log.error(...data)`, `log.warn(...data)`, `log.info(...data)`,
+  `log.debug(...data)`, `log.print(...data)` (`console.log`), `log.group(...label)` and
+  `log.groupEnd()`. The `log` function of the application gets the entries.
+
+## Tests and mocks
 
 A client can have its own `fetch` function. The client sends each request through it. Give a test
 client in the options of the call, so that the test does not change the configured client:
@@ -214,339 +431,12 @@ const realtime = createRealtime({
     if (display !== undefined) display['power'] = true;
     ```
 
-## Staff API
-
-The staff API (bookings, events, guests, desks, surveys and more) is at
-`@placeos/ts-client/staff`. It uses the client of `configure`, as the REST API functions do:
-
-```ts
-import { bookings } from '@placeos/ts-client/staff';
-
-const now = Math.floor(Date.now() / 1000);
-const result = await bookings.query({ period_start: now, period_end: now + 86_400, type: 'desk' });
-```
-
-- The staff API has its own schemas, such as `Booking` and `Guest`. Each API has its own document,
-  so a schema with the same name can have different fields in each API. For example, the `Zone` of
-  the REST API has `children_count`, and the `Zone` of the staff API does not. Import the type
-  from the entry point of the API that sends the data.
-- The names of the typed mocks of the staff API start with `staff.`, for example
-  `mockEndpoint('staff.bookings.show', ...)`.
-- A booking operation that ends in `Instance` reads or changes one occurrence of a recurring
-  booking. For example, `bookings.showInstance` is `GET /bookings/{id}/instance/{instance}`.
-
-## Log in
-
-`createAuthSession` does the OAuth login of PlaceOS and gives the client its credential:
-
-```ts
-import { configure, createAuthSession } from '@placeos/ts-client';
-
-const session = createAuthSession({
-    base_url: '',
-    redirect_uri: `${location.origin}/oauth-resp.html`,
-    scope: 'public',
-    grant: { kind: 'code' },
-});
-configure({ base_url: '', auth: session.client_auth, headers: { 'X-App-Id': session.client_id } });
-
-const result = await session.start();
-if (!result.ok && result.error.kind === 'redirecting') {
-    // The page goes to the login page now.
-}
-```
-
-Copy `oauth-resp.html` from the package to your application, and use its URL as `redirect_uri`. The
-client ID is the MD5 of `redirect_uri`, as in 6.x.
-
-`session.start()` loads `/auth/authority`, and gets a credential in this order:
-
-1. An API key from the URL or the storage (for a fixed device), or a valid access token.
-2. A code or a token from the redirect. The `state` must be the nonce of this client.
-3. The refresh token.
-4. The `password` or `entra` grant.
-5. If the user has a session: the authorize page, with a redirect or, with `use_frame`, in a
-   hidden frame.
-6. Else the login page of the authority. With `handle_login: false`, the result is a
-   `login_required` error, and the application shows its own login.
-
-The grants are `code` (with PKCE), `implicit`, `password` and `entra`. PlaceOS auth.cr refuses
-the `password` grant. Only older auth services accept it.
-
-A trusted application (`?trust=true` in the URL) keeps its tokens in `localStorage`. Other
-applications keep their tokens in memory only.
-
-After a 401, the client asks the session for a new token and sends the request again, one time.
-Parallel requests share one renewal. After a 511, the session sends the user to the login page.
-
-Other parts of the session:
-
-- `session.status()` and `session.subscribe(listener)` give the state: `loading`, `signed_in`,
-  `redirecting` or `signed_out` with the error.
-- `session.handleRedirect(url)` completes a login from a deep link, in a native wrapper.
-- When the application comes back to the foreground without a session, the session loads the
-  authority again, because the user can log in from a different tab.
-- `session.useToken(token)` and `session.useApiKey(key)` use a credential from a different source.
-- `session.invalidateToken()` removes the access token, so the next request gets a new one.
-- `session.logout()` ends the session on the server, removes the credentials and goes to the
-  logout page.
-- `createAuthSession({ ..., environment })` replaces the browser parts, for tests or a native
-  wrapper. See `AuthEnvironment`.
-
-### Changes from 6.x
-
-- The session keeps the storage keys of 6.x, so a user stays logged in after the change.
-- The default token path is `/auth/oauth/token`. PlaceOS auth.cr and the older Ruby auth service
-  both serve it. The Ruby auth service does not serve `/auth/token`.
-- A relative login or logout URL of the authority is on `base_url`. 6.x used the `domain` of the
-  authority, which has no port.
-- A refused code stops the login with `token_rejected`. The session does not redirect again,
-  because a new redirect could loop.
-- The token requests send their parameters in the body, not in the URL. A password is not in the
-  URL.
-- A trusted application with the `implicit` grant uses the `code` grant with PKCE.
-- The frame login checks the `state`. It needs the `oauth-resp.html` of 7.x.
-- The session removes `x-api-key` from the URL after it reads it.
-- With an API key, a call does not follow a redirect. It gets a `network` error. On a redirect to
-  another origin, `fetch` removes `Authorization`, but it keeps `X-API-Key`.
-- After a refused refresh token, the login continues immediately.
-- A refusal on the consent page (`error=access_denied` with the state of this client) stops the
-  login with `authorization_denied`. 6.x sent the user to the authorize page again.
-- `/auth/authority` gets `AUTHORITY_ATTEMPTS_MAX` attempts, not an unlimited number. Then
-  `start` gives `authority_unavailable`. Call `start` again to try again.
-- The debug logs need a `log` function, such as `consoleLog` (see [Debug logs](#debug-logs)).
-  `window.debug` alone does not turn them on. The logs do not have the cookie of the socket, which
-  6.x logged with the token in it.
-- Not ported: `revokeToken`, the state of the application in `authorise(state)`, and the ACA
-  Engine API path. The mock mode is in `@placeos/ts-client/compat` (see [Mock mode](#mock-mode)).
-  It does not need a login: give `auth: { kind: 'none' }`.
-
-## Realtime
-
-`createRealtime` opens one WebSocket to `systems/control`. It binds to the status variables of
-modules, calls their functions and gets their logs:
-
-```ts
-import { createRealtime } from '@placeos/ts-client';
-
-const realtime = createRealtime({ base_url: '', auth: session.client_auth });
-
-const power = { sys: 'sys-1234', mod: 'Display', index: 1, name: 'power' };
-const release = realtime.bind(power, (state) => {
-    if (state.kind === 'value') console.log('power', state.value);
-});
-const result = await realtime.exec(power, [true]);
-release();
-```
-
-- The client connects when the first binding or call needs it. `start` connects now.
-- A binding has a count. The first `bind` sends `bind`. The last release sends `unbind`.
-- After a new connection, the client binds each variable again.
-- The client handles the messages of the server in batches. In one batch, many notifications for
-  one variable give one call to its listeners, with the last value.
-- `exec` gives a `Result` with the return value of the function, or a `RealtimeError`:
-  `timeout`, `disconnected` (the socket closed after the server got the call), `stopped`,
-  `unavailable`, `too_many_requests` or `server` (with the error code and the status).
-- The client sends `ping` each 15 seconds. When the socket gets no message for 60 seconds, it
-  closes, and the client connects again. The wait before each new attempt increases, to a maximum
-  of 5 seconds. After 40 failed attempts, the status is `failed`. Call `start` to try again.
-- `realtime.debug({ sys, module_id }, listener)` gets the logs of a module.
-- `splitModuleId('Display_2')` gives `{ mod: 'Display', index: 2 }`.
-- In a browser, the token goes in a cookie on the socket path. In a frame and on mobile Safari it
-  goes in the query, as in 6.x. `createRealtime({ ..., environment })` replaces the socket, the
-  timers and the cookie, for tests.
-
-### Changes from 6.x
-
-- A call that the server got fails with `disconnected` when the socket closes. 6.x did not settle
-  these calls.
-- Two calls with the same arguments are two calls. 6.x merged them for one minute.
-- Server errors have the correct code name. 6.x read the HTTP style status as the error code.
-- `iface: true` addresses an interface, such as `Interface::Sensor`.
-- After 40 failed attempts, the status is `failed`. 6.x reloaded the page.
-- Not ported: the `connectionState` signal and the `/control/websocket` path of ACA Engine. The
-  mock systems are in `@placeos/ts-client/compat` (see [Mock mode](#mock-mode)).
-
-## Debug logs
-
-The client, the login and the realtime client log nothing by default. Give each one a `log`
-function to get an entry for each step: `{ scope, level, args }`. `args` are the arguments of the
-call, as a console method gets them: a message, then values such as a status. `consoleLog` of
-`@placeos/ts-client/compat` writes the entries in the console format of 6.x, and only when
-`window.debug` is set:
-
-```ts
-import { consoleLog } from '@placeos/ts-client/compat';
-
-const session = createAuthSession({ ..., log: consoleLog });
-configure({ base_url: '', auth: session.client_auth, log: consoleLog });
-const realtime = createRealtime({ base_url: '', auth: session.client_auth, log: consoleLog });
-// In the console of the browser:
-window.debug = true;
-// [PlaceOS][Auth] the authority is loaded {id: 'authority-1'}
-//     [PlaceOS][Auth] name: PlaceOS
-//     [PlaceOS][Auth] domain: placeos.example.com
-// [PlaceOS][HTTP] zones.query: 200 in 41 ms {name: 'zones.query', method: 'GET', ...}
-// [PlaceOS][WS] sys-1 Display_1 power changed {sys: 'sys-1', ..., value: true}
-```
-
-| `scope`    | Entries                                                                         |
-| ---------- | ------------------------------------------------------------------------------- |
-| `auth`     | The steps of the login: the authority, each grant, redirects, renewals, logout. |
-| `http`     | Each call: the name, the status or the error, and the time.                     |
-| `realtime` | The socket: connect, close and reconnect, value changes, server errors, logs.   |
-| `mock`     | The 6.x mock endpoints of `compat`: added, matched and not found.               |
-
-| `level`     | Use                                                       | Console method     |
-| ----------- | --------------------------------------------------------- | ------------------ |
-| `error`     | A failure without an answer, such as a timeout.           | `console.error`    |
-| `warn`      | A refusal or a drop, such as a 404 or a closed socket.    | `console.warn`     |
-| `info`      | A step, such as a new token or a connected socket.        | `console.info`     |
-| `debug`     | A detail, such as each call or an aborted call.           | `console.debug`    |
-| `print`     | A line without a level, such as a field of the authority. | `console.log`      |
-| `group`     | Starts a group of the entries that follow.                | `console.group`    |
-| `group_end` | Ends the group.                                           | `console.groupEnd` |
-
-- `createConsoleLog({ colors: false })` writes the same text without the `%c` colors.
-- An entry has no tokens, API keys, cookies, request bodies or input values. A redirect gives its
-  path only, because the query has the state of the login.
-- A log function that throws does not change the call, the login or the socket.
-- The `mock` entries of the 6.x mock endpoints always go to `consoleLog`, as in 6.x.
-- For contributors: in the library, each part logs through a scoped logger:
-  `const log = scopedLog('auth', { sink: config.log ?? null })`. Its methods have the arguments
-  of the console methods: `log.error(...data)`, `log.warn(...data)`, `log.info(...data)`,
-  `log.debug(...data)`, `log.print(...data)` (`console.log`), `log.group(...label)` and
-  `log.groupEnd()`. The `log` function of the application gets the entries.
-
-## Types
-
-Each schema of the API document has a value and two types with the same base name:
-
-- `Zone` is the type of a zone from the server. Each field is present. A field that the server can
-  leave out is `null`.
-- `ZoneInput` is the type of a zone that you send. Each field is optional.
-- The `Zone` value is the schema. `parseResponse(Zone, value)` parses data from other sources.
-
-The parser removes the fields of a response that the schema does not have. A request with a field
-that the schema does not have throws, because a misspelled field name is a bug.
-
-Some schemas have a name from the server code that does not say what they are. These have a
-short name too. The short name is the same value and type:
-
-| Short name               | Name in the API document        |
-| ------------------------ | ------------------------------- |
-| `User`                   | `UserAdminMetadataResponse`     |
-| `System`                 | `ControlSystem`                 |
-| `Application`            | `DoorkeeperApplication`         |
-| `Domain`                 | `Authority`                     |
-| `Metadata`               | `MetadataInterface`             |
-| `ShortUrl`               | `Shortener`                     |
-| `SignageTemplateMapping` | `SignageTemplateSystemTemplate` |
-
-`TYPE_ALIASES` in `scripts/generate.ts` has the list.
-
-## Differences from the API document
-
-The generator changes some parts of the document. Each change has a comment in
-`scripts/generate.ts`.
-
-- **Notes on numbers.** The documents give Unix times and some enums as integers, without the unit
-  or the names. The generator adds a note to these fields. A field such as `created_at` gets
-  "Unix time in seconds.", and an enum such as `Driver.role` gets the name of each number (`99` is
-  `logic`). The lists come from the source of PlaceOS/models. The generator stops if a field of a
-  list changes its type. It also stops on a `date-time` field that is in no list, so that each new
-  time field gets a decision: Unix seconds or an RFC 3339 string.
-- **Fields that refer back to `Booking`.** `Booking` has its guests, attendees and linked events,
-  and these refer to `Booking` again. A schema of the client cannot refer to itself, so these
-  fields are `JsonValue`: `Guest.booking`, `Booking.linked_parent_booking`, and
-  `linked_bookings` of `Booking`, `EventMetadata` and `PlaceCalendar.Event`.
-- **A 204 without a body.** `staff.calendars.availability` sends 204 when no calendar matches. The
-  data is then `null`.
-- **Required fields in a request.** The document marks a field as required when the server always
-  sends it. In a request, the server can have a default for the same field. So each field of a
-  request body is optional, and the server checks the body. Path and query parameters keep the
-  `required` of the document.
-- **Arrays in a query.** The server reads an array parameter as one value with commas, for example
-  `zone_id=a,b`. The items of an array parameter must not contain commas.
-- **PATCH and PUT.** When PATCH and PUT of a path go to the same server action, the client has one
-  `update`, which sends PATCH. When they go to different actions, the client has both. For
-  example, `metadata.update` sends PUT and replaces the metadata, and `metadata.merge` sends PATCH.
-- **Numbered routes.** The document numbers the routes of one action: `show` and `show_2`. A second
-  path with the same signature is an alias, such as `checkin` for `check_in` in the staff API. The
-  client has only the first path. A path with more segments gets a name from them, such as
-  `showInstance` for `bookings/{id}/instance/{instance}`.
-- **A query parameter named `body`.** `body` of the input is the request body, so the `body` query
-  parameter of `staff.events.book` (the description of the meeting) is `body_text` in the input.
-  The query keeps the name `body`.
-- **Responses without a schema.** The data is a `Uint8Array` with the raw body. `systems.execute`,
-  `modules.execute` and `modules.stateValue` are exceptions: they return a `JsonValue`.
-- **Endpoints that are not in the client.** The WebSocket endpoints, such as `systems/control` and
-  `webrtc/signaller`, are not in the client. Use [Realtime](#realtime) for `systems/control`.
-  `short_url/{id}/redirect` is also not in the client, because its answer is a redirect for a
-  browser.
-
-## Change the generated code
-
-Do not edit `src/generated`. The generator downloads the API documents from the master branches of
-[PlaceOS/rest-api](https://github.com/PlaceOS/rest-api) and
-[PlaceOS/staff-api](https://github.com/PlaceOS/staff-api) on each run. It does not keep a copy in
-this repository. `APIS` in `scripts/generate.ts` has the list: the repository, the output folder
-and the prefix of the operation IDs and names.
-
-```sh
-bun run generate         # Downloads the documents and writes src/generated and src/generated/staff.
-bun run generate:check   # Fails if the generated files do not match the current documents.
-```
-
-The generated files are in the repository, so a change to the API shows as a diff. Examine the
-diff before you commit it. `generate:check` can fail because the API changed, not because of your
-change, so it is not part of `bun test` or of the checks of a PR.
-
-Each day, the `Regenerate` workflow runs `scripts/regenerate-pr.sh`. It regenerates the client
-from the API documents on master:
-
-- When the output changes, it opens a PR with the diff and the results of the checks. It closes
-  the older regeneration PRs, because the new PR has their changes.
-- When the branch matches the documents again, it closes all the regeneration PRs.
-- It deletes the regeneration branches that have no open PR, such as the branch of a merged PR.
-- The schedule runs on `master`. A manual run of the workflow on another branch, such as `next`,
-  regenerates that branch and opens the PR to it.
-- `DRY_RUN=1 scripts/regenerate-pr.sh`, from the root of the repository, shows what the script
-  would do on GitHub.
-
-The commit of a regeneration PR is a `fix`, so its merge publishes a patch release. Before the
-merge, change the commit message to a `feat` for new operations, or add a `BREAKING CHANGE:` footer
-for a change that breaks apps.
-
-The generator stops with an assertion on a part of the document that it does not support. Add the
-support to `scripts/generate.ts` and `src/core/schema.ts`. It also stops when a document changes
-a field that has a note or a patch in the generator. Then change or remove the entry in the list
-that the assertion names.
-
-## Development
-
-```sh
-bun install
-bun run check   # Type checks the library, the tests and the scripts.
-bun test
-bun run build   # Writes dist/. Then it type checks test/loose without `strict`.
-bun run v1-map  # Writes the 6.x to 7.x map, from the source of the placeos-ts-client-6 package.
-bun run docs    # Writes the API docs to docs/. It needs Deno.
-```
-
-### Releases
-
-semantic-release publishes the package from the commit messages, with the `Release` workflow. A
-`fix` commit gives a patch release, a `feat` commit gives a minor release, and a commit with a
-`BREAKING CHANGE:` footer gives a major release. `release` in `package.json` has the branches:
-
-| Branch   | Releases                                                                 |
-| -------- | ------------------------------------------------------------------------ |
-| `master` | To the npm tag `latest`. The API docs go to GitHub Pages.                |
-| `next`   | Prereleases, such as `7.0.0-next.1`, to the npm tag `next`.              |
-| `6.x`    | The fixes of 6.x, such as `6.13.1`. The workflow of that branch runs it. |
-
 ## Migrate from 6.x
+
+A move from 6.x has two steps. First, run the migration tool on the project. Then examine the
+changes in behavior of the login and of realtime, which the tool cannot change for you.
+
+### The migration tool
 
 The migration tool rewrites the 6.x calls of a project to 7.x. Commit your work first, so that you
 can examine and undo the changes. Run the tool in the folder of the project, because it uses the
@@ -648,11 +538,153 @@ The tool parses each file, but it does not type check it. The map from 6.x to 7.
 `src/migrate/v1-map.ts`. `scripts/v1-map.ts` writes the map. It calls each 6.x REST function with
 marker arguments, and it finds the 7.x operation with the same method and path.
 
-## What 6.x has that 7.x does not have
+### Changes in the login
+
+- The session keeps the storage keys of 6.x, so a user stays logged in after the change.
+- The default token path is `/auth/oauth/token`. PlaceOS auth.cr and the older Ruby auth service
+  both serve it. The Ruby auth service does not serve `/auth/token`.
+- A relative login or logout URL of the authority is on `base_url`. 6.x used the `domain` of the
+  authority, which has no port.
+- A refused code stops the login with `token_rejected`. The session does not redirect again,
+  because a new redirect could loop.
+- The token requests send their parameters in the body, not in the URL. A password is not in the
+  URL.
+- A trusted application with the `implicit` grant uses the `code` grant with PKCE.
+- The frame login checks the `state`. It needs the `oauth-resp.html` of 7.x.
+- The session removes `x-api-key` from the URL after it reads it.
+- With an API key, a call does not follow a redirect. It gets a `network` error. On a redirect to
+  another origin, `fetch` removes `Authorization`, but it keeps `X-API-Key`.
+- After a refused refresh token, the login continues immediately.
+- A refusal on the consent page (`error=access_denied` with the state of this client) stops the
+  login with `authorization_denied`. 6.x sent the user to the authorize page again.
+- `/auth/authority` gets `AUTHORITY_ATTEMPTS_MAX` attempts, not an unlimited number. Then
+  `start` gives `authority_unavailable`. Call `start` again to try again.
+- The debug logs need a `log` function, such as `consoleLog` (see [Debug logs](#debug-logs)).
+  `window.debug` alone does not turn them on. The logs do not have the cookie of the socket, which
+  6.x logged with the token in it.
+- Not ported: `revokeToken`, the state of the application in `authorise(state)`, and the ACA
+  Engine API path. The mock mode is in `@placeos/ts-client/compat` (see [Mock mode](#mock-mode)).
+  It does not need a login: give `auth: { kind: 'none' }`.
+
+### Changes in realtime
+
+- A call that the server got fails with `disconnected` when the socket closes. 6.x did not settle
+  these calls.
+- Two calls with the same arguments are two calls. 6.x merged them for one minute.
+- Server errors have the correct code name. 6.x read the HTTP style status as the error code.
+- `iface: true` addresses an interface, such as `Interface::Sensor`.
+- After 40 failed attempts, the status is `failed`. 6.x reloaded the page.
+- Not ported: the `connectionState` signal and the `/control/websocket` path of ACA Engine. The
+  mock systems are in `@placeos/ts-client/compat` (see [Mock mode](#mock-mode)).
+
+### What 7.x does not have
 
 - Classes with methods for each model. 7.x has plain data and functions.
 
-## Exceptions to the design rules
+## Differences from the API document
+
+The generator changes some parts of the document. Each change has a comment in
+`scripts/generate.ts`.
+
+- **Notes on numbers.** The documents give Unix times and some enums as integers, without the unit
+  or the names. The generator adds a note to these fields. A field such as `created_at` gets
+  "Unix time in seconds.", and an enum such as `Driver.role` gets the name of each number (`99` is
+  `logic`). The lists come from the source of PlaceOS/models. The generator stops if a field of a
+  list changes its type. It also stops on a `date-time` field that is in no list, so that each new
+  time field gets a decision: Unix seconds or an RFC 3339 string.
+- **Fields that refer back to `Booking`.** `Booking` has its guests, attendees and linked events,
+  and these refer to `Booking` again. A schema of the client cannot refer to itself, so these
+  fields are `JsonValue`: `Guest.booking`, `Booking.linked_parent_booking`, and
+  `linked_bookings` of `Booking`, `EventMetadata` and `PlaceCalendar.Event`.
+- **A 204 without a body.** `staff.calendars.availability` sends 204 when no calendar matches. The
+  data is then `null`.
+- **Required fields in a request.** The document marks a field as required when the server always
+  sends it. In a request, the server can have a default for the same field. So each field of a
+  request body is optional, and the server checks the body. Path and query parameters keep the
+  `required` of the document.
+- **Arrays in a query.** The server reads an array parameter as one value with commas, for example
+  `zone_id=a,b`. The items of an array parameter must not contain commas.
+- **PATCH and PUT.** When PATCH and PUT of a path go to the same server action, the client has one
+  `update`, which sends PATCH. When they go to different actions, the client has both. For
+  example, `metadata.update` sends PUT and replaces the metadata, and `metadata.merge` sends PATCH.
+- **Numbered routes.** The document numbers the routes of one action: `show` and `show_2`. A second
+  path with the same signature is an alias, such as `checkin` for `check_in` in the staff API. The
+  client has only the first path. A path with more segments gets a name from them, such as
+  `showInstance` for `bookings/{id}/instance/{instance}`.
+- **A query parameter named `body`.** `body` of the input is the request body, so the `body` query
+  parameter of `staff.events.book` (the description of the meeting) is `body_text` in the input.
+  The query keeps the name `body`.
+- **Responses without a schema.** The data is a `Uint8Array` with the raw body. `systems.execute`,
+  `modules.execute` and `modules.stateValue` are exceptions: they return a `JsonValue`.
+- **Endpoints that are not in the client.** The WebSocket endpoints, such as `systems/control` and
+  `webrtc/signaller`, are not in the client. Use [Realtime](#realtime) for `systems/control`.
+  `short_url/{id}/redirect` is also not in the client, because its answer is a redirect for a
+  browser.
+
+## Contribute
+
+### Change the generated code
+
+Do not edit `src/generated`. The generator downloads the API documents from the master branches of
+[PlaceOS/rest-api](https://github.com/PlaceOS/rest-api) and
+[PlaceOS/staff-api](https://github.com/PlaceOS/staff-api) on each run. It does not keep a copy in
+this repository. `APIS` in `scripts/generate.ts` has the list: the repository, the output folder
+and the prefix of the operation IDs and names.
+
+```sh
+bun run generate         # Downloads the documents and writes src/generated and src/generated/staff.
+bun run generate:check   # Fails if the generated files do not match the current documents.
+```
+
+The generated files are in the repository, so a change to the API shows as a diff. Examine the
+diff before you commit it. `generate:check` can fail because the API changed, not because of your
+change, so it is not part of `bun test` or of the checks of a PR.
+
+Each day, the `Regenerate` workflow runs `scripts/regenerate-pr.sh`. It regenerates the client
+from the API documents on master:
+
+- When the output changes, it opens a PR with the diff and the results of the checks. It closes
+  the older regeneration PRs, because the new PR has their changes.
+- When the branch matches the documents again, it closes all the regeneration PRs.
+- It deletes the regeneration branches that have no open PR, such as the branch of a merged PR.
+- The schedule runs on `master`. A manual run of the workflow on another branch, such as `next`,
+  regenerates that branch and opens the PR to it.
+- `DRY_RUN=1 scripts/regenerate-pr.sh`, from the root of the repository, shows what the script
+  would do on GitHub.
+
+The commit of a regeneration PR is a `fix`, so its merge publishes a patch release. Before the
+merge, change the commit message to a `feat` for new operations, or add a `BREAKING CHANGE:` footer
+for a change that breaks apps.
+
+The generator stops with an assertion on a part of the document that it does not support. Add the
+support to `scripts/generate.ts` and `src/core/schema.ts`. It also stops when a document changes
+a field that has a note or a patch in the generator. Then change or remove the entry in the list
+that the assertion names.
+
+### Development
+
+```sh
+bun install
+bun run check   # Type checks the library, the tests and the scripts.
+bun test
+bun run build   # Writes dist/. Then it type checks test/loose without `strict`.
+bun run v1-map  # Writes the 6.x to 7.x map, from the source of the placeos-ts-client-6 package.
+bun run docs    # Writes the API docs to docs/. It needs Deno.
+```
+
+#### Releases
+
+semantic-release publishes the package from the commit messages, with the `Release` workflow. A
+`fix` commit gives a patch release, a `feat` commit gives a minor release, and a commit with a
+`BREAKING CHANGE:` footer gives a major release. `release` in `package.json` has the branches:
+
+| Branch   | Releases                                                                 |
+| -------- | ------------------------------------------------------------------------ |
+| `master` | To the npm tag `latest`. The API docs go to GitHub Pages.                |
+| `next`   | Prereleases, such as `7.0.0-next.1`, to the npm tag `next`.              |
+| `6.x`    | The fixes of 6.x, such as `6.13.1`. The workflow of that branch runs it. |
+
+### Exceptions to the design rules
 
 The library gives errors as values, has no `any` and no unchecked casts, keeps no module state,
 keeps its state in plain data, and keeps keyed data in a `Map`. These are the exceptions:
