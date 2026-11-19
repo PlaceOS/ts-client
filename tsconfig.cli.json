@@ -1,0 +1,9 @@
+{
+    // Builds the migration tool. It runs on Node, so it has the Node types. The library does not.
+    "extends": "./tsconfig.build.json",
+    "compilerOptions": {
+        "types": ["node"]
+    },
+    "include": ["src/migrate/cli.ts"],
+    "exclude": []
+}
