@@ -38,11 +38,12 @@ if (result.ok) {
 ```
 
 There is one namespace for each controller of the API, for example `zones`, `systems` and
-`alert_dashboards`. Namespaces, options and fields are snake_case, as the data of the server is.
-Functions are camelCase. Each function has the name of the server action: `show`, `create`,
-`update`, `destroy`, or a custom action such as `systems.execute`. The `index` action is `query`,
-because a list operation queries the items. The comment of each function gives the HTTP method and
-the path.
+`alert_dashboards`. Each function has the name of the server action: `show`, `create`, `update`,
+`destroy`, or a custom action such as `systems.execute`. The server action `index` is `query` in
+the client. The comment of each function gives the HTTP method and the path.
+
+Namespaces, options and fields are snake_case, the same as the data of the server. Functions are
+camelCase, for example `modules.stateValue`.
 
 The first argument has the path parameters, the query parameters and, for an operation with a
 body, `body`. The second argument has the options of the request:
@@ -64,15 +65,18 @@ A function does not throw for an expected failure. It returns a `Result`. Examin
 | `error.kind`         | Meaning                                                                    |
 | -------------------- | -------------------------------------------------------------------------- |
 | `http`               | The server sent a status that is not 2xx. See `status`, `message`, `body`. |
-| `network`            | The request got no response. For example, the network is down.             |
+| `network`            | No response, for example because the network is down. See below.           |
 | `timeout`            | The request took more than `timeout_ms`.                                   |
 | `aborted`            | The `signal` of the caller cancelled the request.                          |
 | `auth_missing`       | The auth had no token or credential.                                       |
 | `response_too_large` | The body was more than `response_bytes_max`.                               |
 | `response_invalid`   | The body does not match the API document. See `path` and `expected`.       |
 
-A function throws only for a programmer error. For example, a parameter that the operation does
-not have, an empty path parameter, or a call before `configure`.
+A call with an API key does not follow a redirect, so a redirect gives a `network` error. See
+[Changes from 6.x](#changes-from-6x).
+
+A function throws only for a programmer error. Examples are a parameter that the operation does
+not have, a path parameter that is empty, `.` or `..`, and a call before `configure`.
 
 In a project without `strictNullChecks`, `if (!result.ok)` does not narrow the `Result`. Use
 `if (result.ok === false)`.
@@ -100,9 +104,9 @@ await zones.query({}, { signal: controller.signal, timeout_ms: 60_000 });
 
 ### Pages
 
-A `query` operation returns one page. `next()` of the reply requests the next page: the same
-input with the offset of the `Link` header, through the same client. It gives `null` on the last
-page:
+A `query` operation returns one page. To get the next page, call `next()` on the reply. It sends
+the same input again, with the offset from the `Link` header, through the same client. On the last
+page, `next()` gives `null`:
 
 ```ts
 let result = await zones.query({ limit: 100 });
@@ -114,8 +118,8 @@ while (result.ok) {
 }
 ```
 
-- Each operation with an `offset` parameter has `next()`, such as `zones.query`, `history.query`
-  and `staff.bookings.query`. The compiler knows which ones do.
+- Each operation with an `offset` parameter has `next()`, for example `zones.query`,
+  `history.query` and `staff.bookings.query`. The type of the reply shows if it has `next()`.
 - `next(options)` replaces the options of the first call, such as `signal` or `timeout_ms`.
 - `next()` also gives `null` when the offset of the link does not move forward, so that a loop over
   the pages always ends.
@@ -123,8 +127,8 @@ while (result.ok) {
 
 ### Tests and mocks
 
-Give the client a `fetch` function. The client sends each request through it. A test can give
-its own client in the options, so it does not change the configured client:
+A client can have its own `fetch` function. The client sends each request through it. Give a test
+client in the options of the call, so that the test does not change the configured client:
 
 ```ts
 const client = createClient({
@@ -153,21 +157,22 @@ mockEndpoint('zones.destroy', () => {
 });
 ```
 
-- The client checks the input first, as for a request. Then it parses the data of the handler with
-  the response schema of the endpoint, as it parses a response. The data can leave out fields: a
-  missing required field gets its empty value, such as `''`, `0` or `[]`. A field with the wrong
-  type is a `response_invalid` error.
+- The client checks the input, the same as for a real request. Then it parses the data from the
+  handler with the response schema of the endpoint. The data can leave out fields. A missing
+  required field gets its empty value, such as `''`, `0` or `[]`. A field with the wrong type
+  gives a `response_invalid` error.
 - `respond(data, { status, headers, total, next_offset })` sets the status and the headers.
   `total` is the `X-Total-Count` that `pageInfo` and `orThrowPage` read. `next_offset` goes in
   the `Link` header, so `next()` of the reply asks the mock for that page.
 - `mockEndpoint` returns the function that removes the mock. `clearEndpointMocks()` removes all.
 - A call to an endpoint without a mock goes to the `fetch` of the client. Give `mockFetch` of
   `@placeos/ts-client/compat` to answer it from the 6.x mock endpoints.
-- `mock` of the client is a function. A test can give its own, which gets the name of the endpoint
-  (such as `zones.show`) and the input, and returns an answer or `null`.
+- The `mock` option of the client is a function. A test can give its own function. It gets the
+  name of the endpoint (such as `zones.show`) and the input, and it returns an answer or `null`.
 
-A test double of a 7.x call gives a `Result`. `mockReply` and `mockPage` of
-`@placeos/ts-client/compat` make one:
+A 7.x call returns a `Result`, so a test double of a call must also return one. Make it with
+`mockReply` or `mockPage` from `@placeos/ts-client/compat`. `mockPage` also sets the total of a
+page. Both give a reply with `next()`, which returns `null`:
 
 ```ts
 vi.mock('@placeos/ts-client', { spy: true });
@@ -178,8 +183,8 @@ vi.mocked(zones.query).mockResolvedValue(mockPage({ data: [zone], total: 1 }));
 ### Mock mode
 
 For new mocks, use [typed mocks](#typed-mocks). The 6.x mock endpoints and mock systems are in
-`@placeos/ts-client/compat`, with the same names.
-Give `mockFetch` to the client, and `mockRealtimeEnvironment()` to the realtime client:
+`@placeos/ts-client/compat`, with their 6.x names. Give `mockFetch` to the client, and
+`mockRealtimeEnvironment()` to the realtime client:
 
 ```ts
 registerMockEndpoint({
@@ -200,10 +205,14 @@ const realtime = createRealtime({
 - 7.x parses each mock response with the schema of the operation. Mock data often has only some
   fields. `missing_fields: 'zero'` gives each missing required field its empty value, such as `''`,
   `0` or `[]`, as the 6.x classes did. A field with the wrong type is still an error, because the
-  real server does not send it.
+  real server does not send that data.
 - A mock endpoint that throws an error with a `status`, such as `404`, gives that HTTP status.
-- A change to a variable of a mock module, such as `mockSystem('sys-1')['Display'][0]['power']
-= true`, notifies its bindings.
+- A change to a status variable of a mock module notifies its bindings:
+
+    ```ts
+    const display = mockSystem('sys-1')?.['Display']?.[0];
+    if (display !== undefined) display['power'] = true;
+    ```
 
 ## Staff API
 
@@ -217,11 +226,14 @@ const now = Math.floor(Date.now() / 1000);
 const result = await bookings.query({ period_start: now, period_end: now + 86_400, type: 'desk' });
 ```
 
-- The staff API has its own schemas, such as `Booking` and `Guest`. A schema that both APIs have,
-  such as `Zone`, is in both entries with the same shape.
-- The typed mocks of the staff API start with `staff.`: `mockEndpoint('staff.bookings.show', ...)`.
-- Some routes of the staff API have an occurrence of a recurring booking: `bookings.showInstance`
-  is `GET /bookings/{id}/instance/{instance}`, the occurrence of `bookings.show`.
+- The staff API has its own schemas, such as `Booking` and `Guest`. Each API has its own document,
+  so a schema with the same name can have different fields in each API. For example, the `Zone` of
+  the REST API has `children_count`, and the `Zone` of the staff API does not. Import the type
+  from the entry point of the API that sends the data.
+- The names of the typed mocks of the staff API start with `staff.`, for example
+  `mockEndpoint('staff.bookings.show', ...)`.
+- A booking operation that ends in `Instance` reads or changes one occurrence of a recurring
+  booking. For example, `bookings.showInstance` is `GET /bookings/{id}/instance/{instance}`.
 
 ## Log in
 
@@ -249,7 +261,7 @@ client ID is the MD5 of `redirect_uri`, as in 6.x.
 
 `session.start()` loads `/auth/authority`, and gets a credential in this order:
 
-1. An API key from the URL or the storage (a fixed device), or an access token that is valid.
+1. An API key from the URL or the storage (for a fixed device), or a valid access token.
 2. A code or a token from the redirect. The `state` must be the nonce of this client.
 3. The refresh token.
 4. The `password` or `entra` grant.
@@ -259,8 +271,10 @@ client ID is the MD5 of `redirect_uri`, as in 6.x.
    `login_required` error, and the application shows its own login.
 
 The grants are `code` (with PKCE), `implicit`, `password` and `entra`. PlaceOS auth.cr refuses
-the `password` grant; only older auth services accept it. A trusted application (`?trust=true`)
-keeps its tokens in the storage. Other applications keep them in memory only.
+the `password` grant. Only older auth services accept it.
+
+A trusted application (`?trust=true` in the URL) keeps its tokens in `localStorage`. Other
+applications keep their tokens in memory only.
 
 After a 401, the client asks the session for a new token and sends the request again, one time.
 Parallel requests share one renewal. After a 511, the session sends the user to the login page.
@@ -271,8 +285,11 @@ Other parts of the session:
   `redirecting` or `signed_out` with the error.
 - `session.handleRedirect(url)` completes a login from a deep link, in a native wrapper.
 - When the application comes back to the foreground without a session, the session loads the
-  authority again. The user can have logged in from a different tab.
-- `session.useToken`, `session.useApiKey`, `session.invalidateToken` and `session.logout`.
+  authority again, because the user can log in from a different tab.
+- `session.useToken(token)` and `session.useApiKey(key)` use a credential from a different source.
+- `session.invalidateToken()` removes the access token, so the next request gets a new one.
+- `session.logout()` ends the session on the server, removes the credentials and goes to the
+  logout page.
 - `createAuthSession({ ..., environment })` replaces the browser parts, for tests or a native
   wrapper. See `AuthEnvironment`.
 
@@ -283,10 +300,11 @@ Other parts of the session:
   both serve it. The Ruby auth service does not serve `/auth/token`.
 - A relative login or logout URL of the authority is on `base_url`. 6.x used the `domain` of the
   authority, which has no port.
-- A refused code stops the login with `token_rejected`. A new redirect could loop.
+- A refused code stops the login with `token_rejected`. The session does not redirect again,
+  because a new redirect could loop.
 - The token requests send their parameters in the body, not in the URL. A password is not in the
   URL.
-- A trusted application with the `implicit` grant uses the code with PKCE.
+- A trusted application with the `implicit` grant uses the `code` grant with PKCE.
 - The frame login checks the `state`. It needs the `oauth-resp.html` of 7.x.
 - The session removes `x-api-key` from the URL after it reads it.
 - With an API key, a call does not follow a redirect. It gets a `network` error. On a redirect to
@@ -329,9 +347,9 @@ release();
 - `exec` gives a `Result` with the return value of the function, or a `RealtimeError`:
   `timeout`, `disconnected` (the socket closed after the server got the call), `stopped`,
   `unavailable`, `too_many_requests` or `server` (with the error code and the status).
-- The client sends `ping` each 15 seconds. A socket without a message for 60 seconds closes, and
-  the client connects again. It waits longer after each failure, to 5 seconds. After 40 attempts,
-  the status is `failed`. Call `start` to try again.
+- The client sends `ping` each 15 seconds. When the socket gets no message for 60 seconds, it
+  closes, and the client connects again. The wait before each new attempt increases, to a maximum
+  of 5 seconds. After 40 failed attempts, the status is `failed`. Call `start` to try again.
 - `realtime.debug({ sys, module_id }, listener)` gets the logs of a module.
 - `splitModuleId('Display_2')` gives `{ mod: 'Display', index: 2 }`.
 - In a browser, the token goes in a cookie on the socket path. In a frame and on mobile Safari it
@@ -394,7 +412,7 @@ window.debug = true;
   path only, because the query has the state of the login.
 - A log function that throws does not change the call, the login or the socket.
 - The `mock` entries of the 6.x mock endpoints always go to `consoleLog`, as in 6.x.
-- In the library, each part logs through a scoped logger:
+- For contributors: in the library, each part logs through a scoped logger:
   `const log = scopedLog('auth', { sink: config.log ?? null })`. Its methods have the arguments
   of the console methods: `log.error(...data)`, `log.warn(...data)`, `log.info(...data)`,
   `log.debug(...data)`, `log.print(...data)` (`console.log`), `log.group(...label)` and
@@ -409,8 +427,8 @@ Each schema of the API document has a value and two types with the same base nam
 - `ZoneInput` is the type of a zone that you send. Each field is optional.
 - The `Zone` value is the schema. `parseResponse(Zone, value)` parses data from other sources.
 
-The parser removes the fields that the schema does not have. A request that has a field that the
-schema does not have stops with an error, because a typing error in a field name is a bug.
+The parser removes the fields of a response that the schema does not have. A request with a field
+that the schema does not have throws, because a misspelled field name is a bug.
 
 Some schemas have a name from the server code that does not say what they are. These have a
 short name too. The short name is the same value and type:
@@ -432,24 +450,27 @@ short name too. The short name is the same value and type:
 The generator changes some parts of the document. Each change has a comment in
 `scripts/generate.ts`.
 
-- **Notes on numbers.** The documents give Unix times and some enums as integers, but not the unit
-  or the names. The generator adds a note: "Unix time in seconds." on fields such as `created_at`,
-  and the name of each number on enums such as `Driver.role` (`99` is `logic`). The lists come
-  from the source of PlaceOS/models. The generator stops if a field of a list changes its type, or
-  if it finds a `date-time` field that is not in a list, so each new field gets a decision.
+- **Notes on numbers.** The documents give Unix times and some enums as integers, without the unit
+  or the names. The generator adds a note to these fields. A field such as `created_at` gets
+  "Unix time in seconds.", and an enum such as `Driver.role` gets the name of each number (`99` is
+  `logic`). The lists come from the source of PlaceOS/models. The generator stops if a field of a
+  list changes its type. It also stops on a `date-time` field that is in no list, so that each new
+  time field gets a decision: Unix seconds or an RFC 3339 string.
 - **Fields that refer back to `Booking`.** `Booking` has its guests, attendees and linked events,
-  and these refer to `Booking` again. The client schemas cannot refer to themselves, so
-  `Guest.booking` and the `linked_bookings` and `linked_parent_booking` fields are `JsonValue`.
+  and these refer to `Booking` again. A schema of the client cannot refer to itself, so these
+  fields are `JsonValue`: `Guest.booking`, `Booking.linked_parent_booking`, and
+  `linked_bookings` of `Booking`, `EventMetadata` and `PlaceCalendar.Event`.
 - **A 204 without a body.** `staff.calendars.availability` sends 204 when no calendar matches. The
   data is then `null`.
 - **Required fields in a request.** The document marks a field as required when the server always
-  sends it. The server can have a default for the same field in a request. Thus each field of a
+  sends it. In a request, the server can have a default for the same field. So each field of a
   request body is optional, and the server checks the body. Path and query parameters keep the
   `required` of the document.
 - **Arrays in a query.** The server reads an array parameter as one value with commas, for example
   `zone_id=a,b`. The items of an array parameter must not contain commas.
-- **PATCH and PUT.** The server sends PATCH and PUT of `update` to the same method. The client has
-  only `update`, which sends PATCH.
+- **PATCH and PUT.** When PATCH and PUT of a path go to the same server action, the client has one
+  `update`, which sends PATCH. When they go to different actions, the client has both. For
+  example, `metadata.update` sends PUT and replaces the metadata, and `metadata.merge` sends PATCH.
 - **Numbered routes.** The document numbers the routes of one action: `show` and `show_2`. A second
   path with the same signature is an alias, such as `checkin` for `check_in` in the staff API. The
   client has only the first path. A path with more segments gets a name from them, such as
@@ -459,9 +480,10 @@ The generator changes some parts of the document. Each change has a comment in
   The query keeps the name `body`.
 - **Responses without a schema.** The data is a `Uint8Array` with the raw body. `systems.execute`,
   `modules.execute` and `modules.stateValue` are exceptions: they return a `JsonValue`.
-- **WebSocket endpoints** (`systems/control`, `webrtc/signaller` and others) are not in the
-  client. Also `short_url/{id}/redirect` is not in the client: the useful part of its answer is the
-  `Location` header, which is for a browser.
+- **Endpoints that are not in the client.** The WebSocket endpoints, such as `systems/control` and
+  `webrtc/signaller`, are not in the client. Use [Realtime](#realtime) for `systems/control`.
+  `short_url/{id}/redirect` is also not in the client, because its answer is a redirect for a
+  browser.
 
 ## Change the generated code
 
@@ -480,20 +502,26 @@ The generated files are in the repository, so a change to the API shows as a dif
 diff before you commit it. `generate:check` can fail because the API changed, not because of your
 change, so it is not part of `bun test` or of the checks of a PR.
 
-Each day, the `Regenerate` workflow regenerates the client from the API documents on master
-(`scripts/regenerate-pr.sh`). When the output changes, it opens a PR with the diff and the results
-of the checks. It also closes the older regeneration PRs, because the new one has their changes.
-When master matches the documents again, it closes all of them. Each run deletes the
-regeneration branches that have no open PR, such as the branch of a merged PR. `DRY_RUN=1
-scripts/regenerate-pr.sh` (from the root of the repository) shows what it would do. A manual run
-of the workflow on another branch, such as `next`, regenerates that branch and opens the PR to it.
+Each day, the `Regenerate` workflow runs `scripts/regenerate-pr.sh`. It regenerates the client
+from the API documents on master:
+
+- When the output changes, it opens a PR with the diff and the results of the checks. It closes
+  the older regeneration PRs, because the new PR has their changes.
+- When the branch matches the documents again, it closes all the regeneration PRs.
+- It deletes the regeneration branches that have no open PR, such as the branch of a merged PR.
+- The schedule runs on `master`. A manual run of the workflow on another branch, such as `next`,
+  regenerates that branch and opens the PR to it.
+- `DRY_RUN=1 scripts/regenerate-pr.sh`, from the root of the repository, shows what the script
+  would do on GitHub.
 
 The commit of a regeneration PR is a `fix`, so its merge publishes a patch release. Before the
 merge, change the commit message to a `feat` for new operations, or add a `BREAKING CHANGE:` footer
 for a change that breaks apps.
 
 The generator stops with an assertion on a part of the document that it does not support. Add the
-support to `scripts/generate.ts` and `src/core/schema.ts`.
+support to `scripts/generate.ts` and `src/core/schema.ts`. It also stops when a document changes
+a field that has a note or a patch in the generator. Then change or remove the entry in the list
+that the assertion names.
 
 ## Development
 
@@ -521,7 +549,7 @@ semantic-release publishes the package from the commit messages, with the `Relea
 ## Migrate from 6.x
 
 The migration tool rewrites the 6.x calls of a project to 7.x. Commit your work first, so that you
-can examine and undo the changes. Run it in the folder of the project, because it uses the
+can examine and undo the changes. Run the tool in the folder of the project, because it uses the
 `typescript` package of the project:
 
 ```sh
@@ -554,7 +582,8 @@ The tool makes these changes:
 - A type reference to a 6.x class becomes the 7.x type. For example, `PlaceZone` becomes `Zone`.
 - The imports of the 6.x enums, such as `PlaceDriverRole`, and of `QueryResponse` move to
   `@placeos/ts-client/compat`. The enums have the 7.x values, so they fit the 7.x fields of the
-  data. A query parameter takes the name: the `role` of `drivers.query` is `'logic'`, not `99`.
+  data. Be careful with a query parameter: it takes the name, not the number. For example, the
+  `role` of `drivers.query` is `'logic'`, but the `role` of a logic driver in the data is `99`.
 - A new import gets another name when the file has the name. For example, a file with a
   `zones` variable gets `zones as zones_v7`.
 
@@ -567,9 +596,16 @@ The tool also changes the test doubles, so that the tests of the app still work:
 - A 6.x implementation, such as the value of `mockImplementation`, gets `fromV1Mock`. It gives the
   implementation the 6.x arguments, and makes a 7.x result of its value.
 - The 6.x functions of a `vi.mock('@placeos/ts-client', () => ({ ... }))` factory become 7.x
-  namespaces: `showZone: vi.fn(impl)` becomes `zones: { show: vi.fn(fromV1Mock(impl, ['id',
-'...'])) }`. The factory runs before the imports, so the tool adds `fromV1Mock` with
-  `vi.hoisted`.
+  namespaces. The factory runs before the imports, so the tool imports `fromV1Mock` with
+  `vi.hoisted`:
+
+    ```ts
+    // 6.x
+    showZone: vi.fn(impl),
+    // 7.x, after the tool
+    zones: { show: vi.fn(fromV1Mock(impl, ['id', '...'])) },
+    ```
+
 - The 6.x staff functions, such as `querySurveys`, become the operations of
   `@placeos/ts-client/staff`, with their own import.
 - The imports of the mock endpoints and mock systems move to `@placeos/ts-client/compat`. See
@@ -582,7 +618,7 @@ it keeps its 6.x import, so the compiler also shows it. These uses are:
 - `get`, `post` and the other HTTP functions;
 - `new` and `instanceof` on a 6.x class, because 7.x has plain objects;
 - the `next` function of a 6.x page. In 7.x, `next()` is on the reply of the call;
-- a function that is not called, out of a test;
+- a 6.x function that is not called, outside a test file, such as `const load = showZone`;
 - a `vi.mock` without a factory or `{ spy: true }`: its 7.x functions give `undefined`, and
   `.then(orThrow)` fails;
 - a `jest.mock` factory with 6.x functions;
@@ -590,11 +626,12 @@ it keeps its 6.x import, so the compiler also shows it. These uses are:
   `...(await importOriginal())`;
 - a test double in a variable, such as `const spy = vi.mocked(showZone)`: the tool changes the
   function, but not the calls on `spy`;
-- an argument that has no place in 7.x, and an argument with side effects that 7.x uses two times.
+- an argument that has no place in 7.x, such as the `'patch'` method of `updateMetadata`, and an
+  argument with side effects that the 7.x input uses two times.
 
-On a copy of backoffice, 329 of the 399 tests pass after the tool. 6.x passes 394. The other tests
-use 6.x classes, the 6.x `next` function or the 6.x `createSignal`, or wait for one microtask only.
-These are the uses that the tool shows.
+On a copy of backoffice, 329 of the 399 tests pass after the tool, and 394 pass on 6.x. The other
+tests use 6.x classes, the 6.x `next` function or the 6.x `createSignal`, or they wait for one
+microtask only. The tool shows these uses.
 
 After the tool:
 
@@ -607,9 +644,9 @@ After the tool:
 
 `orThrow` and `orThrowPage` keep the 6.x behavior. In new code, examine the `Result`.
 
-The tool parses each file. It does not type check it. The map from 6.x to 7.x is
-`src/migrate/v1-map.ts`. `scripts/v1-map.ts` makes it: it calls each 6.x REST function with marker
-arguments, and it finds the 7.x operation with the same method and path.
+The tool parses each file, but it does not type check it. The map from 6.x to 7.x is in
+`src/migrate/v1-map.ts`. `scripts/v1-map.ts` writes the map. It calls each 6.x REST function with
+marker arguments, and it finds the 7.x operation with the same method and path.
 
 ## What 6.x has that 7.x does not have
 
@@ -627,10 +664,10 @@ keeps its state in plain data, and keeps keyed data in a `Map`. These are the ex
 - `missing_fields: 'zero'` accepts data without its required fields. It is for mock data only.
 - `parseResponse`, `checkRequest` and `call` each have one `as` cast. The compiler cannot prove
   that the parser output has the type of the schema. The tests check the parser.
-- `fromV1Mock` of `@placeos/ts-client/compat` has one `as` cast. It gives the result of a 6.x mock
-  implementation, which has no types, the type of the test double that holds it.
+- `fromV1Mock` of `@placeos/ts-client/compat` has one `as` cast. A 6.x mock implementation has no
+  types, so the cast gives its result the type of the test double.
 - `configure` keeps one client in module state, so a call does not need a client argument. A
-  call before `configure` is a run-time assertion, not a compile error.
+  call before `configure` throws at run time. The compiler cannot find it.
 - The mocks keep their registries in module state, as 6.x did: the endpoints of
   `registerMockEndpoint` and the systems of `registerSystem` (`@placeos/ts-client/compat`), and
   the mocks of `mockEndpoint` (`@placeos/ts-client/mock`). A test owns them. It removes them with
