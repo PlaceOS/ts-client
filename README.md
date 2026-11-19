@@ -45,17 +45,24 @@ the client. The comment of each function gives the HTTP method and the path.
 Namespaces, options and fields are snake_case, the same as the data of the server. Functions are
 camelCase, for example `modules.stateValue`.
 
-The first argument has the path parameters, the query parameters and, for an operation with a
-body, `body`. The second argument has the options of the request:
+Each function has two arguments:
+
+1. The input: the path parameters, the query parameters and, for an operation with a request
+   body, `body`. The compiler knows the input of each operation. When an operation has no
+   required parameter, such as `zones.query`, the input is optional.
+2. The options of the request. This argument is optional. It has `signal` (see
+   [Timeouts and cancel](#timeouts-and-cancel)), `timeout_ms`, and `client` (see
+   [More than one client](#more-than-one-client)).
 
 ```ts
+// `id` is a path parameter, and `body` is the request body.
 await zones.update({ id: 'zone-1234', body: { name: 'Level 2' } });
-await systems.execute({
-    sys_id: 'sys-1234',
-    module_slug: 'Display_1',
-    method: 'power',
-    body: [true],
-});
+
+// `sys_id`, `module_slug` and `method` are path parameters. The options set a time limit.
+await systems.execute(
+    { sys_id: 'sys-1234', module_slug: 'Display_1', method: 'power', body: [true] },
+    { timeout_ms: 5_000 },
+);
 ```
 
 ### The result
