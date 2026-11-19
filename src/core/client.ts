@@ -93,7 +93,7 @@ export type CallMock = (call: {
 export interface MockAnswer {
     readonly status: number;
     readonly headers: Headers;
-    /** The JSON data, or the bytes for an operation without a response schema. */
+    /** The JSON data. For an operation without a response schema: a string, bytes or nothing. */
     readonly data: unknown;
 }
 
@@ -152,10 +152,16 @@ export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
  * `params` is an object schema with the path parameters and the query parameters. `response` is
  * `null` when the API document gives no schema for the body. The data is then the raw bytes.
  */
+/**
+ * The response of an operation without a response schema. `text` gives the body as a string, and
+ * `bytes` gives it as a `Uint8Array`, for files and images.
+ */
+export type RawResponse = 'text' | 'bytes';
+
 export interface Operation<
     P extends AnySchema,
     B extends AnySchema | null,
-    R extends AnySchema | null,
+    R extends AnySchema | RawResponse,
 > {
     readonly method: HttpMethod;
     /** The path template, for example `/api/engine/v2/zones/{id}`. */
@@ -163,6 +169,7 @@ export interface Operation<
     readonly path_keys: readonly string[];
     readonly params: P;
     readonly body: B;
+    /** The schema of the response data, or a `RawResponse` for an operation without one. */
     readonly response: R;
     /** The namespace and the function, for example `zones.show`. */
     readonly name: string;
@@ -173,7 +180,7 @@ export interface Operation<
     readonly wire_names?: Readonly<Record<string, string>>;
 }
 
-export type AnyOperation = Operation<AnySchema, AnySchema | null, AnySchema | null>;
+export type AnyOperation = Operation<AnySchema, AnySchema | null, AnySchema | RawResponse>;
 
 /**
  * The input of an operation: the path and query parameters, and `body` if it has one.
@@ -182,7 +189,7 @@ export type AnyOperation = Operation<AnySchema, AnySchema | null, AnySchema | nu
  * is true, so the order `B extends AnySchema` would ask for a body on each operation.
  */
 export type OperationInput<O> =
-    O extends Operation<infer P, infer B, AnySchema | null>
+    O extends Operation<infer P, infer B, AnySchema | RawResponse>
         ? [B] extends [null]
             ? Input<P>
             : B extends AnySchema
@@ -190,14 +197,16 @@ export type OperationInput<O> =
               : never
         : never;
 
-/** The data of a successful response of an operation. The `null` check is first, as above. */
+/** The data of a successful response of an operation. */
 export type OperationData<O> =
     O extends Operation<AnySchema, AnySchema | null, infer R>
-        ? [R] extends [null]
-            ? Uint8Array
-            : R extends AnySchema
-              ? Output<R>
-              : never
+        ? [R] extends ['text']
+            ? string
+            : [R] extends ['bytes']
+              ? Uint8Array
+              : R extends AnySchema
+                ? Output<R>
+                : never
         : never;
 
 export interface Reply<T> {
@@ -285,7 +294,7 @@ export function configure(config: ClientConfig): Client {
 export function operation<
     P extends AnySchema,
     B extends AnySchema | null,
-    R extends AnySchema | null,
+    R extends AnySchema | RawResponse,
 >(definition: Operation<P, B, R>): Operation<P, B, R> {
     assert(definition.path.startsWith('/'), 'the path starts with a slash');
     // `staff.` is the prefix of the staff API.
@@ -499,7 +508,9 @@ async function send(
     }
 
     const reply = { status: response.status, headers: response.headers };
-    if (operation.response === null) return { ok: true, value: { ...reply, data: response.bytes } };
+    if (isRaw(operation.response)) {
+        return { ok: true, value: { ...reply, data: rawData(operation.response, response.bytes) } };
+    }
     const parsed = successJson(reply.status, response.bytes);
     if (!parsed.ok) {
         return {
@@ -526,12 +537,14 @@ function mockResult(
     bytes_max: number,
 ): Result<Reply<unknown>, CallError> {
     const reply = { status: answer.status, headers: answer.headers };
+    const raw = isRaw(operation.response);
     const bytes =
         answer.data instanceof Uint8Array
             ? answer.data
             : new TextEncoder().encode(
-                  typeof answer.data === 'string' && operation.response === null
-                      ? answer.data
+                  // A mock of an operation without a schema gives the body as text, or nothing.
+                  raw && (typeof answer.data === 'string' || answer.data === undefined)
+                      ? (answer.data ?? '')
                       : (JSON.stringify(answer.data) ?? 'null'),
               );
     if (bytes.length > bytes_max) {
@@ -550,7 +563,9 @@ function mockResult(
             error: { kind: 'http', status: answer.status, message, body: error_body },
         };
     }
-    if (operation.response === null) return { ok: true, value: { ...reply, data: bytes } };
+    if (isRaw(operation.response)) {
+        return { ok: true, value: { ...reply, data: rawData(operation.response, bytes) } };
+    }
     const parsed = successJson(reply.status, bytes);
     if (!parsed.ok) {
         return {
@@ -814,6 +829,15 @@ async function readBody(
     }
     await reader.cancel();
     return { ok: false, error: 'too_large' };
+}
+
+function isRaw(response: AnySchema | RawResponse): response is RawResponse {
+    return response === 'text' || response === 'bytes';
+}
+
+/** The data of an operation without a schema. Bytes that are not UTF-8 become U+FFFD in text. */
+function rawData(response: RawResponse, bytes: Uint8Array): string | Uint8Array {
+    return response === 'bytes' ? bytes : new TextDecoder().decode(bytes);
 }
 
 /**

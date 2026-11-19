@@ -130,6 +130,6 @@ const REGISTER = /* @__PURE__ */ operation({
         ['system_id'],
     ),
     body: PublicEventsRegistrationRequest,
-    response: null,
+    response: 'text',
     name: 'public_events.register',
 });

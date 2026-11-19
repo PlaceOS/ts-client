@@ -119,7 +119,7 @@ const DESTROY = /* @__PURE__ */ operation({
         ['id', 'name'],
     ),
     body: null,
-    response: null,
+    response: 'text',
     name: 'metadata.destroy',
 });
 

@@ -40,7 +40,7 @@ const DESTROY = /* @__PURE__ */ operation({
         ['id', 'driver'],
     ),
     body: null,
-    response: null,
+    response: 'text',
     name: 'cluster.destroy',
 });
 

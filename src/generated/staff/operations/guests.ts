@@ -120,7 +120,7 @@ const CATERING_DESTROY = /* @__PURE__ */ operation({
         ['id'],
     ),
     body: null,
-    response: null,
+    response: 'text',
     name: 'staff.guests.cateringDestroy',
 });
 
@@ -238,7 +238,7 @@ const DESTROY = /* @__PURE__ */ operation({
         ['id'],
     ),
     body: null,
-    response: null,
+    response: 'text',
     name: 'staff.guests.destroy',
 });
 

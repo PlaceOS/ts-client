@@ -159,7 +159,7 @@ const PHOTO = /* @__PURE__ */ operation({
         ['id'],
     ),
     body: null,
-    response: null,
+    response: 'bytes',
     name: 'staff.staff.photo',
 });
 

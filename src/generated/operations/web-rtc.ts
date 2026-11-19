@@ -42,7 +42,7 @@ const GUEST_ENTRY = /* @__PURE__ */ operation({
         ['system_id'],
     ),
     body: GuestParticipant,
-    response: null,
+    response: 'text',
     name: 'web_rtc.guestEntry',
 });
 
@@ -67,7 +67,7 @@ const GUEST_EXIT = /* @__PURE__ */ operation({
     path_keys: [],
     params: /* @__PURE__ */ parameters({}),
     body: null,
-    response: null,
+    response: 'text',
     name: 'web_rtc.guestExit',
 });
 
@@ -98,7 +98,7 @@ const KICK_USER = /* @__PURE__ */ operation({
         ['user_id', 'session_id'],
     ),
     body: KickReason,
-    response: null,
+    response: 'text',
     name: 'web_rtc.kickUser',
 });
 
@@ -223,7 +223,7 @@ const TRANSFER_GUEST = /* @__PURE__ */ operation({
         ['user_id', 'session_id'],
     ),
     body: /* @__PURE__ */ nullable(/* @__PURE__ */ json()),
-    response: null,
+    response: 'text',
     name: 'web_rtc.transferGuest',
 });
 
@@ -253,6 +253,6 @@ const TRANSFER_GUEST_WITHOUT_SESSION_ID = /* @__PURE__ */ operation({
         ['user_id'],
     ),
     body: /* @__PURE__ */ nullable(/* @__PURE__ */ json()),
-    response: null,
+    response: 'text',
     name: 'web_rtc.transferGuestWithoutSessionId',
 });

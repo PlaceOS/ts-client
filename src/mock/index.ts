@@ -67,16 +67,20 @@ export type EndpointData<K extends EndpointName> =
         : never;
 
 /**
- * Data that can leave out fields, at each level. An endpoint without a response schema gives
- * bytes: its mock can give a `Uint8Array`, a string or nothing.
+ * Data that can leave out fields, at each level. An endpoint without a response schema gives text
+ * or bytes: its mock can give a string, a `Uint8Array` or nothing, such as the mock of a `destroy`.
+ * The type cannot tell a text endpoint from one with a `string()` schema, so both accept nothing.
+ * For a `string()` schema, nothing gives a `response_invalid` error.
  */
 export type MockData<T> = T extends Uint8Array
     ? Uint8Array | string | undefined
-    : T extends readonly (infer E)[]
-      ? readonly MockData<E>[]
-      : T extends object
-        ? { readonly [K in keyof T]?: MockData<T[K]> }
-        : T;
+    : T extends string
+      ? T | undefined
+      : T extends readonly (infer E)[]
+        ? readonly MockData<E>[]
+        : T extends object
+          ? { readonly [K in keyof T]?: MockData<T[K]> }
+          : T;
 
 const RESPONSE: unique symbol = Symbol('mock-response');
 

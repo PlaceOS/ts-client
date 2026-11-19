@@ -106,7 +106,7 @@ const DESTROY = /* @__PURE__ */ operation({
         ['id'],
     ),
     body: null,
-    response: null,
+    response: 'text',
     name: 'uploads.destroy',
 });
 
@@ -138,7 +138,7 @@ const DOWNLOAD_PROXY_FILE_CONTENTS = /* @__PURE__ */ operation({
         ['id'],
     ),
     body: null,
-    response: null,
+    response: 'bytes',
     name: 'uploads.downloadProxyFileContents',
 });
 
@@ -173,7 +173,7 @@ const DOWNLOAD_SIMPLE_ROUTE = /* @__PURE__ */ operation({
         ['id', 'api_key', 'inline', 'file_name'],
     ),
     body: null,
-    response: null,
+    response: 'bytes',
     name: 'uploads.downloadSimpleRoute',
 });
 
@@ -207,7 +207,7 @@ const DOWNLOAD_SIMPLE_ROUTE_WITHOUT_FILE_NAME = /* @__PURE__ */ operation({
         ['id', 'api_key', 'inline'],
     ),
     body: null,
-    response: null,
+    response: 'bytes',
     name: 'uploads.downloadSimpleRouteWithoutFileName',
 });
 
@@ -322,7 +322,7 @@ const GET_LINK = /* @__PURE__ */ operation({
         ['id'],
     ),
     body: null,
-    response: null,
+    response: 'bytes',
     name: 'uploads.getLink',
 });
 

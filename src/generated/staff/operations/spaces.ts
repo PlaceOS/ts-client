@@ -98,7 +98,7 @@ const IMAGE = /* @__PURE__ */ operation({
         ['id', 'index'],
     ),
     body: null,
-    response: null,
+    response: 'bytes',
     name: 'staff.spaces.image',
 });
 
@@ -125,7 +125,7 @@ const MAP = /* @__PURE__ */ operation({
         ['id'],
     ),
     body: null,
-    response: null,
+    response: 'text',
     name: 'staff.spaces.map',
 });
 

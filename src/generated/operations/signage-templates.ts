@@ -151,7 +151,7 @@ const DESTROY = /* @__PURE__ */ operation({
         ['id'],
     ),
     body: null,
-    response: null,
+    response: 'text',
     name: 'signage_templates.destroy',
 });
 
@@ -178,7 +178,7 @@ const DESTROY_DRAFT = /* @__PURE__ */ operation({
         ['id'],
     ),
     body: null,
-    response: null,
+    response: 'text',
     name: 'signage_templates.destroyDraft',
 });
 
@@ -256,7 +256,7 @@ const REQUEST_APPROVAL = /* @__PURE__ */ operation({
         ['id', 'group_id'],
     ),
     body: SignageTemplatesApprovalMessage,
-    response: null,
+    response: 'text',
     name: 'signage_templates.requestApproval',
 });
 

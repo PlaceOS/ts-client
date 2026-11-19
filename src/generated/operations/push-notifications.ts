@@ -28,7 +28,7 @@ const GOOGLE = /* @__PURE__ */ operation({
     path_keys: [],
     params: /* @__PURE__ */ parameters({}),
     body: null,
-    response: null,
+    response: 'text',
     name: 'push_notifications.google',
 });
 
@@ -46,6 +46,6 @@ const MICROSOFT = /* @__PURE__ */ operation({
     path_keys: [],
     params: /* @__PURE__ */ parameters({}),
     body: MicrosoftNotification,
-    response: null,
+    response: 'text',
     name: 'push_notifications.microsoft',
 });

@@ -74,7 +74,7 @@ const SEND_CHANNEL_MESSAGE = /* @__PURE__ */ operation({
         ['teams_id', 'channel_id'],
     ),
     body: /* @__PURE__ */ string(),
-    response: null,
+    response: 'text',
     name: 'staff.teams.sendChannelMessage',
 });
 

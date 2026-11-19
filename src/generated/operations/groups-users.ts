@@ -52,7 +52,7 @@ const DESTROY = /* @__PURE__ */ operation({
         ['user_id', 'group_id'],
     ),
     body: null,
-    response: null,
+    response: 'text',
     name: 'groups_users.destroy',
 });
 

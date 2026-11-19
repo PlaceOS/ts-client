@@ -47,7 +47,7 @@ const AZURE_ADMIN_CONSENT_CALLBACK = /* @__PURE__ */ operation({
         error_description: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     }),
     body: null,
-    response: null,
+    response: 'text',
     name: 'tenant_consent.azureAdminConsentCallback',
 });
 

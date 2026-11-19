@@ -6,7 +6,7 @@
 import { afterEach, expect, test } from 'bun:test';
 import { createClient } from '../src/core/client.ts';
 import { pageInfo } from '../src/core/pagination.ts';
-import { metadata, systems, zones } from '../src/generated/operations/index.ts';
+import { metadata, modules, systems, zones } from '../src/generated/operations/index.ts';
 import {
     clearEndpointMocks,
     endpointMocks,
@@ -104,6 +104,15 @@ test('the compiler checks the name, the input and the data', () => {
     });
     // An endpoint without a response schema gives bytes, text or nothing.
     mockEndpoint('zones.destroy', () => undefined);
+});
+
+test('a mock of an endpoint without a response schema gives text', async () => {
+    mockEndpoint('modules.logs', () => 'line 1');
+    const logs = await modules.logs({ id: 'mod-1' }, options);
+    expect(logs.ok && logs.value.data).toBe('line 1');
+    mockEndpoint('zones.destroy', () => undefined);
+    const destroyed = await zones.destroy({ id: 'zone-1' }, options);
+    expect(destroyed.ok && destroyed.value.data).toBe('');
 });
 
 test('a staff API endpoint has a typed mock too', async () => {

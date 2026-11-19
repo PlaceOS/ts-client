@@ -61,7 +61,7 @@ const DESTROY = /* @__PURE__ */ operation({
         ['token'],
     ),
     body: null,
-    response: null,
+    response: 'text',
     name: 'staff.surveys_invitations.destroy',
 });
 

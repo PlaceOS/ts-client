@@ -44,7 +44,7 @@ const MQTT_ACCESS = /* @__PURE__ */ operation({
         ['topic', 'acc'],
     ),
     body: null,
-    response: null,
+    response: 'text',
     name: 'mqtt.mqttAccess',
 });
 
@@ -69,6 +69,6 @@ const MQTT_USER = /* @__PURE__ */ operation({
     path_keys: [],
     params: /* @__PURE__ */ parameters({}),
     body: null,
-    response: null,
+    response: 'text',
     name: 'mqtt.mqttUser',
 });

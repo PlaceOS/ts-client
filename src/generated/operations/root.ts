@@ -76,7 +76,7 @@ const ROOT = /* @__PURE__ */ operation({
     path_keys: [],
     params: /* @__PURE__ */ parameters({}),
     body: null,
-    response: null,
+    response: 'text',
     name: 'root.root',
 });
 
@@ -129,7 +129,7 @@ const SIGNAL = /* @__PURE__ */ operation({
         ['channel'],
     ),
     body: null,
-    response: null,
+    response: 'text',
     name: 'root.signal',
 });
 

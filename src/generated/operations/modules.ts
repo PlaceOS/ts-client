@@ -71,7 +71,7 @@ const DESTROY = /* @__PURE__ */ operation({
         ['id'],
     ),
     body: null,
-    response: null,
+    response: 'text',
     name: 'modules.destroy',
 });
 
@@ -172,7 +172,7 @@ const LOGS = /* @__PURE__ */ operation({
         ['id'],
     ),
     body: null,
-    response: null,
+    response: 'text',
     name: 'modules.logs',
 });
 
@@ -357,7 +357,7 @@ const START = /* @__PURE__ */ operation({
         ['id'],
     ),
     body: null,
-    response: null,
+    response: 'text',
     name: 'modules.start',
 });
 
@@ -472,7 +472,7 @@ const STOP = /* @__PURE__ */ operation({
         ['id'],
     ),
     body: null,
-    response: null,
+    response: 'text',
     name: 'modules.stop',
 });
 

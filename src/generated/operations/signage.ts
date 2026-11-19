@@ -76,7 +76,7 @@ const FETCH_STATIC_MEDIA = /* @__PURE__ */ operation({
         ['system_id', 'item_id'],
     ),
     body: null,
-    response: null,
+    response: 'bytes',
     name: 'signage.fetchStaticMedia',
 });
 
@@ -171,6 +171,6 @@ const UPDATE_METRICS = /* @__PURE__ */ operation({
         ['system_id'],
     ),
     body: SignageMetrics,
-    response: null,
+    response: 'text',
     name: 'signage.updateMetrics',
 });

@@ -155,7 +155,7 @@ const DESTROY = /* @__PURE__ */ operation({
         ['id'],
     ),
     body: null,
-    response: null,
+    response: 'text',
     name: 'repositories.destroy',
 });
 
@@ -190,7 +190,7 @@ const DETAILS = /* @__PURE__ */ operation({
         ['id', 'driver', 'commit'],
     ),
     body: null,
-    response: null,
+    response: 'text',
     name: 'repositories.details',
 });
 

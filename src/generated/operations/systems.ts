@@ -102,7 +102,7 @@ const DESTROY = /* @__PURE__ */ operation({
         ['sys_id'],
     ),
     body: null,
-    response: null,
+    response: 'text',
     name: 'systems.destroy',
 });
 
@@ -398,7 +398,7 @@ const START = /* @__PURE__ */ operation({
         ['sys_id'],
     ),
     body: null,
-    response: null,
+    response: 'text',
     name: 'systems.start',
 });
 
@@ -490,7 +490,7 @@ const STOP = /* @__PURE__ */ operation({
         ['sys_id'],
     ),
     body: null,
-    response: null,
+    response: 'text',
     name: 'systems.stop',
 });
 

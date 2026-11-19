@@ -194,6 +194,29 @@ const CYCLE_FIELDS: ReadonlyMap<string, readonly string[]> = new Map([
     ['PlaceOS.Model.Guest', ['booking']],
 ]);
 
+/**
+ * Operations without a response schema that send binary data: files, images and redirects to
+ * files. Their data is a `Uint8Array`. The data of the other operations without a schema is the
+ * body as text, because they send text, such as `modules.logs`, or no body, such as `destroy`.
+ * Each entry comes from the source of PlaceOS/rest-api and PlaceOS/staff-api.
+ */
+const BYTES_RESPONSE_OPERATIONS: ReadonlySet<string> = new Set([
+    // A PNG, or a PNG or an SVG.
+    'PlaceOS::Api::ShortURL_generate_qr_code',
+    'PlaceOS::Api::ShortURL_png_qr',
+    // A redirect to the file in the storage. `fetch` follows it.
+    'PlaceOS::Api::PlaylistMedia_thumbnail',
+    'PlaceOS::Api::Signage_fetch_static_media',
+    'PlaceOS::Api::Uploads_get_link',
+    // A copy of the body of another server.
+    'PlaceOS::Api::Uploads_download_proxy_file_contents',
+    'PlaceOS::Api::Uploads_download_simple_route',
+    'PlaceOS::Api::Uploads_download_simple_route_without_file_name',
+    'PlaceOS::Api::UrlProxy_proxy',
+    'Spaces_image',
+    'Staff_photo',
+]);
+
 /** Operations that send JSON, but have no response schema in the document. */
 const JSON_RESPONSE_OPERATIONS: ReadonlySet<string> = new Set([
     'PlaceOS::Api::Modules_execute',
@@ -354,7 +377,8 @@ interface OperationPlan {
     readonly params: string;
     readonly params_required: boolean;
     readonly body: string | null;
-    readonly response: string | null;
+    /** The schema code, or `'text'` or `'bytes'` for a response without a schema. */
+    readonly response: string;
     /** Input key to query name, from `PARAMETER_KEYS`. */
     readonly wire_names: Readonly<Record<string, string>>;
     readonly imports: Imports;
@@ -399,12 +423,18 @@ const APIS: readonly ApiSource[] = [
     },
 ];
 
+/** The `operationId` of each operation of the documents, for the check of the patch lists. */
+const seen_operation_ids = new Set<string>();
+
 await main();
 
 async function main(): Promise<void> {
     const check = process.argv.includes('--check');
     const stale: string[] = [];
     for (const api of APIS) stale.push(...(await generate(api, check)));
+    for (const id of [...BYTES_RESPONSE_OPERATIONS, ...JSON_RESPONSE_OPERATIONS]) {
+        assert(seen_operation_ids.has(id), `the operation ${id} of a patch is in a document`);
+    }
     if (check && stale.length > 0) {
         console.error(`Not up to date. Run \`bun run generate\`:\n  ${stale.join('\n  ')}`);
         process.exit(1);
@@ -569,6 +599,7 @@ function planOperation(
     operation: SpecNode,
 ): OperationPlan | null {
     const operation_id = asString(field(operation, 'operationId'), `${path} operationId`);
+    seen_operation_ids.add(operation_id);
     const id = operation_id.startsWith(api.id_prefix)
         ? operation_id.slice(api.id_prefix.length)
         : '';
@@ -598,9 +629,11 @@ function planOperation(
     if (status === '101' || status.startsWith('3')) return null;
 
     const imports: Imports = { combinators: new Set(), schemas: new Set() };
-    let response: string | null = null;
     const success = asNode(field(responses, status), `${operation_id} ${status}`);
     const content = field(success, 'content');
+    const bytes = BYTES_RESPONSE_OPERATIONS.has(operation_id);
+    assert(!bytes || content === undefined, `${operation_id} has no response schema`);
+    let response = bytes ? "'bytes'" : "'text'";
     if (JSON_RESPONSE_OPERATIONS.has(operation_id)) {
         assert(content === undefined, `${operation_id} has no response schema to replace`);
         imports.combinators.add('json');
@@ -1155,7 +1188,7 @@ function writeOperationsFile(
                 `path_keys: ${JSON.stringify(plan.path_keys)},\n` +
                 `params: ${plan.params},\n` +
                 `body: ${plan.body ?? 'null'},\n` +
-                `response: ${plan.response ?? 'null'},\n` +
+                `response: ${plan.response},\n` +
                 `name: '${api.name_prefix}${snakeCase(controllerWords(controller))}.${function_name}',\n` +
                 (Object.keys(plan.wire_names).length > 0
                     ? `wire_names: ${JSON.stringify(plan.wire_names)},\n`

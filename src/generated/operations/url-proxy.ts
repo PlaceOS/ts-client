@@ -40,6 +40,6 @@ const PROXY = /* @__PURE__ */ operation({
         ['url'],
     ),
     body: null,
-    response: null,
+    response: 'bytes',
     name: 'url_proxy.proxy',
 });

@@ -107,7 +107,7 @@ const DELETE_RESOURCE_TOKEN = /* @__PURE__ */ operation({
         ['id'],
     ),
     body: null,
-    response: null,
+    response: 'text',
     name: 'users.deleteResourceToken',
 });
 
@@ -136,7 +136,7 @@ const DESTROY = /* @__PURE__ */ operation({
         ['id'],
     ),
     body: null,
-    response: null,
+    response: 'text',
     name: 'users.destroy',
 });
 
@@ -297,7 +297,7 @@ const REVIVE = /* @__PURE__ */ operation({
         ['id'],
     ),
     body: null,
-    response: null,
+    response: 'text',
     name: 'users.revive',
 });
 

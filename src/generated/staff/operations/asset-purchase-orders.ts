@@ -60,7 +60,7 @@ const DESTROY = /* @__PURE__ */ operation({
         ['id'],
     ),
     body: null,
-    response: null,
+    response: 'text',
     name: 'staff.asset_purchase_orders.destroy',
 });
 

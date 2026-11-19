@@ -282,7 +282,7 @@ const DECLINE = /* @__PURE__ */ operation({
         ['id'],
     ),
     body: null,
-    response: null,
+    response: 'text',
     name: 'staff.events.decline',
 });
 
@@ -319,7 +319,7 @@ const DELETE_ATTENDEE = /* @__PURE__ */ operation({
         ['id', 'email'],
     ),
     body: null,
-    response: null,
+    response: 'text',
     name: 'staff.events.deleteAttendee',
 });
 
@@ -360,7 +360,7 @@ const DESTROY = /* @__PURE__ */ operation({
         ['id'],
     ),
     body: null,
-    response: null,
+    response: 'text',
     name: 'staff.events.destroy',
 });
 
@@ -659,7 +659,7 @@ const LINK_MASTER_METADATA = /* @__PURE__ */ operation({
         ['id', 'system_id', 'ical_uid'],
     ),
     body: null,
-    response: null,
+    response: 'text',
     name: 'staff.events.linkMasterMetadata',
 });
 
@@ -691,7 +691,7 @@ const NOTIFY_CHANGE = /* @__PURE__ */ operation({
         ['change', 'system_id', 'event_id'],
     ),
     body: /* @__PURE__ */ nullable(PlaceCalendarEvent),
-    response: null,
+    response: 'text',
     name: 'staff.events.notifyChange',
 });
 

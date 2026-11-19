@@ -37,7 +37,7 @@ const COMPILED = /* @__PURE__ */ operation({
         ['id'],
     ),
     body: null,
-    response: null,
+    response: 'text',
     name: 'drivers.compiled',
 });
 
@@ -86,7 +86,7 @@ const DESTROY = /* @__PURE__ */ operation({
         ['id'],
     ),
     body: null,
-    response: null,
+    response: 'text',
     name: 'drivers.destroy',
 });
 

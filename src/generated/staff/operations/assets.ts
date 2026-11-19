@@ -54,7 +54,7 @@ const BULK_DESTROY = /* @__PURE__ */ operation({
     path_keys: [],
     params: /* @__PURE__ */ parameters({}),
     body: /* @__PURE__ */ array(/* @__PURE__ */ string()),
-    response: null,
+    response: 'text',
     name: 'staff.assets.bulkDestroy',
 });
 
@@ -125,7 +125,7 @@ const DESTROY = /* @__PURE__ */ operation({
         ['id'],
     ),
     body: null,
-    response: null,
+    response: 'text',
     name: 'staff.assets.destroy',
 });
 
@@ -152,7 +152,7 @@ const MAP = /* @__PURE__ */ operation({
         ['id'],
     ),
     body: null,
-    response: null,
+    response: 'text',
     name: 'staff.assets.map',
 });
 

@@ -467,7 +467,7 @@ const DESTROY = /* @__PURE__ */ operation({
         ['id'],
     ),
     body: null,
-    response: null,
+    response: 'text',
     name: 'staff.bookings.destroy',
 });
 
@@ -504,7 +504,7 @@ const DESTROY_ATTENDEE = /* @__PURE__ */ operation({
         ['id', 'attendee_id'],
     ),
     body: null,
-    response: null,
+    response: 'text',
     name: 'staff.bookings.destroyAttendee',
 });
 
@@ -541,7 +541,7 @@ const DESTROY_INSTANCE = /* @__PURE__ */ operation({
         ['id', 'instance'],
     ),
     body: null,
-    response: null,
+    response: 'text',
     name: 'staff.bookings.destroyInstance',
 });
 

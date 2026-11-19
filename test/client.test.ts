@@ -82,9 +82,11 @@ const DOWNLOAD = operation({
     path_keys: [],
     params: parameters({}),
     body: null,
-    response: null,
+    response: 'bytes',
     name: 'items.download',
 });
+
+const LOGS = operation({ ...DOWNLOAD, response: 'text', name: 'items.logs' });
 
 describe('call', () => {
     test('puts parameters in the path and query, and sends the body as JSON', async () => {
@@ -118,11 +120,14 @@ describe('call', () => {
         if (result.ok) expect(result.value.data).toEqual({ id: 'item-1', name: null });
     });
 
-    test('gives the raw bytes when the operation has no response schema', async () => {
-        const { fetch } = fakeFetch(() => new Response(new Uint8Array([1, 2, 3])));
-        const result = await call(DOWNLOAD, {}, { client: clientWith(fetch) });
-        expect(result.ok).toBe(true);
-        if (result.ok) expect([...result.value.data]).toEqual([1, 2, 3]);
+    test('gives the body as text, or as bytes, when the operation has no response schema', async () => {
+        const { fetch } = fakeFetch(() => new Response('line 1\nline 2'));
+        const text = await call(LOGS, {}, { client: clientWith(fetch) });
+        const data: string | null = text.ok ? text.value.data : null;
+        expect(data).toBe('line 1\nline 2');
+        const binary = fakeFetch(() => new Response(new Uint8Array([0xff, 0, 1])));
+        const bytes = await call(DOWNLOAD, {}, { client: clientWith(binary.fetch) });
+        expect(bytes.ok && [...bytes.value.data]).toEqual([0xff, 0, 1]);
     });
 
     test('sends the bearer token or the API key', async () => {

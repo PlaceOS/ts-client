@@ -59,7 +59,7 @@ const DESTROY = /* @__PURE__ */ operation({
         ['id'],
     ),
     body: null,
-    response: null,
+    response: 'text',
     name: 'short_url.destroy',
 });
 
@@ -92,7 +92,7 @@ const GENERATE_QR_CODE = /* @__PURE__ */ operation({
         ['content', 'id'],
     ),
     body: null,
-    response: null,
+    response: 'bytes',
     name: 'short_url.generateQrCode',
 });
 
@@ -121,7 +121,7 @@ const PNG_QR = /* @__PURE__ */ operation({
         ['id'],
     ),
     body: null,
-    response: null,
+    response: 'bytes',
     name: 'short_url.pngQr',
 });
 
@@ -211,7 +211,7 @@ const SVG_QR = /* @__PURE__ */ operation({
         ['id'],
     ),
     body: null,
-    response: null,
+    response: 'text',
     name: 'short_url.svgQr',
 });
 

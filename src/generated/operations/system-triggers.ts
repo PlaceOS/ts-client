@@ -67,7 +67,7 @@ const DESTROY = /* @__PURE__ */ operation({
         ['sys_id', 'trig_id'],
     ),
     body: null,
-    response: null,
+    response: 'text',
     name: 'system_triggers.destroy',
 });
 

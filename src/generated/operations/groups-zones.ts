@@ -52,7 +52,7 @@ const DESTROY = /* @__PURE__ */ operation({
         ['group_id', 'zone_id'],
     ),
     body: null,
-    response: null,
+    response: 'text',
     name: 'groups_zones.destroy',
 });
 

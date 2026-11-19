@@ -35,7 +35,7 @@ const CLEANUP = /* @__PURE__ */ operation({
         authority_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
     }),
     body: null,
-    response: null,
+    response: 'text',
     name: 'pending_mails.cleanup',
 });
 
@@ -62,7 +62,7 @@ const DESTROY = /* @__PURE__ */ operation({
         ['id'],
     ),
     body: null,
-    response: null,
+    response: 'text',
     name: 'pending_mails.destroy',
 });
 

@@ -85,7 +85,7 @@ const DESTROY = /* @__PURE__ */ operation({
         ['id'],
     ),
     body: null,
-    response: null,
+    response: 'text',
     name: 'playlist_media.destroy',
 });
 
@@ -168,7 +168,7 @@ const REMOVE_TAG = /* @__PURE__ */ operation({
         ['tag'],
     ),
     body: null,
-    response: null,
+    response: 'text',
     name: 'playlist_media.removeTag',
 });
 
@@ -206,7 +206,7 @@ const RENAME_TAG = /* @__PURE__ */ operation({
         ['current_tag', 'new_tag'],
     ),
     body: null,
-    response: null,
+    response: 'text',
     name: 'playlist_media.renameTag',
 });
 
@@ -369,7 +369,7 @@ const THUMBNAIL = /* @__PURE__ */ operation({
         ['id'],
     ),
     body: null,
-    response: null,
+    response: 'bytes',
     name: 'playlist_media.thumbnail',
 });
 

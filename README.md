@@ -75,10 +75,14 @@ When `ok` is `true`, `value` is the reply:
 | `data`    | The body, parsed with the schema of the operation.                    |
 | `next()`  | Only on an operation with an `offset` parameter. See [Pages](#pages). |
 
-An operation without a response schema gives the raw body in `data`, as a `Uint8Array`. A 204
-has no body, so `data` is `null`. Only an operation with a 204 in the API document, such as
-`staff.calendars.availability`, accepts it. For the other operations, a 204 is a
-`response_invalid` error.
+An operation without a response schema gives the body in `data` as a string, for example the text
+of `modules.logs`, or `''` for a `destroy`. An operation that sends a file or an image, such as
+`uploads.downloadProxyFileContents` or `staff.staff.photo`, gives a `Uint8Array`. The type of
+`data` shows which one you get.
+
+A 204 has no body. For an operation with a response schema, `data` is then `null`. Only an
+operation with a 204 in the API document, such as `staff.calendars.availability`, accepts it. For
+the other operations with a schema, a 204 is a `response_invalid` error.
 
 When `ok` is `false`, `error.kind` tells what failed. The other fields depend on the kind:
 
@@ -614,8 +618,10 @@ The generator changes some parts of the document. Each change has a comment in
 - **A query parameter named `body`.** `body` of the input is the request body, so the `body` query
   parameter of `staff.events.book` (the description of the meeting) is `body_text` in the input.
   The query keeps the name `body`.
-- **Responses without a schema.** The data is a `Uint8Array` with the raw body. `systems.execute`,
-  `modules.execute` and `modules.stateValue` are exceptions: they return a `JsonValue`.
+- **Responses without a schema.** The data is the body as a string. The operations that send files
+  or images give a `Uint8Array`. `BYTES_RESPONSE_OPERATIONS` in `scripts/generate.ts` has the list,
+  from the server source. `systems.execute`, `modules.execute` and `modules.stateValue` are
+  exceptions: they send JSON, so they give a `JsonValue`.
 - **Endpoints that are not in the client.** The WebSocket endpoints, such as `systems/control` and
   `webrtc/signaller`, are not in the client. Use [Realtime](#realtime) for `systems/control`.
   `short_url/{id}/redirect` is also not in the client, because its answer is a redirect for a

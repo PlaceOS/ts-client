@@ -31,6 +31,6 @@ const QUERY = /* @__PURE__ */ operation({
     path_keys: [],
     params: /* @__PURE__ */ parameters({}),
     body: /* @__PURE__ */ string(),
-    response: null,
+    response: 'text',
     name: 'flux.query',
 });
