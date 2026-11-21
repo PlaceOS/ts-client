@@ -35,23 +35,41 @@ export function orThrow<T>(result: Result<Reply<T>, CallError>): T {
     return result.value.data;
 }
 
-/** The page of a 6.x query function. 6.x also gave `next`. 7.x gives `next_offset`. */
+/** The page of a 6.x query function. */
 export interface Page<T> {
     readonly data: T;
     /** The `X-Total-Count` header, or `0` without it, as in 6.x. */
     readonly total: number;
     /** Give it as the `offset` of the next call. `null` on the last page. */
     readonly next_offset: number | null;
+    /**
+     * Requests the next page, as in 6.x. `null` on the last page. The promise rejects on an error.
+     * The function gives `null` when the link does not move the offset forward.
+     */
+    readonly next: (() => Promise<Page<T>> | null) | null;
+}
+
+/** A 7.x reply, with `next()` when the operation has pages. */
+interface PagedReply<T> extends Reply<T> {
+    next?(): Promise<Result<PagedReply<T>, CallError>> | null;
 }
 
 /** The 6.x type of a query function, such as `QueryResponse<PlaceZone>`. */
 export type QueryResponse<T> = Promise<Page<T[]>>;
 
-/** Gives the data and the totals of a `query` call, or throws `CallFailed`. */
-export function orThrowPage<T>(result: Result<Reply<T>, CallError>): Page<T> {
+/**
+ * Gives the data, the totals and `next` of a `query` call, as a 6.x query function did, or throws
+ * `CallFailed`.
+ */
+export function orThrowPage<T>(result: Result<PagedReply<T>, CallError>): Page<T> {
     if (!result.ok) throw new CallFailed(result.error);
-    const page = pageInfo(result.value.headers);
-    return { data: result.value.data, total: page.total ?? 0, next_offset: page.next_offset };
+    const reply = result.value;
+    const page = pageInfo(reply.headers);
+    const next =
+        reply.next === undefined || page.next_offset === null
+            ? null
+            : () => reply.next?.()?.then(orThrowPage) ?? null;
+    return { data: reply.data, total: page.total ?? 0, next_offset: page.next_offset, next };
 }
 
 /**

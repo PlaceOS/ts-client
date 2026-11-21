@@ -39,8 +39,8 @@ const TS_SUPPORTED = '4.9 to 6.x';
 
 const USAGE = `Usage: placeos-migrate [--write] <folder or file>...
 
-Rewrites the calls of @placeos/ts-client 6.x to 7.x. Without --write, it shows the changes and
-writes no file. Commit your work first, so that you can see and undo the changes.`;
+Rewrites the calls of @placeos/ts-client 6.x to 7.x. Without --write, it lists the files that
+would change and the uses to change by hand, and writes no file. Commit your work first, so that you can see and undo the changes.`;
 
 await main(process.argv.slice(2));
 

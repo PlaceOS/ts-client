@@ -9,6 +9,7 @@ import {
     configure,
     createClient,
     operation,
+    type Auth,
     type ClientConfig,
     type FetchFunction,
 } from '../src/core/client.ts';
@@ -23,6 +24,7 @@ import {
 } from '../src/core/schema.ts';
 import { join } from 'node:path';
 import { zones } from '../src/index.ts';
+import { events } from '../src/staff.ts';
 
 interface Sent {
     readonly url: string;
@@ -109,6 +111,16 @@ describe('call', () => {
         expect(sent[0]?.headers.get('content-type')).toBe('application/json');
     });
 
+    test('a query parameter with a wire name goes in the query with that name', async () => {
+        const { fetch, sent } = fakeFetch(() => new Response('{}', { status: 500 }));
+        // `staff.events.book` takes the description as `body_text`, because `body` is the body.
+        const input = { title: 'Standup', event_start: 1, event_end: 2, body_text: 'Notes' };
+        await events.book(input, { client: clientWith(fetch) });
+        const query = new URL(sent[0]?.url ?? '').searchParams;
+        expect(query.get('body')).toBe('Notes');
+        expect(query.has('body_text')).toBe(false);
+    });
+
     test('parses the response with the schema of the operation', async () => {
         const { fetch } = fakeFetch(() => jsonResponse({ id: 'item-1', extra: 1 }));
         const result = await call(
@@ -149,7 +161,61 @@ describe('call', () => {
             ok: false,
             error: { kind: 'auth_missing' },
         });
+        // A token function that throws gives an error result. The call does not reject.
+        const failing = clientWith(fetch, {
+            auth: {
+                kind: 'bearer',
+                token: () => {
+                    throw new Error('the token store is closed');
+                },
+            },
+        });
+        expect(await call(DOWNLOAD, {}, { client: failing })).toEqual({
+            ok: false,
+            error: { kind: 'auth_missing' },
+        });
         expect(sent).toHaveLength(2);
+    });
+
+    test('a rejected callback that throws gives the 401 as the result', async () => {
+        const { fetch } = fakeFetch(() => new Response('{}', { status: 401 }));
+        const credential = async () => ({ kind: 'bearer', token: 'abc' }) as const;
+        const failures = [
+            () => {
+                throw new Error('the session is closed');
+            },
+            () => Promise.reject(new Error('the session is closed')),
+        ];
+        for (const rejected of failures) {
+            const client = clientWith(fetch, {
+                auth: { kind: 'credential', credential, rejected },
+            });
+            const result = await call(DOWNLOAD, {}, { client });
+            expect(result.ok === false && result.error.kind === 'http' && result.error.status).toBe(
+                401,
+            );
+        }
+    });
+
+    test('the client calls rejected as a method of the auth', async () => {
+        const { fetch } = fakeFetch((init) =>
+            new Headers(init.headers).get('authorization') === 'Bearer new'
+                ? new Response('')
+                : new Response('{}', { status: 401 }),
+        );
+        const auth = {
+            kind: 'credential' as const,
+            token: 'old',
+            async credential() {
+                return { kind: 'bearer', token: this.token } as const;
+            },
+            async rejected() {
+                this.token = 'new';
+                return true;
+            },
+        } satisfies Auth & { token: string };
+        const result = await call(DOWNLOAD, {}, { client: clientWith(fetch, { auth }) });
+        expect(result.ok).toBe(true);
     });
 
     test('does not send the API key to the target of a redirect', async () => {
@@ -168,6 +234,14 @@ describe('call', () => {
             });
             const result = await call(DOWNLOAD, {}, { client });
             expect(result.ok ? 'followed' : result.error.kind).toBe('network');
+            // A key in the headers of the client is also an API key.
+            const in_headers = createClient({
+                base_url: `http://localhost:${server.port}`,
+                auth: { kind: 'none' },
+                headers: { 'X-API-Key': 'key-1' },
+            });
+            const second = await call(DOWNLOAD, {}, { client: in_headers });
+            expect(second.ok ? 'followed' : second.error.kind).toBe('network');
         } finally {
             await Promise.all([server.stop(true), target.stop(true)]);
         }

@@ -10,7 +10,8 @@
             // use its URL as the `redirect_uri` of `createAuthSession`.
             //
             // In a frame of the same origin, it sends the parameters to the parent page. Else it
-            // goes back to the application with the parameters in the query.
+            // goes back to the application with the parameters in the hash. The browser does not
+            // send the hash to the server, so the access token is not in its logs.
             (function () {
                 var params = {};
                 var parts = [window.location.search.slice(1), window.location.hash.slice(1)];
@@ -37,7 +38,7 @@
 
                 var path = window.location.pathname.replace(/oauth-resp\.html$/, '');
                 var query = new URLSearchParams(params).toString();
-                window.location.replace(window.location.origin + path + (query ? '?' + query : ''));
+                window.location.replace(window.location.origin + path + (query ? '#' + query : ''));
             })();
         </script>
     </body>

@@ -17,7 +17,7 @@
  * many notifications for one variable give one call to its listeners, with the last value.
  */
 import { assert, unreachable } from '../core/assert.ts';
-import { resolveCredential, type Auth, type Credential } from '../core/client.ts';
+import { renewCredential, resolveCredential, type Auth, type Credential } from '../core/client.ts';
 import { scopedLog, type LogFunction } from '../core/log.ts';
 import type { Result } from '../core/result.ts';
 import {
@@ -99,7 +99,10 @@ export interface DebugTarget {
 
 export type RealtimeError =
     | { readonly kind: 'timeout'; readonly timeout_ms: number }
-    /** The socket closed after the server got the request. The result is not known. */
+    /**
+     * The client sent the request, and the socket closed before the result came. The client does
+     * not know if the server got or ran the request.
+     */
     | { readonly kind: 'disconnected' }
     /** `stop` ran before the response. */
     | { readonly kind: 'stopped' }
@@ -153,7 +156,10 @@ export interface Realtime {
     /** Closes the socket. Pending calls give `stopped`. The bindings stay for the next `start`. */
     stop(): void;
     status(): RealtimeStatus;
-    /** Calls `listener` on each change of the status. Returns the remover. */
+    /**
+     * Calls `listener` after a change of the status, in a later task. When the status changes more
+     * than one time before that, the listener gets only the last status. Returns the remover.
+     */
     subscribe(listener: (status: RealtimeStatus) => void): () => void;
     /** Calls a function of a module. The value is the return value of the function. */
     exec(
@@ -221,7 +227,7 @@ interface Pending {
     readonly text: string;
     /** A call of the application, which counts to `PENDING_MAX`. Else a binding command. */
     readonly call: boolean;
-    /** The server got the request. A close then makes its result unknown. */
+    /** The client sent the request on the socket. A close then makes its result unknown. */
     sent: boolean;
     readonly resolve: (result: Result<JsonValue, RealtimeError>) => void;
     readonly cancelTimer: () => void;
@@ -300,6 +306,8 @@ export function createRealtime(config: RealtimeConfig): Realtime {
         cancelReconnect?.();
         cancelReconnect = null;
         closeSocket();
+        // A message of the closed socket can wait for the drain. It must not update a binding now.
+        inbox.length = 0;
         for (const id of [...pending.keys()]) settle(id, { ok: false, error: { kind: 'stopped' } });
         queue.length = 0;
     }
@@ -345,7 +353,7 @@ export function createRealtime(config: RealtimeConfig): Realtime {
             if (owner.holders.size > 0) return;
             bindings.delete(key);
             // Without a socket, the server has no binding to remove.
-            if (status.kind === 'open') {
+            if (isLive()) {
                 void request('unbind', owner.target, null, REQUEST_TIMEOUT_MS);
             }
         };
@@ -381,7 +389,7 @@ export function createRealtime(config: RealtimeConfig): Realtime {
             owner.holders.delete(holder);
             if (owner.holders.size > 0) return;
             debuggers.delete(key);
-            if (status.kind === 'open') sendDebug(owner, 'ignore');
+            if (isLive()) sendDebug(owner, 'ignore');
         };
     }
 
@@ -446,9 +454,18 @@ export function createRealtime(config: RealtimeConfig): Realtime {
         entry.resolve(result);
     }
 
+    /**
+     * The socket is open, and not closing. A close sets `socket` to `null` before the last drain,
+     * so a bind or an unbind of a listener does not wait for the next socket. `onOpen` sends the
+     * bindings and the debuggers that exist then.
+     */
+    function isLive(): boolean {
+        return status.kind === 'open' && socket !== null;
+    }
+
     /** Binds on the server when the socket is open. `onOpen` binds the others. */
     function sendBind(binding: Binding): void {
-        if (status.kind !== 'open') {
+        if (!isLive()) {
             if (status.kind === 'idle') start();
             return;
         }
@@ -462,7 +479,7 @@ export function createRealtime(config: RealtimeConfig): Realtime {
     }
 
     function sendDebug(entry: Debugger, command: 'debug' | 'ignore'): void {
-        if (status.kind !== 'open') {
+        if (!isLive()) {
             if (status.kind === 'idle') start();
             return;
         }
@@ -480,7 +497,7 @@ export function createRealtime(config: RealtimeConfig): Realtime {
         if (renew_before_connect && config.auth.kind === 'credential' && last_credential !== null) {
             log.info('asking the auth for a new credential, after failures to connect');
             renew_before_connect = false;
-            await config.auth.rejected(401, last_credential);
+            await renewCredential(config.auth, 401, last_credential);
             if (this_attempt !== connect_attempt) return;
         }
         const credential = await resolveCredential(config.auth);
@@ -616,13 +633,14 @@ export function createRealtime(config: RealtimeConfig): Realtime {
     }
 
     function onDisconnect(): void {
+        // Without the socket, a request of a listener in the drain waits for the next socket.
+        socket = null;
         // A response can wait in the inbox. Handle it before the requests fail as disconnected.
         if (inbox.length > 0) drain();
         log.warn('the socket closed', { was_open: status.kind === 'open' });
         cancelTimers();
-        socket = null;
         if (status.kind !== 'open') failures_before_open += 1;
-        // The result of a request that the server got is not known now.
+        // The result of a request that the client sent is not known now.
         for (const [id, entry] of [...pending]) {
             if (entry.sent) settle(id, failure({ kind: 'disconnected' }));
         }

@@ -445,6 +445,44 @@ describe('exec', () => {
         expect(await result).toEqual({ ok: true, value: 1 });
     });
 
+    test('a listener in the last batch of a closed socket uses the next socket', async () => {
+        const platform = fakePlatform();
+        const client = realtime(platform);
+        let release = () => {};
+        let result: ReturnType<typeof client.exec> | null = null;
+        release = client.bind(POWER, (state) => {
+            if (state.kind !== 'value') return;
+            release();
+            result = client.exec(POWER, [true]);
+        });
+        await platform.open();
+        // The notification is in the inbox when the socket closes.
+        const notify = { id: 0, type: 'notify', value: 1, meta: META };
+        platform.latest().handlers.message(JSON.stringify(notify));
+        platform.latest().handlers.close();
+        client.bind(POWER, () => {});
+        await platform.advance(5_000);
+        await platform.open();
+        // No `unbind` after the new `bind`, and the call goes on the new socket.
+        expect(platform.requests().map((message) => message.cmd)).toEqual(['bind', 'exec']);
+        expect(result).not.toBeNull();
+    });
+
+    test('stop drops a notification that waits in the inbox', async () => {
+        const platform = fakePlatform();
+        const client = realtime(platform);
+        const states: BindingState[] = [];
+        client.bind(POWER, (state) => states.push(state));
+        await platform.open();
+        platform
+            .latest()
+            .handlers.message(JSON.stringify({ id: 0, type: 'notify', value: 1, meta: META }));
+        client.stop();
+        await platform.advance(0);
+        // `stop` settles the bind request, so the binding gets an error. It gets no value.
+        expect(states.filter((state) => state.kind === 'value')).toEqual([]);
+    });
+
     test('stop settles each pending call and does not reconnect', async () => {
         const platform = fakePlatform();
         const client = realtime(platform);

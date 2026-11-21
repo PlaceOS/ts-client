@@ -21,7 +21,10 @@ export interface RealtimeSocket {
 
 /** How the socket sends the token. A browser WebSocket cannot set an `Authorization` header. */
 export type TokenTransport =
-    /** A cookie on the path of the socket. The token is not in the URL. */
+    /**
+     * A cookie on the path of the socket, so the token is not in the URL. A cookie reaches only the
+     * host of the page, so a socket on a different host gets the token in the query.
+     */
     | 'cookie'
     /** A `bearer_token` or `api-key` query parameter. The server removes these from its logs. */
     | 'query';

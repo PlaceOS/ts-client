@@ -24,6 +24,7 @@ import {
 import { createClient } from '../src/core/client.ts';
 import { createRealtime, type BindingState } from '../src/realtime/realtime.ts';
 import { settings, zones } from '../src/generated/operations/index.ts';
+import { clearEndpointMocks, endpointMocks, mockEndpoint, respond } from '../src/mock/index.ts';
 
 // An app gives `base_url: ''`. Outside a browser, a URL needs an origin. 6.x mock data often has
 // only some fields. `missing_fields: 'zero'` fills the others, as the 6.x classes did.
@@ -37,6 +38,7 @@ const options = { client };
 
 afterEach(() => {
     clearMockEndpoints();
+    clearEndpointMocks();
     deregisterSystem('sys-1');
 });
 
@@ -95,6 +97,9 @@ test('a missing endpoint is a 404, and a thrown status is that status', async ()
     const refused = await zones.destroy({ id: 'zone-1' }, options);
     expect(missing.ok === false && missing.error.kind === 'http' && missing.error.status).toBe(404);
     expect(refused.ok === false && refused.error.kind === 'http' && refused.error.status).toBe(403);
+    // A migrated call rejects, as the 6.x function did.
+    const rejected = zones.show({ id: 'zone-1' }, options).then(orThrow);
+    await expect(rejected).rejects.toMatchObject({ name: 'CallFailed', status: 404 });
 });
 
 test('without missing_fields: zero, partial mock data is not valid', async () => {
@@ -162,11 +167,28 @@ test('mockReply and mockPage make the results of test doubles', () => {
     // The double of an operation with pages needs `next`.
     const history: Awaited<ReturnType<typeof settings.history>> = mockReply([]);
     expect(history.ok && history.value.next()).toBeNull();
-    expect(orThrowPage(mockPage({ data: [zone], total: 3 }))).toEqual({
-        data: [zone],
-        total: 3,
-        next_offset: null,
+    const page = orThrowPage(mockPage({ data: [zone], total: 3 }));
+    expect(page).toMatchObject({ data: [zone], total: 3, next_offset: null });
+    // On the last page, `next` is `null`, as in 6.x, so `if (page.next)` works.
+    expect(page.next).toBeNull();
+});
+
+test('a page of orThrowPage requests the next page, as in 6.x', async () => {
+    mockEndpoint('zones.query', (input) =>
+        input.offset === undefined
+            ? respond([{ id: 'zone-1' }], { next_offset: 1 })
+            : respond([{ id: 'zone-2' }]),
+    );
+    const typed = createClient({
+        base_url: 'http://mock.invalid',
+        auth: { kind: 'none' },
+        mock: endpointMocks,
+        missing_fields: 'zero',
     });
+    const first = await zones.query({ limit: 1 }, { client: typed }).then(orThrowPage);
+    const second = await first.next?.();
+    expect(second?.data.map((item) => item.id)).toEqual(['zone-2']);
+    expect(second?.next).toBeNull();
 });
 
 test('a 7.x binding and call use a 6.x mock system', async () => {

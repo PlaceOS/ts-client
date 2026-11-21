@@ -314,6 +314,11 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
     let halted: AuthError | null = null;
     /** `logout` adds one. A token request from an earlier epoch drops its tokens. */
     let epoch = 0;
+    /**
+     * The logouts whose request waits. Then `authorize` starts no attempt, because a refresh in the
+     * new epoch could store tokens after the logout removes them.
+     */
+    let logouts_pending = 0;
     const listeners = new Set<(status: AuthStatus) => void>();
 
     const session: AuthSession = {
@@ -359,18 +364,25 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
     }
 
     function authorize(): Promise<Result<Credential, AuthError>> {
-        // Check and set in one synchronous step, so that callers share one attempt.
+        if (logouts_pending > 0) {
+            return Promise.resolve({ ok: false, error: { kind: 'logged_out' } });
+        }
+        // Check and set in one synchronous step, so that callers share one attempt. The attempt
+        // starts in a microtask: a listener of a status that it sets can call `authorize` again.
         if (authorizing !== null) return authorizing;
-        const attempt = runAuthorize().finally(() => {
-            authorizing = null;
-        });
+        // A logout during this attempt ends it. Each step checks the epoch after it waits.
+        const attempt_epoch = epoch;
+        const attempt = Promise.resolve()
+            .then(() => runAuthorize(attempt_epoch))
+            .finally(() => {
+                authorizing = null;
+            });
         authorizing = attempt;
         return attempt;
     }
 
-    async function runAuthorize(): Promise<Result<Credential, AuthError>> {
-        // A logout during this attempt ends it. Each step checks the epoch after it waits.
-        const attempt_epoch = epoch;
+    async function runAuthorize(attempt_epoch: number): Promise<Result<Credential, AuthError>> {
+        if (epoch !== attempt_epoch) return failed({ kind: 'logged_out' });
         // Read the redirect first, before any wait, so its tokens leave the URL also when the
         // authority does not load.
         const redirect_outcome = readRedirectParams();
@@ -486,7 +498,9 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
 
     /**
      * Tries the credentials that need no action of the user: the current credential, a code from
-     * a redirect, and the refresh token. Returns `null` if none gives a credential.
+     * a redirect, and the refresh token. Gives a credential, or a failure that ends the attempt,
+     * such as a refused code. Gives `null` when none gives a credential, also after a refused
+     * refresh token. Then the attempt continues with the grant of the configuration.
      */
     async function tokenFromKnownCredentials(
         attempt_epoch: number,
@@ -519,13 +533,26 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
         const refresh_token = readTokens().refresh_token;
         if (refresh_token !== null) {
             log.debug('refreshing the access token');
-            const result = await requestTokens(attempt_epoch, {
-                grant_type: 'refresh_token',
-                client_id,
-                redirect_uri: config.redirect_uri,
-                refresh_token,
-            });
+            // Trusted tabs share the tokens. Another tab can refresh or log out while this request
+            // waits. Then the result of this request is old, and the shared tokens are the answer.
+            const shared = () => readTokens().refresh_token === refresh_token;
+            const result = await requestTokens(
+                attempt_epoch,
+                {
+                    grant_type: 'refresh_token',
+                    client_id,
+                    redirect_uri: config.redirect_uri,
+                    refresh_token,
+                },
+                shared,
+            );
             if (result.ok) return signedIn(result.value);
+            if (!shared()) {
+                const current = currentCredential();
+                if (current !== null) return signedIn(current);
+                // A different tab logged out. A grant of this tab must not log the user in again.
+                return failed({ kind: 'logged_out' });
+            }
             if (!isRefusal(result.error)) return failed(result.error);
             // Keep a refresh token after a network error, but not after the server refused it.
             log.warn('the server refused the refresh token');
@@ -534,10 +561,14 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
         return null;
     }
 
-    /** Sends a grant to the token endpoint and keeps the tokens of the response. */
+    /**
+     * Sends a grant to the token endpoint and keeps the tokens of the response. If `current` gives
+     * `false` when the response comes, the tokens are old: it keeps none and gives `logged_out`.
+     */
     async function requestTokens(
         attempt_epoch: number,
         params: Readonly<Record<string, string>>,
+        current: () => boolean = () => true,
     ): Promise<Result<Credential, AuthError>> {
         const fetched = await fetchBody(
             environment.fetch,
@@ -550,11 +581,15 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
                 body: new URLSearchParams(params).toString(),
+                // A 307 or a 308 sends the body again, with the secrets of the grant. The token
+                // endpoint has no redirect, so a redirect is an error.
+                redirect: 'error',
             },
             limits,
         );
         // A logout ran while the request waited. Its tokens must not log the user in again.
-        if (epoch !== attempt_epoch) return { ok: false, error: { kind: 'logged_out' } };
+        if (epoch !== attempt_epoch || !current())
+            return { ok: false, error: { kind: 'logged_out' } };
         const grant = params['grant_type'] ?? '';
         if (!fetched.ok) {
             log.error('the token request failed', { grant, error: fetched.error.kind });
@@ -649,6 +684,7 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
         if (status === 511) {
             // 511: the session on the server ended. The user must log in again.
             if (handle_login && authority !== null) redirect(loginUrl(authority));
+            else failed({ kind: 'login_required' });
             return false;
         }
         // 401: the session can have changed, so load the authority again before the new attempt.
@@ -936,11 +972,20 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
             authority === null ? serverUrl(LOGOUT_PATH_DEFAULT) : serverUrl(authority.logout_url);
         log.info('logging out');
         epoch += 1;
-        const request_headers: Record<string, string> = { ...headers };
+        logouts_pending += 1;
+        // The logout URL of the authority can be on a different origin. Only the PlaceOS server
+        // gets the headers of the session and the token. A URL that does not parse gets none.
+        const page = environment.currentUrl();
+        const same_origin =
+            URL.canParse(url, page) &&
+            new URL(url, page).origin === new URL(serverUrl('/'), page).origin;
+        const request_headers: Record<string, string> = same_origin ? { ...headers } : {};
         // Send the token also after its local expiry. That has a margin, so the server can still
         // accept the token, and the logout revokes it.
         const access_token = readTokens().access_token;
-        if (access_token !== null) request_headers['Authorization'] = `Bearer ${access_token}`;
+        if (access_token !== null && same_origin) {
+            request_headers['Authorization'] = `Bearer ${access_token}`;
+        }
         const fetched = await fetchBody(
             environment.fetch,
             url,
@@ -950,8 +995,11 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
         // Remove the credentials also when the request fails. The navigation ends the session.
         const location = fetched.ok ? fetched.value.headers.get('location') : null;
         clearCredentials();
+        logouts_pending -= 1;
         setStatus({ kind: 'signed_out', error: null });
-        environment.navigate(location ?? url);
+        // The browser throws on a URL that does not parse. Then the page stays, signed out.
+        const target = location ?? url;
+        if (URL.canParse(target, page)) environment.navigate(target);
     }
 
     /** Removes each stored value of this client: each key that has the client ID, and the link. */
@@ -1098,9 +1146,13 @@ function hasLoginParams(params: ReadonlyMap<string, string>): boolean {
     return params.has('error') && params.has('state');
 }
 
-/** A 4xx from the token endpoint refuses the grant. Other errors can pass with a new attempt. */
+/**
+ * A 4xx from the token endpoint refuses the grant, except a 408 (timeout) and a 429 (too many
+ * requests). A new attempt can pass after these and after other errors.
+ */
 function isRefusal(error: AuthError): boolean {
     if (error.kind !== 'token_rejected') return false;
+    if (error.status === 408 || error.status === 429) return false;
     return error.status >= 400 && error.status < 500;
 }
 

@@ -35,17 +35,22 @@ remote() {
 # The open regeneration PRs: "<number> <branch>" on each line. A PR from a fork is not one, even
 # when its branch has the prefix. The filter runs after `--limit`, so a full list stops the script:
 # a regeneration PR can be out of the list.
+#
+# Bash does not apply `set -e` in a command substitution, such as `prs="$(open_prs)"`. So each step
+# returns on a failure. Else a failure of `gh` gives an empty list, and the cleanup deletes the
+# branches of open PRs.
 open_prs() {
-    local prs
+    local prs count
     prs="$(gh pr list --state open --base "$BASE" --limit "$OPEN_PRS_MAX" \
-        --json number,headRefName,isCrossRepository)"
-    if [ "$(jq length <<<"$prs")" -ge "$OPEN_PRS_MAX" ]; then
+        --json number,headRefName,isCrossRepository)" || return 1
+    count="$(jq length <<<"$prs")" || return 1
+    if [ "$count" -ge "$OPEN_PRS_MAX" ]; then
         echo "$OPEN_PRS_MAX or more open PRs to $BASE. Close some, then run again." >&2
         exit 1
     fi
     jq -r --arg prefix "$BRANCH_PREFIX" '.[]
         | select((.isCrossRepository | not) and (.headRefName | startswith($prefix)))
-        | "\(.number) \(.headRefName)"' <<<"$prs"
+        | "\(.number) \(.headRefName)"' <<<"$prs" || return 1
 }
 
 # Closes each open regeneration PR except the one on branch $1, with the comment $2.

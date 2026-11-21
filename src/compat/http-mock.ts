@@ -7,13 +7,14 @@
  *     id: request.route_params.id,
  *     name: 'Zone',
  * }) });
- * configure({ base_url: '', auth: { kind: 'none' }, fetch: mockFetch });
+ * configure({ base_url: '', auth: { kind: 'none' }, fetch: mockFetch, missing_fields: 'zero' });
  * ```
  *
  * The behavior is the same as 6.x: a path segment `:name` is a route parameter, the response comes
  * after a delay (300 ms by default), and an endpoint that is not registered gives a 404. One
  * difference: 7.x parses each response with the schema of the operation, so the mock data must
- * match the API document.
+ * match the API document. `missing_fields: 'zero'` fills the fields that the mock data does not
+ * have, as the 6.x classes did.
  *
  * @module
  */

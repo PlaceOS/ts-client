@@ -109,20 +109,33 @@ export function migrateSource(
     const kind = /\.[cm]?tsx$/.test(file_name) ? ts.ScriptKind.TSX : ts.ScriptKind.TS;
     const source = ts.createSourceFile(file_name, text, ts.ScriptTarget.Latest, true, kind);
 
-    const imports = readImports(ts, source);
-    if (imports.declarations.length === 0) {
+    const read = readImports(ts, source);
+    if (read.declarations.length === 0) {
         return { text, changes: 0, findings: [], migrated: new Set() };
     }
+    // A local declaration with the name of a 6.x import, such as a parameter `showZone`, hides the
+    // import in its scope. The tool does not read scopes, so it changes no use of that name.
+    const shadowed = shadowedImports(ts, source, read, tables);
+    if (shadowed === null) return tooDeep(text);
+    const imports: V1Imports = {
+        declarations: read.declarations,
+        named: new Map([...read.named].filter(([local]) => !shadowed.has(local))),
+        namespaces: new Set([...read.namespaces].filter((local) => !shadowed.has(local))),
+    };
     // A 6.x class that the file uses only as a type loses its import, so a 7.x type can take its
-    // name, such as `Survey` for the 6.x `Survey`.
+    // name, such as `Survey` for the 6.x `Survey`. An import that the file exports stays, so its
+    // name is not free.
+    const exported = localExports(ts, source);
     const typeOnly = (name: string) => {
         const imported = imports.named.get(name);
-        return imported !== undefined && imported in tables.types;
+        return imported !== undefined && imported in tables.types && !exported.has(name);
     };
     const names = declaredNames(ts, source, typeOnly);
     if (names === null) return tooDeep(text);
     // A closure does not keep the narrowing of `names`, so this name has the narrow type.
     const taken: Set<string> = names;
+    // `export { Zone }` names the import. A new import must not take that name.
+    for (const name of exported) taken.add(name);
     const edits: Edit[] = [];
     const findings: Finding[] = [];
     const migrated = new Set<string>();
@@ -147,6 +160,15 @@ export function migrateSource(
     }
     let changes = 0;
     let deep = false;
+    for (const [local, declaration] of shadowed) {
+        // The import stays, because the tool did not change its uses.
+        countUse(local, false);
+        find(
+            declaration,
+            local,
+            `a local declaration hides the 6.x import ${local}: change its uses by hand`,
+        );
+    }
 
     // The helpers that a file already imports from the compat module, by name.
     const compat_imported = new Map<string, string>();
@@ -652,6 +674,15 @@ export function migrateSource(
                 ts.isPropertyAccessExpression(callee) &&
                 ts.isIdentifier(callee.expression) &&
                 imports.namespaces.has(callee.expression.text) &&
+                callee.name.text in tables.compat
+            ) {
+                // `client.registerSystem(...)` calls the compat function, as a named import does.
+                replace(callee, compatLocal(callee.name.text));
+                changes += 1;
+            } else if (
+                ts.isPropertyAccessExpression(callee) &&
+                ts.isIdentifier(callee.expression) &&
+                imports.namespaces.has(callee.expression.text) &&
                 (callee.name.text in tables.unmapped || callee.name.text in tables.types)
             ) {
                 // The same finding as for a call of a named import, such as `authority()`.
@@ -687,6 +718,17 @@ export function migrateSource(
             } else if (right in tables.compat) {
                 replace(type_name, compatLocal(right));
                 changes += 1;
+            }
+            return;
+        }
+
+        // `export { showZone }` gives the 6.x function to other files. The tool cannot change them.
+        if (ts.isExportSpecifier(node) && node.parent.parent.moduleSpecifier === undefined) {
+            const local = node.propertyName ?? node.name;
+            const imported = ts.isIdentifier(local) ? imports.named.get(local.text) : undefined;
+            if (imported !== undefined && !moved.has(local.text) && isV1Name(tables, imported)) {
+                countUse(local.text, false);
+                find(node, imported, 'an export of a 6.x import: change it by hand');
             }
             return;
         }
@@ -872,7 +914,6 @@ function readImports(ts: typeof TS, source: TS.SourceFile): V1Imports {
     return { declarations, named, namespaces };
 }
 
-/** The names that the file declares or uses, so that a new import does not hide one. */
 /** The result for a file deeper than `AST_DEPTH_MAX`: no change, and a finding. */
 function tooDeep(text: string): MigrateResult {
     const message = `the file nests deeper than ${AST_DEPTH_MAX} levels: change it by hand`;
@@ -924,6 +965,68 @@ function declaredNames(
     }
     visit(source, 0);
     return deep ? null : names;
+}
+
+/** The local names in `export { name }` statements without a module. */
+function localExports(ts: typeof TS, source: TS.SourceFile): Set<string> {
+    const names = new Set<string>();
+    for (const statement of source.statements) {
+        if (!ts.isExportDeclaration(statement) || statement.moduleSpecifier !== undefined) continue;
+        const clause = statement.exportClause;
+        if (clause === undefined || !ts.isNamedExports(clause)) continue;
+        for (const element of clause.elements)
+            names.add((element.propertyName ?? element.name).text);
+    }
+    return names;
+}
+
+/**
+ * The 6.x calls and namespaces whose name a local declaration also has, with the first such
+ * declaration. `null` for a file deeper than `AST_DEPTH_MAX`.
+ */
+function shadowedImports(
+    ts: typeof TS,
+    source: TS.SourceFile,
+    imports: V1Imports,
+    tables: MigrateTables,
+): Map<string, TS.Identifier> | null {
+    const names = new Set(imports.namespaces);
+    for (const [local, imported] of imports.named) {
+        if (imported in tables.calls) names.add(local);
+    }
+    const shadowed = new Map<string, TS.Identifier>();
+    let deep = false;
+    function visit(node: TS.Node, depth: number): void {
+        if (depth > AST_DEPTH_MAX) {
+            deep = true;
+            return;
+        }
+        if (ts.isIdentifier(node) && names.has(node.text) && !shadowed.has(node.text)) {
+            if (isDeclarationName(ts, node)) shadowed.set(node.text, node);
+        }
+        ts.forEachChild(node, (child) => visit(child, depth + 1));
+    }
+    if (names.size > 0) visit(source, 0);
+    return deep ? null : shadowed;
+}
+
+/**
+ * The name of a variable, a parameter, a function, a class, an enum or a namespace. Not the name of
+ * an import.
+ */
+function isDeclarationName(ts: typeof TS, node: TS.Identifier): boolean {
+    const parent = node.parent;
+    const declaration =
+        ts.isVariableDeclaration(parent) ||
+        ts.isParameter(parent) ||
+        ts.isBindingElement(parent) ||
+        ts.isFunctionDeclaration(parent) ||
+        ts.isFunctionExpression(parent) ||
+        ts.isClassDeclaration(parent) ||
+        ts.isClassExpression(parent) ||
+        ts.isEnumDeclaration(parent) ||
+        ts.isModuleDeclaration(parent);
+    return declaration && parent.name === node;
 }
 
 /** `vi.<method>` or `jest.<method>`, or only `<global>.<method>`. */
@@ -1138,6 +1241,23 @@ function renderCall(
             const name = mapping.parameters[index]?.name ?? String(index);
             return `the 7.x call uses the ${name} argument twice: put it in a variable first`;
         }
+    }
+    // The 7.x input can have the arguments in a different order. The order of the keys is the order
+    // of evaluation. A call or an assignment in one argument can change the value of a name in a
+    // different argument, so the arguments keep their order when one of them is not simple. Only a
+    // literal can move.
+    const order = [...counts.keys()].filter((index) => {
+        const arg = given[index];
+        return (
+            arg !== null && arg !== undefined && literalText(ts, { text: '', node: arg }) === null
+        );
+    });
+    const has_effects = order.some((index) => {
+        const arg = given[index];
+        return arg !== null && arg !== undefined && !isSimple(ts, arg);
+    });
+    if (has_effects && order.some((index, at) => at > 0 && index < (order[at - 1] ?? -1))) {
+        return 'the 7.x call evaluates the arguments in a different order: put them in variables first';
     }
 
     const value = (index: number): Value | null => {

@@ -38,9 +38,8 @@ function parseCount(text: string | null): number | null {
 function parseNextOffset(header: string | null): number | null {
     if (header === null) return null;
     if (header.length > LINK_HEADER_LENGTH_MAX) return null;
-    for (const link of header.split(',')) {
-        const match = /^\s*<([^>]*)>\s*;\s*rel="?next"?\s*$/.exec(link);
-        if (match === null) continue;
+    // A target can have commas, such as `?zone_id=a,b`, so a link ends at a comma after its `>`.
+    for (const match of header.matchAll(/<([^>]*)>\s*;\s*rel="?next"?\s*(?:,|$)/g)) {
         const target = match[1] ?? '';
         // The target is often a path only. The base makes it a URL that `URL` can parse.
         if (!URL.canParse(target, 'http://base.invalid')) return null;

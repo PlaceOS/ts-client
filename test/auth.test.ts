@@ -26,6 +26,7 @@ interface Sent {
     readonly method: string;
     readonly headers: Headers;
     readonly form: URLSearchParams;
+    readonly redirect: RequestRedirect | undefined;
 }
 
 interface FakeOptions {
@@ -67,6 +68,7 @@ function fake(options: FakeOptions = {}) {
                 method: init.method ?? 'GET',
                 headers: new Headers(init.headers),
                 form,
+                redirect: init.redirect,
             };
             sent.push(record);
             const path = new URL(url, 'http://localhost:4200').pathname;
@@ -426,6 +428,51 @@ describe('trusted applications and refresh tokens', () => {
         expect(world.storage.get(`${CLIENT_ID}_refresh_token`)).toBe('old');
         expect(world.navigations).toHaveLength(0);
     });
+
+    test('a 429 keeps the refresh token, because a later attempt can pass', async () => {
+        const world = fake({ token: () => new Response('{}', { status: 429 }) });
+        world.storage.set('trusted', 'true');
+        world.storage.set(`${CLIENT_ID}_refresh_token`, 'old');
+        await session(world).start();
+        expect(world.storage.get(`${CLIENT_ID}_refresh_token`)).toBe('old');
+    });
+
+    test('a refresh that a different tab completes first uses the tokens of that tab', async () => {
+        let answer: (response: Response) => void = () => {};
+        const world = fake({ token: () => new Promise<Response>((resolve) => (answer = resolve)) });
+        world.storage.set('trusted', 'true');
+        world.storage.set(`${CLIENT_ID}_refresh_token`, 'refresh-0');
+        const pending = session(world).start();
+        await Bun.sleep(0);
+        // The other tab sent the same refresh token, and the server rotated it for that tab.
+        world.storage.set(`${CLIENT_ID}_access_token`, 'other');
+        world.storage.set(`${CLIENT_ID}_refresh_token`, 'refresh-other');
+        world.storage.set(`${CLIENT_ID}_expires_at`, String(NOW_MS + 60_000));
+        answer(Response.json({ error: 'invalid_grant' }, { status: 400 }));
+        expect(await pending).toEqual({ ok: true, value: { kind: 'bearer', token: 'other' } });
+        expect(world.storage.get(`${CLIENT_ID}_refresh_token`)).toBe('refresh-other');
+    });
+
+    test('a refresh during a logout in a different tab does not log in with a grant', async () => {
+        let answer: (response: Response) => void = () => {};
+        const world = fake({
+            token: (form) =>
+                form.get('grant_type') === 'refresh_token'
+                    ? new Promise<Response>((resolve) => (answer = resolve))
+                    : Response.json({ access_token: 'from-password', expires_in: 3600 }),
+        });
+        world.storage.set('trusted', 'true');
+        world.storage.set(`${CLIENT_ID}_refresh_token`, 'refresh-0');
+        const grant = { kind: 'password', username: 'user', password: 'secret' } as const;
+        const pending = session(world, { grant }).start();
+        await Bun.sleep(0);
+        // The other tab logged out: it removed the shared tokens.
+        world.storage.remove(`${CLIENT_ID}_refresh_token`);
+        answer(Response.json({ access_token: 'late', refresh_token: 'late-2', expires_in: 3600 }));
+        expect(await pending).toEqual({ ok: false, error: { kind: 'logged_out' } });
+        expect(world.tokenRequests()).toHaveLength(1);
+        expect(world.storage.get(`${CLIENT_ID}_access_token`)).toBeNull();
+    });
 });
 
 describe('other grants', () => {
@@ -449,6 +496,8 @@ describe('other grants', () => {
         await session(world, { grant }).start();
         const request = world.tokenRequests()[0];
         expect(request?.url).toBe('/auth/oauth/token');
+        // A redirect would send the body again, to its target.
+        expect(request?.redirect).toBe('error');
         expect(request?.form.get('grant_type')).toBe('password');
         expect(request?.form.get('password')).toBe('secret');
         expect(request?.form.get('authority')).toBe('authority-1');
@@ -686,6 +735,80 @@ describe('the session with the client', () => {
         expect(await renewing).toBe(false);
         expect(world.tokenRequests()).toHaveLength(0);
         expect(auth.credential()).toBeNull();
+    });
+
+    test('a request while logout waits starts no refresh, so it cannot log in again', async () => {
+        const world = fake();
+        world.storage.set('trusted', 'true');
+        world.storage.set(`${CLIENT_ID}_refresh_token`, 'refresh-0');
+        let release: () => void = () => {};
+        const held = new Promise<void>((resolve) => (release = resolve));
+        let logouts = 0;
+        const fetch: AuthEnvironment['fetch'] = async (url, init) => {
+            // Only the first logout request waits.
+            if (url.endsWith('/logout') && logouts++ === 0) await held;
+            return world.environment.fetch(url, init);
+        };
+        // A password grant needs no stored token, so only the logout can stop it.
+        const grant = { kind: 'password', username: 'user', password: 'secret' } as const;
+        const auth = session(world, { grant, environment: { ...world.environment, fetch } });
+        await auth.reloadAuthority();
+        const client = createClient({ base_url: '', auth: auth.client_auth, fetch });
+        const logout = auth.logout();
+        const result = await call(SHOW, { id: 'zone-1' }, { client });
+        expect(result).toEqual({ ok: false, error: { kind: 'auth_missing' } });
+        // A second logout ends first. The first one still waits, so no attempt starts.
+        await auth.logout();
+        expect(await call(SHOW, { id: 'zone-1' }, { client })).toEqual(result);
+        release();
+        await logout;
+        expect(world.tokenRequests()).toHaveLength(0);
+    });
+
+    test('a 511 with handle_login false signs out, so the application shows its login', async () => {
+        const world = fake({ api: () => new Response('{}', { status: 511 }) });
+        world.storage.set('trusted', 'true');
+        world.storage.set(`${CLIENT_ID}_access_token`, 'token');
+        world.storage.set(`${CLIENT_ID}_expires_at`, String(NOW_MS + 60_000));
+        const auth = session(world, { handle_login: false });
+        const client = createClient({
+            base_url: '',
+            auth: auth.client_auth,
+            fetch: world.environment.fetch,
+        });
+        const result = await call(SHOW, { id: 'zone-1' }, { client });
+        expect(result.ok === false && result.error.kind === 'http' && result.error.status).toBe(
+            511,
+        );
+        expect(auth.status()).toEqual({ kind: 'signed_out', error: { kind: 'login_required' } });
+        expect(world.navigations).toHaveLength(0);
+    });
+
+    test('logout sends the token and the headers only to the PlaceOS server', async () => {
+        const world = fake();
+        world.authority.logout_url = 'https://idp.test/logout';
+        world.storage.set('trusted', 'true');
+        world.storage.set(`${CLIENT_ID}_access_token`, 'token');
+        const auth = session(world, { headers: { 'X-API-Key': 'key-1' } });
+        await auth.reloadAuthority();
+        await auth.logout();
+        expect(world.sent.at(-1)?.url).toBe('https://idp.test/logout');
+        expect([...(world.sent.at(-1)?.headers.keys() ?? [])]).toEqual([]);
+    });
+
+    test('a logout URL that does not parse still removes the credentials', async () => {
+        const world = fake();
+        world.authority.logout_url = 'https://';
+        world.storage.set('trusted', 'true');
+        world.storage.set(`${CLIENT_ID}_access_token`, 'token');
+        world.storage.set(`${CLIENT_ID}_expires_at`, String(NOW_MS + 60_000));
+        const auth = session(world);
+        await auth.reloadAuthority();
+        await auth.logout();
+        expect(world.storage.get(`${CLIENT_ID}_access_token`)).toBeNull();
+        expect(auth.status().kind).toBe('signed_out');
+        // A browser throws on that URL, so the session does not go there.
+        expect(world.navigations).toEqual([]);
     });
 
     test('logout sends the token also after its local expiry, so the server revokes it', async () => {

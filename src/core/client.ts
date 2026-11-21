@@ -147,17 +147,17 @@ export type CallError =
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
 /**
- * One endpoint of the API, as data. The generated functions call `call` with an operation.
- *
- * `params` is an object schema with the path parameters and the query parameters. `response` is
- * `null` when the API document gives no schema for the body. The data is then the raw bytes.
- */
-/**
  * The response of an operation without a response schema. `text` gives the body as a string, and
  * `bytes` gives it as a `Uint8Array`, for files and images.
  */
 export type RawResponse = 'text' | 'bytes';
 
+/**
+ * One endpoint of the API, as data. The generated functions call `call` with an operation.
+ *
+ * `params` is an object schema with the path parameters and the query parameters. `response` is
+ * the schema of the body or, when the API document gives no schema, a `RawResponse`.
+ */
 export interface Operation<
     P extends AnySchema,
     B extends AnySchema | null,
@@ -230,8 +230,9 @@ export interface Reply<T> {
  */
 export interface PageReply<O, T> extends Reply<T> {
     /**
-     * Requests the next page: the same input with the `offset` of the `Link` header, through the
-     * same client. `options` replace the options of the first call. `null` on the last page, and
+     * Requests the next page: the same input with the `offset` of the `Link` header. Each field of
+     * `options` replaces that field of the request that gave this page, and the other fields stay,
+     * also `client` and `signal`. `null` on the last page, and
      * when the offset does not move forward, so that a loop over the pages ends.
      */
     next(options?: CallOptions): Promise<CallResult<O>> | null;
@@ -463,7 +464,8 @@ async function send(
         setCredentialHeader(headers, credential.value);
         // On a redirect to another origin, `fetch` removes `Authorization` but keeps `X-API-Key`.
         // So with an API key, a redirect is a `network` error. The API has no redirect operations.
-        const redirect: RequestRedirect = credential.value.kind === 'api_key' ? 'error' : 'follow';
+        // The key can also come from the `headers` of the client.
+        const redirect: RequestRedirect = headers.has('X-API-Key') ? 'error' : 'follow';
         const init = { method: operation.method, headers, body: body_text, redirect };
         const remaining_ms = deadline_ms - Date.now();
         if (remaining_ms <= 0) return { ok: false, error: { kind: 'timeout', timeout_ms } };
@@ -480,11 +482,15 @@ async function send(
         if (client.auth.kind !== 'credential') break;
         if (status !== 401 && status !== 511) break;
         if (attempt + 1 >= AUTH_ATTEMPTS_MAX) break;
-        const rejected = client.auth.rejected;
+        const credential_auth = client.auth;
         const used = credential.value;
         const log = scopedLog('http', { sink: client.log });
         log.info(`${operation.name}: ${status}, renewing the credential`);
-        const renewed = await waitWithin(() => rejected(status, used), deadline_ms, signal);
+        const renewed = await waitWithin(
+            () => renewCredential(credential_auth, status, used),
+            deadline_ms,
+            signal,
+        );
         if (!renewed.ok) return limitError(renewed.error, timeout_ms);
         if (!renewed.value) break;
     }
@@ -757,8 +763,37 @@ function isAborted(signal: AbortSignal | undefined): boolean {
     return signal?.aborted === true;
 }
 
-/** The credential that `auth` gives now, or `null`. The client and the realtime client use it. */
+/**
+ * The credential that `auth` gives now, or `null`. The client and the realtime client use it. A
+ * `token` or `credential` function of the application that throws gives `null`, so the call gives
+ * `auth_missing` and does not reject.
+ */
 export async function resolveCredential(auth: Auth): Promise<Credential | null> {
+    try {
+        return await credentialOf(auth);
+    } catch {
+        return null;
+    }
+}
+
+/**
+ * Calls `rejected` of a `credential` auth, as a method of the auth, so that it can use `this`. A
+ * callback that throws or rejects gives `false`: no new credential, so the call gives the 401 or
+ * the 511.
+ */
+export async function renewCredential(
+    auth: Extract<Auth, { readonly kind: 'credential' }>,
+    status: 401 | 511,
+    credential: Credential,
+): Promise<boolean> {
+    try {
+        return await auth.rejected(status, credential);
+    } catch {
+        return false;
+    }
+}
+
+async function credentialOf(auth: Auth): Promise<Credential | null> {
     switch (auth.kind) {
         case 'none':
             return { kind: 'none' };

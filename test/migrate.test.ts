@@ -438,3 +438,79 @@ test('finds the unmapped names on a namespace import', () => {
         '3 getModule',
     ]);
 });
+
+test('an exported 6.x type keeps its name, so the 7.x type gets an alias', () => {
+    const result = migrate(
+        [
+            "import { PlaceZone as Zone } from '@placeos/ts-client';",
+            'export { Zone };',
+            'let draft: Zone;',
+        ].join('\n'),
+    );
+    expect(result.text.split('\n')).toEqual([
+        "import { PlaceZone as Zone, type Zone as ZoneV7 } from '@placeos/ts-client';",
+        'export { Zone };',
+        'let draft: ZoneV7;',
+    ]);
+    // The exported alias is taken also when the file uses the 6.x name too.
+    const both = migrate(
+        [
+            "import { PlaceZone, PlaceZone as Zone } from '@placeos/ts-client';",
+            'export { Zone };',
+            'let draft: PlaceZone;',
+        ].join('\n'),
+    );
+    expect(both.text).toContain('let draft: ZoneV7;');
+});
+
+test('a local name that hides a 6.x import, and an export of one, stay with a finding', () => {
+    const text = [
+        "import { queryZones, showZone } from '@placeos/ts-client';",
+        'function load({ queryZones }: { queryZones: () => void }) {',
+        '    queryZones();',
+        '}',
+        'export { showZone as loadZone };',
+    ].join('\n');
+    const result = migrate(text);
+    expect(result.text).toBe(text);
+    expect(result.findings.map(({ line, name }) => ({ line, name }))).toEqual([
+        { line: 2, name: 'queryZones' },
+        { line: 5, name: 'showZone' },
+    ]);
+    // An enum or a namespace also hides a namespace import.
+    for (const kind of ['enum', 'namespace']) {
+        const hidden = [
+            "import * as client from '@placeos/ts-client';",
+            `${kind} client {}`,
+            "client.showZone('a');",
+        ].join('\n');
+        expect(migrate(hidden).text).toBe(hidden);
+    }
+});
+
+test('a call whose 7.x input changes the order of its arguments stays with a finding', () => {
+    // `getModule()` can change `method`. In 6.x, `method` was read first.
+    const text = [
+        "import { executeOnZone } from '@placeos/ts-client';",
+        "executeOnZone('zone-1', method, getModule());",
+    ].join('\n');
+    const result = migrate(text);
+    expect(result.text).toBe(text);
+    expect(result.findings[0]?.message).toContain('different order');
+});
+
+test('a namespace import calls a 6.x mock function from the compat module', () => {
+    const result = migrate(
+        [
+            "import * as client from '@placeos/ts-client';",
+            "client.registerSystem('sys-1', {});",
+        ].join('\n'),
+    );
+    expect(result.text).toBe(
+        [
+            "import * as client from '@placeos/ts-client';",
+            "import { registerSystem } from '@placeos/ts-client/compat';",
+            "registerSystem('sys-1', {});",
+        ].join('\n'),
+    );
+});

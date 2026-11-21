@@ -87,9 +87,9 @@ of `modules.logs`, or `''` for a `destroy`. An operation that sends a file or an
 `uploads.downloadProxyFileContents` or `staff.staff.photo`, gives a `Uint8Array`. The type of
 `data` shows which one you get.
 
-A 204 has no body. For an operation with a response schema, `data` is then `null`. Only an
-operation with a 204 in the API document, such as `staff.calendars.availability`, accepts it. For
-the other operations with a schema, a 204 is a `response_invalid` error.
+A 204 has no body. For an operation with a response schema, `data` is then `null` if the schema
+accepts `null`. If the schema does not accept `null`, a 204 is a `response_invalid` error. A 204
+in the API document makes the schema accept `null`, as for `staff.calendars.availability`.
 
 When `ok` is `false`, `error.kind` tells what failed. The other fields depend on the kind:
 
@@ -119,9 +119,9 @@ In a project without `strictNullChecks`, `if (!result.ok)` does not narrow the `
 
 ### Pages
 
-A `query` operation returns one page. To get the next page, call `next()` on the reply. It sends
-the same input again, with the offset from the `Link` header, through the same client. On the last
-page, `next()` gives `null`:
+An operation with an `offset` parameter, such as `zones.query`, returns one page. To get the next
+page, call `next()` on the reply. It sends the same input again, with the offset from the `Link`
+header. On the last page, `next()` gives `null`:
 
 ```ts
 let result = await zones.query({ limit: 100 });
@@ -135,7 +135,8 @@ while (result.ok) {
 
 - Each operation with an `offset` parameter has `next()`, for example `zones.query`,
   `history.query` and `staff.bookings.query`. The type of the reply shows if it has `next()`.
-- `next(options)` replaces the options of the first call, such as `signal` or `timeout_ms`.
+- `next(options)` replaces each option that you give, such as `timeout_ms`. The options that you
+  do not give stay as in the request that returned this page, also `client` and `signal`.
 - `next()` also gives `null` when the offset of the link does not move forward, so that a loop over
   the pages always ends.
 - `pageInfo(result.value.headers)` gives the `total` (`X-Total-Count`) and the `next_offset`.
@@ -202,8 +203,11 @@ the `password` grant. Only older auth services accept it.
 A trusted application (`?trust=true` in the URL) keeps its tokens in `localStorage`. Other
 applications keep their tokens in memory only.
 
-After a 401, the client asks the session for a new token and sends the request again, one time.
-Parallel requests share one renewal. After a 511, the session sends the user to the login page.
+After a 401, the client asks the session for a new token. If the session gets one, the client
+sends the request again, one time. Parallel requests share one renewal. After a 511, the session
+removes the token. If `handle_login` is on and the authority is loaded, it then sends the user to
+the login page. Else the status becomes `signed_out` with `login_required`. The session does not
+renew an API key, so a 401 or a 511 with an API key is the result of the call.
 
 Other parts of the session:
 
@@ -243,7 +247,8 @@ release();
 - The client handles the messages of the server in batches. In one batch, many notifications for
   one variable give one call to its listeners, with the last value.
 - `exec` gives a `Result` with the return value of the function, or a `RealtimeError`:
-  `timeout`, `disconnected` (the socket closed after the server got the call), `stopped`,
+  `timeout`, `disconnected` (the client sent the call, and the socket closed before the result
+  came: the client does not know if the server ran the call), `stopped`,
   `unavailable`, `too_many_requests` or `server` (with the error code and the status).
 - The client sends `ping` each 15 seconds. When the socket gets no message for 60 seconds, it
   closes, and the client connects again. The wait before each new attempt increases, to a maximum
@@ -251,8 +256,9 @@ release();
 - `realtime.debug({ sys, module_id }, listener)` gets the logs of a module.
 - `splitModuleSlug('Display_2')` gives `{ mod: 'Display', index: 2 }`.
 - In a browser, the token goes in a cookie on the socket path. In a frame and on mobile Safari it
-  goes in the query, as in 6.x. `createRealtime({ ..., environment })` replaces the socket, the
-  timers and the cookie, for tests.
+  goes in the query, as in 6.x. A cookie reaches only the hostname of the page. If the hostname of
+  the socket is different, the token also goes in the query. `createRealtime({ ..., environment })` replaces
+  the socket, the timers and the cookie, for tests.
 
 ## Staff API
 
@@ -343,8 +349,11 @@ window.debug = true;
 | `group_end` | Ends the group.                                           | `console.groupEnd` |
 
 - `createConsoleLog({ colors: false })` writes the same text without the `%c` colors.
-- An entry has no tokens, API keys, cookies, request bodies or input values. A redirect gives its
-  path only, because the query has the state of the login.
+- The library does not put the tokens, API keys, cookies or request bodies that it sends in an
+  entry. A redirect gives its path only, because the query has the state of the login.
+- An entry can have data from the server: the body of an HTTP error, the error text of the login,
+  the values of realtime bindings and the logs of modules. This data can contain secrets or
+  personal data. Do not send the entries to a service that must not get this data.
 - A log function that throws does not change the call, the login or the socket.
 - The `mock` entries of the 6.x mock endpoints always go to `consoleLog`, as in 6.x.
 - For contributors: in the library, each part logs through a scoped logger:
@@ -363,6 +372,8 @@ const client = createClient({
     base_url: '',
     auth: { kind: 'none' },
     fetch: async (url, init) => new Response(JSON.stringify({ id: 'zone-1' })),
+    // The data of the test has only some fields. This gives the other fields their empty value.
+    missing_fields: 'zero',
 });
 const result = await zones.show({ id: 'zone-1' }, { client });
 ```
@@ -454,7 +465,7 @@ can examine and undo the changes. Run the tool in the folder of the project, bec
 `typescript` package of the project:
 
 ```sh
-npx -p @placeos/ts-client@next placeos-migrate src           # Shows the changes. Writes no file.
+npx -p @placeos/ts-client@next placeos-migrate src           # Lists the files and the uses to change by hand. Writes no file.
 npx -p @placeos/ts-client@next placeos-migrate --write src   # Writes the changes.
 ```
 
@@ -469,7 +480,8 @@ The tool makes these changes:
 
 - A call of a 6.x REST function becomes the 7.x operation. `.then(orThrow)` gives the data, and an
   error rejects the promise, as in 6.x. A 6.x query function gets `.then(orThrowPage)`, which gives
-  `{ data, total, next_offset }`.
+  `{ data, total, next_offset, next }`. `next` requests the next page, as in 6.x, and is `null` on
+  the last page.
 
     ```ts
     // 6.x
@@ -551,7 +563,9 @@ marker arguments, and it finds the 7.x operation with the same method and path.
 
 ### Changes in the login
 
-- The session keeps the storage keys of 6.x, so a user stays logged in after the change.
+- The session keeps the storage keys of 6.x, so the user of a trusted application stays logged in
+  after the change. Other applications keep their tokens in memory only, so they get a new token
+  at the first load of 7.x.
 - The default token path is `/auth/oauth/token`. PlaceOS auth.cr and the older Ruby auth service
   both serve it. The Ruby auth service does not serve `/auth/token`.
 - A relative login or logout URL of the authority is on `base_url`. 6.x used the `domain` of the
@@ -579,8 +593,8 @@ marker arguments, and it finds the 7.x operation with the same method and path.
 
 ### Changes in realtime
 
-- A call that the server got fails with `disconnected` when the socket closes. 6.x did not settle
-  these calls.
+- A call that the client sent fails with `disconnected` when the socket closes before its result.
+  6.x did not settle these calls.
 - Two calls with the same arguments are two calls. 6.x merged them for one minute.
 - Server errors have the correct code name. 6.x read the HTTP style status as the error code.
 - `iface: true` addresses an interface, such as `Interface::Sensor`.
@@ -591,6 +605,8 @@ marker arguments, and it finds the 7.x operation with the same method and path.
 ### What 7.x does not have
 
 - Classes with methods for each model. 7.x has plain data and functions.
+- A CommonJS build. 7.x is an ES module only. Use `import`. In a CommonJS file, use
+  `import('@placeos/ts-client').then(...)`, or `await import(...)` in an `async` function.
 
 ## Differences from the API document
 
@@ -663,7 +679,9 @@ from the API documents on master:
 - The schedule runs on `master`. A manual run of the workflow on another branch, such as `next`,
   regenerates that branch and opens the PR to it.
 - `DRY_RUN=1 scripts/regenerate-pr.sh`, from the root of the repository, shows what the script
-  would do on GitHub.
+  would do on GitHub, and makes no change there. It still changes the local repository: it
+  regenerates and stages the files, sets the Git author, and makes a branch and a commit when the
+  output changes.
 
 The commit of a regeneration PR is a `fix`, so its merge publishes a patch release. Before the
 merge, change the commit message to a `feat` for new operations, or add a `BREAKING CHANGE:` footer

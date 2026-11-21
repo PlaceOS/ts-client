@@ -11,6 +11,9 @@ test('reads the total and the offset of the next page', () => {
         Link: '</api/engine/v2/zones?limit=100&offset=100>; rel="next"',
     });
     expect(pageInfo(headers)).toEqual({ total: 250, next_offset: 100 });
+    // A query value can have a comma. It does not end the link.
+    const listed = new Headers({ Link: '</zones?zone_id=a,b&offset=100>; rel="next"' });
+    expect(pageInfo(listed).next_offset).toBe(100);
 });
 
 test('gives null on the last page and for values that are not counts', () => {

@@ -7,7 +7,9 @@
  * configure({ base_url: '', auth, log: (entry) => console.debug(entry.scope, ...entry.args) });
  * ```
  *
- * An entry has no tokens, API keys, cookies, request bodies or input values.
+ * The library does not put the tokens, API keys, cookies or request bodies that it sends in an
+ * entry. An entry can have data from the server, such as the body of an HTTP error or the value of
+ * a realtime binding, and that data can contain secrets.
  *
  * Inside the library, each part logs through a scoped logger. The log function of the application
  * decides where the entries go:
