@@ -359,12 +359,24 @@ describe('call errors', () => {
                 status: 404,
                 message: 'not found',
                 body: { error: 'not found' },
+                text: null,
             },
         });
-        const text = fakeFetch(() => new Response('<html>', { status: 502 }));
+        const text = fakeFetch(() => new Response('error: undefined constant', { status: 422 }));
         expect(await call(DOWNLOAD, {}, { client: clientWith(text.fetch) })).toEqual({
             ok: false,
-            error: { kind: 'http', status: 502, message: null, body: null },
+            error: {
+                kind: 'http',
+                status: 422,
+                message: null,
+                body: null,
+                text: 'error: undefined constant',
+            },
+        });
+        const empty = fakeFetch(() => new Response(null, { status: 502 }));
+        expect(await call(DOWNLOAD, {}, { client: clientWith(empty.fetch) })).toEqual({
+            ok: false,
+            error: { kind: 'http', status: 502, message: null, body: null, text: null },
         });
     });
 

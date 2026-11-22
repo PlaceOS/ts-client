@@ -93,18 +93,19 @@ in the API document makes the schema accept `null`, as for `staff.calendars.avai
 
 When `ok` is `false`, `error.kind` tells what failed. The other fields depend on the kind:
 
-| `error.kind`         | Fields                       | Meaning                                        |
-| -------------------- | ---------------------------- | ---------------------------------------------- |
-| `http`               | `status`, `message`, `body`  | The server sent a status that is not 2xx.      |
-| `network`            | `message`                    | No response, such as when the network is down. |
-| `timeout`            | `timeout_ms`                 | The request took more than `timeout_ms`.       |
-| `aborted`            |                              | The `signal` of the caller cancelled the call. |
-| `auth_missing`       |                              | The auth had no token or credential.           |
-| `response_too_large` | `bytes_max`                  | The body was more than `response_bytes_max`.   |
-| `response_invalid`   | `status`, `path`, `expected` | The body does not match the API document.      |
+| `error.kind`         | Fields                              | Meaning                                        |
+| -------------------- | ----------------------------------- | ---------------------------------------------- |
+| `http`               | `status`, `message`, `body`, `text` | The server sent a status that is not 2xx.      |
+| `network`            | `message`                           | No response, such as when the network is down. |
+| `timeout`            | `timeout_ms`                        | The request took more than `timeout_ms`.       |
+| `aborted`            |                                     | The `signal` of the caller cancelled the call. |
+| `auth_missing`       |                                     | The auth had no token or credential.           |
+| `response_too_large` | `bytes_max`                         | The body was more than `response_bytes_max`.   |
+| `response_invalid`   | `status`, `path`, `expected`        | The body does not match the API document.      |
 
 - In an `http` error, `message` is the `error` field of the JSON body, or `null`. `body` is the
-  parsed JSON body, or `null`.
+  parsed JSON body, or `null`. `text` is a body that is not JSON, such as the compiler output of
+  `drivers.recompile`, or `null`.
 - In a `response_invalid` error, `path` names the field, such as `$.id`, and `expected` is the
   type that the schema wants, such as `string`.
 - A call with an API key does not follow a redirect, so a redirect gives a `network` error. See

@@ -129,12 +129,17 @@ export type CallError =
     /** The request did not get a response, for example because the network is down. */
     | { readonly kind: 'network'; readonly message: string }
     | { readonly kind: 'response_too_large'; readonly bytes_max: number }
-    /** The server sent a status that is not 2xx. `message` is the `error` field of the body. */
+    /**
+     * The server sent a status that is not 2xx. `message` is the `error` field of a JSON body.
+     * `text` is a body that is not JSON, such as the compiler output of `drivers.recompile`. The
+     * body is read up to `response_bytes_max`, as a 2xx body is.
+     */
     | {
           readonly kind: 'http';
           readonly status: number;
           readonly message: string | null;
           readonly body: JsonValue | null;
+          readonly text: string | null;
       }
     /** The server sent a 2xx body that does not match the schema of the operation. */
     | {
@@ -496,22 +501,7 @@ async function send(
     }
     assert(response !== null, 'the request was sent');
 
-    if (!response.ok) {
-        const parsed = decodeJson(response.bytes);
-        let error_body: JsonValue | null = null;
-        if (parsed.ok) {
-            const body = parseResponse(json(), parsed.value);
-            if (body.ok) error_body = body.value;
-        }
-        let message: string | null = null;
-        if (isRecord(error_body) && typeof error_body['error'] === 'string') {
-            message = error_body['error'];
-        }
-        return {
-            ok: false,
-            error: { kind: 'http', status: response.status, message, body: error_body },
-        };
-    }
+    if (!response.ok) return { ok: false, error: httpError(response.status, response.bytes) };
 
     const reply = { status: response.status, headers: response.headers };
     if (isRaw(operation.response)) {
@@ -536,6 +526,22 @@ async function send(
     return { ok: true, value: { ...reply, data: data.value } };
 }
 
+/**
+ * The error of a status that is not 2xx. A JSON body goes in `body`, and its `error` field in
+ * `message`. Another body, such as plain text or HTML, goes in `text`. An empty body gives none.
+ */
+function httpError(status: number, bytes: Uint8Array): Extract<CallError, { kind: 'http' }> {
+    const parsed = decodeJson(bytes);
+    const body = parsed.ok ? parseResponse(json(), parsed.value) : null;
+    const error_body = body !== null && body.ok ? body.value : null;
+    const message =
+        isRecord(error_body) && typeof error_body['error'] === 'string'
+            ? error_body['error']
+            : null;
+    const text = parsed.ok || bytes.length === 0 ? null : new TextDecoder().decode(bytes);
+    return { kind: 'http', status, message, body: error_body, text };
+}
+
 /** The result of a mock answer. The data goes through JSON, as the data of a response does. */
 function mockResult(
     operation: AnyOperation,
@@ -557,17 +563,7 @@ function mockResult(
         return { ok: false, error: { kind: 'response_too_large', bytes_max } };
     }
     if (answer.status < 200 || answer.status > 299) {
-        const parsed = decodeJson(bytes);
-        const body = parsed.ok ? parseResponse(json(), parsed.value) : null;
-        const error_body = body !== null && body.ok ? body.value : null;
-        const message =
-            isRecord(error_body) && typeof error_body['error'] === 'string'
-                ? error_body['error']
-                : null;
-        return {
-            ok: false,
-            error: { kind: 'http', status: answer.status, message, body: error_body },
-        };
+        return { ok: false, error: httpError(answer.status, bytes) };
     }
     if (isRaw(operation.response)) {
         return { ok: true, value: { ...reply, data: rawData(operation.response, bytes) } };
