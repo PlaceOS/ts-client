@@ -8,7 +8,13 @@ import { Glob } from 'bun';
 import { join } from 'node:path';
 
 const SOURCE_DIR = join(import.meta.dir, '..', 'src');
-const ALLOWED_CASTS = ['parsed as O', 'checked as I', 'result as CallResult<O>', 'reply as R'];
+const ALLOWED_CASTS = [
+    'parsed as O',
+    'checked as I',
+    'result as CallResult<O>',
+    'reply as R',
+    'reply as Result<MockPage<T>',
+];
 /** The 6.x mock types of the compat module keep `any`, so that the mocks of an app still compile. */
 const ALLOWED_ANY = [
     'compat/http-mock.ts: readonly metadata: any;',

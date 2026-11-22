@@ -89,10 +89,16 @@ export function mockReply<T>(
     return { ok: true, value: { status, headers: new Headers(), data, next: () => null } };
 }
 
+/** The reply of `mockPage`. `next()` gives the next page, or `null` on the last page. */
+export interface MockPage<T> extends Reply<T> {
+    next(): Promise<Result<MockPage<T>, CallError>> | null;
+}
+
 /**
  * The 7.x result for a 6.x page, for a test double of a `query` call. `total` goes in the
- * `X-Total-Count` header, so `orThrowPage` gives it back. The page is the last one: `next()` gives
- * `null`.
+ * `X-Total-Count` header, so `orThrowPage` gives it back. When the 6.x page has a `next` function,
+ * `next()` of the reply calls it and gives the page that it returns. Then the `next` of
+ * `orThrowPage` follows the pages, as in 6.x. Without it, the page is the last one.
  *
  * ```ts
  * vi.mocked(zones.query).mockResolvedValue(mockPage({ data: [zone], total: 1 }));
@@ -101,12 +107,38 @@ export function mockReply<T>(
 export function mockPage<T>(page: {
     readonly data: T;
     readonly total?: number;
-    /** The `next` of a 6.x page. 7.x has no use for it. */
+    /** The `next` of a 6.x page: a function that gives the next page, or `null`. */
     readonly next?: unknown;
-}): Result<Reply<T> & { next(): null }, CallError> {
+}): Result<MockPage<T>, CallError> {
+    const reply = pageReply(page, 0);
+    // The next pages come from a 6.x double, which has no types. The cast gives their data the
+    // type of the first page, as `fromV1Mock` does.
+    return reply as Result<MockPage<T>, CallError>;
+}
+
+/**
+ * The 7.x result for a 6.x page `{ data, total, next }`. `read` is the number of items on the pages
+ * before it, so the `Link` header gives the offset of the next page.
+ */
+function pageReply(page: unknown, read: number): Result<MockPage<unknown>, CallError> {
+    const value = typeof page === 'object' && page !== null ? page : {};
+    const data: unknown = Reflect.get(value, 'data');
+    const total: unknown = Reflect.get(value, 'total');
+    const more: unknown = Reflect.get(value, 'next');
+    const offset = read + (Array.isArray(data) ? data.length : 0);
     const headers = new Headers();
-    if (page.total !== undefined) headers.set('x-total-count', String(page.total));
-    return { ok: true, value: { status: 200, headers, data: page.data, next: () => null } };
+    if (typeof total === 'number') headers.set('x-total-count', String(total));
+    // `orThrowPage` gives a `next` only when the `Link` header has the next offset.
+    if (typeof more === 'function') headers.set('link', `<?offset=${offset}>; rel="next"`);
+    const next = (): Promise<Result<MockPage<unknown>, CallError>> | null => {
+        if (typeof more !== 'function') return null;
+        const following: unknown = Reflect.apply(more, value, []);
+        if (following === null || following === undefined) return null;
+        return Promise.resolve(following).then((next_page: unknown) =>
+            pageReply(next_page, offset),
+        );
+    };
+    return { ok: true, value: { status: 200, headers, data, next } };
 }
 
 /** In the arguments of `fromV1Mock`, the input values that no other argument has. */
@@ -164,11 +196,7 @@ export function fromV1Mock<R = Result<Reply<unknown>, CallError>>(
                 : await Reflect.apply(implementation, undefined, values);
         if (key !== undefined) return mockReply({ [String(input[key])]: value });
         if (result === 'data') return mockReply(value);
-        // A 6.x page is `{ data, total, next }`.
-        const page = typeof value === 'object' && value !== null ? value : {};
-        const total: unknown = Reflect.get(page, 'total');
-        const data: unknown = Reflect.get(page, 'data');
-        return mockPage(typeof total === 'number' ? { data, total } : { data });
+        return pageReply(value, 0);
     }
 }
 

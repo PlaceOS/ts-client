@@ -411,7 +411,9 @@ mockEndpoint('zones.destroy', () => {
 
 A 7.x call returns a `Result`, so a test double of a call must also return one. Make it with
 `mockReply` or `mockPage` from `@placeos/ts-client/compat`. `mockPage` also sets the total of a
-page. Both give a reply with `next()`, which returns `null`:
+page. `next()` of the reply returns `null`, except when the 6.x page of `mockPage` has a `next`
+function. Then `next()` gives the page that the function returns, so the `next` of `orThrowPage`
+follows the pages, as in 6.x:
 
 ```ts
 vi.mock('@placeos/ts-client', { spy: true });
@@ -727,8 +729,9 @@ keeps its state in plain data, and keeps keyed data in a `Map`. These are the ex
 - `missing_fields: 'zero'` accepts data without its required fields. It is for mock data only.
 - `parseResponse`, `checkRequest` and `call` each have one `as` cast. The compiler cannot prove
   that the parser output has the type of the schema. The tests check the parser.
-- `fromV1Mock` of `@placeos/ts-client/compat` has one `as` cast. A 6.x mock implementation has no
-  types, so the cast gives its result the type of the test double.
+- `fromV1Mock` and `mockPage` of `@placeos/ts-client/compat` each have one `as` cast. A 6.x mock
+  implementation or 6.x `next` has no types, so the cast gives its result the type of the test
+  double.
 - `configure` keeps one client in module state, so a call does not need a client argument. A
   call before `configure` throws at run time. The compiler cannot find it.
 - The mocks keep their registries in module state, as 6.x did: the endpoints of

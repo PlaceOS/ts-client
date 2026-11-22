@@ -173,6 +173,25 @@ test('mockReply and mockPage make the results of test doubles', () => {
     expect(page.next).toBeNull();
 });
 
+test('fromV1Mock and mockPage keep the next of a 6.x page', async () => {
+    const last = { data: [{ id: 'zone-3' }], total: 3, next: null };
+    const second = { data: [{ id: 'zone-2' }], total: 3, next: () => Promise.resolve(last) };
+    const query: (...args: Parameters<typeof zones.query>) => ReturnType<typeof zones.query> =
+        fromV1Mock(
+            () => Promise.resolve({ data: [{ id: 'zone-1' }], total: 3, next: () => second }),
+            ['...'],
+            'page',
+        );
+    const first = orThrowPage(await query());
+    expect(first.next_offset).toBe(1);
+    const middle = await first.next?.();
+    expect(middle).toMatchObject({ data: [{ id: 'zone-2' }], total: 3, next_offset: 2 });
+    const end = await middle?.next?.();
+    expect(end).toMatchObject({ data: [{ id: 'zone-3' }], next_offset: null, next: null });
+    const typed = orThrowPage(mockPage({ data: [{ id: 'zone-1' }], next: () => last }));
+    expect((await typed.next?.())?.data).toEqual([{ id: 'zone-3' }]);
+});
+
 test('a page of orThrowPage requests the next page, as in 6.x', async () => {
     mockEndpoint('zones.query', (input) =>
         input.offset === undefined
