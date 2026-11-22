@@ -228,9 +228,11 @@ export type AuthError =
       }
     /** `handleRedirect` got a URL without a code or a token. */
     | { readonly kind: 'redirect_invalid' }
-    /** The user or the server refused the login, for example on the consent page. */
+    /** The login URL is not `http:` or `https:`, for example `javascript:`. */
+    | { readonly kind: 'navigation_refused' }
     /** A logout ran while this attempt waited. The session drops the tokens of the attempt. */
     | { readonly kind: 'logged_out' }
+    /** The user or the server refused the login, for example on the consent page. */
     | {
           readonly kind: 'authorization_denied';
           readonly error: string;
@@ -868,6 +870,7 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
     }
 
     function redirect(url: string): Result<Credential, AuthError> {
+        if (!isWebUrl(url, environment.currentUrl())) return failed({ kind: 'navigation_refused' });
         // The path only: the query has the state of the login.
         log.info('redirecting', { path: new URL(url, 'http://base.invalid').pathname });
         setStatus({ kind: 'redirecting', url });
@@ -997,9 +1000,11 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
         clearCredentials();
         logouts_pending -= 1;
         setStatus({ kind: 'signed_out', error: null });
-        // The browser throws on a URL that does not parse. Then the page stays, signed out.
+        // The browser throws on a URL that does not parse, and a `javascript:` URL runs script.
+        // Then the page stays, signed out.
         const target = location ?? url;
-        if (URL.canParse(target, page)) environment.navigate(target);
+        if (isWebUrl(target, page)) environment.navigate(target);
+        else log.warn('the logout page is not an http or https URL');
     }
 
     /** Removes each stored value of this client: each key that has the client ID, and the link. */
@@ -1087,6 +1092,17 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
         assert(text.length === length, 'the random source gives enough values');
         return text;
     }
+}
+
+/**
+ * Whether `url` is an `http:` or `https:` URL. A relative URL resolves against `page`. The session
+ * navigates only to these, so a URL from the server, such as the login URL of the authority, cannot
+ * run script on the page.
+ */
+function isWebUrl(url: string, page: string): boolean {
+    if (!URL.canParse(url, page)) return false;
+    const protocol = new URL(url, page).protocol;
+    return protocol === 'http:' || protocol === 'https:';
 }
 
 /** The login parameters of a URL: the query, and the hash, which can have its own query. */

@@ -340,6 +340,18 @@ describe('login page', () => {
         expect(auth.status()).toEqual({ kind: 'signed_out', error: { kind: 'login_required' } });
     });
 
+    test('refuses a login URL that is not http or https, and does not navigate', async () => {
+        const world = fake({ session: false });
+        world.authority.login_url = 'javascript:alert(1)';
+        const auth = session(world);
+        expect(await auth.start()).toEqual({ ok: false, error: { kind: 'navigation_refused' } });
+        expect(world.navigations).toEqual([]);
+        expect(auth.status()).toEqual({
+            kind: 'signed_out',
+            error: { kind: 'navigation_refused' },
+        });
+    });
+
     test('accepts the authority of auth.cr, which can have a null id', async () => {
         const world = fake({
             session: false,
@@ -808,6 +820,19 @@ describe('the session with the client', () => {
         expect(world.storage.get(`${CLIENT_ID}_access_token`)).toBeNull();
         expect(auth.status().kind).toBe('signed_out');
         // A browser throws on that URL, so the session does not go there.
+        expect(world.navigations).toEqual([]);
+    });
+
+    test('a logout page that is not http or https removes the credentials, but does not navigate', async () => {
+        const world = fake();
+        world.authority.logout_url = 'javascript:alert(1)';
+        world.storage.set('trusted', 'true');
+        world.storage.set(`${CLIENT_ID}_access_token`, 'token');
+        const auth = session(world);
+        await auth.reloadAuthority();
+        await auth.logout();
+        expect(world.storage.get(`${CLIENT_ID}_access_token`)).toBeNull();
+        expect(auth.status().kind).toBe('signed_out');
         expect(world.navigations).toEqual([]);
     });
 
