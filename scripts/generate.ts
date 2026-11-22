@@ -225,6 +225,15 @@ const JSON_RESPONSE_OPERATIONS: ReadonlySet<string> = new Set([
 ]);
 
 /**
+ * Operations that send text, but have a JSON response schema in the document. The server renders
+ * the body with `text:`, so the client must not parse it as JSON. Their data is the body as text.
+ */
+const TEXT_RESPONSE_OPERATIONS: ReadonlySet<string> = new Set([
+    'PlaceOS::Api::Drivers_recompile',
+    'PlaceOS::Api::Drivers_reload',
+]);
+
+/**
  * Short names for schemas with a name from the server code that does not say what they are. The
  * app name is an alias: `User` and `UserAdminMetadataResponse` are the same value and type.
  */
@@ -432,7 +441,12 @@ async function main(): Promise<void> {
     const check = process.argv.includes('--check');
     const stale: string[] = [];
     for (const api of APIS) stale.push(...(await generate(api, check)));
-    for (const id of [...BYTES_RESPONSE_OPERATIONS, ...JSON_RESPONSE_OPERATIONS]) {
+    const patches = [
+        ...BYTES_RESPONSE_OPERATIONS,
+        ...JSON_RESPONSE_OPERATIONS,
+        ...TEXT_RESPONSE_OPERATIONS,
+    ];
+    for (const id of patches) {
         assert(seen_operation_ids.has(id), `the operation ${id} of a patch is in a document`);
     }
     if (check && stale.length > 0) {
@@ -638,6 +652,8 @@ function planOperation(
         assert(content === undefined, `${operation_id} has no response schema to replace`);
         imports.combinators.add('json');
         response = 'json()';
+    } else if (TEXT_RESPONSE_OPERATIONS.has(operation_id)) {
+        assert(content !== undefined, `${operation_id} has a response schema to replace`);
     } else if (content !== undefined) {
         const schema = asNode(jsonContentSchema(content, operation_id), `${operation_id} schema`);
         response = emitSchema(schemas, schema, imports, 0);

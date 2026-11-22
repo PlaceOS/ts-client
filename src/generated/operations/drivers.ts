@@ -180,7 +180,7 @@ const RECOMPILE = /* @__PURE__ */ operation({
         ['id'],
     ),
     body: null,
-    response: /* @__PURE__ */ string(),
+    response: 'text',
     name: 'drivers.recompile',
 });
 
@@ -207,7 +207,7 @@ const RELOAD = /* @__PURE__ */ operation({
         ['id'],
     ),
     body: null,
-    response: /* @__PURE__ */ string(),
+    response: 'text',
     name: 'drivers.reload',
 });
 
