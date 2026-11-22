@@ -1,517 +1,746 @@
-# TypeScript PlaceOS Library
+# @placeos/ts-client
 
-This library is a Typescript interface to PlaceOS
+A typed client for the PlaceOS REST API and the staff API. A script generates the types and the
+request functions from the OpenAPI documents of
+[PlaceOS/rest-api](https://github.com/PlaceOS/rest-api/blob/master/OPENAPI_DOC.yml) and
+[PlaceOS/staff-api](https://github.com/PlaceOS/staff-api/blob/master/OPENAPI_DOC.yml).
 
-## Compilation
+The library has no runtime dependencies. It runs in browsers, in Node 20.3 and later, and in Bun.
 
-You can build the library from source after installing the dependencies with the command
+Version 7 is a new client, with a different API from 6.x. To move an application from 6.x, see
+[Migrate from 6.x](#migrate-from-6x). The 6.x source is on the
+[`6.x` branch](https://github.com/PlaceOS/ts-client/tree/6.x), which gets the 6.x fixes.
 
-`npm run build`
-
-## Usage
-
-API docs can be found [here](https://placeos.github.io/ts-client)
-
-You can install the PlaceOS Typescript client with the npm command
-
-`npm install --save-dev @placeos/ts-client`
-
-Before using PlaceOS it will need to be initialised.
-
-```typescript
-import { setup } from '@placeos/ts-client';
-
-setup(config).then(() => doAfterAuthInitialised());
+```sh
+npm install @placeos/ts-client@next
 ```
 
-The setup method returns a promise that resolves after the auth flow has completed.
-The setup method takes a `config` object with the following properties
+Version 7 is a prerelease on the npm tag `next` until 7.0.0 is out. `@7` does not install a
+prerelease.
 
-| Property         | Description                                             | Optional | Type                       | Example                    |
-| ---------------- | ------------------------------------------------------- | -------- | -------------------------- | -------------------------- |
-| `host`           | Host name and port of the PlaceOS server                | Yes      | `string`                   | `"dev.placeos.com:8080"`   |
-| `mock`           | Whether to initialise PlaceOS with mock services        | Yes      | `boolean`                  | `true`                     |
-| `auth_uri`       | URI for authorising users session                       | No       | `string`                   | `"/auth/oauth/authorize"`  |
-| `token_uri`      | URI for generating new auth tokens                      | No       | `string`                   | `"/auth/token"`            |
-| `redirect_uri`   | URI to redirect user to after authorising session       | No       | `string`                   | `"/oauth-resp.html"`       |
-| `scope`          | Scope of the user permissions needed by the application | No       | `string`                   | `"admin"`                  |
-| `storage`        | Browser storage to use for storing user credentials     | Yes      | `"local" \| "session"`     | "session"`                 |
-| `handle_login`   | Whether PlaceOS should handle user login                | Yes      | `boolean`                  | `true`                     |
-| `use_iframe`     | Use iFrame for authorization of application             | Yes      | `boolean`                  | `false`                    |
-| `secure`         | Force requests to backend to be secure i.e. HTTPS/WSS   | Yes      | `boolean`                  | `false`                    |
-| `ignore_api_key` | Ignore set API keys when authenticating requests        | Yes      | `boolean`                  | `false`                    |
-| `token_header`   | Force all requests to use headers for auth over cookies | Yes      | `boolean`                  | `false`                    |
-| `username`       | Username to use for basic authentication                | Yes      | `string`                   | `"user@place.os"`          |
-| `password`       | Password to use for basic authentication                | Yes      | `string`                   | `"hard-to-guest-password"` |
-| `auth_type`      | Type of authentication to perform                       | Yes      | `"implicit" \| "password"` | `"implicit"`               |
-| `entra_token`    | Get a Microsoft Entra access token to exchange          | Yes      | `() => Promise<string>`    | `getAccessToken`           |
+## Use the client
 
-#### Microsoft Entra token exchange
+```ts
+import { configure, zones } from '@placeos/ts-client';
 
-Apps that are signed in to Microsoft (for example, an Outlook add-in) can exchange the Entra access token for PlaceOS tokens. The user does not have to sign in again.
+// Do this one time, when the application starts.
+configure({
+    base_url: 'https://placeos.example.com', // Use '' for the origin of the page.
+    auth: { kind: 'bearer', token: () => localStorage.getItem('token') },
+});
 
-Set `entra_token` to a function that gets the Entra access token. When no other credentials are available, `authorise` sends the token to `token_uri` with the RFC 8693 token exchange grant.
+const result = await zones.show({ id: 'zone-1234', complete: true });
+if (result.ok) {
+    console.log(result.value.data.name);
+} else {
+    console.error(result.error.kind);
+}
+```
 
-```typescript
-import { setup } from '@placeos/ts-client';
+There is one namespace for each controller of the API, for example `zones`, `systems` and
+`alert_dashboards`. Each function has the name of the server action: `show`, `create`, `update`,
+`destroy`, or a custom action such as `systems.execute`. The server action `index` is `query` in
+the client. The comment of each function gives the HTTP method and the path.
 
-await setup({
-    auth_uri: '/auth/oauth/authorize',
-    token_uri: '/auth/oauth/token',
-    redirect_uri: `${location.origin}/addin/oauth-resp.html`,
+Namespaces, options and fields are snake_case, the same as the data of the server. Functions are
+camelCase, for example `modules.stateValue`.
+
+Each function has two arguments:
+
+1. The input: the path parameters, the query parameters and, for an operation with a request
+   body, `body`. The compiler knows the input of each operation. When an operation has no
+   required parameter, such as `zones.query`, the input is optional.
+2. The options of the request. This argument is optional. It has `signal` (see
+   [Timeouts and cancel](#timeouts-and-cancel)), `timeout_ms`, and `client` (see
+   [More than one client](#more-than-one-client)).
+
+```ts
+// `id` is a path parameter, and `body` is the request body.
+await zones.update({ id: 'zone-1234', body: { name: 'Level 2' } });
+
+// `sys_id`, `module_slug` and `method` are path parameters. The options set a time limit.
+await systems.execute(
+    { sys_id: 'sys-1234', module_slug: 'Display_1', method: 'power', body: [true] },
+    { timeout_ms: 5_000 },
+);
+```
+
+### The result
+
+Each call returns a `Result`, also when it fails. Check `ok`, then read `value` or `error`:
+
+```ts
+type Result<T, E> = { ok: true; value: T } | { ok: false; error: E };
+```
+
+When `ok` is `true`, `value` is the reply:
+
+| Field     | Value                                                                 |
+| --------- | --------------------------------------------------------------------- |
+| `status`  | The HTTP status, such as `200`.                                       |
+| `headers` | The `Headers` of the response, such as `X-Total-Count`.               |
+| `data`    | The body, parsed with the schema of the operation.                    |
+| `next()`  | Only on an operation with an `offset` parameter. See [Pages](#pages). |
+
+An operation without a response schema gives the body in `data` as a string, for example the text
+of `modules.logs`, or `''` for a `destroy`. An operation that sends a file or an image, such as
+`uploads.downloadProxyFileContents` or `staff.staff.photo`, gives a `Uint8Array`. The type of
+`data` shows which one you get.
+
+A 204 has no body. For an operation with a response schema, `data` is then `null` if the schema
+accepts `null`. If the schema does not accept `null`, a 204 is a `response_invalid` error. A 204
+in the API document makes the schema accept `null`, as for `staff.calendars.availability`.
+
+When `ok` is `false`, `error.kind` tells what failed. The other fields depend on the kind:
+
+| `error.kind`         | Fields                       | Meaning                                        |
+| -------------------- | ---------------------------- | ---------------------------------------------- |
+| `http`               | `status`, `message`, `body`  | The server sent a status that is not 2xx.      |
+| `network`            | `message`                    | No response, such as when the network is down. |
+| `timeout`            | `timeout_ms`                 | The request took more than `timeout_ms`.       |
+| `aborted`            |                              | The `signal` of the caller cancelled the call. |
+| `auth_missing`       |                              | The auth had no token or credential.           |
+| `response_too_large` | `bytes_max`                  | The body was more than `response_bytes_max`.   |
+| `response_invalid`   | `status`, `path`, `expected` | The body does not match the API document.      |
+
+- In an `http` error, `message` is the `error` field of the JSON body, or `null`. `body` is the
+  parsed JSON body, or `null`.
+- In a `response_invalid` error, `path` names the field, such as `$.id`, and `expected` is the
+  type that the schema wants, such as `string`.
+- A call with an API key does not follow a redirect, so a redirect gives a `network` error. See
+  [Changes in the login](#changes-in-the-login).
+- To name the type of a result, use `Awaited<ReturnType<typeof zones.show>>`.
+
+A function throws only for a programmer error. Examples are a parameter that the operation does
+not have, a path parameter that is empty, `.` or `..`, and a call before `configure`.
+
+In a project without `strictNullChecks`, `if (!result.ok)` does not narrow the `Result`. Use
+`if (result.ok === false)`.
+
+### Pages
+
+An operation with an `offset` parameter, such as `zones.query`, returns one page. To get the next
+page, call `next()` on the reply. It sends the same input again, with the offset from the `Link`
+header. On the last page, `next()` gives `null`:
+
+```ts
+let result = await zones.query({ limit: 100 });
+while (result.ok) {
+    show(result.value.data);
+    const next = result.value.next();
+    if (next === null) break;
+    result = await next;
+}
+```
+
+- Each operation with an `offset` parameter has `next()`, for example `zones.query`,
+  `history.query` and `staff.bookings.query`. The type of the reply shows if it has `next()`.
+- `next(options)` replaces each option that you give, such as `timeout_ms`. The options that you
+  do not give stay as in the request that returned this page, also `client` and `signal`.
+- `next()` also gives `null` when the offset of the link does not move forward, so that a loop over
+  the pages always ends.
+- `pageInfo(result.value.headers)` gives the `total` (`X-Total-Count`) and the `next_offset`.
+
+### Timeouts and cancel
+
+Each request has a time limit. The default is 30 seconds. Set a different limit for the client or
+for one request:
+
+```ts
+configure({ base_url: '', auth: { kind: 'none' }, timeout_ms: 10_000 });
+const controller = new AbortController();
+await zones.query({}, { signal: controller.signal, timeout_ms: 60_000 });
+```
+
+### More than one client
+
+`configure` makes the client that each call uses. To use a different client for one call, make it
+with `createClient` and give it in the options. The configured client does not change:
+
+```ts
+const other = createClient({ base_url: 'https://other.example.com', auth: { kind: 'none' } });
+await zones.query({}, { client: other });
+```
+
+## Log in
+
+`createAuthSession` does the OAuth login of PlaceOS and gives the client its credential:
+
+```ts
+import { configure, createAuthSession } from '@placeos/ts-client';
+
+const session = createAuthSession({
+    base_url: '',
+    redirect_uri: `${location.origin}/oauth-resp.html`,
     scope: 'public',
-    entra_token: () => Office.auth.getAccessToken({ allowSignInPrompt: true }),
+    grant: { kind: 'code' },
 });
-```
+configure({ base_url: '', auth: session.client_auth, headers: { 'X-App-Id': session.client_id } });
 
-You can also call `exchangeEntraToken(token)` directly.
-
-The PlaceOS domain must have an Entra OAuth source for a single tenant. Refer to the [auth.cr documentation](https://github.com/PlaceOS/auth.cr/blob/master/README.md#microsoft-entra-token-exchange) for the server requirements.
-
-#### Local Development with live environments
-
-You will not be able to use SSO for local development by default.
-To solve this you will either need to:
-
-- Reverse proxy the development UI through the live environment
-- Reverse proxy the `/login` endpoint from the live environment to the local development environment then perform basic login instead
-- Use an API key to authenticate with the backend
-
-If you're not proxying the local development UI through the live server it is recommended to reverse proxy all the API endpoints to prevent any possible CORS issues.
-
-### Websocket API
-
-`PlaceOS` exposes a websocket API through the `realtime` entrypoint.
-
-The `realtime` entrypoint provides methods for real-time interaction with modules running on PlaceOS. It provides an interface to build efficient, responsive user interfaces, monitoring systems and other extensions which require live, two-way or asynchronous interaction.
-
-Once PlaceOS has initialised you can listen to values on modules
-
-```typescript
-import { getModule } from '@placeos/ts-client';
-
-const my_mod = getModule('sys-death-star', 'TestModule', 3);
-const my_variable = my_mod.variable('power');
-const unbind = my_variable.bind();
-const unsubscribe = my_variable.subscribe((value) => doSomething(value));
-
-// Later, when the UI no longer needs the value:
-unsubscribe();
-unbind();
-```
-
-This binds to the `power` status variable on the 3rd `TestModule` in the system `sys-death-star`.
-Any changes to the value of `power` on PlaceOS will then be emitted to the function passed to `subscribe`.
-
-Realtime values are exposed as signals. A signal is a callable value holder with a `value` property and a `subscribe` method.
-
-```typescript
-import { listen } from '@placeos/ts-client';
-
-const power = listen<boolean>({
-    sys: 'sys-death-star',
-    mod: 'TestModule',
-    index: 3,
-    name: 'power',
-});
-
-console.log(power.value); // Current value
-console.log(power()); // Same current value
-
-const unsubscribe = power.subscribe((value, previous) => {
-    console.log('Power changed from', previous, 'to', value);
-});
-```
-
-Other than listening to changes of values you can also remotely execute methods on modules.
-
-```typescript
-const my_mod = getModule('sys-death-star', 'DemoModule', 2);
-
-try {
-    const resp = await my_mod.execute('power_off');
-    handleSuccess(resp);
-} catch (err) {
-    handleError(err);
+const result = await session.start();
+if (!result.ok && result.error.kind === 'redirecting') {
+    // The page goes to the login page now.
 }
 ```
 
-This will execute the method `power_off` on the 2nd `DemoModule` in the system `sys-death-star`.
-If the method doesn't exist or the system is turned off it will return an error.
-The response from PlaceOS can be handled using the promise returned by the `execute` method.
+Copy `oauth-resp.html` from the package to your application, and use its URL as `redirect_uri`. The
+client ID is the MD5 of `redirect_uri`, as in 6.x.
 
-### HTTP API
+`session.start()` loads `/auth/authority`, and gets a credential in this order:
 
-For the HTTP API, `PlaceOS` provides various methods for each of the root endpoints available on PlaceOS's RESTful API.
+1. An API key from the URL or the storage (for a fixed device), or a valid access token.
+2. A code or a token from the redirect. The `state` must be the nonce of this client.
+3. The refresh token.
+4. The `password` or `entra` grant.
+5. If the user has a session: the authorize page, with a redirect or, with `use_frame`, in a
+   hidden frame.
+6. Else the login page of the authority. With `handle_login: false`, the result is a
+   `login_required` error, and the application shows its own login.
 
-Docs for the API can be found here https://docs.placeos.com/api/control
+The grants are `code` (with PKCE), `implicit`, `password` and `entra`. PlaceOS auth.cr refuses
+the `password` grant. Only older auth services accept it.
 
-Methods are provided for `brokers`, `drivers`, `metadata`, `modules`, `repositories`, `settings`, `systems`, `triggers`, `users`, and `zones`.
+A trusted application (`?trust=true` in the URL) keeps its tokens in `localStorage`. Other
+applications keep their tokens in memory only.
 
-```typescript
-// Drivers CRUD
-const new_driver = await addDriver(driver_data);
-const driver = await showDriver(driver_id);
-const updated_driver = await updateDriver(driver_id, driver_data);
-await removeDriver(driver_id);
+After a 401, the client asks the session for a new token. If the session gets one, the client
+sends the request again, one time. Parallel requests share one renewal. After a 511, the session
+removes the token. If `handle_login` is on and the authority is loaded, it then sends the user to
+the login page. Else the status becomes `signed_out` with `login_required`. The session does not
+renew an API key, so a 401 or a 511 with an API key is the result of the call.
 
-// Modules CRUD
-const new_module = await addModule(module_data);
-const mod = await showModule(module_id);
-const updated_module = await updateModule(module_id, module_data);
-await removeModule(module_id);
+Other parts of the session:
 
-// Systems CRUD
-const new_system = await addSystem(system_data);
-const system = await showSystem(system_id);
-const updated_system = await updateSystem(system_id, system_data);
-await removeSystem(system_id);
+- `session.status()` and `session.subscribe(listener)` give the state: `loading`, `signed_in`,
+  `redirecting` or `signed_out` with the error.
+- `session.handleRedirect(url)` completes a login from a deep link, in a native wrapper.
+- When the application comes back to the foreground without a session, the session loads the
+  authority again, because the user can log in from a different tab.
+- `session.useToken(token)` and `session.useApiKey(key)` use a credential from a different source.
+- `session.invalidateToken()` removes the access token, so the next request gets a new one.
+- `session.logout()` ends the session on the server, removes the credentials and goes to the
+  logout page.
+- `createAuthSession({ ..., environment })` replaces the browser parts, for tests or a native
+  wrapper. See `AuthEnvironment`.
 
-// Users CRUD
-const new_user = await addUser(user_data);
-const user = await showUser(user_id);
-const updated_user = await updateUser(user_id, user_data);
-await removeUser(user_id);
+## Realtime
 
-// Zones CRUD
-const new_zone = await addZone(zone_data);
-const zone = await showZone(zone_id);
-const updated_zone = await updateZone(zone_id, zone_data);
-await removeZone(zone_id);
+`createRealtime` opens one WebSocket to `systems/control`. It binds to the status variables of
+modules, calls their functions and gets their logs:
+
+```ts
+import { createRealtime } from '@placeos/ts-client';
+
+const realtime = createRealtime({ base_url: '', auth: session.client_auth });
+
+const power = { sys: 'sys-1234', mod: 'Display', index: 1, name: 'power' };
+const release = realtime.bind(power, (state) => {
+    if (state.kind === 'value') console.log('power', state.value);
+});
+const result = await realtime.exec(power, [true]);
+release();
 ```
 
-The lower-level HTTP helpers are promise-based too.
+- The client connects when the first binding or call needs it. `start` connects now.
+- A binding has a count. The first `bind` sends `bind`. The last release sends `unbind`.
+- After a new connection, the client binds each variable again.
+- The client handles the messages of the server in batches. In one batch, many notifications for
+  one variable give one call to its listeners, with the last value.
+- `exec` gives a `Result` with the return value of the function, or a `RealtimeError`:
+  `timeout`, `disconnected` (the client sent the call, and the socket closed before the result
+  came: the client does not know if the server ran the call), `stopped`,
+  `unavailable`, `too_many_requests` or `server` (with the error code and the status).
+- The client sends `ping` each 15 seconds. When the socket gets no message for 60 seconds, it
+  closes, and the client connects again. The wait before each new attempt increases, to a maximum
+  of 5 seconds. After 40 failed attempts, the status is `failed`. Call `start` to try again.
+- `realtime.debug({ sys, module_id }, listener)` gets the logs of a module.
+- `splitModuleSlug('Display_2')` gives `{ mod: 'Display', index: 2 }`.
+- In a browser, the token goes in a cookie on the socket path. In a frame and on mobile Safari it
+  goes in the query, as in 6.x. A cookie reaches only the hostname of the page. If the hostname of
+  the socket is different, the token also goes in the query. `createRealtime({ ..., environment })` replaces
+  the socket, the timers and the cookie, for tests.
 
-```typescript
-import { get, post, del } from '@placeos/ts-client';
+## Staff API
 
-const system = await get(`/api/engine/v2/systems/${system_id}`);
-const created = await post('/api/engine/v2/zones', zone_data);
-await del(`/api/engine/v2/zones/${zone_id}`);
+The staff API (bookings, events, guests, desks, surveys and more) is at
+`@placeos/ts-client/staff`. It uses the client of `configure`, as the REST API functions do:
+
+```ts
+import { bookings } from '@placeos/ts-client/staff';
+
+const now = Math.floor(Date.now() / 1000);
+const result = await bookings.query({ period_start: now, period_end: now + 86_400, type: 'desk' });
 ```
 
-Every HTTP request sends the OAuth client ID as `X-App-Id` after `setup` runs.
-To identify your application, set app headers. Every HTTP request then also sends `X-App-Name`, `X-App-Date` and `X-App-Build`.
-Headers given in the request options override them.
+- The staff API has its own schemas, such as `Booking` and `Guest`. Each API has its own document,
+  so a schema with the same name can have different fields in each API. For example, the `Zone` of
+  the REST API has `children_count`, and the `Zone` of the staff API does not. Import the type
+  from the entry point of the API that sends the data.
+- The names of the typed mocks of the staff API start with `staff.`, for example
+  `mockEndpoint('staff.bookings.show', ...)`.
+- A booking operation that ends in `Instance` reads or changes one occurrence of a recurring
+  booking. For example, `bookings.showInstance` is `GET /bookings/{id}/instance/{instance}`.
 
-```typescript
-import { setAppHeaders } from '@placeos/ts-client';
+## Types
 
-setAppHeaders('workplace', '2026-10-08', 'abcd1234');
+Each schema of the API document has a value and two types with the same base name:
+
+- `Zone` is the type of a zone from the server. Each field is present. A field that the server can
+  leave out is `null`.
+- `ZoneInput` is the type of a zone that you send. Each field is optional.
+- The `Zone` value is the schema. `parseResponse(Zone, value)` parses data from other sources.
+
+The parser removes the fields of a response that the schema does not have. A request with a field
+that the schema does not have throws, because a misspelled field name is a bug.
+
+Some schemas have a name from the server code that does not say what they are. These have a
+short name too. The short name is the same value and type:
+
+| Short name               | Name in the API document        |
+| ------------------------ | ------------------------------- |
+| `User`                   | `UserAdminMetadataResponse`     |
+| `System`                 | `ControlSystem`                 |
+| `Application`            | `DoorkeeperApplication`         |
+| `Domain`                 | `Authority`                     |
+| `Metadata`               | `MetadataInterface`             |
+| `ShortUrl`               | `Shortener`                     |
+| `SignageTemplateMapping` | `SignageTemplateSystemTemplate` |
+
+`TYPE_ALIASES` in `scripts/generate.ts` has the list.
+
+## Debug logs
+
+The client, the login and the realtime client log nothing by default. Give each one a `log`
+function to get an entry for each step: `{ scope, level, args }`. `args` are the arguments of the
+call, as a console method gets them: a message, then values such as a status. `consoleLog` of
+`@placeos/ts-client/compat` writes the entries in the console format of 6.x, and only when
+`window.debug` is set:
+
+```ts
+import { consoleLog } from '@placeos/ts-client/compat';
+
+const session = createAuthSession({ ..., log: consoleLog });
+configure({ base_url: '', auth: session.client_auth, log: consoleLog });
+const realtime = createRealtime({ base_url: '', auth: session.client_auth, log: consoleLog });
+// In the console of the browser:
+window.debug = true;
+// [PlaceOS][Auth] the authority is loaded {id: 'authority-1'}
+//     [PlaceOS][Auth] name: PlaceOS
+//     [PlaceOS][Auth] domain: placeos.example.com
+// [PlaceOS][HTTP] zones.query: 200 in 41 ms {name: 'zones.query', method: 'GET', ...}
+// [PlaceOS][WS] sys-1 Display_1 power changed {sys: 'sys-1', ..., value: true}
 ```
 
-The modules also provide methods for the various item action endpoints
+| `scope`    | Entries                                                                         |
+| ---------- | ------------------------------------------------------------------------------- |
+| `auth`     | The steps of the login: the authority, each grant, redirects, renewals, logout. |
+| `http`     | Each call: the name, the status or the error, and the time.                     |
+| `realtime` | The socket: connect, close and reconnect, value changes, server errors, logs.   |
+| `mock`     | The 6.x mock endpoints of `compat`: added, matched and not found.               |
 
-```typescript
-// Driver Actions
-await reloadDriver(driver_id);
+| `level`     | Use                                                       | Console method     |
+| ----------- | --------------------------------------------------------- | ------------------ |
+| `error`     | A failure without an answer, such as a timeout.           | `console.error`    |
+| `warn`      | A refusal or a drop, such as a 404 or a closed socket.    | `console.warn`     |
+| `info`      | A step, such as a new token or a connected socket.        | `console.info`     |
+| `debug`     | A detail, such as each call or an aborted call.           | `console.debug`    |
+| `print`     | A line without a level, such as a field of the authority. | `console.log`      |
+| `group`     | Starts a group of the entries that follow.                | `console.group`    |
+| `group_end` | Ends the group.                                           | `console.groupEnd` |
 
-// Module Actions
-await startModule(module_id);
-await stopModule(module_id);
-await pingModule(module_id);
-await lookupModuleState(module_id, lookup);
-await moduleState(module_id);
+- `createConsoleLog({ colors: false })` writes the same text without the `%c` colors.
+- The library does not put the tokens, API keys, cookies or request bodies that it sends in an
+  entry. A redirect gives its path only, because the query has the state of the login.
+- An entry can have data from the server: the body of an HTTP error, the error text of the login,
+  the values of realtime bindings and the logs of modules. This data can contain secrets or
+  personal data. Do not send the entries to a service that must not get this data.
+- A log function that throws does not change the call, the login or the socket.
+- The `mock` entries of the 6.x mock endpoints always go to `consoleLog`, as in 6.x.
+- For contributors: in the library, each part logs through a scoped logger:
+  `const log = scopedLog('auth', { sink: config.log ?? null })`. Its methods have the arguments
+  of the console methods: `log.error(...data)`, `log.warn(...data)`, `log.info(...data)`,
+  `log.debug(...data)`, `log.print(...data)` (`console.log`), `log.group(...label)` and
+  `log.groupEnd()`. The `log` function of the application gets the entries.
 
-// System Actions
-await addSystemModule(system_id, module_name);
-await removeSystemModule(system_id, module_name);
-await startSystem(system_id);
-await stopSystem(system_id);
-await executeOnSystem(system_id, module_name, index, args);
-await lookupSystemModuleState(system_id, module_name, index, lookup);
-await functionList(system_id, module_name, index);
-await moduleTypes(system_id, module_name);
-await moduleCount(system_id);
-await listSystemZones(system_id);
+## Tests and mocks
 
-// User Actions
-await currentUser();
+A client can have its own `fetch` function. The client sends each request through it. Give a test
+client in the options of the call, so that the test does not change the configured client:
+
+```ts
+const client = createClient({
+    base_url: '',
+    auth: { kind: 'none' },
+    fetch: async (url, init) => new Response(JSON.stringify({ id: 'zone-1' })),
+    // The data of the test has only some fields. This gives the other fields their empty value.
+    missing_fields: 'zero',
+});
+const result = await zones.show({ id: 'zone-1' }, { client });
 ```
 
-Objects returned by `show` and `query` methods are immutable.
-Therefore to change items you'll need to create a new object to store the changes.
+### Typed mocks
 
-```typescript
-showZone(zone_id).then((zone) => {
-    console.log(zone.description); // Some Description
-    const zone_edited = new PlaceZone({
-        ...zone,
-        description: 'New description',
-    });
-    updateZone(zone_edited.id, zone_edited).then((updated_zone) => {
-        console.log(updated_zone.description); // New description
-    });
+`@placeos/ts-client/mock` answers the calls of an endpoint without a request. The compiler checks
+the name of the endpoint, the input that the handler gets, and the data that it gives:
+
+```ts
+import { endpointMocks, httpError, mockEndpoint, respond } from '@placeos/ts-client/mock';
+
+configure({ base_url: '', auth: { kind: 'none' }, mock: endpointMocks });
+
+mockEndpoint('zones.show', (input) => ({ id: input.id, name: 'Level 1' }));
+mockEndpoint('zones.query', () => respond([{ id: 'zone-1' }], { total: 1 }));
+mockEndpoint('systems.update', (input) => ({ id: input.sys_id, ...input.body }), { delay_ms: 300 });
+mockEndpoint('zones.destroy', () => {
+    throw httpError(403);
 });
 ```
 
-You can find more details about endpoint action on the API docs
+- The client checks the input, the same as for a real request. Then it parses the data from the
+  handler with the response schema of the endpoint. The data can leave out fields. A missing
+  required field gets its empty value, such as `''`, `0` or `[]`. A field with the wrong type
+  gives a `response_invalid` error.
+- `respond(data, { status, headers, total, next_offset })` sets the status and the headers.
+  `total` is the `X-Total-Count` that `pageInfo` and `orThrowPage` read. `next_offset` goes in
+  the `Link` header, so `next()` of the reply asks the mock for that page.
+- `mockEndpoint` returns the function that removes the mock. `clearEndpointMocks()` removes all.
+- A call to an endpoint without a mock goes to the `fetch` of the client. Give `mockFetch` of
+  `@placeos/ts-client/compat` to answer it from the 6.x mock endpoints.
+- The `mock` option of the client is a function. A test can give its own function. It gets the
+  name of the endpoint (such as `zones.show`) and the input, and it returns an answer or `null`.
 
-https://placeos.docs.apiary.io/
+A 7.x call returns a `Result`, so a test double of a call must also return one. Make it with
+`mockReply` or `mockPage` from `@placeos/ts-client/compat`. `mockPage` also sets the total of a
+page. `next()` of the reply returns `null`, except when the 6.x page of `mockPage` has a `next`
+function. Then `next()` gives the page that the function returns, so the `next` of `orThrowPage`
+follows the pages, as in 6.x:
 
-## Migrating from RxJS
-
-The client no longer depends on RxJS. HTTP and resource methods now return promises, while realtime and authentication state methods return signals.
-
-### HTTP and resource requests
-
-Replace observable subscriptions with `await` or promise handlers.
-
-```typescript
-// Before
-showDriver(driver_id).subscribe((driver) => doSomething(driver));
-
-// After
-const driver = await showDriver(driver_id);
-doSomething(driver);
+```ts
+vi.mock('@placeos/ts-client', { spy: true });
+vi.mocked(zones.show).mockResolvedValue(mockReply(zone));
+vi.mocked(zones.query).mockResolvedValue(mockPage({ data: [zone], total: 1 }));
 ```
 
-```typescript
-// Before
-querySystems({ limit: 20 }).subscribe(({ data }) => render(data));
+### Mock mode
 
-// After
-const { data } = await querySystems({ limit: 20 });
-render(data);
-```
+For new mocks, use [typed mocks](#typed-mocks). The 6.x mock endpoints and mock systems are in
+`@placeos/ts-client/compat`, with their 6.x names. Give `mockFetch` to the client, and
+`mockRealtimeEnvironment()` to the realtime client:
 
-For error handling, use `try`/`catch` or `.catch`.
-
-```typescript
-try {
-    await updateZone(zone_id, zone_data);
-} catch (error) {
-    handleError(error);
-}
-```
-
-### Realtime values
-
-Realtime listeners now return signals instead of observables. A signal:
-
-- can be called to read its current value: `signal()`
-- exposes the same current value as `signal.value`
-- emits changes with `signal.subscribe((value, previous) => {})`
-- returns an unsubscribe function from `subscribe`
-- emits the current value immediately by default
-
-```typescript
-// Before
-const sub = listen(binding).subscribe((value) => render(value));
-sub.unsubscribe();
-
-// After
-const signal = listen(binding);
-render(signal.value);
-
-const unsubscribe = signal.subscribe((value, previous) => {
-    render(value);
-});
-unsubscribe();
-```
-
-If you do not want the initial value to emit on subscription, pass `{ emitCurrent: false }`.
-
-```typescript
-const unsubscribe = signal.subscribe((value) => render(value), {
-    emitCurrent: false,
-});
-```
-
-The same pattern applies to realtime status helpers.
-
-```typescript
-const unsubscribe = status().subscribe((connected) => {
-    renderConnectionState(connected);
-});
-```
-
-### Auth state
-
-`listenForToken()` and `onlineState()` now return signals.
-
-```typescript
-const stopListening = onlineState().subscribe((online) => {
-    renderOnlineState(online);
-});
-```
-
-### Common replacements
-
-| Old RxJS pattern                     | New API                                                               |
-| ------------------------------------ | --------------------------------------------------------------------- |
-| `await firstValueFrom(showZone(id))` | `await showZone(id)`                                                  |
-| `showZone(id).toPromise()`           | `showZone(id)`                                                        |
-| `showZone(id).subscribe(fn)`         | `showZone(id).then(fn)` or `const zone = await showZone(id)`          |
-| `listen(binding).pipe(...)`          | `listen(binding).subscribe(...)` and handle filtering in the callback |
-| `subscription.unsubscribe()`         | `unsubscribe()`                                                       |
-
-## Writing mocks
-
-If you don't have access to a PlaceOS server you can also write mocks so that you can still develop interfaces for PlaceOS.
-
-To use the mock services you can pass `mock: true` into the initialisation object.
-
-### Websockets
-
-To write mocks for the the realtime(websocket) API you'll need to register your systems with the `registerSystem` before attempting to bind to the modules it contains.
-
-```typescript
-import { registerSystem } from '@placeos/ts-client';
-
-registerSystem('my-system', {
-    MyModule: [
-        {
-            power: true,
-            $power_on: function () {
-                this.power = true;
-            },
-            $power_off: function () {
-                this.power = false;
-            },
-        },
-    ],
-});
-```
-
-Note that executable methods on mock systems are namespaced with `$` as real systems in PlaceOS allow for methods to have the same name as variables.
-
-Once initialised interactions with a system are performed in the same manner as the live system.
-
-```typescript
-const my_mod = getModule('my-system', 'MyModule', 1);
-const my_variable = my_mod.variable('power');
-const unbind = my_variable.bind();
-const unsubscribe = my_variable.subscribe((value) => doSomething(value)); // Emits true
-await my_mod.execute('power_off'); // The listen callback will now emit false
-```
-
-Some methods may need access to other modules within the system, for this a property is appended on runtime called `_system` which allows for access to the parent system
-
-```typescript
-registerSystem('my-system', {
-    "MyModule": [
-        {
-            $lights_off: function () { this._system.MyOtherModule[0].lights = false; }
-        }
-    ]
-    "MyOtherModule": [
-        {
-            lights: true,
-        }
-    ]
-});
-```
-
-### HTTP Requests
-
-HTTP API Requests can be mocked in a similar way to the realtime API by registering handlers with `registerMockEndpoint`
-
-```typescript
-import { registerMockEndpoint } from '@placeos/ts-client';
-
+```ts
 registerMockEndpoint({
-    path: '/api/engine/v2/systems',
-    metadata: {},
+    path: '/api/engine/v2/zones/:id',
     method: 'GET',
-    callback: (request) => my_mock_systems,
+    callback: (request) => ({ id: request.route_params['id'], name: 'Level 1' }),
+});
+registerSystem('sys-1', { Display: [{ power: false, $power: (on: boolean) => on }] });
+
+configure({ base_url: '', auth: { kind: 'none' }, fetch: mockFetch, missing_fields: 'zero' });
+const realtime = createRealtime({
+    base_url: '',
+    auth: { kind: 'none' },
+    environment: mockRealtimeEnvironment(),
 });
 ```
 
-Paths allow for route parameters and will pass the value in the callback input.
+- 7.x parses each mock response with the schema of the operation. Mock data often has only some
+  fields. `missing_fields: 'zero'` gives each missing required field its empty value, such as `''`,
+  `0` or `[]`, as the 6.x classes did. A field with the wrong type is still an error, because the
+  real server does not send that data.
+- A mock endpoint that throws an error with a `status`, such as `404`, gives that HTTP status.
+- A change to a status variable of a mock module notifies its bindings:
 
-```typescript
-registerMockEndpoint({
-    path: '/api/engine/v2/systems/:system_id',
-    ...
-    callback: (request) =>
-        my_mock_systems.find(sys => sys.id === request.route_params.system_id)
-});
+    ```ts
+    const display = mockSystem('sys-1')?.['Display']?.[0];
+    if (display !== undefined) display['power'] = true;
+    ```
+
+## Migrate from 6.x
+
+A move from 6.x has two steps. First, run the migration tool on the project. Then examine the
+changes in behavior of the login and of realtime, which the tool cannot change for you.
+
+### The migration tool
+
+The migration tool rewrites the 6.x calls of a project to 7.x. Commit your work first, so that you
+can examine and undo the changes. Run the tool in the folder of the project, because it uses the
+`typescript` package of the project:
+
+```sh
+npx -p @placeos/ts-client@next placeos-migrate src           # Lists the files and the uses to change by hand. Writes no file.
+npx -p @placeos/ts-client@next placeos-migrate --write src   # Writes the changes.
 ```
 
-Handlers may also throw errors
+The tool needs TypeScript 4.9 to 6.x, because TypeScript 7 has no JavaScript API. If the project
+has TypeScript 7, or no TypeScript, give the tool TypeScript 5:
 
-```typescript
-registerMockEndpoint({
-    path: `/api/engin/v2/systems/:id`,
-    method: 'GET',
-    callback: (request) => {
-        if (request.route_params.id) {
-            ...
-        }
-        throw { status: 404, message: 'Invalid system ID' };
-    }
-});
+```sh
+npx -p typescript@5 -p @placeos/ts-client@next placeos-migrate src
 ```
 
-Query parameters are also available on the callback input.
+The tool makes these changes:
 
-Handlers can return response headers, e.g. `Link` and `X-Total-Count` for paginated results.
-Use a static map, or a function to make headers from the request.
-Header keys are lowercase in `responseHeaders(url)`, the same as live requests.
+- A call of a 6.x REST function becomes the 7.x operation. `.then(orThrow)` gives the data, and an
+  error rejects the promise, as in 6.x. A 6.x query function gets `.then(orThrowPage)`, which gives
+  `{ data, total, next_offset, next }`. `next` requests the next page, as in 6.x, and is `null` on
+  the last page.
 
-```typescript
-registerMockEndpoint({
-    path: '/api/engine/v2/systems',
-    method: 'GET',
-    callback: (request) => {
-        const offset = +(request.query_params.offset || 0);
-        return my_mock_systems.slice(offset, offset + 20);
-    },
-    headers: (request) => {
-        const next = +(request.query_params.offset || 0) + 20;
-        return {
-            'X-Total-Count': `${my_mock_systems.length}`,
-            ...(next < my_mock_systems.length
-                ? {
-                      Link: `</api/engine/v2/systems?offset=${next}>; rel="next"`,
-                  }
-                : {}),
-        };
-    },
-});
+    ```ts
+    // 6.x
+    const zone = await showZone(id, { complete: true });
+    const list = await queryZones({ limit: 10 });
+    // 7.x, after the tool
+    const zone = await zones.show({ id, complete: true }).then(orThrow);
+    const list = await zones.query({ limit: 10 }).then(orThrowPage);
+    ```
+
+- A type reference to a 6.x class becomes the 7.x type. For example, `PlaceZone` becomes `Zone`.
+- The imports of the 6.x enums, such as `PlaceDriverRole`, and of `QueryResponse` move to
+  `@placeos/ts-client/compat`. The enums have the 7.x values, so they fit the 7.x fields of the
+  data. Be careful with a query parameter: it takes the name, not the number. For example, the
+  `role` of `drivers.query` is `'logic'`, but the `role` of a logic driver in the data is `99`.
+- A new import gets another name when the file has the name. For example, a file with a
+  `zones` variable gets `zones as zones_v7`.
+
+The tool also changes the test doubles, so that the tests of the app still work:
+
+- `vi.mocked(showZone)`, `expect(showZone)`, `vi.spyOn(client, 'showZone')` and, in a spec file,
+  each other use of `showZone` become `zones.show`.
+- A value of `mockResolvedValue` gets `mockReply` or `mockPage`. The arguments of
+  `toHaveBeenCalledWith` become the 7.x input.
+- A 6.x implementation, such as the value of `mockImplementation`, gets `fromV1Mock`. It gives the
+  implementation the 6.x arguments, and makes a 7.x result of its value.
+- The 6.x functions of a `vi.mock('@placeos/ts-client', () => ({ ... }))` factory become 7.x
+  namespaces. The factory runs before the imports, so the tool imports `fromV1Mock` with
+  `vi.hoisted`:
+
+    ```ts
+    // 6.x
+    showZone: vi.fn(impl),
+    // 7.x, after the tool
+    zones: { show: vi.fn(fromV1Mock(impl, ['id', '...'])) },
+    ```
+
+- The 6.x staff functions, such as `querySurveys`, become the operations of
+  `@placeos/ts-client/staff`, with their own import.
+- The imports of the mock endpoints and mock systems move to `@placeos/ts-client/compat`. See
+  [Mock mode](#mock-mode).
+
+The tool does not change a use that it cannot rewrite safely. It shows each one with a hint, and
+it keeps its 6.x import, so the compiler also shows it. These uses are:
+
+- the login and the realtime functions, such as `setup`, `token` and `getModule`;
+- `get`, `post` and the other HTTP functions;
+- `new` and `instanceof` on a 6.x class, because 7.x has plain objects;
+- the `next` function of a 6.x page. In 7.x, `next()` is on the reply of the call;
+- a 6.x function that is not called, outside a test file, such as `const load = showZone`;
+- a `vi.mock` without a factory or `{ spy: true }`: its 7.x functions give `undefined`, and
+  `.then(orThrow)` fails;
+- a `jest.mock` factory with 6.x functions;
+- in a `vi.mock` factory, a 6.x function that is a method, and a spread without a name, such as
+  `...(await importOriginal())`;
+- a test double in a variable, such as `const spy = vi.mocked(showZone)`: the tool changes the
+  function, but not the calls on `spy`;
+- an argument that has no place in 7.x, such as the `'patch'` method of `updateMetadata`, and an
+  argument with side effects that the 7.x input uses two times.
+
+On a copy of backoffice, 329 of the 399 tests pass after the tool, and 394 pass on 6.x. The other
+tests use 6.x classes, the 6.x `next` function or the 6.x `createSignal`, or they wait for one
+microtask only. The tool shows these uses.
+
+After the tool:
+
+1. Run Prettier, or your formatter. The tool writes long imports on one line.
+2. Install 7.x, and call `configure` once before the first call (see [Log in](#log-in)). For a
+   mock mode, give `fetch: mockFetch` (see [Mock mode](#mock-mode)).
+3. Run the compiler. It shows the differences of the data. For example, a field that can be
+   `null`, an array that is `readonly`, or a query parameter that has a different type in 7.x.
+4. Change the uses that the tool showed.
+
+`orThrow` and `orThrowPage` keep the 6.x behavior. In new code, examine the `Result`.
+
+The tool parses each file, but it does not type check it. The map from 6.x to 7.x is in
+`src/migrate/v1-map.ts`. `scripts/v1-map.ts` writes the map. It calls each 6.x REST function with
+marker arguments, and it finds the 7.x operation with the same method and path.
+
+### Changes in the login
+
+- The session keeps the storage keys of 6.x, so the user of a trusted application stays logged in
+  after the change. Other applications keep their tokens in memory only, so they get a new token
+  at the first load of 7.x.
+- The default token path is `/auth/oauth/token`. PlaceOS auth.cr and the older Ruby auth service
+  both serve it. The Ruby auth service does not serve `/auth/token`.
+- A relative login or logout URL of the authority is on `base_url`. 6.x used the `domain` of the
+  authority, which has no port.
+- A refused code stops the login with `token_rejected`. The session does not redirect again,
+  because a new redirect could loop.
+- The token requests send their parameters in the body, not in the URL. A password is not in the
+  URL.
+- A trusted application with the `implicit` grant uses the `code` grant with PKCE.
+- The frame login checks the `state`. It needs the `oauth-resp.html` of 7.x.
+- The session removes `x-api-key` from the URL after it reads it.
+- With an API key, a call does not follow a redirect. It gets a `network` error. On a redirect to
+  another origin, `fetch` removes `Authorization`, but it keeps `X-API-Key`.
+- After a refused refresh token, the login continues immediately.
+- A refusal on the consent page (`error=access_denied` with the state of this client) stops the
+  login with `authorization_denied`. 6.x sent the user to the authorize page again.
+- `/auth/authority` gets `AUTHORITY_ATTEMPTS_MAX` attempts, not an unlimited number. Then
+  `start` gives `authority_unavailable`. Call `start` again to try again.
+- The debug logs need a `log` function, such as `consoleLog` (see [Debug logs](#debug-logs)).
+  `window.debug` alone does not turn them on. The logs do not have the cookie of the socket, which
+  6.x logged with the token in it.
+- Not ported: `revokeToken`, the state of the application in `authorise(state)`, and the ACA
+  Engine API path. The mock mode is in `@placeos/ts-client/compat` (see [Mock mode](#mock-mode)).
+  It does not need a login: give `auth: { kind: 'none' }`.
+
+### Changes in realtime
+
+- A call that the client sent fails with `disconnected` when the socket closes before its result.
+  6.x did not settle these calls.
+- Two calls with the same arguments are two calls. 6.x merged them for one minute.
+- Server errors have the correct code name. 6.x read the HTTP style status as the error code.
+- `iface: true` addresses an interface, such as `Interface::Sensor`.
+- After 40 failed attempts, the status is `failed`. 6.x reloaded the page.
+- Not ported: the `connectionState` signal and the `/control/websocket` path of ACA Engine. The
+  mock systems are in `@placeos/ts-client/compat` (see [Mock mode](#mock-mode)).
+
+### What 7.x does not have
+
+- Classes with methods for each model. 7.x has plain data and functions.
+- A CommonJS build. 7.x is an ES module only. Use `import`. In a CommonJS file, use
+  `import('@placeos/ts-client').then(...)`, or `await import(...)` in an `async` function.
+
+## Differences from the API document
+
+The generator changes some parts of the document. Each change has a comment in
+`scripts/generate.ts`.
+
+- **Notes on numbers.** The documents give Unix times and some enums as integers, without the unit
+  or the names. The generator adds a note to these fields. A field such as `created_at` gets
+  "Unix time in seconds.", and an enum such as `Driver.role` gets the name of each number (`99` is
+  `logic`). The lists come from the source of PlaceOS/models. The generator stops if a field of a
+  list changes its type. It also stops on a `date-time` field that is in no list, so that each new
+  time field gets a decision: Unix seconds or an RFC 3339 string.
+- **Fields that refer back to `Booking`.** `Booking` has its guests, attendees and linked events,
+  and these refer to `Booking` again. A schema of the client cannot refer to itself, so these
+  fields are `JsonValue`: `Guest.booking`, `Booking.linked_parent_booking`, and
+  `linked_bookings` of `Booking`, `EventMetadata` and `PlaceCalendar.Event`.
+- **A 204 without a body.** `staff.calendars.availability` sends 204 when no calendar matches. The
+  data is then `null`.
+- **Required fields in a request.** The document marks a field as required when the server always
+  sends it. In a request, the server can have a default for the same field. So each field of a
+  request body is optional, and the server checks the body. Path and query parameters keep the
+  `required` of the document.
+- **Arrays in a query.** The server reads an array parameter as one value with commas, for example
+  `zone_id=a,b`. The items of an array parameter must not contain commas.
+- **PATCH and PUT.** When PATCH and PUT of a path go to the same server action, the client has one
+  `update`, which sends PATCH. When they go to different actions, the client has both. For
+  example, `metadata.update` sends PUT and replaces the metadata, and `metadata.merge` sends PATCH.
+- **Numbered routes.** The document numbers the routes of one action: `show` and `show_2`. A second
+  path with the same signature is an alias, such as `checkin` for `check_in` in the staff API. The
+  client has only the first path. A path with more segments gets a name from them, such as
+  `showInstance` for `bookings/{id}/instance/{instance}`.
+- **A query parameter named `body`.** `body` of the input is the request body, so the `body` query
+  parameter of `staff.events.book` (the description of the meeting) is `body_text` in the input.
+  The query keeps the name `body`.
+- **Responses without a schema.** The data is the body as a string. The operations that send files
+  or images give a `Uint8Array`. `BYTES_RESPONSE_OPERATIONS` in `scripts/generate.ts` has the list,
+  from the server source. `systems.execute`, `modules.execute` and `modules.stateValue` are
+  exceptions: they send JSON, so they give a `JsonValue`.
+- **Endpoints that are not in the client.** The WebSocket endpoints, such as `systems/control` and
+  `webrtc/signaller`, are not in the client. Use [Realtime](#realtime) for `systems/control`.
+  `short_url/{id}/redirect` is also not in the client, because its answer is a redirect for a
+  browser.
+
+## Contribute
+
+### Change the generated code
+
+Do not edit `src/generated`. The generator downloads the API documents from the master branches of
+[PlaceOS/rest-api](https://github.com/PlaceOS/rest-api) and
+[PlaceOS/staff-api](https://github.com/PlaceOS/staff-api) on each run. It does not keep a copy in
+this repository. `APIS` in `scripts/generate.ts` has the list: the repository, the output folder
+and the prefix of the operation IDs and names.
+
+```sh
+bun run generate         # Downloads the documents and writes src/generated and src/generated/staff.
+bun run generate:check   # Fails if the generated files do not match the current documents.
 ```
 
-`GET`, `POST`, `PUT`, `PATCH` and `DELETE` requests can be mocked out.
+The generated files are in the repository, so a change to the API shows as a diff. Examine the
+diff before you commit it. `generate:check` can fail because the API changed, not because of your
+change, so it is not part of `bun test` or of the checks of a PR.
 
-Mock HTTP handlers return promises. If a request is made and there are no handlers it will attempt to make the live request.
+Each day, the `Regenerate` workflow runs `scripts/regenerate-pr.sh`. It regenerates the client
+from the API documents on master:
 
-### Authentication
+- When the output changes, it opens a PR with the diff and the results of the checks. It closes
+  the older regeneration PRs, because the new PR has their changes.
+- When the branch matches the documents again, it closes all the regeneration PRs.
+- It deletes the regeneration branches that have no open PR, such as the branch of a merged PR.
+- The schedule runs on `master`. A manual run of the workflow on another branch, such as `next`,
+  regenerates that branch and opens the PR to it.
+- `DRY_RUN=1 scripts/regenerate-pr.sh`, from the root of the repository, shows what the script
+  would do on GitHub, and makes no change there. It still changes the local repository: it
+  regenerates and stages the files, sets the Git author, and makes a branch and a commit when the
+  output changes.
 
-Authentication is handled automatically by the library but can be configured with the `setup` configuration.
+The commit of a regeneration PR is a `fix`, so its merge publishes a patch release. Before the
+merge, change the commit message to a `feat` for new operations, or add a `BREAKING CHANGE:` footer
+for a change that breaks apps.
 
-If you wish to handle login within your application you can set `handle_login` to `false` to prevent redirecting to the login URL set in the `authority`.  
-If you wish to prevent redirecting the application to handle application authentication you can set `use_iframe` to `true` to have that handled in the background.
+The generator stops with an assertion on a part of the document that it does not support. Add the
+support to `scripts/generate.ts` and `src/core/schema.ts`. It also stops when a document changes
+a field that has a note or a patch in the generator. Then change or remove the entry in the list
+that the assertion names.
 
-![Authentication Flowchart](https://aca.im/cdn/images/auth-flowchart.png)
+### Development
 
-## Usage with Node JS
-
-It is possible to use `ts-client` with Node JS.
-It requires an addition setup step before the library can be used loading the library.
-
-### Javascript:
-
-```javascript
-const ts_client = require('@placeos/ts-client');
-
-async function setupPlaceOS() {
-    await ts_client.preSetupNode();
-    await ts_client.setup({
-        ...
-    })
-}
+```sh
+bun install
+bun run check   # Type checks the library, the tests and the scripts.
+bun test
+bun run build   # Writes dist/. Then it type checks test/loose without `strict`.
+bun run v1-map  # Writes the 6.x to 7.x map, from the source of the placeos-ts-client-6 package.
+bun run docs    # Writes the API docs to docs/. It needs Deno.
 ```
 
-### Typescript:
+#### Releases
 
-```typescript
-import { preSetupNode, setup } from '@placeos/ts-client';
+semantic-release publishes the package from the commit messages, with the `Release` workflow. A
+`fix` commit gives a patch release, a `feat` commit gives a minor release, and a commit with a
+`BREAKING CHANGE:` footer gives a major release. `release` in `package.json` has the branches:
 
-async function setupPlaceOS() {
-    await preSetupNode();
-    await setup({
-        ...
-    })
-}
-```
+| Branch   | Releases                                                                 |
+| -------- | ------------------------------------------------------------------------ |
+| `master` | To the npm tag `latest`. The API docs go to GitHub Pages.                |
+| `next`   | Prereleases, such as `7.0.0-next.1`, to the npm tag `next`.              |
+| `6.x`    | The fixes of 6.x, such as `6.13.1`. The workflow of that branch runs it. |
+
+### Exceptions to the design rules
+
+The library gives errors as values, has no `any` and no unchecked casts, keeps no module state,
+keeps its state in plain data, and keeps keyed data in a `Map`. These are the exceptions:
+
+- `orThrow` and `orThrowPage` of `@placeos/ts-client/compat` throw. They are for code that moves
+  from 6.x.
+- The 6.x mock types of `@placeos/ts-client/compat` (`MockHttpRequest.body`, `metadata` and
+  `MockModule`) keep `any`, so that the mocks of an app still compile.
+- `missing_fields: 'zero'` accepts data without its required fields. It is for mock data only.
+- `parseResponse`, `checkRequest` and `call` each have one `as` cast. The compiler cannot prove
+  that the parser output has the type of the schema. The tests check the parser.
+- `fromV1Mock` and `mockPage` of `@placeos/ts-client/compat` each have one `as` cast. A 6.x mock
+  implementation or 6.x `next` has no types, so the cast gives its result the type of the test
+  double.
+- `configure` keeps one client in module state, so a call does not need a client argument. A
+  call before `configure` throws at run time. The compiler cannot find it.
+- The mocks keep their registries in module state, as 6.x did: the endpoints of
+  `registerMockEndpoint` and the systems of `registerSystem` (`@placeos/ts-client/compat`), and
+  the mocks of `mockEndpoint` (`@placeos/ts-client/mock`). A test owns them. It removes them with
+  `clearMockEndpoints`, `deregisterSystem` and `clearEndpointMocks`. Each registry has a named
+  limit. The status variables of a mock module are properties with setters that notify the
+  bindings, as in 6.x.
+- `createAuthSession` keeps its state in a closure. The login is a state machine with I/O, and
+  one object with one owner is the clearest model of it.
+- Records from the server are plain objects, not `Map`s. A `Map` does not go through
+  `JSON.stringify`, and the API sends these objects back and forth.

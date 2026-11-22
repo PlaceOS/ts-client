@@ -1,25 +1,30 @@
 {
+    // Type checks the library, the tests and the scripts. The scripts and tests run on Bun.
     "compilerOptions": {
-        "target": "ES2020",
-        "useDefineForClassFields": true,
-        "module": "ESNext",
-        "lib": ["ES2020", "DOM", "DOM.Iterable"],
-        "skipLibCheck": true,
-
-        /* Bundler mode */
+        "target": "ES2022",
+        "module": "preserve",
         "moduleResolution": "bundler",
+        "lib": ["ES2022", "DOM", "DOM.Iterable"],
+        "types": ["bun"],
+        "noEmit": true,
         "allowImportingTsExtensions": true,
+        "verbatimModuleSyntax": true,
         "isolatedModules": true,
         "moduleDetection": "force",
-        "noEmit": true,
+        "skipLibCheck": true,
 
-        /* Linting */
         "strict": true,
+        "noUncheckedIndexedAccess": true,
+        "exactOptionalPropertyTypes": true,
+        "noImplicitOverride": true,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
+        "noPropertyAccessFromIndexSignature": true,
         "noUnusedLocals": true,
         "noUnusedParameters": true,
-        "noFallthroughCasesInSwitch": true,
-        "noUncheckedSideEffectImports": true
+        "useUnknownInCatchVariables": true
     },
-    "include": ["src"],
-    "exclude": ["scripts"]
+    "include": ["src", "test", "scripts"],
+    // `bun run build` checks it against `dist`, without `strict`.
+    "exclude": ["test/loose"]
 }

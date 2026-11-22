@@ -1,0 +1,16 @@
+{
+    // Type checks a consumer without `strict`, as in projects such as backoffice. Without
+    // `strictNullChecks`, `null` fits each type, and conditional types can change.
+    "compilerOptions": {
+        "target": "ES2022",
+        "module": "preserve",
+        "moduleResolution": "bundler",
+        "lib": ["ES2022", "DOM", "DOM.Iterable"],
+        "types": [],
+        "noEmit": true,
+        "skipLibCheck": true,
+        "strict": false,
+        "strictNullChecks": false
+    },
+    "include": ["consumer.ts"]
+}
