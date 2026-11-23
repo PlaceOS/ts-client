@@ -95,8 +95,9 @@ const DESTROY = /* @__PURE__ */ operation({
  * list media items for the current authority.
  *
  * Non-admin callers see only items linked to groups they're a member of (direct or transitive).
- * `group_id=...` scopes to a single group; `q=...` is a case-insensitive substring search across
- * `name` and `description`; `tags=...` returns items carrying any of the supplied tags.
+ * `group_id=...` scopes to a single group by default. `q=...` is a case-insensitive substring
+ * search across `name` and `description`; `tags=...` returns items carrying any of the supplied
+ * tags.
  *
  * `GET /api/engine/v2/signage/media`
  */
@@ -114,6 +115,8 @@ const QUERY = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({
         /** filter to items linked to this group (caller must have Read on the group) */
         group_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        /** with group_id, also include items linked to readable descendant groups */
+        include_child_data: /* @__PURE__ */ boolean(),
         /** case-insensitive substring search on name and description (SQL ILIKE) */
         q: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         /** return items carrying any of these tags */
@@ -134,10 +137,10 @@ const QUERY = /* @__PURE__ */ operation({
  * Remove a tag from every media item carrying it, or with.
  *
  * remove a tag from every media item carrying it, or with `remove_media=true` remove the tagged
- * media itself. Scoping and permissions per `tag_operation_scope`: authority-wide is admin/support
- * only, `group_id` requires Read and Update (or Manage) on that group — Read and Delete when
- * removing media. Removing media with `group_id` behaves like `DELETE /:id?group_id=`: the items
- * are unlinked from that group and only deleted once no group links remain.
+ * media itself. Authority-wide is admin/support only. A single-group operation requires Read and
+ * Update (or Manage) on that group, or Read and Delete when removing media. An expanded operation
+ * requires Update on each matched item, or Delete on every matched group link when removing media.
+ * Group-scoped media removal keeps items that are still linked outside the scope.
  *
  * `DELETE /api/engine/v2/signage/media/tags`
  */
@@ -159,11 +162,17 @@ const REMOVE_TAG = /* @__PURE__ */ operation({
             /** if true, removes the tag by removing all the media with this tag */
             remove_media: /* @__PURE__ */ boolean(),
             /**
-             * limit to media linked to this group (caller must have Read and Update on the group,
-             * Read and
-             * Delete when removing media)
+             * select the media group. A single-group operation requires Read and Update, or Read
+             * and Delete
+             * when removing media.
              */
             group_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+            /**
+             * with group_id, also include media linked to readable descendant groups. Requires
+             * Update on
+             * every matched item, or Delete on every matched group link when removing media.
+             */
+            include_child_data: /* @__PURE__ */ boolean(),
         },
         ['tag'],
     ),
@@ -176,8 +185,8 @@ const REMOVE_TAG = /* @__PURE__ */ operation({
  * Rename a tag on every media item carrying it. Items that already carry.
  *
  * rename a tag on every media item carrying it. Items that already carry `new_tag` end up with it
- * once. Scoping and permissions per `tag_operation_scope`: authority-wide is admin/support only,
- * `group_id` requires Read and Update (or Manage) on that group.
+ * once. Authority-wide is admin/support only. A single-group operation requires Read and Update (or
+ * Manage) on that group. An expanded operation requires Update access to every matched item.
  *
  * `PATCH /api/engine/v2/signage/media/tags`
  */
@@ -199,9 +208,15 @@ const RENAME_TAG = /* @__PURE__ */ operation({
             /** the replacement tag name */
             new_tag: /* @__PURE__ */ string(),
             /**
-             * limit to media linked to this group (caller must have Read and Update on the group)
+             * select the media group. A single-group rename requires Read and Update on that group.
              */
             group_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+            /**
+             * with group_id, also include media linked to readable descendant groups. Every matched
+             * item
+             * must allow Update.
+             */
+            include_child_data: /* @__PURE__ */ boolean(),
         },
         ['current_tag', 'new_tag'],
     ),
@@ -290,9 +305,9 @@ const SHOW = /* @__PURE__ */ operation({
  * Return the number of media items carrying each tag. Scopes the same.
  *
  * return the number of media items carrying each tag. Scopes the same way as `index`/`tags`:
- * `group_id=...` limits to media linked to that group (caller must have Read on it); without
- * `group_id`, admin/support callers see counts across the authority while regular users see counts
- * from media in groups they can read. An item carrying a tag twice still counts once.
+ * `group_id=...` limits to media linked to that group by default (caller must have Read on it).
+ * Without `group_id`, admin/support callers see counts across the authority while regular users see
+ * counts from media in groups they can read. An item carrying a tag twice still counts once.
  *
  * `GET /api/engine/v2/signage/media/tag_counts`
  */
@@ -310,6 +325,8 @@ const TAG_COUNTS = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({
         /** limit to media linked to this group (caller must have Read on the group) */
         group_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        /** with group_id, also count media linked to readable descendant groups */
+        include_child_data: /* @__PURE__ */ boolean(),
     }),
     body: null,
     response: /* @__PURE__ */ record(/* @__PURE__ */ integer('Int32')),
@@ -320,9 +337,9 @@ const TAG_COUNTS = /* @__PURE__ */ operation({
  * Return the distinct tags in use by media. Scopes the same way as.
  *
  * return the distinct tags in use by media. Scopes the same way as `index`: `group_id=...` limits
- * to media linked to that group (caller must have Read on it); without `group_id`, admin/support
- * callers see every tag in the authority while regular users see tags from media in groups they can
- * read.
+ * to media linked to that group by default (caller must have Read on it). Without `group_id`,
+ * admin/support callers see every tag in the authority while regular users see tags from media in
+ * groups they can read.
  *
  * `GET /api/engine/v2/signage/media/tags`
  */
@@ -340,6 +357,8 @@ const TAGS = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({
         /** limit to media linked to this group (caller must have Read on the group) */
         group_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        /** with group_id, also include tags on media linked to readable descendant groups */
+        include_child_data: /* @__PURE__ */ boolean(),
     }),
     body: null,
     response: /* @__PURE__ */ array(/* @__PURE__ */ string()),

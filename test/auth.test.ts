@@ -569,6 +569,18 @@ describe('frames, deep links and fixed devices', () => {
         expect(result).toEqual({ ok: true, value: { kind: 'bearer', token: 'token-1' } });
     });
 
+    test('useRefreshToken gives the refresh grant to an application that is not trusted', async () => {
+        const world = fake();
+        const auth = session(world);
+        auth.useRefreshToken('pasted');
+        const result = await auth.start();
+        expect(result).toEqual({ ok: true, value: { kind: 'bearer', token: 'token-1' } });
+        expect(world.tokenRequests()[0]?.form.get('refresh_token')).toBe('pasted');
+        expect(world.navigations).toEqual([]);
+        // Not trusted: memory only.
+        expect(world.storage.get(`${CLIENT_ID}_refresh_token`)).toBeNull();
+    });
+
     test('an API key in the URL is the credential of a fixed device', async () => {
         const world = fake({ url: 'http://localhost:4200/?x-api-key=key-1&fixed_device=true' });
         const auth = session(world);

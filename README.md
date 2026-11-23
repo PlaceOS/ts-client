@@ -218,6 +218,8 @@ Other parts of the session:
 - When the application comes back to the foreground without a session, the session loads the
   authority again, because the user can log in from a different tab.
 - `session.useToken(token)` and `session.useApiKey(key)` use a credential from a different source.
+- `session.useRefreshToken(refresh_token)` keeps a refresh token from a different source. When
+  there is no valid access token, the next `authorize` exchanges it.
 - `session.invalidateToken()` removes the access token, so the next request gets a new one.
 - `session.logout()` ends the session on the server, removes the credentials and goes to the
   logout page.
