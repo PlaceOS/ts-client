@@ -178,7 +178,15 @@ function createSocket(_url: string, handlers: SocketHandlers): RealtimeSocket {
         }
         switch (request.cmd) {
             case 'bind': {
-                if (!state.values.has(request.name)) addVariable(state, request.name, null);
+                // A function can add a variable after `registerSystem`, as a plain property. The
+                // first binding keeps its value.
+                if (!state.values.has(request.name)) {
+                    addVariable(
+                        state,
+                        request.name,
+                        Reflect.get(state.module, request.name) ?? null,
+                    );
+                }
                 const notify: Listener = (value) =>
                     reply({ id: request.id, type: 'notify', value: value ?? null, meta });
                 bound.get(key)?.();

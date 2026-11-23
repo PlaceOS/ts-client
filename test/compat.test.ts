@@ -250,6 +250,34 @@ test('a 7.x binding and call use a 6.x mock system', async () => {
     realtime.stop();
 });
 
+test('a binding keeps the value of a variable that a function added', async () => {
+    registerSystem('sys-2', {
+        Debug: [
+            {
+                $post(this: Record<string, unknown>, id: string, value: string) {
+                    this[`logs:${id}`] = value;
+                },
+            },
+        ],
+    });
+    const realtime = createRealtime({
+        base_url: 'http://mock.invalid',
+        auth: { kind: 'none' },
+        environment: mockRealtimeEnvironment(),
+    });
+    const logs = { sys: 'sys-2', mod: 'Debug', index: 1, name: 'post' };
+    expect(await realtime.exec(logs, ['a', 'first'])).toEqual({ ok: true, value: null });
+    const states: BindingState[] = [];
+    const release = realtime.bind({ ...logs, name: 'logs:a' }, (state) => states.push(state));
+    await waitFor(() => lastValue(states) === 'first');
+
+    // After the binding, a change notifies it.
+    expect((await realtime.exec(logs, ['a', 'second'])).ok).toBe(true);
+    await waitFor(() => lastValue(states) === 'second');
+    release();
+    realtime.stop();
+});
+
 function lastValue(states: readonly BindingState[]): unknown {
     const last = states.at(-1);
     return last?.kind === 'value' ? last.value : undefined;
