@@ -270,8 +270,8 @@ const MEDIA_REVISIONS = /* @__PURE__ */ operation({
  * list media playlists in the current authority.
  *
  * Non-admin callers see only playlists linked to groups they're a member of (direct or transitive).
- * Pass `group_id=...` to scope to a specific group (caller must have Read on that group). Pass
- * `q=...` for a case-insensitive substring search over `name` and `description`.
+ * Pass `group_id=...` to scope to a specific group by default (caller must have Read on that
+ * group). Pass `q=...` for a case-insensitive substring search over `name` and `description`.
  *
  * `GET /api/engine/v2/signage/playlists`
  */
@@ -289,6 +289,8 @@ const QUERY = /* @__PURE__ */ operation({
     params: /* @__PURE__ */ parameters({
         /** filter to playlists linked to this group (caller must have Read on the group) */
         group_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
+        /** with group_id, also include playlists linked to readable descendant groups */
+        include_child_data: /* @__PURE__ */ boolean(),
         /** case-insensitive substring search on name and description (SQL ILIKE) */
         q: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         limit: /* @__PURE__ */ integer('Int32'),
