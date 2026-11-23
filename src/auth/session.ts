@@ -264,6 +264,11 @@ export interface AuthSession {
     handleRedirect(url: string): Promise<Result<Credential, AuthError>>;
     /** Uses a token from a different source. */
     useToken(token: string, expires_at_ms?: number): void;
+    /**
+     * Keeps a refresh token from a different source. When there is no valid access token, the next
+     * `authorize` exchanges it. It is in memory only if the application is not trusted.
+     */
+    useRefreshToken(refresh_token: string): void;
     /** Uses an API key, for a fixed device. */
     useApiKey(key: string, options?: { readonly trusted?: boolean }): void;
     /** Removes the access token, so the next request gets a new one. */
@@ -311,7 +316,7 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
     /**
      * A login that the user or the server refused: a consent denial or a refused code. Then
      * `authorize` does not send the user to the server again, so a request cannot start a loop.
-     * `start`, `handleRedirect`, `useToken` and `useApiKey` clear it.
+     * `start`, `handleRedirect`, `useToken`, `useRefreshToken` and `useApiKey` clear it.
      */
     let halted: AuthError | null = null;
     /** `logout` adds one. A token request from an earlier epoch drops its tokens. */
@@ -340,6 +345,7 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
         reloadAuthority: loadAuthority,
         handleRedirect,
         useToken,
+        useRefreshToken,
         useApiKey,
         invalidateToken,
         logout,
@@ -954,6 +960,13 @@ export function createAuthSession(config: AuthSessionConfig): AuthSession {
         halted = null;
         log.info('using a token of the application');
         setStatus({ kind: 'signed_in', credential: 'bearer' });
+    }
+
+    function useRefreshToken(refresh_token: string): void {
+        assert(refresh_token.length > 0, 'the refresh token is not empty');
+        writeTokens({ ...readTokens(), refresh_token });
+        halted = null;
+        log.info('using a refresh token of the application');
     }
 
     function useApiKey(key: string, options: { readonly trusted?: boolean } = {}): void {
