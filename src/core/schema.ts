@@ -211,8 +211,9 @@ function objectNode(
 }
 
 /**
- * A value that matches one of `variants`. The parser tries each variant in sequence and returns
- * the first match, so put the most specific variant first.
+ * A value that matches one of `variants`. For a response, the parser returns the match that knows
+ * the most of the given fields, and in a tie the first match. For a request, it returns the first
+ * match, so put the most specific variant first.
  */
 export function union<const V extends readonly AnySchema[]>(
     variants: V,
@@ -413,12 +414,36 @@ function walk(
             return output;
         }
         case 'union': {
-            if (direction !== 'response_zero') {
+            if (direction === 'request') {
+                // A request object with a field that a variant does not have fails that variant,
+                // so the first match keeps each field.
                 for (const variant of node.variants) {
                     const parsed = walk(variant, value, direction, failure, depth + 1);
                     if (parsed !== FAIL) return parsed;
                     failure.segments.length = 0;
                 }
+                return fail(failure, 'a match for one variant of the union');
+            }
+            if (direction === 'response') {
+                // An object drops the fields that it does not have, so a narrow variant, such as
+                // `{ id }`, can match a wide value. The variant that knows the most of the given
+                // fields wins. In a tie, the first wins.
+                const total = keyCount(value);
+                let best: unknown = FAIL;
+                let best_score = -1;
+                for (const variant of node.variants) {
+                    const parsed = walk(variant, value, direction, failure, depth + 1);
+                    failure.segments.length = 0;
+                    if (parsed === FAIL) continue;
+                    const score = knownKeys(variant, value, depth + 1);
+                    if (score > best_score) {
+                        best = parsed;
+                        best_score = score;
+                    }
+                    // No other variant can know more fields
+                    if (score === total) break;
+                }
+                if (best !== FAIL) return best;
                 return fail(failure, 'a match for one variant of the union');
             }
             // Zero-fill can make each variant match. The variant that knows the most of the given
@@ -432,7 +457,7 @@ function walk(
                 if (parsed === FAIL) continue;
                 const strict = walk(variant, value, 'response', failure, depth + 1) !== FAIL;
                 failure.segments.length = 0;
-                const score = knownKeys(variant, value) * 2 + (strict ? 1 : 0);
+                const score = knownKeys(variant, value, depth + 1) * 2 + (strict ? 1 : 0);
                 if (score > best_score) {
                     best = parsed;
                     best_score = score;
@@ -446,10 +471,36 @@ function walk(
     }
 }
 
-/** The number of keys of `value` that an object schema has. Other schemas know none. */
-function knownKeys(node: SchemaNode, value: unknown): number {
-    if (node.kind !== 'object' || !isRecord(value)) return 0;
-    return Object.keys(value).filter((key) => node.keys.has(key)).length;
+/**
+ * The number of keys of `value` that an object schema has. For an array, the sum over its items.
+ * Other schemas know none. A nullable schema counts as its inner schema.
+ */
+function knownKeys(node: SchemaNode, value: unknown, depth: number): number {
+    assert(depth < SCHEMA_DEPTH_MAX, 'the schema depth is less than SCHEMA_DEPTH_MAX');
+    switch (node.kind) {
+        case 'nullable':
+            return knownKeys(node.inner, value, depth + 1);
+        case 'array': {
+            if (!Array.isArray(value)) return 0;
+            let count = 0;
+            for (const item of value) count += knownKeys(node.items, item, depth + 1);
+            return count;
+        }
+        case 'object':
+            if (!isRecord(value)) return 0;
+            return Object.keys(value).filter((key) => node.keys.has(key)).length;
+        default:
+            return 0;
+    }
+}
+
+/** The number of keys of `value`, or of the objects in an array. The most `knownKeys` can give. */
+function keyCount(value: unknown): number {
+    if (isRecord(value)) return Object.keys(value).length;
+    if (!Array.isArray(value)) return 0;
+    let count = 0;
+    for (const item of value) if (isRecord(item)) count += Object.keys(item).length;
+    return count;
 }
 
 /** The empty value of a schema, for a missing required field of mock data. */

@@ -24,6 +24,7 @@ import {
     type Input,
     type Output,
 } from '../src/core/schema.ts';
+import { PlaceCalendarEvent } from '../src/generated/staff/schemas.ts';
 
 const Zone = object(
     {
@@ -91,19 +92,48 @@ describe('parseResponse', () => {
         expect(Object.keys(result.value)).toEqual(['__proto__', 'a']);
     });
 
-    test('returns the first union variant that matches', () => {
+    test('returns the union variant that knows the most fields, or the first in a tie', () => {
         const Admin = object({ id: string(), sys_admin: boolean() }, ['id', 'sys_admin']);
         const Public = object({ id: string() }, ['id']);
-        const User = union([Admin, Public]);
+        // The narrow variant is first, and it matches each value
+        const User = union([Public, Admin]);
         expect(parseResponse(User, { id: 'u', sys_admin: true })).toEqual({
             ok: true,
             value: { id: 'u', sys_admin: true },
         });
         expect(parseResponse(User, { id: 'u' })).toEqual({ ok: true, value: { id: 'u' } });
+        expect(parseResponse(union([Admin, Public]), { id: 'u' })).toEqual({
+            ok: true,
+            value: { id: 'u' },
+        });
         expect(parseResponse(User, { name: 'u' })).toEqual({
             ok: false,
             error: { path: '$', expected: 'a match for one variant of the union' },
         });
+        // Arrays count the fields of their items
+        const Users = union([array(Public), array(Admin)]);
+        expect(parseResponse(Users, [{ id: 'u', sys_admin: false }])).toEqual({
+            ok: true,
+            value: [{ id: 'u', sys_admin: false }],
+        });
+    });
+
+    test('keeps the full system of a staff calendar event', () => {
+        const zero = parseResponse(PlaceCalendarEvent, {}, { missing_fields: 'zero' });
+        expect(zero.ok).toBe(true);
+        if (!zero.ok) return;
+        // The server sends `update_triggers` with each system
+        const system = {
+            id: 'sys-1',
+            name: 'Room 1',
+            email: 'room1@example.com',
+            zones: ['z'],
+            update_triggers: false,
+        };
+        const result = parseResponse(PlaceCalendarEvent, { ...zero.value, system });
+        expect(result.ok).toBe(true);
+        if (!result.ok) return;
+        expect(result.value.system).toMatchObject(system);
     });
 
     test('accepts any JSON value for json, but not a missing value', () => {
