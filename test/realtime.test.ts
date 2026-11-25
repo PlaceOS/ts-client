@@ -275,7 +275,7 @@ describe('connection', () => {
 });
 
 describe('bindings', () => {
-    test('binds on open, and gives each listener the last value of a batch', async () => {
+    test('binds on open, and gives each listener each value of a batch', async () => {
         const platform = fakePlatform();
         const client = realtime(platform);
         const states: BindingState[] = [];
@@ -289,8 +289,31 @@ describe('bindings', () => {
             { id: 0, type: 'notify', value: false, meta: META },
             { id: 0, type: 'notify', value: true, meta: META },
         );
-        expect(states).toEqual([{ kind: 'value', value: true }]);
+        expect(states).toEqual([
+            { kind: 'value', value: false },
+            { kind: 'value', value: true },
+        ]);
         expect(client.value(POWER)).toEqual({ kind: 'value', value: true });
+    });
+
+    test('a value that turns on and back off in one batch gives both, in order', async () => {
+        const platform = fakePlatform();
+        const client = realtime(platform);
+        // Each call gets the value, and the state at the time of the call
+        const calls: [BindingState, BindingState][] = [];
+        client.bind(POWER, (state) => calls.push([state, client.value(POWER)]));
+        await platform.open();
+        await platform.receive(
+            { id: 0, type: 'notify', value: true, meta: META },
+            { id: 0, type: 'notify', value: false, meta: META },
+        );
+        const on: BindingState = { kind: 'value', value: true };
+        const off: BindingState = { kind: 'value', value: false };
+        expect(calls).toEqual([
+            [on, on],
+            [off, off],
+        ]);
+        expect(client.value(POWER)).toEqual(off);
     });
 
     test('a second binding gets the value at once and sends no request', async () => {

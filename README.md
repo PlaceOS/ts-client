@@ -247,8 +247,9 @@ release();
 - The client connects when the first binding or call needs it. `start` connects now.
 - A binding has a count. The first `bind` sends `bind`. The last release sends `unbind`.
 - After a new connection, the client binds each variable again.
-- The client handles the messages of the server in batches. In one batch, many notifications for
-  one variable give one call to its listeners, with the last value.
+- The client handles the messages of the server in batches. Each notification gives one call to
+  the listeners of its variable, in the order of the server. When a variable changes two times in
+  one batch, its listeners get the two values.
 - `exec` gives a `Result` with the return value of the function, or a `RealtimeError`:
   `timeout`, `disconnected` (the client sent the call, and the socket closed before the result
   came: the client does not know if the server ran the call), `stopped`,
