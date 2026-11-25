@@ -195,6 +195,16 @@ const CYCLE_FIELDS: ReadonlyMap<string, readonly string[]> = new Map([
 ]);
 
 /**
+ * The metadata fields that the server can send as JSON text, by schema. Old metadata can have
+ * `details` stored as a string, such as `"{\"theme\":\"dark\"}"`. 6.x decoded that text, so
+ * these fields are `json({ decode_text: true })`. Both APIs have this schema. The generator stops
+ * when a field of the list is not `{}`, or when the output has no schema of the list.
+ */
+const JSON_TEXT_FIELDS: ReadonlyMap<string, readonly string[]> = new Map([
+    ['PlaceOS.Model.Metadata.Interface', ['details']],
+]);
+
+/**
  * Operations without a response schema that send binary data: files, images and redirects to
  * files. Their data is a `Uint8Array`. The data of the other operations without a schema is the
  * body as text, because they send text, such as `modules.logs`, or no body, such as `destroy`.
@@ -434,6 +444,8 @@ const APIS: readonly ApiSource[] = [
 
 /** The `operationId` of each operation of the documents, for the check of the patch lists. */
 const seen_operation_ids = new Set<string>();
+/** The name of each named schema that the generator emits, for the check of the patch lists. */
+const seen_schema_names = new Set<string>();
 
 await main();
 
@@ -448,6 +460,9 @@ async function main(): Promise<void> {
     ];
     for (const id of patches) {
         assert(seen_operation_ids.has(id), `the operation ${id} of a patch is in a document`);
+    }
+    for (const spec_name of JSON_TEXT_FIELDS.keys()) {
+        assert(seen_schema_names.has(spec_name), `the schema ${spec_name} of a patch is emitted`);
     }
     if (check && stale.length > 0) {
         console.error(`Not up to date. Run \`bun run generate\`:\n  ${stale.join('\n  ')}`);
@@ -805,6 +820,7 @@ function emitNamedSchema(
     node: SpecNode,
     imports: Imports,
 ): string {
+    seen_schema_names.add(spec_name);
     const epoch_fields = new Set(SECONDS_FIELDS.get(spec_name) ?? []);
     const string_fields = new Set(STRING_TIME_FIELDS.get(spec_name) ?? []);
     const name = schemaTypeName(spec_name);
@@ -1002,6 +1018,9 @@ function emitObject(
             time_fields === null ? undefined : VALUE_ENUM_FIELDS.get(time_fields.spec_name)?.[key];
         const cycle_field =
             time_fields !== null && CYCLE_FIELDS.get(time_fields.spec_name)?.includes(key) === true;
+        const json_text_field =
+            time_fields !== null &&
+            JSON_TEXT_FIELDS.get(time_fields.spec_name)?.includes(key) === true;
         if (time_fields === null) {
             expression = emitSchema(schemas, property, imports, depth + 1);
         } else if (cycle_field) {
@@ -1025,6 +1044,15 @@ function emitObject(
             const separator = description.length > 0 ? '\n\n' : '';
             const shape = list ? 'A list of `Booking`' : 'A `Booking`';
             const note = `${shape}, as JSON, because the client schemas cannot refer to themselves.`;
+            description = `${description}${separator}${note}`;
+        } else if (json_text_field) {
+            const subject = `${time_fields.spec_name}.${key}`;
+            // `{}` is the `JSON::Any` of the document.
+            assertPatchedShape(property, (node) => isOnly(node, {}), subject);
+            imports.combinators.add('json');
+            expression = 'json({ decode_text: true })';
+            const separator = description.length > 0 ? '\n\n' : '';
+            const note = 'In a response, a string of JSON text becomes its value.';
             description = `${description}${separator}${note}`;
         } else if (value_enum_field !== undefined) {
             const subject = `${time_fields.spec_name}.${key}`;
@@ -1059,6 +1087,7 @@ function emitObject(
         const keys = [...time_fields.epoch_fields, ...time_fields.string_fields];
         keys.push(...Object.keys(VALUE_ENUM_FIELDS.get(time_fields.spec_name) ?? {}));
         keys.push(...(CYCLE_FIELDS.get(time_fields.spec_name) ?? []));
+        keys.push(...(JSON_TEXT_FIELDS.get(time_fields.spec_name) ?? []));
         for (const key of keys) assert(Object.hasOwn(properties, key), `${key} is a property`);
     }
     imports.combinators.add('object');

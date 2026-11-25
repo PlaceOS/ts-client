@@ -24,6 +24,7 @@ import {
     type Input,
     type Output,
 } from '../src/core/schema.ts';
+import { MetadataInterface } from '../src/generated/schemas.ts';
 import { PlaceCalendarEvent } from '../src/generated/staff/schemas.ts';
 
 const Zone = object(
@@ -156,6 +157,44 @@ describe('parseResponse', () => {
     test('refuses a JSON value with more than JSON_NODES_MAX values before it walks them', () => {
         expect(parseResponse(json(), new Array(JSON_NODES_MAX).fill(0)).ok).toBe(false);
         expect(parseResponse(json(), new Array(1_000).fill(0)).ok).toBe(true);
+    });
+});
+
+describe('metadata details', () => {
+    const metadata = {
+        name: 'settings',
+        description: '',
+        editors: [],
+        updated_at: 0,
+        created_at: 0,
+    };
+
+    test('decodes details that the server sends as JSON text', () => {
+        const result = parseResponse(MetadataInterface, {
+            ...metadata,
+            details: '{"theme":"dark"}',
+        });
+        expect(result.ok && result.value.details).toEqual({ theme: 'dark' });
+        const list = parseResponse(MetadataInterface, { ...metadata, details: '[1,"a"]' });
+        expect(list.ok && list.value.details).toEqual([1, 'a']);
+    });
+
+    test('keeps a string that is not JSON text, and does not throw', () => {
+        const details = (text: string) => {
+            const result = parseResponse(MetadataInterface, { ...metadata, details: text });
+            return result.ok ? result.value.details : 'parse failed';
+        };
+        expect(details('dark theme')).toBe('dark theme');
+        expect(details('{"theme":')).toBe('{"theme":');
+        // JSON text of a string becomes that string
+        expect(details('"dark"')).toBe('dark');
+    });
+
+    test('decodes the details of a response, but not of a request', () => {
+        const input = { ...metadata, details: '{"theme":"dark"}' };
+        expect(checkRequest(MetadataInterface, input)).toEqual({ ok: true, value: input });
+        const result = parseResponse(MetadataInterface, input);
+        expect(result.ok && result.value.details).toEqual({ theme: 'dark' });
     });
 });
 

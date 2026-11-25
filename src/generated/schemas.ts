@@ -1898,7 +1898,8 @@ const MetadataInterfaceSchema = /* @__PURE__ */ object(
     {
         name: /* @__PURE__ */ string(),
         description: /* @__PURE__ */ string(),
-        details: /* @__PURE__ */ json(),
+        /** In a response, a string of JSON text becomes its value. */
+        details: /* @__PURE__ */ json({ decode_text: true }),
         parent_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         schema_id: /* @__PURE__ */ nullable(/* @__PURE__ */ string()),
         editors: /* @__PURE__ */ array(/* @__PURE__ */ string()),
