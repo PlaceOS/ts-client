@@ -38,7 +38,7 @@ export type SchemaNode =
     | { readonly kind: 'integer'; readonly min: number; readonly max: number }
     | { readonly kind: 'number' }
     | { readonly kind: 'boolean' }
-    | { readonly kind: 'json' }
+    | { readonly kind: 'json'; readonly decode_text: boolean }
     | { readonly kind: 'nullable'; readonly inner: SchemaNode }
     | { readonly kind: 'array'; readonly items: SchemaNode }
     | { readonly kind: 'tuple'; readonly items: readonly SchemaNode[] }
@@ -114,12 +114,22 @@ export function boolean(): Schema<boolean> {
     return { node: { kind: 'boolean' } };
 }
 
+export interface JsonOptions {
+    /**
+     * In a response, a string that holds JSON text becomes the value of the text, as in 6.x. For
+     * example, `'{"theme":"dark"}'` becomes `{ theme: 'dark' }`. A string that is not JSON text
+     * stays the same. Only for fields that the server can store as JSON text, such as the
+     * `details` of old metadata. A request and a `missing_fields: 'zero'` parse do not change.
+     */
+    readonly decode_text?: boolean;
+}
+
 /**
  * Any JSON value: `null`, a boolean, a finite number, a string, an array or a plain object. The
  * parser checks the value, but does not copy it.
  */
-export function json(): Schema<JsonValue> {
-    return { node: { kind: 'json' } };
+export function json(options: JsonOptions = {}): Schema<JsonValue> {
+    return { node: { kind: 'json', decode_text: options.decode_text === true } };
 }
 
 export function nullable<O, I>(inner: Schema<O, I>): Schema<O | null, I | null> {
@@ -317,6 +327,9 @@ function walk(
         case 'json':
             // `JSON.stringify` changes other values without an error, such as `NaN` to `null`.
             if (!isJsonValue(value)) return fail(failure, 'JSON value');
+            if (node.decode_text && direction === 'response' && typeof value === 'string') {
+                return decodeJsonText(value);
+            }
             return value;
         case 'nullable':
             if (value === null) return null;
@@ -573,6 +586,20 @@ function isJsonValue(value: unknown): boolean {
         for (const key of keys) stack.push({ value: current[key], depth: top.depth + 1 });
     }
     return false;
+}
+
+/**
+ * The value of the JSON text in `text`. If `text` is not JSON text, or its value is not in the
+ * limits of `isJsonValue`, it returns `text`.
+ */
+function decodeJsonText(text: string): unknown {
+    let decoded: unknown;
+    try {
+        decoded = JSON.parse(text);
+    } catch {
+        return text;
+    }
+    return isJsonValue(decoded) ? decoded : text;
 }
 
 function fail(failure: Failure, expected: string): typeof FAIL {

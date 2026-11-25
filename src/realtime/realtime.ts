@@ -13,8 +13,9 @@
  * The client connects when the first binding or call needs it. It binds each variable again after
  * a new connection, so a binding stays live across network drops.
  *
- * Incoming messages go into a bounded inbox, and the client handles them in batches. In one batch,
- * many notifications for one variable give one call to its listeners, with the last value.
+ * Incoming messages go into a bounded inbox, and the client handles them in batches. Each
+ * notification of a batch gives one call to the listeners of its variable, in the order of the
+ * server.
  */
 import { assert, unreachable } from '../core/assert.ts';
 import { renewCredential, resolveCredential, type Auth, type Credential } from '../core/client.ts';
@@ -169,7 +170,9 @@ export interface Realtime {
     ): Promise<Result<JsonValue, RealtimeError>>;
     /**
      * Binds to a status variable. `listener` gets each new state, and the current one at once if
-     * it is known. The returned function releases this binding. The last release unbinds.
+     * it is known. It gets each value that the server sends, in order, also when one batch has
+     * many values of the variable. The returned function releases this binding. The last release
+     * unbinds.
      *
      * A listener must not throw.
      */
@@ -570,11 +573,15 @@ export function createRealtime(config: RealtimeConfig): Realtime {
         environment.setTimer(0, drain);
     }
 
-    /** Handles the inbox in one batch. Notifications for one variable give one update. */
+    /**
+     * Handles the inbox in one batch. Each notification gives one update of its binding, in the
+     * order of the server, so a value that changes and changes back in one batch gives both.
+     */
     function drain(): void {
         drain_scheduled = false;
         const messages = inbox.splice(0, inbox.length);
-        const changed = new Map<string, JsonValue>();
+        // At most one for each message, so `INBOX_MAX` is also its limit.
+        const notifications: [string, JsonValue][] = [];
         const logs: [Debugger, DebugMessage][] = [];
         const received_at_ms = environment.now();
         for (const data of messages) {
@@ -603,7 +610,7 @@ export function createRealtime(config: RealtimeConfig): Realtime {
                             name,
                             value: message.value,
                         });
-                        changed.set(variableKey(message.meta), message.value);
+                        notifications.push([variableKey(message.meta), message.value]);
                     }
                     break;
                 case 'debug': {
@@ -620,11 +627,12 @@ export function createRealtime(config: RealtimeConfig): Realtime {
                     unreachable(message.type);
             }
         }
-        // Update the state first, then call the listeners.
-        for (const [key, changed_value] of changed) {
+        // For each notification, update the state first, then call the listeners. A listener can
+        // release or add a binding, so look up the binding each time.
+        for (const [key, notified_value] of notifications) {
             const binding = bindings.get(key);
             if (binding !== undefined) {
-                setBindingState(binding, { kind: 'value', value: changed_value });
+                setBindingState(binding, { kind: 'value', value: notified_value });
             }
         }
         for (const [entry, log] of logs) {
@@ -758,7 +766,7 @@ export function createRealtime(config: RealtimeConfig): Realtime {
     /**
      * Sets the status now, and tells the listeners after the current step. A listener can call
      * `stop` or `start`, and that must not run in the middle of a transition. The listeners get
-     * the latest status, as the bindings get the latest value of a batch.
+     * the latest status only, not each status of the step.
      */
     function setStatus(next: RealtimeStatus): void {
         status = next;
